@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+/*
+  STYLE_GUIDE.md 2장의 시작값입니다. 2026-10-09 기준 Proposed.
+  Figma로 확정되기 전에는 이 파일만 고치고, 화면 파일에 HEX를 새로 넣지 않습니다.
+  트렌드·전문가 색은 작은 분류 라벨에만 씁니다.
+*/
+@theme {
+  --font-sans: "Pretendard", "Noto Sans KR", system-ui, sans-serif;
+  --color-brand: #5036f4;
+  --color-brand-hover: #4126d9;
+  --color-brand-deep: #4126d9;
+  --color-brand-soft: #f3f2ff;
+  --color-ink: #101c3c;
+  --color-muted: #51607d;
+  --color-faint: #75809a;
+  --color-line: #e4e8f2;
+  --color-page: #f8f9fd;
+  --color-card: #ffffff;
+  --color-trend: #f26745;
+  --color-trend-soft: #fff1ec;
+  --color-expert: #087e83;
+  --color-expert-soft: #e7f4f4;
+  --color-navy: #101c3c;
+  --radius-card: 12px;
+  --radius-button: 10px;
+  --shadow-card: 0 6px 24px rgb(18 32 75 / 0.04);
+}
+
+:root {
+  --layout-content: 1400px;
+  --layout-article: 720px;
+  --header-height: 60px;
+  --toc-collapsed-height: 48px;
+  --toc-sticky-gap: 24px;
+}
+
+/* 페이지마다 같은 좌우 기준선. 모바일 20px, 태블릿 이상 32px. */
+.page-container {
+  width: min(calc(100% - 40px), var(--layout-content));
+  margin-inline: auto;
+}
+
+@media (min-width: 768px) {
+  .page-container {
+    width: min(calc(100% - 64px), var(--layout-content));
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background: var(--color-page);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  word-break: keep-all;
+}
+
+::selection {
+  background: #ddd6ff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 3px;
+}
+
+/* 목차 이동 시 고정 헤더와 접힌 목차가 제목을 가리지 않게 합니다. */
+.article-section {
+  scroll-margin-top: calc(var(--header-height) + var(--toc-sticky-gap) + var(--toc-collapsed-height) + 16px);
+}
+
+@media (min-width: 1280px) {
+  .article-section {
+    scroll-margin-top: calc(var(--header-height) + 24px);
+  }
+
+  /* 1200px 아래에서는 3열을 억지로 유지하지 않습니다. */
+  .article-layout {
+    display: grid;
+    grid-template-columns: 180px minmax(0, var(--layout-article)) 260px;
+    justify-content: center;
+    column-gap: 32px;
+  }
+}

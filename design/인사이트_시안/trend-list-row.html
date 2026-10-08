@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 트렌드 · WHAT THE LAB (목록형)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/insight.css">
+</head>
+<body class="theme-trend">
+
+<svg class="sprite" aria-hidden="true">
+  <symbol id="am-01" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="2.2"/><circle cx="18" cy="5" r="2.2"/><circle cx="12" cy="13" r="2.4"/><circle cx="5" cy="19" r="2.2"/><circle cx="19" cy="18" r="2.2"/><path d="M7 7l3.4 4.4M16.2 6.3l-2.8 4.9M10.2 14.6L6.8 17.6M14.3 14l2.9 2.7M7.2 6l8.6-.8"/></symbol>
+  <symbol id="am-02" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M6 15l3-4 3 2 3-6 3 4 2-2"/><path d="M15 7v0" stroke-width="3"/></symbol>
+  <symbol id="am-03" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M6.5 12s2-4 5.5-4 5.5 4 5.5 4-2 4-5.5 4-5.5-4-5.5-4z"/><circle cx="12" cy="12" r="1.6"/></symbol>
+  <symbol id="am-04" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 4.6L18 9l-4.2 1.5L12 15l-1.8-4.5L6 9l4.2-1.4z"/><circle cx="5" cy="17" r="1"/><circle cx="9" cy="20" r="1"/><circle cx="18" cy="17" r="1.4"/><circle cx="15" cy="21" r=".8"/></symbol>
+  <symbol id="am-05" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8c3-3 5-3 8 0s5 3 8 0 3-2 4-1"/><path d="M2 13c3-3 5-3 8 0s5 3 8 0 3-2 4-1"/><path d="M2 18c3-3 5-3 8 0s5 3 8 0 3-2 4-1"/></symbol>
+  <symbol id="am-06" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4" r="2"/><circle cx="6" cy="12" r="2"/><circle cx="18" cy="12" r="2"/><circle cx="3.5" cy="20" r="1.5"/><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="2" fill="currentColor"/><path d="M11 5.8L7 10.3M13 5.8l4 4.5M5.2 13.8l-1.2 4.7M6.8 13.8l1.6 4.7M18 14v4"/></symbol>
+  <symbol id="am-07" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-9l-5 4v-4H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><path d="M7 8.5h10M7 12h6"/></symbol>
+  <symbol id="am-08" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M6 18L20 6"/><circle cx="7.5" cy="13" r="1" fill="currentColor"/><circle cx="10" cy="15.5" r="1" fill="currentColor"/><circle cx="12" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="17" cy="6.5" r="1" fill="currentColor"/></symbol>
+  <symbol id="bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></symbol>
+</svg>
+
+<header class="topbar">
+  <div class="wrap topbar__in">
+    <a class="brand" href="#"><span class="brand__mark"></span>WHAT THE LAB</a>
+    <nav class="topnav">
+      <a href="#">홈</a>
+      <a href="case-list-row.html">AI 연구 협업 사례</a>
+      <a href="trend-list-row.html" class="is-active">AI 트렌드</a>
+      <a href="../HTML_목업/expert/expert-find.html">AI 전문가 찾기</a>
+    </nav>
+    <div class="topbar__right">
+      <a class="btn btn--ghost" href="#">회원가입</a>
+      <a class="btn btn--ghost" href="#">로그인</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap sheet">
+
+  <!-- 1. 마스트헤드 -->
+  <section class="masthead">
+    <div class="masthead__bar">
+      <span class="label">Insight · Trend</span>
+      <span class="masthead__center">WHAT THE LAB</span>
+      <span class="masthead__meta">최근 갱신 <b>| 2026.10.08</b></span>
+    </div>
+    <h1 class="masthead__title">AI 트렌드</h1>
+    <p class="masthead__sub">연구실에서 읽는 · <em>이번 주 AI 흐름</em></p>
+    <p class="masthead__desc">AI를 전공하지 않은 연구자도 따라올 수 있게, 연구에 쓸 만한 AI 소식만 골라 짧게 정리합니다. <b>지금 보이는 글은 모두 화면 시안용 예시입니다.</b></p>
+  </section>
+
+  <!-- 2. Featured: 주목 트렌드 -->
+  <section class="featured">
+    <div class="featured__body">
+      <span class="label">주목 트렌드</span>
+      <span class="featured__field">LLM·에이전트 &nbsp;|&nbsp; 예시 데이터</span>
+      <h2 class="featured__title">논문 읽기부터 실험 설계까지,<br>연구 보조 에이전트가 온다</h2>
+      <p class="featured__desc">문헌 검색·요약에 머물던 LLM이 실험 계획 초안과 데이터 정리까지 돕는 방향으로 넓어지고 있습니다. 비-AI 연구실이 지금 확인해 볼 것들을 정리했습니다.</p>
+      <div class="tags tags--dark">
+        <span class="tag">#LLM</span>
+        <span class="tag">#연구 자동화</span>
+        <span class="tag">#에이전트</span>
+      </div>
+      <a class="btn btn--accent" href="#">트렌드 읽기 →</a>
+    </div>
+    <div class="featured__art" aria-hidden="true">
+      <!-- 토큰 흐름·네트워크를 추상화한 패턴 (사진 아님) -->
+      <svg viewBox="0 0 640 400" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <linearGradient id="tg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2a1d2a"/><stop offset=".55" stop-color="#5a2a1c"/><stop offset="1" stop-color="#c2552d"/></linearGradient>
+          <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#fff" stroke-opacity=".06"/></pattern>
+        </defs>
+        <rect width="640" height="400" fill="url(#tg)"/>
+        <rect width="640" height="400" fill="url(#grid)"/>
+        <g fill="#fff">
+          <rect x="190" y="70"  width="70"  height="14" rx="7" opacity=".85"/>
+          <rect x="268" y="70"  width="40"  height="14" rx="7" opacity=".5"/>
+          <rect x="316" y="70"  width="96"  height="14" rx="7" opacity=".7"/>
+          <rect x="420" y="70"  width="54"  height="14" rx="7" fill="#ffb38f"/>
+          <rect x="482" y="70"  width="80"  height="14" rx="7" opacity=".4"/>
+          <rect x="230" y="96"  width="48"  height="14" rx="7" opacity=".45"/>
+          <rect x="286" y="96"  width="110" height="14" rx="7" fill="#ffb38f" opacity=".8"/>
+          <rect x="404" y="96"  width="62"  height="14" rx="7" opacity=".6"/>
+          <rect x="474" y="96"  width="36"  height="14" rx="7" opacity=".35"/>
+        </g>
+        <g stroke="#ffd2bd" stroke-opacity=".5" stroke-width="1.2">
+          <path d="M260 180L360 150M260 180L360 210M260 180L360 270M260 240L360 150M260 240L360 210M260 240L360 270M260 300L360 210M260 300L360 270"/>
+          <path d="M360 150L470 190M360 210L470 190M360 270L470 190M360 150L470 260M360 210L470 260M360 270L470 260"/>
+          <path d="M470 190L570 225M470 260L570 225"/>
+        </g>
+        <g fill="#2a1d2a" stroke="#fff" stroke-width="2">
+          <circle cx="260" cy="180" r="10"/><circle cx="260" cy="240" r="10"/><circle cx="260" cy="300" r="10"/>
+          <circle cx="360" cy="150" r="10"/><circle cx="360" cy="210" r="10"/><circle cx="360" cy="270" r="10"/>
+          <circle cx="470" cy="190" r="10"/><circle cx="470" cy="260" r="10"/>
+        </g>
+        <circle cx="570" cy="225" r="16" fill="#e0663a" stroke="#fff" stroke-width="2"/>
+        <path d="M563 225l5 5 9-10" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <g fill="#fff" opacity=".35"><rect x="190" y="345" width="380" height="2"/><rect x="190" y="345" width="220" height="2" fill="#ffb38f" opacity="1"/></g>
+      </svg>
+      <span class="featured__caption">일러스트: 연구 보조 에이전트 개념도</span>
+    </div>
+  </section>
+
+  <!-- 3. 필터 칩: 주제 태그 -->
+  <section class="filterbar">
+    <div class="filterbar__head">
+      <h2 class="filterbar__title">최신 트렌드</h2>
+      <span class="filterbar__count">주제로 골라 보기</span>
+      <span class="filterbar__sort">정렬 <b>최신순 ▾</b></span>
+    </div>
+    <div class="chips">
+      <a class="chip is-active" href="#">전체</a>
+      <a class="chip" href="#">LLM·에이전트</a>
+      <a class="chip" href="#">비전</a>
+      <a class="chip" href="#">과학 AI</a>
+      <a class="chip" href="#">생성형 AI</a>
+      <a class="chip" href="#">시계열·예측</a>
+      <a class="chip" href="#">오픈소스·도구</a>
+      <a class="chip" href="#">정책·연구윤리</a>
+    </div>
+  </section>
+
+  <!-- 4. 리스트 본체: 목록형 (모두 예시 데이터) -->
+  <div class="rowhead"><span>주제</span><span>트렌드</span><span>태그</span><span>출처·날짜</span></div>
+  <section class="cards cards--list">
+
+    <article class="card">
+      <div class="card__head">
+        <span class="card__icon"><svg><use href="#am-07"/></svg></span>
+        <div class="card__cat"><span class="label">LLM·에이전트</span><span class="card__am">읽는 데 3분</span></div>
+      </div>
+      <div class="tags"><span class="tag tag--sample">예시</span><span class="tag">#문헌 리뷰</span><span class="tag">#요약</span></div>
+      <div class="card__body">
+        <h3 class="card__title"><a href="#">문헌 리뷰, LLM에게 어디까지 맡겨도 될까</a></h3>
+        <p class="card__desc">검색·요약은 빠르지만 인용 확인은 여전히 사람 몫입니다. 연구실에서 쓸 때의 체크리스트.</p>
+      </div>
+      <div class="card__foot"><span class="card__src">예시 출처 A · 10.08</span><a class="readmore" href="#">읽어 보기 <span>→</span></a></div>
+    </article>
+
+    <article class="card">
+      <div class="card__head">
+        <span class="card__icon"><svg><use href="#am-05"/></svg></span>
+        <div class="card__cat"><span class="label">과학 AI</span><span class="card__am">읽는 데 4분</span></div>
+      </div>
+      <div class="tags"><span class="tag tag--sample">예시</span><span class="tag">#시뮬레이션</span><span class="tag">#대리 모델</span></div>
+      <div class="card__body">
+        <h3 class="card__title"><a href="#">느린 시뮬레이션을 대신하는 ‘대리 모델’이 늘고 있다</a></h3>
+        <p class="card__desc">수치해석 결과로 학습한 모델이 계산 시간을 줄이는 흐름. 어떤 연구에 맞고 어떤 연구엔 안 맞는지.</p>
+      </div>
+      <div class="card__foot"><span class="card__src">예시 출처 B · 10.07</span><a class="readmore" href="#">읽어 보기 <span>→</span></a></div>
+    </article>
+
+    <article class="card">
+      <div class="card__head">
+        <span class="card__icon"><svg><use href="#am-03"/></svg></span>
+        <div class="card__cat"><span class="label">비전</span><span class="card__am">읽는 데 3분</span></div>
+      </div>
+      <div class="tags"><span class="tag tag--sample">예시</span><span class="tag">#파운데이션 모델</span><span class="tag">#이미지 분할</span></div>
+      <div class="card__body">
+        <h3 class="card__title"><a href="#">라벨 몇 장으로 시작하는 이미지 분석, 어디까지 왔나</a></h3>
+        <p class="card__desc">범용 비전 모델 위에 소량 데이터만 더하는 방식이 실험실 이미지 분석의 출발점이 되고 있습니다.</p>
+      </div>
+      <div class="card__foot"><span class="card__src">예시 출처 C · 10.06</span><a class="readmore" href="#">읽어 보기 <span>→</span></a></div>
+    </article>
+
+    <article class="card">
+      <div class="card__head">
+        <span class="card__icon"><svg><use href="#am-04"/></svg></span>
+        <div class="card__cat"><span class="label">생성형 AI</span><span class="card__am">읽는 데 5분</span></div>
+      </div>
+      <div class="tags"><span class="tag tag--sample">예시</span><span class="tag">#분자 설계</span><span class="tag">#확산 모델</span></div>
+      <div class="card__body">
+        <h3 class="card__title"><a href="#">그림 그리던 확산 모델, 분자와 소재를 설계하다</a></h3>
+        <p class="card__desc">이미지 생성 기술이 화학·재료 연구로 넘어오는 과정과, 실험 검증이 왜 꼭 필요한지.</p>
+      </div>
+      <div class="card__foot"><span class="card__src">예시 출처 A · 10.03</span><a class="readmore" href="#">읽어 보기 <span>→</span></a></div>
+    </article>
+
+    <article class="card">
+      <div class="card__head">
+        <span class="card__icon"><svg><use href="#am-02"/></svg></span>
+        <div class="card__cat"><span class="label">시계열·예측</span><span class="card__am">읽는 데 3분</span></div>
+      </div>
+      <div class="tags"><span class="tag tag--sample">예시</span><span class="tag">#센서 데이터</span><span class="tag">#이상 탐지</span></div>
+      <div class="card__body">
+        <h3 class="card__title"><a href="#">장비 센서 로그, 버리지 말고 모아 두세요</a></h3>
+        <p class="card__desc">시계열 예측 모델이 쉬워지면서 실험 장비 기록 자체가 연구 자산이 되고 있습니다.</p>
+      </div>
+      <div class="card__foot"><span class="card__src">예시 출처 D · 10.02</span><a class="readmore" href="#">읽어 보기 <span>→</span></a></div>
+    </article>
+
+    <article class="card">
+      <div class="card__head">
+        <span class="card__icon"><svg><use href="#am-06"/></svg></span>
+        <div class="card__cat"><span class="label">오픈소스·도구</span><span class="card__am">읽는 데 2분</span></div>
+      </div>
+      <div class="tags"><span class="tag tag--sample">예시</span><span class="tag">#실험 최적화</span><span class="tag">#베이지안 최적화</span></div>
+      <div class="card__body">
+        <h3 class="card__title"><a href="#">실험 조건 찾기를 줄여 주는 최적화 도구 정리</a></h3>
+        <p class="card__desc">온도·농도·시간 조합을 다 돌려 보지 않고 다음 실험을 추천받는 방법들을 모았습니다.</p>
+      </div>
+      <div class="card__foot"><span class="card__src">예시 출처 B · 09.30</span><a class="readmore" href="#">읽어 보기 <span>→</span></a></div>
+    </article>
+
+    <article class="card">
+      <div class="card__head">
+        <span class="card__icon"><svg><use href="#am-08"/></svg></span>
+        <div class="card__cat"><span class="label">정책·연구윤리</span><span class="card__am">읽는 데 4분</span></div>
+      </div>
+      <div class="tags"><span class="tag tag--sample">예시</span><span class="tag">#재현성</span><span class="tag">#데이터 공개</span></div>
+      <div class="card__body">
+        <h3 class="card__title"><a href="#">AI를 쓴 논문, 무엇을 함께 공개해야 할까</a></h3>
+        <p class="card__desc">코드·데이터·모델 버전까지, 심사에서 자주 요구되는 재현성 항목을 정리했습니다.</p>
+      </div>
+      <div class="card__foot"><span class="card__src">예시 출처 C · 09.26</span><a class="readmore" href="#">읽어 보기 <span>→</span></a></div>
+    </article>
+
+    <article class="card">
+      <div class="card__head">
+        <span class="card__icon"><svg><use href="#am-01"/></svg></span>
+        <div class="card__cat"><span class="label">과학 AI</span><span class="card__am">읽는 데 3분</span></div>
+      </div>
+      <div class="tags"><span class="tag tag--sample">예시</span><span class="tag">#그래프 신경망</span><span class="tag">#분자·소재</span></div>
+      <div class="card__body">
+        <h3 class="card__title"><a href="#">구조가 있는 데이터라면 그래프 신경망을 떠올려 보자</a></h3>
+        <p class="card__desc">분자, 교통망, 기상 격자처럼 ‘연결’이 중요한 데이터에서 그래프 모델이 강한 이유.</p>
+      </div>
+      <div class="card__foot"><span class="card__src">예시 출처 D · 09.24</span><a class="readmore" href="#">읽어 보기 <span>→</span></a></div>
+    </article>
+
+    <article class="card">
+      <div class="card__head">
+        <span class="card__icon"><svg><use href="#am-07"/></svg></span>
+        <div class="card__cat"><span class="label">LLM·에이전트</span><span class="card__am">읽는 데 3분</span></div>
+      </div>
+      <div class="tags"><span class="tag tag--sample">예시</span><span class="tag">#보안</span><span class="tag">#로컬 모델</span></div>
+      <div class="card__body">
+        <h3 class="card__title"><a href="#">미공개 데이터, 외부 AI에 올려도 괜찮을까</a></h3>
+        <p class="card__desc">연구실 밖으로 데이터를 내보내지 않고 AI를 쓰는 선택지와 그 비용을 비교합니다.</p>
+      </div>
+      <div class="card__foot"><span class="card__src">예시 출처 A · 09.22</span><a class="readmore" href="#">읽어 보기 <span>→</span></a></div>
+    </article>
+
+  </section>
+  <p class="footnote">* 트렌드 데이터는 아직 수집 전입니다. 이 페이지의 글·출처·날짜는 모두 화면 배치 확인용 예시입니다.</p>
+
+  <div class="more">
+    <a class="btn btn--outline" href="#">트렌드 더 보기 ↓</a>
+    <nav class="pager" aria-label="페이지">
+      <a class="is-active" href="#">1</a><a href="#">2</a><a href="#">3</a><a href="#">→</a>
+    </nav>
+  </div>
+
+  <!-- 5·6. 해설 블록 + 날짜순 목록 -->
+  <section class="duo">
+    <div class="voice">
+      <div class="voice__text">
+        <span class="label">이번 주 트렌드 요약</span>
+        <h3 class="voice__title">“AI가 연구를 대신하기보다<br>연구의 병목을 줄이는 쪽으로”</h3>
+        <p class="voice__quote">이번 주 소식을 한 줄로 묶으면 ‘보조’입니다. 문헌 정리, 이미지 라벨링, 실험 조건 탐색처럼 시간이 오래 걸리던 단계를 AI가 맡고, 판단과 검증은 연구자가 쥐는 구조가 자리 잡고 있습니다. 내 연구의 어느 단계가 가장 느린지부터 적어 보세요.</p>
+        <p class="voice__who"><b>WHAT THE LAB 에디터</b>예시 코멘트</p>
+      </div>
+      <div class="voice__art" aria-hidden="true">
+        <!-- 인물 사진 대신: 주간 흐름을 추상화한 막대 일러스트 -->
+        <svg viewBox="0 0 210 320" preserveAspectRatio="xMidYMid slice">
+          <rect width="210" height="320" fill="var(--accent-soft)"/>
+          <g fill="var(--accent)">
+            <rect x="34"  y="190" width="22" height="70"  rx="3" opacity=".25"/>
+            <rect x="66"  y="160" width="22" height="100" rx="3" opacity=".4"/>
+            <rect x="98"  y="130" width="22" height="130" rx="3" opacity=".55"/>
+            <rect x="130" y="150" width="22" height="110" rx="3" opacity=".7"/>
+            <rect x="162" y="96"  width="22" height="164" rx="3"/>
+          </g>
+          <path d="M34 150L76 120L108 92L140 108L174 60" fill="none" stroke="var(--accent-ink)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="174" cy="60" r="6" fill="#fff" stroke="var(--accent-ink)" stroke-width="2.5"/>
+          <path d="M30 264h160" stroke="var(--accent-ink)" stroke-opacity=".4" stroke-width="2"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="dated">
+      <span class="label">트렌드 타임라인</span>
+      <ul class="dated__list">
+        <li class="dated__item">
+          <span class="datebox"><small>OCT</small><b>08</b></span>
+          <div><h4>연구 보조 에이전트, 실험 설계 단계로 확장</h4><p>LLM·에이전트 · 예시</p></div>
+        </li>
+        <li class="dated__item">
+          <span class="datebox"><small>OCT</small><b>07</b></span>
+          <div><h4>시뮬레이션 대리 모델 공개 사례 증가</h4><p>과학 AI · 예시</p></div>
+        </li>
+        <li class="dated__item">
+          <span class="datebox"><small>OCT</small><b>06</b></span>
+          <div><h4>소량 라벨 기반 이미지 분석 도구 업데이트</h4><p>비전 · 예시</p></div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 7. 하단 알림 유도: 디스코드 -->
+  <footer class="notify">
+    <div>
+      <span class="notify__icon"><svg><use href="#bell"/></svg></span>
+      <div>
+        <h4>디스코드에서 새 글 알림 받기</h4>
+        <p>새 트렌드가 올라오면 디스코드 채널로 바로 알려 드려요.</p>
+        <a class="btn btn--light" href="#">디스코드 알림 연결 →</a>
+      </div>
+    </div>
+    <div class="notify__links">
+      <strong>함께 보기</strong>
+      <a href="case-list-row.html">AI 연구 협업 사례 <span>→</span></a>
+      <a href="../HTML_목업/expert/expert-find.html">AI 전문가 찾기 <span>→</span></a>
+    </div>
+    <div class="notify__copy">
+      <strong>WHAT THE LAB</strong>
+      비-AI 연구실과 AI 전문가를 잇는 매칭 플랫폼<br>© 2026 SKN36 4팀
+    </div>
+  </footer>
+
+</main>
+</body>
+</html>
