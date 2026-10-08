@@ -1,0 +1,45 @@
+import type { CoverTheme } from "@/lib/insights";
+
+/**
+ * 주제별 표지 사진입니다.
+ * 연구 원본 그림이 아니라, 화면이 무슨 분야인지 보여 주는 사진입니다.
+ */
+const COVER_SRC: Record<CoverTheme, string> = {
+  cells: "/photos/cells-render.jpg",
+  medical: "/photos/histology.jpg",
+  protein: "/photos/protein-render.jpg",
+  molecule: "/photos/protein.jpg",
+  turbines: "/photos/turbines-sunset.jpg",
+  brain: "/photos/brain-network.jpg",
+  climate: "/photos/turbines-sunset.jpg",
+  solar: "/photos/solar.jpg",
+  battery: "/photos/chart.jpg",
+  flow: "/photos/pexel-scope.jpg",
+  chart: "/photos/chart.jpg",
+  script: "/photos/waves.jpg",
+  audio: "/photos/waves.jpg",
+  agent: "/photos/waves.jpg",
+  food: "/photos/protein.jpg",
+};
+
+interface CoverArtProps {
+  theme: CoverTheme;
+  /** 부모가 정한 칸을 채웁니다. 높이를 주지 않으면 사진이 0으로 줄어듭니다. */
+  className: string;
+}
+
+/**
+ * 목록 카드 사진 칸입니다.
+ * 원본 파일의 가로세로와 상관없이 16:9로 맞춥니다.
+ * SCREEN_DESIGN_SPECS의 목록 카드 시작값입니다.
+ */
+export const INSIGHT_CARD_COVER_CLASS = "aspect-video w-full shrink-0";
+
+export function CoverArt({ theme, className }: CoverArtProps) {
+  return (
+    <div className={`relative overflow-hidden bg-page ${className}`}>
+      {/* 절대 위치로 두어야 원본 사진 크기가 칸 높이를 밀지 않습니다. */}
+      <img src={COVER_SRC[theme]} alt="" className="absolute inset-0 h-full w-full object-cover" />
+    </div>
+  );
+}
