@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { CoverArt, INSIGHT_CARD_COVER_CLASS } from "@/components/cover-art";
 import { KindBadge } from "@/components/kind-badge";
-import { articlePath, type InsightArticle } from "@/lib/insights";
+import { articlePath, kindLabel, type InsightArticle } from "@/lib/insights";
 
 interface InsightCardProps {
   article: InsightArticle;
-  variant?: "default" | "landing";
+  variant?: "default" | "landing" | "editorial";
 }
 
 /**
@@ -15,6 +15,34 @@ interface InsightCardProps {
 export function InsightCard({ article, variant = "default" }: InsightCardProps) {
   const href = articlePath(article);
   const isLanding = variant === "landing";
+
+  // 목록 전용 스타일만 분리해 홈과 상세의 기존 카드 디자인은 보존합니다.
+  if (variant === "editorial") {
+    return (
+      <article className="insight-editorial-card">
+        {/* 카드 전체를 링크 하나로 묶어 클릭과 키보드 탐색을 모두 쉽게 합니다. */}
+        <Link href={href} className="group flex h-full flex-col" aria-label={`${kindLabel(article.kind)}: ${article.title}`}>
+          <CoverArt theme={article.cover} className={INSIGHT_CARD_COVER_CLASS} />
+          <div className="flex flex-1 flex-col p-5">
+            <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-5">
+              <span className={`font-semibold ${article.kind === "case" ? "text-brand" : "text-trend"}`}>{kindLabel(article.kind)}</span>
+              <span aria-hidden="true" className="text-line">|</span>
+              <span className="text-muted">{article.field}</span>
+            </p>
+            <h3 className="mt-2 line-clamp-2 text-base leading-snug font-bold tracking-tight text-ink transition-colors group-hover:text-brand md:min-h-[2lh]">{article.title}</h3>
+            <p className="mt-3 line-clamp-2 text-sm leading-6 text-muted md:min-h-[2lh]">{article.summary}</p>
+            <div className="mt-auto flex items-center justify-between gap-3 pt-5 text-xs text-muted">
+              <time dateTime={article.publishedOn}>{article.publishedOn}</time>
+              <span className="flex items-center gap-3">
+                읽는 시간 {article.readingMinutes}분
+                <span aria-hidden="true" className="text-base text-brand">↗</span>
+              </span>
+            </div>
+          </div>
+        </Link>
+      </article>
+    );
+  }
 
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-card border border-line bg-card shadow-card">
