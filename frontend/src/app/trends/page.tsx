@@ -17,14 +17,13 @@ export default function TrendsPage() {
         articles={articles}
         featured={featuredInsight("trend")}
         topics={TREND_TOPICS}
-        eyebrow="Insight · Trend"
+        eyebrow="AI · Research Trends"
         title="AI 트렌드"
-        kicker="연구실에서 읽는 · 이번 주 AI 흐름"
+        kicker="연구실에서 읽는, 지금의 AI 흐름"
         description="AI를 전공하지 않은 연구자도 따라올 수 있게, 연구에 쓸 만한 AI 소식만 골라 짧게 정리합니다. 지금 보이는 글은 모두 화면 시안용 예시입니다."
+        featuredHeadline={"논문 읽기부터 실험 설계까지,\nAI는 어디까지 도울 수 있을까요?"}
+        featuredDescription="문헌 검색과 요약을 넘어 실험 계획의 초안까지. 연구 보조 에이전트의 가능성과 연구자가 직접 확인해야 할 지점을 살펴보세요."
         listTitle="최신 트렌드"
-        voiceTitle="“AI가 연구를 대신하기보다 연구의 병목을 줄이는 쪽으로”"
-        voiceBody="이번 주 소식을 한 줄로 묶으면 보조입니다. 문헌 정리, 이미지 라벨링, 실험 조건 탐색처럼 오래 걸리던 단계를 AI가 맡고, 판단과 검증은 연구자가 둡니다."
-        voiceWho="LabBridge 에디터 · 예시 코멘트"
         footnote="트렌드 데이터는 아직 수집 전입니다. 이 페이지의 글·출처·날짜는 모두 화면 배치 확인용 예시입니다."
       />
     </Suspense>

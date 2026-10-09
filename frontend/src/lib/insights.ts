@@ -658,7 +658,7 @@ const seeds: ArticleSeed[] = [
     publishedOn: "2026.07.02",
     readingMinutes: 4,
     cover: "audio",
-    sampleNotice: "오디오 사례의 AI 기술 분야는 시안에서 AM-03으로 임시 표기했습니다.",
+    sampleNotice: "오디오 사례의 AI 기술 분야는 시안에서 컴퓨터 비전으로 임시 표기했습니다.",
     highlights: [
       { label: "연구 문제", text: "긴 수중 녹음에서 특정 소리만 찾으려면 시간이 많이 듭니다." },
       { label: "AI의 역할", text: "소리를 이미지로 바꿔 탐지 모델에 넣습니다." },

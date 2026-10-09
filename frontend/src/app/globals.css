@@ -33,6 +33,149 @@
   --header-height: 60px;
   --toc-collapsed-height: 48px;
   --toc-sticky-gap: 24px;
+  --insight-page-title: clamp(32px, 3.4vw, 48px);
+  --insight-feature-title: clamp(28px, 3vw, 42px);
+  --insight-quote-title: clamp(24px, 2.2vw, 30px);
+}
+
+/* 목록 두 페이지의 배경·페이드 색을 하나로 맞춰 사진 경계가 생기지 않게 합니다. */
+.insight-editorial {
+  --insight-surface: var(--color-page);
+  background: var(--insight-surface);
+}
+
+.insight-feature {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.insight-feature__art {
+  position: absolute;
+  inset: 0 0 0 32%;
+  mask-image: linear-gradient(180deg, #000 85%, transparent);
+}
+
+.insight-feature::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, var(--insight-surface) 0%, var(--insight-surface) 34%, color-mix(in srgb, var(--insight-surface) 94%, transparent) 46%, color-mix(in srgb, var(--insight-surface) 30%, transparent) 68%, transparent 86%),
+    linear-gradient(180deg, var(--insight-surface), transparent 36%, transparent 72%, var(--insight-surface));
+}
+
+.insight-page-heading {
+  padding-block: 40px 32px;
+  border-bottom: 1px solid var(--color-line);
+  background: var(--color-card);
+}
+
+.insight-page-heading__title {
+  font-size: var(--insight-page-title);
+  font-weight: 700;
+  line-height: 1.22;
+  letter-spacing: -0.035em;
+}
+
+.insight-feature__copy {
+  position: relative;
+  max-width: 680px;
+  padding-block: 40px 56px;
+}
+
+.insight-feature__title {
+  margin-top: 16px;
+  font-size: var(--insight-feature-title);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.035em;
+  white-space: pre-line;
+}
+
+.insight-editorial-card {
+  overflow: hidden;
+  height: 100%;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: var(--color-card);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.insight-editorial-card:hover,
+.insight-editorial-card:focus-within {
+  border-color: color-mix(in srgb, var(--color-brand) 35%, var(--color-line));
+  box-shadow: var(--shadow-card);
+}
+
+.insight-perspective {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin-top: 32px;
+  border-top: 1px solid var(--color-line);
+}
+
+.insight-perspective__art {
+  position: absolute;
+  inset: 0 0 0 38%;
+  opacity: 0.6;
+  /* 사진은 분위기만 보조하고 인용문이 먼저 읽히게 합니다. */
+  mask-image: linear-gradient(90deg, transparent, #000 65%), linear-gradient(180deg, transparent, #000 20%, #000 75%, transparent);
+  mask-composite: intersect;
+}
+
+.insight-perspective__copy {
+  position: relative;
+  max-width: 800px;
+  /* 높이를 고정하지 않고 내부 여백만 줄여 긴 문장도 잘리지 않게 합니다. */
+  padding-block: 28px;
+  padding-right: 24px;
+}
+
+.insight-perspective__mark {
+  color: color-mix(in srgb, var(--color-brand) 25%, var(--insight-surface));
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.insight-perspective__quote {
+  padding-top: 4px;
+  font-size: var(--insight-quote-title);
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -0.025em;
+  white-space: pre-line;
+}
+
+@media (max-width: 1023px) {
+  .insight-feature__art { inset-inline-start: 20%; }
+  .insight-feature::after {
+    background:
+      linear-gradient(90deg, var(--insight-surface), color-mix(in srgb, var(--insight-surface) 95%, transparent) 38%, color-mix(in srgb, var(--insight-surface) 70%, transparent) 65%, color-mix(in srgb, var(--insight-surface) 20%, transparent)),
+      linear-gradient(180deg, var(--insight-surface), transparent 40%, var(--insight-surface));
+  }
+  .insight-feature__copy { max-width: 600px; }
+  .insight-perspective__art { opacity: 0.25; }
+}
+
+@media (max-width: 767px) {
+  .insight-page-heading { padding-block: 28px 24px; }
+  .insight-feature__art { inset: auto 0 0; height: 240px; }
+  .insight-feature::after {
+    background: linear-gradient(180deg, var(--insight-surface) calc(100% - 240px), color-mix(in srgb, var(--insight-surface) 65%, transparent) calc(100% - 180px), transparent calc(100% - 80px), var(--insight-surface));
+  }
+  /* 모바일은 글을 먼저 읽고 사진을 보도록 공간을 분리하되 경계는 페이드로 연결합니다. */
+  .insight-feature__copy { padding-block: 32px 216px; }
+  .insight-perspective__copy { padding-block: 24px; padding-right: 0; }
+  .insight-perspective__art { inset-inline-start: 0; opacity: 0.12; }
+  .insight-perspective__mark { font-size: 48px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .insight-editorial-card { transition: none; }
 }
 
 /* 페이지마다 같은 좌우 기준선. 모바일 20px, 태블릿 이상 32px. */

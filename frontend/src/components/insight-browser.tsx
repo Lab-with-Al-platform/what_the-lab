@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CoverArt } from "@/components/cover-art";
@@ -28,10 +29,15 @@ interface InsightBrowserProps {
   title: string;
   kicker: string;
   description: string;
+  featuredHeadline: string;
+  featuredDescription: string;
   listTitle: string;
-  voiceTitle: string;
-  voiceBody: string;
-  voiceWho: string;
+  // 인용 콘텐츠가 있는 페이지만 이 묶음을 전달합니다.
+  perspective?: {
+    title: string;
+    body: string;
+    who: string;
+  };
   footnote?: string;
 }
 
@@ -44,10 +50,10 @@ export function InsightBrowser({
   title,
   kicker,
   description,
+  featuredHeadline,
+  featuredDescription,
   listTitle,
-  voiceTitle,
-  voiceBody,
-  voiceWho,
+  perspective,
   footnote,
 }: InsightBrowserProps) {
   const searchParams = useSearchParams();
@@ -69,7 +75,6 @@ export function InsightBrowser({
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, pageCount);
   const visible = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
-  const recent = [...articles].sort((left, right) => right.publishedOn.localeCompare(left.publishedOn)).slice(0, 3);
 
   function selectTopic(nextTopic: string) {
     setPage(1);
@@ -84,155 +89,161 @@ export function InsightBrowser({
   }
 
   return (
-    <PageContainer className="py-8 md:py-10">
-      <section className="rounded-card border border-line bg-card px-6 py-8 shadow-card md:px-10">
-        <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-semibold tracking-[0.14em] text-brand uppercase">
-          <span>{eyebrow}</span>
-          <span className="tracking-normal text-muted normal-case">
-            최근 갱신 <b className="text-ink">{articles[0]?.publishedOn}</b>
-            <span className="mx-1">|</span>
-            총 {articles.length}건
-          </span>
-        </div>
-        <h1 className="mt-4 text-4xl font-bold tracking-tight md:text-5xl">{title}</h1>
-        <p className="mt-3 text-sm font-semibold">{kicker}</p>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{description}</p>
-      </section>
-
-      <section className="mt-6 overflow-hidden rounded-card border border-line bg-card shadow-card md:grid md:min-h-[360px] md:grid-cols-2">
-        <div className="flex flex-col items-start p-6 md:p-10">
-          <p className="text-xs font-semibold tracking-[0.14em] text-brand uppercase">
-            {kind === "case" ? "이번 주 추천 사례" : "주목 트렌드"}
-          </p>
-          <p className="mt-3 text-sm text-muted">
-            {featured.field} · {featured.topicLabel}
-          </p>
-          <h2 className="mt-3 text-2xl font-bold leading-snug md:text-3xl">{featured.title}</h2>
-          <p className="mt-3 text-sm leading-6 text-muted">{featured.summary}</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {featured.tags.map((tag) => (
-              <KeywordTag key={tag} label={tag} />
-            ))}
+    <div className="insight-editorial">
+      {/* 페이지 제목은 추천 사진 영역 밖에 두어 페이지의 역할을 먼저 알립니다. */}
+      <header className="insight-page-heading">
+        <PageContainer>
+          <p className="text-xs font-semibold tracking-[0.18em] text-brand uppercase">{eyebrow}</p>
+          <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <h1 className="insight-page-heading__title">{title}</h1>
+              <p className="mt-3 text-sm text-muted md:text-base">{kicker}</p>
+            </div>
+            <p className="text-xs text-muted">총 {articles.length}건 · 예시 콘텐츠</p>
           </div>
-          <Link href={articlePath(featured)} className="mt-6 inline-flex h-11 items-center rounded-button bg-brand px-5 text-sm font-semibold text-white hover:bg-brand-hover">
-            {kind === "case" ? "사례 보기" : "트렌드 읽기"} →
-          </Link>
-        </div>
-        <CoverArt theme={featured.cover} className="aspect-video w-full md:aspect-auto md:h-full md:min-h-64" />
+          <p className="sr-only">{description}</p>
+        </PageContainer>
+      </header>
+
+      <section aria-labelledby={`${kind}-feature-heading`}>
+        {/* 배경 사진의 기준점을 화면 전체가 아닌 공통 본문 프레임으로 제한합니다. */}
+        <PageContainer className="insight-feature">
+          {/* 사진 위에 배경색 그라데이션을 겹쳐 글과 이미지의 경계를 없앱니다. */}
+          <div className="insight-feature__art" aria-hidden="true">
+            <CoverArt theme={featured.cover} className="h-full w-full" />
+          </div>
+          <div className="relative z-10">
+            <div className="insight-feature__copy">
+              <p className="text-xs font-semibold tracking-[0.08em] text-brand">
+                {kind === "case" ? "이번 주 추천 사례" : "이번 주 주목 트렌드"}
+              </p>
+              <h2 id={`${kind}-feature-heading`} className="insight-feature__title">{featuredHeadline}</h2>
+              <p className="mt-4 max-w-lg text-sm leading-7 text-muted md:text-base">{featuredDescription}</p>
+              <p className="mt-3 text-xs text-muted">
+                {featured.field}
+                {featured.field !== featured.topicLabel ? ` · ${featured.topicLabel}` : ""}
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {featured.tags.map((tag) => <KeywordTag key={tag} label={tag} />)}
+              </div>
+              <Link href={articlePath(featured)} className="mt-6 inline-flex min-h-11 items-center gap-3 rounded-button bg-brand px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-hover">
+                {kind === "case" ? "연구 과정 살펴보기" : "트렌드 살펴보기"}
+                <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+          </div>
+        </PageContainer>
       </section>
 
-      <section className="mt-10">
-        <div className="flex flex-wrap items-end gap-3">
-          <h2 className="text-2xl font-bold">{listTitle}</h2>
-          <p className="text-sm text-muted">{kind === "case" ? "AI 기술 분야로 골라 보기" : "주제로 골라 보기"}</p>
-          <label className="ml-auto text-sm text-muted">
-            정렬{" "}
-            <select
-              className="bg-transparent font-semibold text-ink"
-              value={sort}
-              onChange={(event) => {
-                setSort(event.target.value as "latest" | "title");
-                setPage(1);
-              }}
+      {/* 공통 푸터에 이미 바깥 여백이 있으므로 목록 끝의 여백을 중복하지 않습니다. */}
+      <PageContainer>
+        <section className="pt-8 md:pt-10" aria-labelledby={`${kind}-list-heading`}>
+          <div className="flex flex-wrap items-end gap-3">
+            <h2 id={`${kind}-list-heading`} className="text-2xl font-bold">{listTitle}</h2>
+            <p className="text-sm text-muted">{kind === "case" ? "AI 기술 분야로 골라 보기" : "주제로 골라 보기"}</p>
+            <label className="ml-auto text-sm text-muted">
+              정렬{" "}
+              <select
+                className="bg-transparent font-semibold text-ink"
+                value={sort}
+                onChange={(event) => {
+                  setSort(event.target.value as "latest" | "title");
+                  setPage(1);
+                }}
+              >
+                <option value="latest">{kind === "case" ? "최신 등록순" : "최신순"}</option>
+                <option value="title">제목순</option>
+              </select>
+            </label>
+          </div>
+          {/* 공간이 부족하면 다음 줄로 내려가 모든 분야를 가로 스크롤 없이 보여 줍니다. */}
+          <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label="주제 필터">
+            {topics.map((item) => {
+              const selected = topic === item.id || topic === item.label || (item.id === "all" && topic === "all");
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => selectTopic(item.id)}
+                  className={`inline-flex min-h-11 max-w-full items-center gap-2 rounded-full border px-3 py-2 text-left text-sm ${
+                    selected ? "border-brand bg-brand text-white" : "border-line bg-white text-ink"
+                  }`}
+                  aria-pressed={selected}
+                >
+                  {/* 분류 코드는 선택·검색에만 사용하고, 사용자는 분야 이름으로 구분합니다. */}
+                  <span className="min-w-0 [overflow-wrap:anywhere]">{item.label}</span>
+                  {kind === "case" ? <span className="shrink-0 text-xs opacity-80">{topicCount(kind, item.id)}</span> : null}
+                </button>
+              );
+            })}
+          </div>
+          {topic !== "all" && !topics.some((item) => item.id === topic || item.label === topic) ? (
+            <p className="mt-3 text-sm text-muted">
+              ‘{topic}’ 분야만 보는 중입니다.{" "}
+              <button type="button" className="font-semibold text-brand" onClick={() => selectTopic("all")}>
+                전체 보기
+              </button>
+            </p>
+          ) : null}
+
+          {visible.length === 0 ? (
+            <p className="mt-6 rounded-2xl bg-white px-5 py-10 text-sm text-muted">이 조건에 해당하는 글이 없습니다. 다른 분야를 선택해 보세요.</p>
+          ) : (
+            <div className="mt-6 grid items-stretch gap-5 md:grid-cols-2 xl:grid-cols-3" aria-label="콘텐츠 목록">
+              {visible.map((article) => (
+                <InsightCard key={article.slug} article={article} variant="editorial" />
+              ))}
+            </div>
+          )}
+          {footnote ? <p className="mt-4 text-xs leading-5 text-muted">{footnote}</p> : null}
+
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+            <button
+              type="button"
+              className="inline-flex h-11 items-center rounded-button border border-ink px-4 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-40"
+              disabled={safePage >= pageCount}
+              onClick={() => setPage(safePage + 1)}
             >
-              <option value="latest">{kind === "case" ? "최신 등록순" : "최신순"}</option>
-              <option value="title">제목순</option>
-            </select>
-          </label>
-        </div>
-        <div className="mt-4 flex gap-2 overflow-x-auto pb-2">
-          {topics.map((item) => {
-            const selected = topic === item.id || topic === item.label || (item.id === "all" && topic === "all");
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => selectTopic(item.id)}
-                className={`inline-flex min-h-11 shrink-0 items-center rounded-full border px-3 text-sm ${
-                  selected ? "border-brand bg-brand text-white" : "border-line bg-white text-ink"
-                }`}
-                aria-pressed={selected}
-              >
-                {item.id !== "all" && kind === "case" ? <span className="mr-1 text-xs opacity-70">{item.id}</span> : null}
-                {item.label}
-                {kind === "case" ? <span className="ml-1 text-xs opacity-80">{topicCount(kind, item.id)}</span> : null}
-              </button>
-            );
-          })}
-        </div>
-        {topic !== "all" && !topics.some((item) => item.id === topic || item.label === topic) ? (
-          <p className="mt-3 text-sm text-muted">
-            ‘{topic}’ 분야만 보는 중입니다.{" "}
-            <button type="button" className="font-semibold text-brand" onClick={() => selectTopic("all")}>
-              전체 보기
+              {kindLabel(kind)} 더 보기 ↓
             </button>
-          </p>
-        ) : null}
-
-        {visible.length === 0 ? (
-          <p className="mt-6 rounded-2xl bg-white px-5 py-10 text-sm text-muted">이 조건에 해당하는 글이 없습니다. 다른 분야를 선택해 보세요.</p>
-        ) : (
-          <div className="mt-5 grid items-stretch gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {visible.map((article) => (
-              <InsightCard key={article.slug} article={article} />
-            ))}
+            <nav aria-label="페이지" className="flex gap-2 text-sm">
+              {Array.from({ length: pageCount }, (_, index) => index + 1).map((pageNumber) => (
+                <button
+                  key={pageNumber}
+                  type="button"
+                  onClick={() => setPage(pageNumber)}
+                  aria-current={pageNumber === safePage ? "page" : undefined}
+                  className={`grid h-11 w-11 place-items-center rounded-button ${
+                    pageNumber === safePage ? "bg-ink text-white" : "bg-white text-ink"
+                  }`}
+                >
+                  {pageNumber}
+                </button>
+              ))}
+            </nav>
           </div>
-        )}
-        {footnote ? <p className="mt-4 text-xs leading-5 text-muted">{footnote}</p> : null}
+        </section>
 
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
-          <button
-            type="button"
-            className="inline-flex h-11 items-center rounded-button border border-ink px-4 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-40"
-            disabled={safePage >= pageCount}
-            onClick={() => setPage(safePage + 1)}
-          >
-            {kindLabel(kind)} 더 보기 ↓
-          </button>
-          <nav aria-label="페이지" className="flex gap-2 text-sm">
-            {Array.from({ length: pageCount }, (_, index) => index + 1).map((pageNumber) => (
-              <button
-                key={pageNumber}
-                type="button"
-                onClick={() => setPage(pageNumber)}
-                aria-current={pageNumber === safePage ? "page" : undefined}
-                className={`grid h-11 w-11 place-items-center rounded-button ${
-                  pageNumber === safePage ? "bg-ink text-white" : "bg-white text-ink"
-                }`}
-              >
-                {pageNumber}
-              </button>
-            ))}
-          </nav>
-        </div>
-      </section>
-
-      <section className="mt-10 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-        <div className="rounded-card border border-line bg-brand-soft p-6 text-ink md:p-8">
-          <p className="text-xs font-semibold tracking-[0.14em] text-brand uppercase">
-            {kind === "case" ? "연구자 한마디" : "이번 주 트렌드 요약"}
-          </p>
-          <h2 className="mt-3 text-2xl font-bold leading-snug">{voiceTitle}</h2>
-          <p className="mt-4 text-sm leading-6 text-muted">{voiceBody}</p>
-          <p className="mt-6 text-sm font-semibold">{voiceWho}</p>
-        </div>
-        <div className="rounded-card border border-line bg-card p-6 shadow-card">
-          <h2 className="text-sm font-semibold text-brand">{kind === "case" ? "최근 추가된 사례" : "최근 추가된 트렌드"}</h2>
-          <ul className="mt-4 space-y-4">
-            {recent.map((article) => (
-              <li key={article.slug}>
-                <Link href={articlePath(article)} className="block hover:text-brand">
-                  <p className="text-xs text-muted">{article.publishedOn}</p>
-                  <p className="mt-1 font-semibold">{article.title}</p>
-                  <p className="text-xs text-muted">
-                    {article.field} · {article.source}
-                  </p>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-    </PageContainer>
+        {perspective ? (
+          <section className="insight-perspective" aria-labelledby={`${kind}-perspective-heading`}>
+            <div className="insight-perspective__art" aria-hidden="true">
+              <Image src="/photos/lab.jpg" alt="" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover object-[center_36%]" />
+            </div>
+            <div className="insight-perspective__copy">
+              <h2 id={`${kind}-perspective-heading`} className="text-xs font-semibold tracking-[0.12em] text-brand">연구자의 시선</h2>
+              <figure className="mt-3">
+                <div className="flex items-start gap-3 md:gap-4">
+                  <span aria-hidden="true" className="insight-perspective__mark">“</span>
+                  <blockquote className="insight-perspective__quote">{perspective.title}</blockquote>
+                </div>
+                <figcaption className="mt-3 text-sm font-semibold text-muted">{perspective.who}</figcaption>
+              </figure>
+              <p className="mt-2 max-w-xl text-sm leading-6 text-muted">{perspective.body}</p>
+              <p className="mt-2 text-xs text-faint">디자인 검토용 예시 · 사진은 인터뷰 인물과 무관한 연구 현장 이미지입니다.</p>
+            </div>
+          </section>
+        ) : null}
+      </PageContainer>
+    </div>
   );
 }
