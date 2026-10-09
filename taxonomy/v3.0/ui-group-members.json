@@ -1,0 +1,482 @@
+[
+  {
+    "group_id": "UG01",
+    "capability_id": "CAP001",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG01",
+    "capability_id": "CAP002",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG01",
+    "capability_id": "CAP003",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG01",
+    "capability_id": "CAP004",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG01",
+    "capability_id": "CAP005",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG01",
+    "capability_id": "CAP006",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG01",
+    "capability_id": "CAP007",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG02",
+    "capability_id": "CAP008",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG02",
+    "capability_id": "CAP009",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG02",
+    "capability_id": "CAP010",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG02",
+    "capability_id": "CAP011",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG02",
+    "capability_id": "CAP012",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG02",
+    "capability_id": "CAP013",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG02",
+    "capability_id": "CAP014",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG03",
+    "capability_id": "CAP015",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG03",
+    "capability_id": "CAP016",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG03",
+    "capability_id": "CAP017",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG03",
+    "capability_id": "CAP018",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG03",
+    "capability_id": "CAP019",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG03",
+    "capability_id": "CAP020",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG03",
+    "capability_id": "CAP021",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG04",
+    "capability_id": "CAP022",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG04",
+    "capability_id": "CAP023",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG04",
+    "capability_id": "CAP024",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG04",
+    "capability_id": "CAP025",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG04",
+    "capability_id": "CAP026",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG04",
+    "capability_id": "CAP027",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG04",
+    "capability_id": "CAP028",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG04",
+    "capability_id": "CAP029",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG05",
+    "capability_id": "CAP030",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG05",
+    "capability_id": "CAP031",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG05",
+    "capability_id": "CAP032",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG05",
+    "capability_id": "CAP033",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG05",
+    "capability_id": "CAP034",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG05",
+    "capability_id": "CAP035",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG05",
+    "capability_id": "CAP036",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG05",
+    "capability_id": "CAP037",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG06",
+    "capability_id": "CAP038",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG06",
+    "capability_id": "CAP039",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG06",
+    "capability_id": "CAP040",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG06",
+    "capability_id": "CAP041",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG06",
+    "capability_id": "CAP042",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG06",
+    "capability_id": "CAP043",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG07",
+    "capability_id": "CAP044",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG07",
+    "capability_id": "CAP045",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG07",
+    "capability_id": "CAP046",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG07",
+    "capability_id": "CAP047",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG07",
+    "capability_id": "CAP048",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG07",
+    "capability_id": "CAP049",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG07",
+    "capability_id": "CAP050",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG08",
+    "capability_id": "CAP051",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG08",
+    "capability_id": "CAP052",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG08",
+    "capability_id": "CAP053",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG08",
+    "capability_id": "CAP054",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG08",
+    "capability_id": "CAP055",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG08",
+    "capability_id": "CAP056",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG08",
+    "capability_id": "CAP057",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG08",
+    "capability_id": "CAP058",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG09",
+    "capability_id": "CAP059",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG09",
+    "capability_id": "CAP060",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG09",
+    "capability_id": "CAP061",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG09",
+    "capability_id": "CAP062",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG09",
+    "capability_id": "CAP063",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG09",
+    "capability_id": "CAP064",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG10",
+    "capability_id": "CAP065",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG10",
+    "capability_id": "CAP066",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG10",
+    "capability_id": "CAP067",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG10",
+    "capability_id": "CAP068",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG10",
+    "capability_id": "CAP069",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG10",
+    "capability_id": "CAP070",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG10",
+    "capability_id": "CAP071",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG11",
+    "capability_id": "CAP072",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG11",
+    "capability_id": "CAP073",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG11",
+    "capability_id": "CAP074",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG11",
+    "capability_id": "CAP075",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG11",
+    "capability_id": "CAP076",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG11",
+    "capability_id": "CAP077",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG11",
+    "capability_id": "CAP078",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG11",
+    "capability_id": "CAP079",
+    "source": "category",
+    "status": "pending_review"
+  },
+  {
+    "group_id": "UG11",
+    "capability_id": "CAP080",
+    "source": "category",
+    "status": "pending_review"
+  }
+]
