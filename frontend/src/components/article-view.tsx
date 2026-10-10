@@ -281,7 +281,7 @@ export function ArticleView({ article }: ArticleViewProps) {
                 rel="noreferrer"
                 className="mt-4 block text-xs font-semibold leading-5 text-brand transition hover:text-ink"
               >
-                DOI 원문 확인하기 ↗
+                {article.doi ? "DOI 원문 확인하기 ↗" : "원문 확인하기 ↗"}
               </a>
             ) : (
               <p className="mt-4 text-xs leading-5 text-muted">원문 링크는 출처 확인이 끝난 뒤에 연결합니다.</p>

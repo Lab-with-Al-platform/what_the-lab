@@ -13,6 +13,8 @@ export type CoverTheme =
   | "dental"
   | "concrete"
   | "coScientist"
+  | "mattergen"
+  | "alphaEvolve"
   | "turbines"
   | "brain"
   | "protein"
@@ -1113,6 +1115,215 @@ const seeds: ArticleSeed[] = [
     relatedSlugs: ["literature-review-llm", "private-data-ai", "microscope-cell-drawing"],
   },
   {
+    slug: "mattergen-material-design",
+    kind: "trend",
+    title: "찾는 AI에서 설계하는 AI로: MatterGen이 바꾼 신소재 탐색",
+    summary:
+      "Microsoft Research의 MatterGen은 알려진 후보를 하나씩 거르는 대신 원하는 물성을 조건으로 새로운 무기 결정 구조를 생성합니다. Nature 논문을 바탕으로 가능성과 실험 검증의 경계를 살펴봅니다.",
+    field: "생성형 AI · 재료과학",
+    topicId: "generative",
+    topicLabel: "생성형 AI",
+    domains: ["과학 AI", "신소재·재료과학"],
+    tags: ["#MatterGen", "#신소재 설계", "#확산 모델"],
+    source: "Nature · Microsoft Research · 2025",
+    publishedOn: "2026.10.10",
+    readingMinutes: 6,
+    cover: "mattergen",
+    institution: "Microsoft Research AI for Science",
+    doi: "10.1038/s41586-025-08628-5",
+    sourceUrl: "https://doi.org/10.1038/s41586-025-08628-5",
+    imageAlt:
+      "재료 연구자가 무작위 원자 배치에서 안정된 결정 구조로 변하는 생성 과정을 검토하는 설명용 이미지",
+    imageCaption:
+      "생성형 AI가 결정 후보를 만들고 연구자가 실험 검증하는 흐름을 재구성한 이미지입니다. 실제 MatterGen 화면이나 논문 도판이 아닙니다.",
+    sampleNotice:
+      "수치와 검증 범위는 Nature 원 논문과 Microsoft Research 공식 발표에서 확인했습니다. 대표 이미지는 설명용 생성 이미지입니다.",
+    highlights: [
+      { label: "지금 변하는 점", text: "기존 후보를 검색하는 방식에서 목표 물성에 맞는 구조를 직접 생성하는 방식으로 넓어졌습니다." },
+      { label: "작동 구조", text: "결정의 원자 종류·좌표·격자를 함께 다루는 확산 모델을 사용합니다." },
+      { label: "주요 결과", text: "이전 생성 모델보다 새롭고 안정적인 구조 비율이 2배 이상 높았다고 보고했습니다." },
+      { label: "연구자의 역할", text: "계산상 안정성과 실제 합성 가능성·물성 재현 여부를 실험으로 확인합니다." },
+    ],
+    sections: [
+      {
+        id: "intro",
+        toc: "기술 소개",
+        title: "원하는 물성을 말하면 결정 구조를 제안한다",
+        paragraphs: [
+          "신소재 탐색은 보통 알려진 데이터베이스에서 수많은 후보를 계산하고, 목표에 가까운 물질을 골라 실험하는 방식으로 진행됩니다. MatterGen은 이 순서를 바꿔 원하는 화학 조성이나 기계·전자·자기적 특성을 조건으로 새로운 무기 결정 구조를 생성합니다.",
+          "2025년 Nature에 발표된 연구는 이미지 생성에 쓰이는 확산 모델의 원리를 결정 구조에 맞게 바꿨습니다. 단순한 예쁜 구조가 아니라 원자 종류, 위치, 반복되는 격자를 함께 다루는 것이 핵심입니다.",
+        ],
+      },
+      {
+        id: "difference",
+        toc: "기존과의 차이",
+        title: "수백만 후보를 거르는 것과 무엇이 다를까?",
+        paragraphs: [
+          "기존 고속 스크리닝은 이미 계산하거나 등록한 후보 중에서 조건에 맞는 것을 찾습니다. 반면 생성 모델은 학습한 결정 구조의 규칙을 이용해 아직 데이터베이스에 없는 후보를 제안할 수 있습니다.",
+          "다만 생성은 발견의 출발점일 뿐입니다. 모델이 안정적이라고 예측한 구조가 실제로 합성되거나 목표 물성을 그대로 보인다는 뜻은 아닙니다.",
+        ],
+      },
+      {
+        id: "how",
+        toc: "쉬운 작동 개념",
+        title: "흐트러진 원자에서 조건에 맞는 결정로",
+        paragraphs: [
+          "MatterGen은 원자 종류, 원자의 좌표, 결정 격자를 일부러 흐트러뜨린 뒤 다시 안정된 구조로 복원하는 방법을 학습합니다. 이후 작은 어댑터를 추가 학습해 목표 조성·대칭성·물성 조건으로 생성을 유도합니다.",
+        ],
+        steps: [
+          { title: "구조 학습", detail: "안정된 결정 데이터에서 원자와 격자의 규칙을 배웁니다" },
+          { title: "조건 입력", detail: "원하는 조성·대칭성·물성 범위를 정합니다" },
+          { title: "후보 생성", detail: "잡음에서 시작해 여러 결정 구조를 복원합니다" },
+          { title: "계산·실험", detail: "안정성과 합성 가능성, 실제 물성을 검증합니다" },
+        ],
+      },
+      {
+        id: "fields",
+        toc: "연구 활용 분야",
+        title: "논문은 어느 정도까지 확인했을까?",
+        paragraphs: [
+          "논문은 이전 생성 모델보다 안정적이고 새롭고 중복되지 않은 구조의 비율이 2배 이상 높고, 생성 구조가 국소 에너지 최솟값에 10배 이상 가까웠다고 보고했습니다.",
+          "또한 생성 후보 하나를 실제로 합성했고 측정한 물성이 목표값의 20% 이내였다고 밝혔습니다. 이는 중요한 개념 증명이지만, 모든 생성 후보가 같은 수준으로 합성된다는 뜻은 아닙니다.",
+        ],
+      },
+      {
+        id: "caveats",
+        toc: "한계·주의점",
+        title: "‘안정적’이라는 예측만으로 충분하지 않다",
+        paragraphs: [
+          "계산상 안정성, 실제 합성 가능성, 원하는 환경에서의 성능은 서로 다른 검증 단계입니다. 학습 데이터가 적은 원소 조합이나 복잡한 결함·표면·공정 조건에서는 추가 모델과 도메인 지식이 필요합니다.",
+          "[LabBridge 해석] 재료 연구자는 목표 물성과 합성 제약을 정의하고, AI 전문가는 생성 조건과 계산 검증 파이프라인을 설계하며, 마지막 판단은 실험 데이터로 내려야 합니다.",
+        ],
+      },
+      {
+        id: "related",
+        toc: "관련 기술",
+        title: "우리 연구실에 적용하려면 무엇이 필요할까?",
+        paragraphs: [
+          "결정 구조 데이터, 목표 물성의 신뢰할 수 있는 라벨, 계산화학 검증 환경이 기본입니다. Microsoft는 MatterGen 코드와 학습·파인튜닝 데이터 일부를 공개했지만, 연구실의 물질 계열과 목표에 맞춘 재검증이 필요합니다.",
+          "먼저 ‘새 구조를 만들고 싶은가, 기존 후보를 빠르게 거르고 싶은가’를 구분하면 생성 모델과 예측 모델 중 무엇이 필요한지 더 분명해집니다.",
+        ],
+      },
+    ],
+    facts: [
+      { label: "주제", value: "생성형 무기 재료 설계" },
+      { label: "핵심 모델", value: "결정 구조 확산 모델" },
+      { label: "검증", value: "계산 평가·후보 1개 합성" },
+      { label: "원문", value: "Nature (2025.01.16)" },
+      { label: "DOI", value: "10.1038/s41586-025-08628-5" },
+    ],
+    technologies: [
+      { title: "확산 모델", description: "잡음 상태에서 조건에 맞는 결정 구조를 복원하는 생성 방법" },
+      { title: "역설계", description: "원하는 물성에서 출발해 가능한 구조 후보를 찾는 접근" },
+      { title: "계산 재료과학", description: "생성 후보의 에너지와 안정성을 계산으로 검토하는 분야" },
+    ],
+    relatedSlugs: ["research-agent", "surrogate-models", "retrosynthesis"],
+  },
+  {
+    slug: "alphaevolve-algorithm-discovery",
+    kind: "trend",
+    title: "코드를 진화시켜 알고리즘을 찾는다: AlphaEvolve의 연구 방식",
+    summary:
+      "Google DeepMind의 AlphaEvolve는 LLM이 만든 코드 후보를 자동 평가하고 좋은 해법을 반복 진화시킵니다. 알고리즘 발견에 강한 이유와 적용 가능한 연구 문제의 조건을 정리합니다.",
+    field: "과학 AI · 알고리즘 탐색",
+    topicId: "science",
+    topicLabel: "과학 AI",
+    domains: ["과학 AI", "LLM·생성형 AI"],
+    tags: ["#AlphaEvolve", "#진화적 탐색", "#알고리즘 발견"],
+    source: "Google DeepMind · AlphaEvolve white paper · 2025",
+    publishedOn: "2026.10.10",
+    readingMinutes: 6,
+    cover: "alphaEvolve",
+    institution: "Google DeepMind",
+    sourceUrl: "https://arxiv.org/abs/2506.13131",
+    imageAlt:
+      "연구자가 여러 알고리즘 후보가 자동 평가를 거쳐 더 나은 경로로 진화하는 과정을 검토하는 설명용 이미지",
+    imageCaption:
+      "코드 후보를 생성·평가·선택해 개선하는 진화적 탐색 흐름을 재구성한 이미지입니다. 실제 AlphaEvolve 화면이나 연구 도판이 아닙니다.",
+    sampleNotice:
+      "성과 수치와 적용 조건은 Google DeepMind 공식 발표와 AlphaEvolve 백서에서 확인했습니다. 대표 이미지는 설명용 생성 이미지입니다.",
+    highlights: [
+      { label: "지금 변하는 점", text: "코드 초안을 쓰는 AI에서 검증 가능한 알고리즘을 반복 탐색하는 AI로 넓어졌습니다." },
+      { label: "작동 구조", text: "LLM이 코드를 제안하고 자동 평가기가 실행·채점한 결과로 다음 후보를 고릅니다." },
+      { label: "주요 결과", text: "50개가 넘는 수학 문제 중 약 20%에서 기존 최고 해법을 개선했다고 발표했습니다." },
+      { label: "적용 조건", text: "정답의 품질을 코드로 자동 측정할 수 있는 문제가 가장 잘 맞습니다." },
+    ],
+    sections: [
+      {
+        id: "intro",
+        toc: "기술 소개",
+        title: "코드를 쓰는 AI에서 알고리즘을 발견하는 AI로",
+        paragraphs: [
+          "AlphaEvolve는 Gemini 기반 LLM이 알고리즘 코드를 제안하고, 자동 평가기가 각 후보를 실행·채점한 뒤 더 좋은 프로그램을 다음 탐색의 재료로 남기는 진화적 코딩 에이전트입니다.",
+          "핵심은 자연어로 그럴듯한 코드를 한 번 만드는 것이 아니라, 측정 가능한 목표를 향해 수많은 변형을 시험하고 선택하는 반복 과정입니다.",
+        ],
+      },
+      {
+        id: "difference",
+        toc: "기존과의 차이",
+        title: "일반 코딩 도우미와 무엇이 다를까?",
+        paragraphs: [
+          "일반 코딩 도우미는 사용자의 요청에 맞는 코드를 제안하지만 그 코드가 가장 빠르거나 새로운 해법인지 장기간 탐색하지는 않습니다. AlphaEvolve는 Gemini Flash로 후보의 폭을 넓히고 Gemini Pro로 더 깊은 변형을 제안합니다.",
+          "각 후보는 사람이 느낌으로 고르는 것이 아니라 정확도·속도·비용처럼 미리 만든 평가 함수로 채점됩니다. 그래서 개선 여부를 자동으로 판별할 수 있는 문제가 중요합니다.",
+        ],
+      },
+      {
+        id: "how",
+        toc: "쉬운 작동 개념",
+        title: "제안하고 실행하고 살아남은 코드를 다시 바꾼다",
+        paragraphs: [
+          "연구자가 문제의 코드 골격과 평가 기준을 준비하면 LLM이 여러 프로그램 변형을 만듭니다. 평가기가 실행 결과를 점수로 바꾸고, 진화 알고리즘이 높은 점수와 다양한 아이디어를 다음 세대에 남깁니다.",
+        ],
+        steps: [
+          { title: "목표 정의", detail: "정확도·속도처럼 자동 측정할 점수를 정합니다" },
+          { title: "코드 변형", detail: "LLM이 서로 다른 알고리즘 후보를 제안합니다" },
+          { title: "실행·평가", detail: "테스트와 평가기로 각 후보를 객관적으로 채점합니다" },
+          { title: "선택·진화", detail: "좋은 후보를 보존하고 다시 변형해 탐색을 이어갑니다" },
+        ],
+      },
+      {
+        id: "fields",
+        toc: "연구 활용 분야",
+        title: "어떤 문제에서 성과를 보였을까?",
+        paragraphs: [
+          "Google DeepMind는 수학·컴퓨터과학의 공개 문제 50개 이상에 적용했을 때 약 75%에서 기존 최고 수준의 해법을 다시 찾고, 약 20%에서는 알려진 최고 해법을 개선했다고 발표했습니다.",
+          "또한 4×4 복소수 행렬 곱셈을 48회의 스칼라 곱셈으로 수행하는 알고리즘을 찾아 해당 조건에서 Strassen 이후 56년 만의 개선이라고 보고했습니다. 데이터센터 스케줄링과 하드웨어 회로, AI 학습 최적화에도 활용됐습니다.",
+        ],
+      },
+      {
+        id: "caveats",
+        toc: "한계·주의점",
+        title: "모든 연구 문제를 코드 점수로 바꿀 수는 없다",
+        paragraphs: [
+          "AlphaEvolve는 후보를 자동 실행하고 품질을 정확히 채점할 수 있을 때 강합니다. 사람의 판단이 필요한 연구 질문, 실험 비용이 매우 큰 문제, 안전하지 않은 코드를 격리할 환경이 없는 경우에는 같은 방식을 바로 적용하기 어렵습니다.",
+          "자동 평가기가 잘못된 목표를 측정하면 AI는 실제 연구 가치가 아니라 그 점수만 높이는 편법을 찾을 수 있습니다. 테스트 범위, 계산 자원, 보안 격리, 최종 전문가 검토가 필수입니다.",
+        ],
+      },
+      {
+        id: "related",
+        toc: "관련 기술",
+        title: "우리 연구 문제에 맞는지 확인하는 질문",
+        paragraphs: [
+          "후보 해법을 코드로 표현할 수 있는가, 결과를 자동으로 재현할 수 있는가, 좋은 결과를 하나의 점수나 명확한 기준으로 비교할 수 있는가를 먼저 확인해야 합니다.",
+          "세 질문에 답하기 어렵다면 LLM 에이전트보다 평가 데이터와 시뮬레이터를 만드는 일이 먼저입니다. AlphaEvolve는 당시 선별된 학술 사용자 대상 조기 접근을 예고한 연구 시스템이며, 범용 코딩 제품과 같게 보아서는 안 됩니다.",
+        ],
+      },
+    ],
+    facts: [
+      { label: "주제", value: "진화적 알고리즘 발견" },
+      { label: "기반 모델", value: "Gemini Flash·Pro" },
+      { label: "평가 범위", value: "수학·컴퓨팅 공개 문제 50개 이상" },
+      { label: "공식 발표", value: "Google DeepMind (2025.05.14)" },
+      { label: "원문", value: "arXiv:2506.13131" },
+    ],
+    technologies: [
+      { title: "진화적 탐색", description: "높은 점수와 다양한 코드 후보를 남기며 반복 개선하는 방법" },
+      { title: "LLM 코드 생성", description: "문제의 코드 골격을 여러 알고리즘 후보로 변형하는 기술" },
+      { title: "자동 평가기", description: "후보를 실행해 정확성·속도·비용을 객관적으로 채점하는 장치" },
+    ],
+    relatedSlugs: ["research-agent", "surrogate-models", "experiment-optimization"],
+  },
+  {
     slug: "literature-review-llm",
     kind: "trend",
     title: "문헌 리뷰, LLM에게 어디까지 맡겨도 될까",
@@ -1432,8 +1643,8 @@ export function featuredInsight(kind: InsightKind): InsightArticle {
 /** 랜딩의 최신 인사이트 3장. 이미지에 보인 글 순서를 유지합니다. */
 export const LATEST_LANDING_SLUGS = [
   "research-agent",
-  "lettuce-biomass-estimation",
-  "periodontal-bone-loss-analysis",
+  "mattergen-material-design",
+  "alphaevolve-algorithm-discovery",
 ] as const;
 
 export function landingInsights(): InsightArticle[] {

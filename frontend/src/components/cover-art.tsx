@@ -10,6 +10,8 @@ const COVER_SRC: Record<CoverTheme, string> = {
   dental: "/generated/case-periodontal-xray-v1.png",
   concrete: "/generated/case-concrete-crack-v1.png",
   coScientist: "/generated/trend-co-scientist-v1.png",
+  mattergen: "/generated/trend-mattergen-v1.png",
+  alphaEvolve: "/generated/trend-alphaevolve-v1.png",
   medical: "/photos/histology.jpg",
   protein: "/photos/protein-render.jpg",
   molecule: "/photos/protein.jpg",
