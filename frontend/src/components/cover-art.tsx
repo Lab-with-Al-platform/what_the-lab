@@ -6,6 +6,12 @@ import type { CoverTheme } from "@/lib/insights";
  */
 const COVER_SRC: Record<CoverTheme, string> = {
   cells: "/photos/cells-render.jpg",
+  biomass: "/generated/case-lettuce-biomass-v1.png",
+  dental: "/generated/case-periodontal-xray-v1.png",
+  concrete: "/generated/case-concrete-crack-v1.png",
+  coScientist: "/generated/trend-co-scientist-v1.png",
+  mattergen: "/generated/trend-mattergen-v1.png",
+  alphaEvolve: "/generated/trend-alphaevolve-v1.png",
   medical: "/photos/histology.jpg",
   protein: "/photos/protein-render.jpg",
   molecule: "/photos/protein.jpg",
@@ -26,6 +32,8 @@ interface CoverArtProps {
   theme: CoverTheme;
   /** 부모가 정한 칸을 채웁니다. 높이를 주지 않으면 사진이 0으로 줄어듭니다. */
   className: string;
+  /** 상세 화면에서는 사진의 의미를 설명하고, 장식용 카드에서는 비워 둡니다. */
+  alt?: string;
 }
 
 /**
@@ -35,11 +43,11 @@ interface CoverArtProps {
  */
 export const INSIGHT_CARD_COVER_CLASS = "aspect-video w-full shrink-0";
 
-export function CoverArt({ theme, className }: CoverArtProps) {
+export function CoverArt({ theme, className, alt = "" }: CoverArtProps) {
   return (
     <div className={`relative overflow-hidden bg-page ${className}`}>
       {/* 절대 위치로 두어야 원본 사진 크기가 칸 높이를 밀지 않습니다. */}
-      <img src={COVER_SRC[theme]} alt="" className="absolute inset-0 h-full w-full object-cover" />
+      <img src={COVER_SRC[theme]} alt={alt} className="absolute inset-0 h-full w-full object-cover" />
     </div>
   );
 }

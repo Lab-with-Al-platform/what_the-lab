@@ -99,7 +99,9 @@ export function InsightBrowser({
               <h1 className="insight-page-heading__title">{title}</h1>
               <p className="mt-3 text-sm text-muted md:text-base">{kicker}</p>
             </div>
-            <p className="text-xs text-muted">총 {articles.length}건 · 예시 콘텐츠</p>
+            <p className="text-xs text-muted">
+              총 {articles.length}건 · {kind === "case" ? "실증 사례·시안 콘텐츠" : "검증 글·시안 콘텐츠"}
+            </p>
           </div>
           <p className="sr-only">{description}</p>
         </PageContainer>

@@ -9,6 +9,78 @@ import { articlePath, kindLabel, relatedInsights, type InsightArticle } from "@/
 /** 같은 현미경 사진을 다른 위치로 잘라, 세포 종류마다 다른 연구 그림인 것처럼 보이지 않게 합니다. */
 const CHIP_CROPS = ["object-[18%_35%]", "object-[72%_28%]", "object-[40%_78%]", "object-[82%_68%]"];
 
+/** PC 헤더 사진 너비와 간격입니다. 날짜 줄이 사진 아래로 들어가지 않게 같은 값을 씁니다. */
+const HEADER_FIGURE_WIDTH = 280;
+const HEADER_FIGURE_GAP = 24;
+
+/**
+ * Co-Scientist처럼 하이픈이 있는 이름은 하이픈 앞에서 줄이 끊기지 않게 합니다.
+ */
+function keepCompoundWords(text: string): string {
+  return text.replace(/([\p{L}\p{N}])-([\p{L}\p{N}])/gu, "$1\u2011$2");
+}
+
+/**
+ * 문장이 끝나면 다음 문장을 새 줄에 둡니다.
+ * 제목의 콜론은 문장 경계로 보고, 소수점(0.964)은 문장 끝으로 보지 않습니다.
+ */
+function splitReadableLines(text: string, breakOnColon: boolean): string[] {
+  const normalized = keepCompoundWords(text.trim());
+  const lines: string[] = [];
+  let current = "";
+
+  for (let index = 0; index < normalized.length; index += 1) {
+    const char = normalized[index] ?? "";
+    current += char;
+    const next = normalized[index + 1] ?? "";
+    // DOI·소수점은 점 뒤에 공백이 없습니다. 문장 끝은 공백이나 글의 끝으로만 봅니다.
+    const isSentenceEnd = ".?!…".includes(char) && (next === " " || next === "");
+    const isTitleColon = breakOnColon && char === ":" && (next === " " || next === "");
+
+    if (!isSentenceEnd && !isTitleColon) continue;
+
+    while (normalized[index + 1] === " ") index += 1;
+    const line = current.trim();
+    if (line) lines.push(line);
+    current = "";
+  }
+
+  const rest = current.trim();
+  if (rest) lines.push(rest);
+  return lines.length > 0 ? lines : [normalized];
+}
+
+/** 긴 DOI는 슬래시·점 뒤에서 줄을 바꿔, 박스 밖으로 나가지 않게 합니다. */
+function FactValue({ value }: { value: string }) {
+  if (!value.startsWith("10.")) return value;
+
+  return value.split(/([./])/).map((part, index) =>
+    part === "." || part === "/" ? (
+      <span key={`${part}-${index}`}>
+        {part}
+        <wbr />
+      </span>
+    ) : (
+      <span key={`${part}-${index}`}>{part}</span>
+    ),
+  );
+}
+
+function ReadableText({ text, breakOnColon = false }: { text: string; breakOnColon?: boolean }) {
+  const lines = splitReadableLines(text, breakOnColon);
+  if (lines.length === 1) return lines[0];
+
+  return (
+    <>
+      {lines.map((line, index) => (
+        <span key={`${index}-${line}`} className="block">
+          {line}
+        </span>
+      ))}
+    </>
+  );
+}
+
 interface ArticleViewProps {
   article: InsightArticle;
 }
@@ -56,11 +128,20 @@ export function ArticleView({ article }: ArticleViewProps) {
         />
 
         <article className="-mx-5 min-w-0 bg-card px-5 py-1 sm:mx-0 sm:rounded-card sm:border sm:border-line sm:p-5 sm:shadow-card md:p-6">
-          <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_240px] xl:gap-6">
+          <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_280px] xl:gap-6">
             <figure className="xl:col-start-2 xl:row-start-1">
-              <CoverArt theme={article.cover} className="aspect-[4/2.25] w-full rounded-[8px] xl:aspect-auto xl:h-[190px]" />
-              <figcaption className="mt-1.5 text-center text-[10px] leading-4 text-faint">
-                분야를 보여 주는 사진입니다. 이 글의 원본 연구 그림이 아닙니다.
+              <CoverArt
+                theme={article.cover}
+                className="aspect-[4/2.6] w-full rounded-[8px] xl:aspect-auto xl:h-[232px]"
+                alt={article.imageAlt}
+              />
+              <figcaption className="mt-2 text-center text-[11px] leading-5 text-pretty text-faint">
+                <ReadableText
+                  text={
+                    article.imageCaption ??
+                    "분야를 보여 주는 사진입니다. 이 글의 원본 연구 그림이 아닙니다."
+                  }
+                />
               </figcaption>
             </figure>
             <div className="mt-4 xl:col-start-1 xl:row-start-1 xl:mt-0">
@@ -69,9 +150,13 @@ export function ArticleView({ article }: ArticleViewProps) {
                 <span className="mx-2 text-line">|</span>
                 <span className="font-medium text-muted">{article.field}</span>
               </p>
-              <h1 className="mt-3 text-[26px] leading-[1.3] font-bold tracking-[-0.025em] text-ink md:text-[30px]">{article.title}</h1>
-              <p className="mt-3 text-[14px] leading-6 text-muted">{article.summary}</p>
-              <ul className="mt-3 flex flex-wrap gap-1.5">
+              <h1 className="mt-3 text-[26px] leading-[1.35] font-bold tracking-[-0.025em] text-pretty text-ink md:text-[30px]">
+                <ReadableText text={article.title} breakOnColon />
+              </h1>
+              <p className="mt-3 text-[14px] leading-6 text-muted">
+                <ReadableText text={article.summary} />
+              </p>
+              <ul className="mt-4 flex flex-wrap gap-1.5">
                 {article.tags.slice(0, 3).map((tag) => (
                   <li key={tag}>
                     <KeywordTag label={tag} />
@@ -81,11 +166,28 @@ export function ArticleView({ article }: ArticleViewProps) {
             </div>
           </div>
 
-          <ul className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-line pt-3 text-[11px] text-faint xl:-mt-1 xl:max-w-[calc(100%-264px)] xl:border-t-0 xl:pt-0">
+          {/* 설명 길이와 상관없이 키워드와 날짜 사이에 같은 간격을 둡니다. */}
+          <ul
+            className="mt-8 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-line pt-4 text-[11px] text-faint xl:max-w-[calc(100%-var(--header-figure-offset))] xl:border-t-0 xl:pt-0"
+            style={{ ["--header-figure-offset" as string]: `${HEADER_FIGURE_WIDTH + HEADER_FIGURE_GAP}px` }}
+          >
             {article.institution ? <li>{article.institution}</li> : null}
             <li>{article.publishedOn}</li>
             <li>읽는 시간 {article.readingMinutes}분</li>
-            <li className="font-semibold text-brand">원문 준비 중 ↗</li>
+            <li className="font-semibold text-brand">
+              {article.sourceUrl ? (
+                <a
+                  href={article.sourceUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="transition hover:text-ink"
+                >
+                  원문 보기 ↗
+                </a>
+              ) : (
+                "원문 준비 중 ↗"
+              )}
+            </li>
           </ul>
           {article.sampleNotice ? <p className="mt-2 text-[10px] leading-4 text-faint">{article.sampleNotice}</p> : null}
 
@@ -117,11 +219,12 @@ export function ArticleView({ article }: ArticleViewProps) {
             {article.sections.map((section, index) => (
               <section key={section.id} id={section.id} className="article-section">
                 <h2 className="text-[20px] font-bold tracking-tight text-ink md:text-[22px]">
-                  <span className="text-brand">{String(index + 1).padStart(2, "0")}.</span> {section.title}
+                  <span className="text-brand">{String(index + 1).padStart(2, "0")}.</span>{" "}
+                  <ReadableText text={section.title} />
                 </h2>
                 {section.paragraphs.map((paragraph) => (
-                  <p key={paragraph} className="mt-3 text-[14px] leading-7 text-muted">
-                    {paragraph}
+                  <p key={paragraph} className="mt-3 text-[14px] leading-7 text-pretty text-muted">
+                    <ReadableText text={paragraph} />
                   </p>
                 ))}
                 {section.chips ? (
@@ -163,15 +266,30 @@ export function ArticleView({ article }: ArticleViewProps) {
             <h2 className="border-b border-line pb-3 text-sm font-semibold">연구 정보</h2>
             <dl className="text-[12px]">
               {article.facts.map((fact) => (
-                <div key={fact.label} className="grid grid-cols-[72px_minmax(0,1fr)] gap-2 border-b border-line/70 py-2.5 last:border-b-0">
+                <div key={fact.label} className="grid min-w-0 grid-cols-[72px_minmax(0,1fr)] gap-2 border-b border-line/70 py-2.5 last:border-b-0">
                   <dt className="text-muted">{fact.label}</dt>
-                  <dd>{fact.value}</dd>
+                  <dd className="min-w-0 break-words">
+                    <FactValue value={fact.value} />
+                  </dd>
                 </div>
               ))}
             </dl>
-            <p className="mt-4 text-xs leading-5 text-muted">원문 링크는 출처 확인이 끝난 뒤에 연결합니다.</p>
+            {article.sourceUrl ? (
+              <a
+                href={article.sourceUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-4 block text-xs font-semibold leading-5 text-brand transition hover:text-ink"
+              >
+                {article.doi ? "DOI 원문 확인하기 ↗" : "원문 확인하기 ↗"}
+              </a>
+            ) : (
+              <p className="mt-4 text-xs leading-5 text-muted">원문 링크는 출처 확인이 끝난 뒤에 연결합니다.</p>
+            )}
           </section>
 
+          {/* PC에서는 목차와 같이 헤더 아래에 붙습니다. 글이 끝나면 함께 풀립니다. */}
+          <div className="space-y-4 xl:sticky xl:top-[calc(var(--header-height)+24px)] xl:h-fit">
           <section className="rounded-card border border-line bg-card p-5 shadow-card">
             <h2 className="text-sm font-semibold">관련 AI 기술</h2>
             <ul className="mt-3 space-y-2">
@@ -210,6 +328,7 @@ export function ArticleView({ article }: ArticleViewProps) {
               </ul>
             </section>
           ) : null}
+          </div>
         </aside>
       </div>
 

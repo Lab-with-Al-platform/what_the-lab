@@ -20,11 +20,11 @@ export default function TrendsPage() {
         eyebrow="AI · Research Trends"
         title="AI 트렌드"
         kicker="연구실에서 읽는, 지금의 AI 흐름"
-        description="AI를 전공하지 않은 연구자도 따라올 수 있게, 연구에 쓸 만한 AI 소식만 골라 짧게 정리합니다. 지금 보이는 글은 모두 화면 시안용 예시입니다."
-        featuredHeadline={"논문 읽기부터 실험 설계까지,\nAI는 어디까지 도울 수 있을까요?"}
-        featuredDescription="문헌 검색과 요약을 넘어 실험 계획의 초안까지. 연구 보조 에이전트의 가능성과 연구자가 직접 확인해야 할 지점을 살펴보세요."
+        description="AI를 전공하지 않은 연구자도 따라올 수 있게, 연구에 쓸 만한 AI 소식과 원문 근거를 골라 짧게 정리합니다."
+        featuredHeadline={"AI가 가설을 만들고 토론하면,\n연구자는 무엇을 검증해야 할까요?"}
+        featuredDescription="2026년 Nature에 발표된 Co-Scientist를 통해 멀티에이전트의 작동 방식과 실제 연구에서 지켜야 할 검증 경계를 살펴봅니다."
         listTitle="최신 트렌드"
-        footnote="트렌드 데이터는 아직 수집 전입니다. 이 페이지의 글·출처·날짜는 모두 화면 배치 확인용 예시입니다."
+        footnote="Co-Scientist·MatterGen·AlphaEvolve 글은 원 논문과 공식 연구기관 발표를 확인해 작성했습니다. 나머지 트렌드 글에는 화면 시안용 예시 콘텐츠가 포함되어 있습니다."
       />
     </Suspense>
   );
