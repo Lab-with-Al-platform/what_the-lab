@@ -81,7 +81,7 @@ export function SiteHeader() {
           
           <Link
             href="/login"
-            className="hidden h-11 items-center rounded-button bg-ink px-4 text-sm font-semibold text-white hover:bg-brand-hover sm:inline-flex"
+            className="hidden h-11 items- center rounded-button bg-ink px-4 text-sm font-semibold text-white hover:bg-brand-hover sm:inline-flex"
           >
             디스코드로 로그인
           </Link>
@@ -131,7 +131,7 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
-          <div className="mt-2 grid grid-cols-2 gap-2 sm:hidden">
+          <div className="mt-2 grid gap-2 sm:hidden">
             
             <Link href="/login" className="flex min-h-11 items-center justify-center rounded-button bg-ink text-sm font-semibold text-white">
               디스코드로 로그인

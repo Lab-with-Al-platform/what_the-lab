@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SignupSteps } from "@/components/signup-steps";
 import { findInstitution, getEmailDomain, isPersonalEmail } from "@/lib/email-domain";
-
 const CODE_LENGTH = 6;
 const CODE_VALID_SECONDS = 5 * 60;
 
@@ -50,7 +49,7 @@ export function ResearcherVerifyForm() {
 
   function verify() {
     // TODO: 백엔드가 생기면 여기서 인증번호가 맞는지 확인합니다.
-    router.push("/signup/researcher/profile");
+    router.push("/signup/researcher/info");
   }
 
   return (
