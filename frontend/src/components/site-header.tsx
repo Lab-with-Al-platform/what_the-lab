@@ -81,7 +81,7 @@ export function SiteHeader() {
           
           <Link
             href="/login"
-            className="hidden h-11 items- center rounded-button bg-ink px-4 text-sm font-semibold text-white hover:bg-brand-hover sm:inline-flex"
+            className="hidden h-11 items-center rounded-button bg-ink px-4 text-sm font-semibold text-white hover:bg-brand-hover sm:inline-flex"
           >
             디스코드로 로그인
           </Link>
