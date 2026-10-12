@@ -78,17 +78,12 @@ export function SiteHeader() {
             <span className="sr-only">인사이트 검색 열기</span>
             <SearchIcon />
           </button>
-          <Link
-            href="/signup"
-            className="hidden h-11 items-center rounded-button border border-line bg-white px-4 text-sm font-medium text-ink hover:bg-page sm:inline-flex"
-          >
-            회원가입
-          </Link>
+          
           <Link
             href="/login"
             className="hidden h-11 items-center rounded-button bg-ink px-4 text-sm font-semibold text-white hover:bg-brand-hover sm:inline-flex"
           >
-            로그인
+            디스코드로 로그인
           </Link>
           <button
             type="button"
@@ -136,12 +131,10 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
-          <div className="mt-2 grid grid-cols-2 gap-2 sm:hidden">
-            <Link href="/signup" className="flex min-h-11 items-center justify-center rounded-button border border-line text-sm">
-              회원가입
-            </Link>
+          <div className="mt-2 grid gap-2 sm:hidden">
+            
             <Link href="/login" className="flex min-h-11 items-center justify-center rounded-button bg-ink text-sm font-semibold text-white">
-              로그인
+              디스코드로 로그인
             </Link>
           </div>
           </PageContainer>
