@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = { title: "로그인" };
-// TODO: 백엔드가 생기면 아래 주소로 바꿉니다. 그때는 서버가 회원이면 홈(/), 아니면 /signup으로 보내 줍니다.
-// `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/discord/login`
-const DISCORD_LOGIN_URL = "/signup";
+
+
+// 백엔드의 디스코드 로그인 시작 주소. 서버가 회원이면 홈(/), 아니면 /signup으로 보내 줍니다.
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000/api/v1";
+const DISCORD_LOGIN_URL = `${API_BASE_URL}/auth/discord/login`;
+
 // "왜 디스코드인가요?" 안내 문구. 문구만 바꿀 때 이 목록만 고치면 됩니다.
 const WHY_DISCORD = [
   { title: "협업 알림을 DM으로 바로 받아요", body: "요청 도착, 수락, 일정 알림을 놓치지 않아요" },
