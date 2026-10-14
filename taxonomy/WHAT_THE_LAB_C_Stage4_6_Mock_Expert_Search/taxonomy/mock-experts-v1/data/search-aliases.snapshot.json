@@ -1,0 +1,6322 @@
+[
+  {
+    "axis": "capability",
+    "term_id": "CAP001",
+    "term": "데이터 수집",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "데이터 수집"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP001",
+    "term": "Data acquisition",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "data acquisition"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP001",
+    "term": "데이터 확보",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "데이터 확보"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP001",
+    "term": "Data Collection",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "data collection"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP002",
+    "term": "데이터 통합·ETL",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "데이터 통합 etl"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP002",
+    "term": "Data integration and ETL",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "data integration and etl"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP002",
+    "term": "ETL",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "etl"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP002",
+    "term": "데이터 병합",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "데이터 병합"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP003",
+    "term": "데이터 정제·전처리",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "데이터 정제 전처리"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP003",
+    "term": "Data cleaning and preprocessing",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "data cleaning and preprocessing"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP003",
+    "term": "데이터 클리닝",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "데이터 클리닝"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP003",
+    "term": "Data Cleaning",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "data cleaning"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP003",
+    "term": "전처리",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "전처리"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP004",
+    "term": "데이터 라벨링·어노테이션",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "데이터 라벨링 어노테이션"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP004",
+    "term": "Data labeling and annotation",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "data labeling and annotation"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP004",
+    "term": "데이터 주석",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "데이터 주석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP004",
+    "term": "Annotation",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "annotation"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP005",
+    "term": "데이터 품질 진단",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "데이터 품질 진단"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP005",
+    "term": "Data quality assessment",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "data quality assessment"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP005",
+    "term": "데이터 품질 검증",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "데이터 품질 검증"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP005",
+    "term": "Data Quality Check",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "data quality check"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP006",
+    "term": "비정형 데이터 구조화",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "비정형 데이터 구조화"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP006",
+    "term": "Unstructured data structuring",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "unstructured data structuring"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP006",
+    "term": "비정형 데이터 정리",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "비정형 데이터 정리"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP007",
+    "term": "데이터 파이프라인 구축",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "데이터 파이프라인 구축"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP007",
+    "term": "Data pipeline development",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "data pipeline development"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP007",
+    "term": "데이터 파이프라인",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "데이터 파이프라인"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP007",
+    "term": "데이터 처리 자동화",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "데이터 처리 자동화"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP008",
+    "term": "기초 통계·탐색 분석",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "기초 통계 탐색 분석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP008",
+    "term": "Descriptive and exploratory analysis",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "descriptive and exploratory analysis"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP008",
+    "term": "탐색적 데이터 분석",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "탐색적 데이터 분석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP008",
+    "term": "EDA",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "no",
+    "normalized": "eda"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP008",
+    "term": "기술통계",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "기술통계"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP009",
+    "term": "통계 가설검정",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "통계 가설검정"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP009",
+    "term": "Statistical hypothesis testing",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "statistical hypothesis testing"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP009",
+    "term": "가설 검정",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "가설 검정"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP009",
+    "term": "Hypothesis Testing",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "hypothesis testing"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP010",
+    "term": "실험 설계·검정력 분석",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "실험 설계 검정력 분석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP010",
+    "term": "Experimental design and power analysis",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "experimental design and power analysis"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP010",
+    "term": "실험계획법",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "실험계획법"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP010",
+    "term": "DOE",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "no",
+    "normalized": "doe"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP010",
+    "term": "표본수 산정",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "표본수 산정"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP011",
+    "term": "인과 추론·효과 추정",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "인과 추론 효과 추정"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP011",
+    "term": "Causal inference and impact estimation",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "causal inference and impact estimation"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP011",
+    "term": "인과추론",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "인과추론"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP011",
+    "term": "Causal Inference",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "causal inference"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP012",
+    "term": "생존·사건시간 분석",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "생존 사건시간 분석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP012",
+    "term": "Survival and event-time analysis",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "survival and event time analysis"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP012",
+    "term": "생존분석",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "생존분석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP012",
+    "term": "Survival Analysis",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "survival analysis"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP013",
+    "term": "베이지안 통계·추론",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "베이지안 통계 추론"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP013",
+    "term": "Bayesian modeling and inference",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "bayesian modeling and inference"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP013",
+    "term": "베이지안 분석",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "베이지안 분석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP013",
+    "term": "Bayesian Statistics",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "bayesian statistics"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP014",
+    "term": "설문·표본 분석",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "설문 표본 분석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP014",
+    "term": "Survey and sampling analysis",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "survey and sampling analysis"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP014",
+    "term": "설문 분석",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "설문 분석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP014",
+    "term": "표본 설계",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "표본 설계"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP015",
+    "term": "범주 분류 모델",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "범주 분류 모델"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP015",
+    "term": "Classification modeling",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "classification modeling"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP015",
+    "term": "분류 예측",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "분류 예측"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP015",
+    "term": "Classification",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "classification"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP016",
+    "term": "연속값 회귀 예측",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "연속값 회귀 예측"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP016",
+    "term": "Regression prediction",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "regression prediction"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP016",
+    "term": "회귀 분석 모델",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "회귀 분석 모델"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP017",
+    "term": "비지도 군집화",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "비지도 군집화"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP017",
+    "term": "Clustering",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "clustering"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP017",
+    "term": "군집분석",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "군집분석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP018",
+    "term": "이상·변칙 탐지",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "이상 변칙 탐지"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP018",
+    "term": "Anomaly detection",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "anomaly detection"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP018",
+    "term": "이상 탐지",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "이상 탐지"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP019",
+    "term": "추천·유사도 탐색",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "추천 유사도 탐색"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP019",
+    "term": "Recommendation and similarity search",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "recommendation and similarity search"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP019",
+    "term": "추천 시스템",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "추천 시스템"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP019",
+    "term": "유사도 검색",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "유사도 검색"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP020",
+    "term": "표형 데이터 머신러닝",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "표형 데이터 머신러닝"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP020",
+    "term": "Tabular machine learning",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "tabular machine learning"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP020",
+    "term": "정형 데이터 머신러닝",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "정형 데이터 머신러닝"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP020",
+    "term": "Tabular ML",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "tabular ml"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP021",
+    "term": "특성 선택·엔지니어링",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "특성 선택 엔지니어링"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP021",
+    "term": "Feature selection and engineering",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "feature selection and engineering"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP021",
+    "term": "피처 엔지니어링",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "피처 엔지니어링"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP021",
+    "term": "Feature Engineering",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "feature engineering"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP022",
+    "term": "이미지 분류",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "이미지 분류"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP022",
+    "term": "Image classification",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "image classification"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP022",
+    "term": "영상 분류",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "영상 분류"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP023",
+    "term": "객체 탐지·위치 추정",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "객체 탐지 위치 추정"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP023",
+    "term": "Object detection and localization",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "object detection and localization"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP023",
+    "term": "객체 탐지",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "객체 탐지"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP023",
+    "term": "객체 검출",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "객체 검출"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP023",
+    "term": "Object Detection",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "object detection"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP023",
+    "term": "물체 탐지",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "물체 탐지"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP024",
+    "term": "이미지 분할·영역 추출",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "이미지 분할 영역 추출"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP024",
+    "term": "Image segmentation",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "image segmentation"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP024",
+    "term": "이미지 분할",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "이미지 분할"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP024",
+    "term": "이미지 세그멘테이션",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "이미지 세그멘테이션"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP025",
+    "term": "영상 객체 추적",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "영상 객체 추적"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP025",
+    "term": "Video object tracking",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "video object tracking"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP025",
+    "term": "객체 추적",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "객체 추적"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP025",
+    "term": "Object Tracking",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "object tracking"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP026",
+    "term": "영상 행동·동작 인식",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "영상 행동 동작 인식"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP026",
+    "term": "Action recognition",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "action recognition"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP026",
+    "term": "행동 인식",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "행동 인식"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP027",
+    "term": "이미지 복원·화질 개선",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "이미지 복원 화질 개선"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP027",
+    "term": "Image restoration and enhancement",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "image restoration and enhancement"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP027",
+    "term": "이미지 복원",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "이미지 복원"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP027",
+    "term": "노이즈 제거",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "노이즈 제거"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP028",
+    "term": "3차원 영상·형상 분석",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "3차원 영상 형상 분석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP028",
+    "term": "3D image and shape analysis",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "3d image and shape analysis"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP028",
+    "term": "3D 영상 분석",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "3d 영상 분석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP028",
+    "term": "3차원 형상 분석",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "3차원 형상 분석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP029",
+    "term": "광학문자인식·문서영상",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "광학문자인식 문서영상"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP029",
+    "term": "Optical character recognition",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "optical character recognition"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP029",
+    "term": "OCR",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "ocr"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP029",
+    "term": "광학 문자 인식",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "광학 문자 인식"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP030",
+    "term": "텍스트 분류",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "텍스트 분류"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP030",
+    "term": "Text classification",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "text classification"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP030",
+    "term": "문서 분류",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "문서 분류"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP031",
+    "term": "개체명·정보 추출",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "개체명 정보 추출"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP031",
+    "term": "Named entity and information extraction",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "named entity and information extraction"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP031",
+    "term": "NER",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "ner"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP031",
+    "term": "Named Entity Recognition",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "named entity recognition"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP031",
+    "term": "정보 추출",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "정보 추출"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP032",
+    "term": "문서 검색·정보 검색",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "문서 검색 정보 검색"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP032",
+    "term": "Document and information retrieval",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "document and information retrieval"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP032",
+    "term": "문서 검색",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "문서 검색"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP032",
+    "term": "Information Retrieval",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "information retrieval"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP033",
+    "term": "문서 요약",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "문서 요약"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP033",
+    "term": "Document summarization",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "document summarization"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP033",
+    "term": "자동 요약",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "자동 요약"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP033",
+    "term": "Summarization",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "summarization"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP034",
+    "term": "의미 유사도·임베딩",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "의미 유사도 임베딩"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP034",
+    "term": "Semantic similarity and text embeddings",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "semantic similarity and text embeddings"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP034",
+    "term": "텍스트 임베딩",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "텍스트 임베딩"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP034",
+    "term": "Semantic Search",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "semantic search"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP035",
+    "term": "주제 모델링·담론 분석",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "주제 모델링 담론 분석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP035",
+    "term": "Topic modeling and discourse analytics",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "topic modeling and discourse analytics"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP035",
+    "term": "토픽 모델링",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "토픽 모델링"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP035",
+    "term": "Topic Modeling",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "topic modeling"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP036",
+    "term": "감성·의견 분석",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "감성 의견 분석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP036",
+    "term": "Sentiment and opinion analysis",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "sentiment and opinion analysis"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP036",
+    "term": "감성 분석",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "감성 분석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP036",
+    "term": "Sentiment Analysis",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "sentiment analysis"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP037",
+    "term": "기계번역·다국어 처리",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "기계번역 다국어 처리"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP037",
+    "term": "Machine translation and multilingual NLP",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "machine translation and multilingual nlp"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP037",
+    "term": "기계 번역",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "기계 번역"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP037",
+    "term": "Machine Translation",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "machine translation"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP038",
+    "term": "음성 인식·전사",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "음성 인식 전사"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP038",
+    "term": "Speech recognition and transcription",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "speech recognition and transcription"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP038",
+    "term": "STT",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "stt"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP038",
+    "term": "Speech-to-Text",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "speech to text"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP038",
+    "term": "음성 전사",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "음성 전사"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP039",
+    "term": "음성 합성",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "음성 합성"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP039",
+    "term": "Speech synthesis",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "speech synthesis"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP039",
+    "term": "TTS",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "tts"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP039",
+    "term": "Text-to-Speech",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "text to speech"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP040",
+    "term": "화자 분리·식별",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "화자 분리 식별"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP040",
+    "term": "Speaker diarization and identification",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "speaker diarization and identification"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP040",
+    "term": "화자 분리",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "화자 분리"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP040",
+    "term": "Speaker Diarization",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "speaker diarization"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP041",
+    "term": "음향·환경소리 분석",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "음향 환경소리 분석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP041",
+    "term": "Acoustic event and audio analysis",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "acoustic event and audio analysis"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP041",
+    "term": "소리 이벤트 탐지",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "소리 이벤트 탐지"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP041",
+    "term": "Acoustic Event Detection",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "acoustic event detection"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP042",
+    "term": "이미지-텍스트 결합 분석",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "이미지 텍스트 결합 분석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP042",
+    "term": "Vision-language understanding",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "vision language understanding"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP042",
+    "term": "비전 언어 모델",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "비전 언어 모델"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP042",
+    "term": "Vision Language Model",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "vision language model"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP042",
+    "term": "VLM",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "vlm"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP043",
+    "term": "멀티모달 데이터 융합",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "멀티모달 데이터 융합"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP043",
+    "term": "Multimodal fusion",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "multimodal fusion"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP043",
+    "term": "다중모달 융합",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "다중모달 융합"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP044",
+    "term": "시계열 패턴 분석",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "시계열 패턴 분석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP044",
+    "term": "Time series analysis",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "time series analysis"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP044",
+    "term": "시계열 분석",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "시계열 분석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP045",
+    "term": "시계열 미래값 예측",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "시계열 미래값 예측"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP045",
+    "term": "Time series forecasting",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "time series forecasting"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP045",
+    "term": "시계열 예측",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "시계열 예측"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP046",
+    "term": "시계열 이상 탐지",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "시계열 이상 탐지"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP046",
+    "term": "Time series anomaly detection",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "time series anomaly detection"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP046",
+    "term": "시간 이상 탐지",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "시간 이상 탐지"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP046",
+    "term": "시계열 이상치 탐지",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "시계열 이상치 탐지"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP047",
+    "term": "공간·GIS 데이터 분석",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "공간 gis 데이터 분석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP047",
+    "term": "Geospatial and GIS analysis",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "geospatial and gis analysis"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP047",
+    "term": "공간 분석",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "공간 분석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP047",
+    "term": "GIS 분석",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "gis 분석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP048",
+    "term": "위성·원격탐사 영상 분석",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "위성 원격탐사 영상 분석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP048",
+    "term": "Satellite and remote sensing analytics",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "satellite and remote sensing analytics"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP048",
+    "term": "원격 탐사",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "원격 탐사"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP048",
+    "term": "Remote Sensing",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "remote sensing"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP049",
+    "term": "그래프·네트워크 분석",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "그래프 네트워크 분석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP049",
+    "term": "Graph and network analytics",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "graph and network analytics"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP049",
+    "term": "네트워크 분석",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "네트워크 분석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP049",
+    "term": "Network Analysis",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "network analysis"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP050",
+    "term": "그래프 신경망 학습",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "그래프 신경망 학습"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP050",
+    "term": "Graph neural network modeling",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "graph neural network modeling"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP050",
+    "term": "GNN",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "gnn"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP050",
+    "term": "Graph Neural Network",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "graph neural network"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP051",
+    "term": "LLM 응용 개발",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "llm 응용 개발"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP051",
+    "term": "LLM application development",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "llm application development"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP051",
+    "term": "LLM 앱 개발",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "llm 앱 개발"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP051",
+    "term": "대규모 언어모델 응용",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "대규모 언어모델 응용"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP052",
+    "term": "검색증강생성·RAG 구축",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "검색증강생성 rag 구축"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP052",
+    "term": "Retrieval augmented generation",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "retrieval augmented generation"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP052",
+    "term": "RAG",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "rag"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP052",
+    "term": "검색 증강 생성",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "검색 증강 생성"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP053",
+    "term": "생성형 AI 에이전트",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "생성형 ai 에이전트"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP053",
+    "term": "AI agent and tool use",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "ai agent and tool use"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP053",
+    "term": "AI 에이전트",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "ai 에이전트"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP053",
+    "term": "Agentic AI",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "agentic ai"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP054",
+    "term": "프롬프트·출력 구조화",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "프롬프트 출력 구조화"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP054",
+    "term": "Prompt design and structured outputs",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "prompt design and structured outputs"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP054",
+    "term": "프롬프트 엔지니어링",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "프롬프트 엔지니어링"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP054",
+    "term": "Prompt Engineering",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "prompt engineering"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP055",
+    "term": "LLM 미세조정·적응",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "llm 미세조정 적응"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP055",
+    "term": "LLM fine-tuning and adaptation",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "llm fine tuning and adaptation"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP055",
+    "term": "LLM 파인튜닝",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "llm 파인튜닝"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP055",
+    "term": "Fine-tuning",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "fine tuning"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP056",
+    "term": "이미지·콘텐츠 생성",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "이미지 콘텐츠 생성"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP056",
+    "term": "Generative image and content modeling",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "generative image and content modeling"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP056",
+    "term": "이미지 생성",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "이미지 생성"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP056",
+    "term": "Text-to-Image",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "text to image"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP057",
+    "term": "합성 데이터 생성",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "합성 데이터 생성"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP057",
+    "term": "Synthetic data generation",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "synthetic data generation"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP057",
+    "term": "Synthetic Data",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "synthetic data"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP057",
+    "term": "가상 데이터 생성",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "가상 데이터 생성"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP058",
+    "term": "지식그래프 구축·활용",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "지식그래프 구축 활용"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP058",
+    "term": "Knowledge graph construction",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "knowledge graph construction"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP058",
+    "term": "지식 그래프",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "지식 그래프"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP058",
+    "term": "Knowledge Graph",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "knowledge graph"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP059",
+    "term": "수리 최적화",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "수리 최적화"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP059",
+    "term": "Mathematical optimization",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "mathematical optimization"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP059",
+    "term": "Operations Research",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "operations research"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP059",
+    "term": "최적화 모델링",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "최적화 모델링"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP060",
+    "term": "조합 최적화·경로 탐색",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "조합 최적화 경로 탐색"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP060",
+    "term": "Combinatorial optimization and routing",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "combinatorial optimization and routing"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP060",
+    "term": "경로 최적화",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "경로 최적화"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP060",
+    "term": "조합 최적화",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "조합 최적화"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP061",
+    "term": "강화학습",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "강화학습"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP061",
+    "term": "Reinforcement learning",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "reinforcement learning"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP061",
+    "term": "RL",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "no",
+    "normalized": "rl"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP062",
+    "term": "제어 시스템·최적 제어",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "제어 시스템 최적 제어"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP062",
+    "term": "Control systems and optimal control",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "control systems and optimal control"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP062",
+    "term": "제어공학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "제어공학"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP062",
+    "term": "Optimal Control",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "optimal control"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP063",
+    "term": "로봇 인지·자율주행",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "로봇 인지 자율주행"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP063",
+    "term": "Robotics perception and autonomy",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "robotics perception and autonomy"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP063",
+    "term": "로봇 인지",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "로봇 인지"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP063",
+    "term": "자율 이동",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "자율 이동"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP064",
+    "term": "실험·공정 자동화",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "실험 공정 자동화"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP064",
+    "term": "Laboratory and process automation",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "laboratory and process automation"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP064",
+    "term": "실험 자동화",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "실험 자동화"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP064",
+    "term": "공정 자동화",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "공정 자동화"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP065",
+    "term": "오믹스·유전체 데이터 분석",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "오믹스 유전체 데이터 분석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP065",
+    "term": "Genomics and omics analytics",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "genomics and omics analytics"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP065",
+    "term": "유전체 데이터 분석",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "유전체 데이터 분석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP065",
+    "term": "Omics Analysis",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "omics analysis"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP066",
+    "term": "단백질·분자 구조 계산",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "단백질 분자 구조 계산"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP066",
+    "term": "Protein and molecular modeling",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "protein and molecular modeling"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP066",
+    "term": "단백질 구조 예측",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "단백질 구조 예측"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP066",
+    "term": "Molecular Modeling",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "molecular modeling"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP067",
+    "term": "계산화학·물성 예측",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "계산화학 물성 예측"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP067",
+    "term": "Computational chemistry and property prediction",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "computational chemistry and property prediction"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP067",
+    "term": "분자 물성 예측",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "분자 물성 예측"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP067",
+    "term": "계산 화학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "계산 화학"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP068",
+    "term": "수치 시뮬레이션·모델링",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "수치 시뮬레이션 모델링"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP068",
+    "term": "Numerical simulation and modeling",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "numerical simulation and modeling"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP068",
+    "term": "수치 시뮬레이션",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "수치 시뮬레이션"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP068",
+    "term": "Numerical Simulation",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "numerical simulation"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP069",
+    "term": "물리정보 신경망",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "물리정보 신경망"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP069",
+    "term": "Physics-informed neural networks",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "physics informed neural networks"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP069",
+    "term": "PINN",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "pinn"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP070",
+    "term": "최적 실험 설계·능동학습",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "최적 실험 설계 능동학습"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP070",
+    "term": "Active learning and adaptive experimentation",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "active learning and adaptive experimentation"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP070",
+    "term": "Active Learning",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "active learning"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP070",
+    "term": "능동 학습",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "능동 학습"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP071",
+    "term": "디지털 트윈·시뮬레이터 연동",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "디지털 트윈 시뮬레이터 연동"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP071",
+    "term": "Digital twin integration",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "digital twin integration"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP071",
+    "term": "Digital Twin",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "digital twin"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP071",
+    "term": "디지털 트윈",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "디지털 트윈"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP072",
+    "term": "모델 학습·전이학습",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "모델 학습 전이학습"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP072",
+    "term": "Model training and transfer learning",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "model training and transfer learning"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP072",
+    "term": "Transfer Learning",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "transfer learning"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP072",
+    "term": "전이학습",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "전이학습"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP073",
+    "term": "모델 성능 평가·재현성",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "모델 성능 평가 재현성"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP073",
+    "term": "Model evaluation and reproducibility",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "model evaluation and reproducibility"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP073",
+    "term": "성능 평가",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "성능 평가"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP073",
+    "term": "Model Validation",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "model validation"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP074",
+    "term": "모델 설명가능성·해석",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "모델 설명가능성 해석"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP074",
+    "term": "Explainable AI and model interpretation",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "explainable ai and model interpretation"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP074",
+    "term": "XAI",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "xai"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP074",
+    "term": "설명가능 AI",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "설명가능 ai"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP075",
+    "term": "모델 최적화·경량화",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "모델 최적화 경량화"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP075",
+    "term": "Model compression and optimization",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "model compression and optimization"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP075",
+    "term": "모델 압축",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "모델 압축"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP075",
+    "term": "Quantization",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "quantization"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP075",
+    "term": "Pruning",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "pruning"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP076",
+    "term": "모델 배포·API 서빙",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "모델 배포 api 서빙"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP076",
+    "term": "Model deployment and serving",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "model deployment and serving"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP076",
+    "term": "모델 서빙",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "모델 서빙"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP076",
+    "term": "Model Serving",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "model serving"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP077",
+    "term": "MLOps·모니터링",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "mlops 모니터링"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP077",
+    "term": "MLOps and model monitoring",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "mlops and model monitoring"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP077",
+    "term": "MLOps",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "mlops"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP077",
+    "term": "모델 모니터링",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "모델 모니터링"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP078",
+    "term": "공정성·편향 평가",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "공정성 편향 평가"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP078",
+    "term": "Fairness and bias evaluation",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "fairness and bias evaluation"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP078",
+    "term": "공정성 평가",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "공정성 평가"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP078",
+    "term": "Bias Evaluation",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "bias evaluation"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP079",
+    "term": "개인정보 보호 ML",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "개인정보 보호 ml"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP079",
+    "term": "Privacy-preserving machine learning",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "privacy preserving machine learning"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP080",
+    "term": "LLM·AI 안전성 평가",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "llm ai 안전성 평가"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP080",
+    "term": "AI safety and LLM evaluation",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "ai safety and llm evaluation"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP080",
+    "term": "LLM 평가",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "llm 평가"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP080",
+    "term": "AI 안전성 테스트",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "ai 안전성 테스트"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD001",
+    "term": "유전학·유전체학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "유전학 유전체학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD001",
+    "term": "Genetics and genomics",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "genetics and genomics"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD001",
+    "term": "유전학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "유전학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD001",
+    "term": "Genomics",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "genomics"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD002",
+    "term": "분자·세포생물학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "분자 세포생물학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD002",
+    "term": "Molecular and cell biology",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "molecular and cell biology"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD002",
+    "term": "세포생물학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "세포생물학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD002",
+    "term": "Molecular Biology",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "molecular biology"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD003",
+    "term": "생물정보학·계산생물학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "생물정보학 계산생물학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD003",
+    "term": "Bioinformatics and computational biology",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "bioinformatics and computational biology"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD003",
+    "term": "생명정보학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "생명정보학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD003",
+    "term": "Bioinformatics",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "bioinformatics"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD004",
+    "term": "미생물학·감염생물학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "미생물학 감염생물학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD004",
+    "term": "Microbiology and infectious biology",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "microbiology and infectious biology"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD004",
+    "term": "미생물학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "미생물학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD004",
+    "term": "Microbiology",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "microbiology"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD005",
+    "term": "생태·진화생물학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "생태 진화생물학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD005",
+    "term": "Ecology and evolutionary biology",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "ecology and evolutionary biology"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD005",
+    "term": "진화생물학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "진화생물학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD005",
+    "term": "Ecology",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "ecology"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD006",
+    "term": "신경과학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "신경과학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD006",
+    "term": "Neuroscience",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "neuroscience"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD006",
+    "term": "뇌과학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "뇌과학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD007",
+    "term": "생화학·구조생물학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "생화학 구조생물학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD007",
+    "term": "Biochemistry and structural biology",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "biochemistry and structural biology"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD007",
+    "term": "구조생물학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "구조생물학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD007",
+    "term": "Structural Biology",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "structural biology"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD008",
+    "term": "생물공학·합성생물학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "생물공학 합성생물학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD008",
+    "term": "Biotechnology and synthetic biology",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "biotechnology and synthetic biology"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD008",
+    "term": "합성생물학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "합성생물학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD008",
+    "term": "Synthetic Biology",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "synthetic biology"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD009",
+    "term": "기초의학·병리학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "기초의학 병리학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD009",
+    "term": "Basic medicine and pathology",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "basic medicine and pathology"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD009",
+    "term": "병리학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "병리학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD009",
+    "term": "Pathology",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "pathology"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD010",
+    "term": "임상의학·임상연구",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "임상의학 임상연구"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD010",
+    "term": "Clinical medicine and clinical research",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "clinical medicine and clinical research"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD010",
+    "term": "임상 의학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "임상 의학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD010",
+    "term": "Clinical Research",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "clinical research"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD011",
+    "term": "의료영상·영상의학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "의료영상 영상의학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD011",
+    "term": "Medical imaging and radiology",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "medical imaging and radiology"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD011",
+    "term": "영상의학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "영상의학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD011",
+    "term": "Radiology",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "radiology"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD012",
+    "term": "공중보건·역학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "공중보건 역학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD012",
+    "term": "Public health and epidemiology",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "public health and epidemiology"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD012",
+    "term": "Epidemiology",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "epidemiology"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD012",
+    "term": "역학 연구",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "역학 연구"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD013",
+    "term": "약학·신약개발",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "약학 신약개발"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD013",
+    "term": "Pharmaceutical sciences and drug discovery",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "pharmaceutical sciences and drug discovery"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD013",
+    "term": "Drug Discovery",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "drug discovery"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD013",
+    "term": "신약 연구",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "신약 연구"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD014",
+    "term": "간호·보건서비스",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "간호 보건서비스"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD014",
+    "term": "Nursing and health services",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "nursing and health services"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD014",
+    "term": "간호학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "간호학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD014",
+    "term": "Healthcare Services",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "healthcare services"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD015",
+    "term": "치의학·구강보건",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "치의학 구강보건"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD015",
+    "term": "Dentistry and oral health",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "dentistry and oral health"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD015",
+    "term": "치의학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "치의학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD015",
+    "term": "Dentistry",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "dentistry"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD016",
+    "term": "재활·운동의학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "재활 운동의학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD016",
+    "term": "Rehabilitation and sports medicine",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "rehabilitation and sports medicine"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD016",
+    "term": "재활의학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "재활의학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD016",
+    "term": "Sports Medicine",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "sports medicine"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD017",
+    "term": "정신건강·정신의학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "정신건강 정신의학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD017",
+    "term": "Mental health and psychiatry",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "mental health and psychiatry"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD017",
+    "term": "정신의학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "정신의학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD017",
+    "term": "Psychiatry",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "psychiatry"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD018",
+    "term": "의료정보학·디지털헬스",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "의료정보학 디지털헬스"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD018",
+    "term": "Medical informatics and digital health",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "medical informatics and digital health"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD018",
+    "term": "디지털 헬스",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "디지털 헬스"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD018",
+    "term": "Medical Informatics",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "medical informatics"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD019",
+    "term": "컴퓨터과학·소프트웨어",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "컴퓨터과학 소프트웨어"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD019",
+    "term": "Computer science and software",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "computer science and software"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD019",
+    "term": "Computer Science",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "computer science"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD019",
+    "term": "전산학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "전산학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD020",
+    "term": "인공지능·정보과학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "인공지능 정보과학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD020",
+    "term": "Artificial intelligence and information science",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "artificial intelligence and information science"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD020",
+    "term": "AI 연구",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "ai 연구"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD020",
+    "term": "정보과학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "정보과학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD021",
+    "term": "수학·응용수학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "수학 응용수학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD021",
+    "term": "Mathematics and applied mathematics",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "mathematics and applied mathematics"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD021",
+    "term": "Mathematics",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "mathematics"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD021",
+    "term": "응용 수학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "응용 수학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD022",
+    "term": "통계학·확률과정",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "통계학 확률과정"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD022",
+    "term": "Statistics and stochastic processes",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "statistics and stochastic processes"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD022",
+    "term": "Statistics",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "statistics"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD022",
+    "term": "확률통계",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "확률통계"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD023",
+    "term": "물리학·응용물리",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "물리학 응용물리"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD023",
+    "term": "Physics and applied physics",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "physics and applied physics"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD023",
+    "term": "Physics",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "physics"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD023",
+    "term": "응용 물리",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "응용 물리"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD024",
+    "term": "천문·우주과학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "천문 우주과학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD024",
+    "term": "Astronomy and space science",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "astronomy and space science"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD024",
+    "term": "Astronomy",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "astronomy"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD024",
+    "term": "천체 물리",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "천체 물리"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD025",
+    "term": "양자과학·양자정보",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "양자과학 양자정보"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD025",
+    "term": "Quantum science and information",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "quantum science and information"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD025",
+    "term": "양자정보",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "양자정보"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD025",
+    "term": "Quantum Science",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "quantum science"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD026",
+    "term": "계산과학·수치해석",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "계산과학 수치해석"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD026",
+    "term": "Computational science and numerical methods",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "computational science and numerical methods"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD026",
+    "term": "계산 과학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "계산 과학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD026",
+    "term": "Numerical Analysis",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "numerical analysis"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD027",
+    "term": "일반·분석화학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "일반 분석화학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD027",
+    "term": "Chemistry and analytical chemistry",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "chemistry and analytical chemistry"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD027",
+    "term": "화학 분석",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "화학 분석"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD027",
+    "term": "Analytical Chemistry",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "analytical chemistry"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD028",
+    "term": "계산화학·이론화학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "계산화학 이론화학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD028",
+    "term": "Computational and theoretical chemistry",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "computational and theoretical chemistry"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD028",
+    "term": "Computational Chemistry",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "computational chemistry"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD029",
+    "term": "화학공학·공정",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "화학공학 공정"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD029",
+    "term": "Chemical engineering and process",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "chemical engineering and process"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD029",
+    "term": "화공",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "화공"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD029",
+    "term": "Chemical Engineering",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "chemical engineering"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD030",
+    "term": "재료·신소재공학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "재료 신소재공학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD030",
+    "term": "Materials science and engineering",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "materials science and engineering"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD030",
+    "term": "재료공학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "재료공학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD030",
+    "term": "신소재",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "신소재"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD031",
+    "term": "나노과학·나노소재",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "나노과학 나노소재"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD031",
+    "term": "Nanoscience and nanomaterials",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "nanoscience and nanomaterials"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD031",
+    "term": "Nanomaterials",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "nanomaterials"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD031",
+    "term": "나노소재",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "나노소재"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD032",
+    "term": "에너지·배터리",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "에너지 배터리"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD032",
+    "term": "Energy science and batteries",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "energy science and batteries"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD032",
+    "term": "배터리 연구",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "배터리 연구"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD032",
+    "term": "Energy Storage",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "energy storage"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD033",
+    "term": "반도체·전자재료",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "반도체 전자재료"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD033",
+    "term": "Semiconductor and electronic materials",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "semiconductor and electronic materials"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD033",
+    "term": "Semiconductor",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "semiconductor"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD033",
+    "term": "전자재료",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "전자재료"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD034",
+    "term": "기계·기계설계",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "기계 기계설계"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD034",
+    "term": "Mechanical engineering",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "mechanical engineering"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD035",
+    "term": "전기·전자공학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "전기 전자공학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD035",
+    "term": "Electrical and electronics engineering",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "electrical and electronics engineering"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD035",
+    "term": "전자전기공학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "전자전기공학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD035",
+    "term": "EEE",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "eee"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD036",
+    "term": "로봇·제어공학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "로봇 제어공학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD036",
+    "term": "Robotics and control engineering",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "robotics and control engineering"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD036",
+    "term": "로보틱스",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "로보틱스"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD036",
+    "term": "Robotics",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "robotics"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD037",
+    "term": "산업·시스템공학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "산업 시스템공학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD037",
+    "term": "Industrial and systems engineering",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "industrial and systems engineering"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD037",
+    "term": "산업공학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "산업공학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD038",
+    "term": "스마트제조·품질공학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "스마트제조 품질공학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD038",
+    "term": "Smart manufacturing and quality engineering",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "smart manufacturing and quality engineering"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD038",
+    "term": "제조 AI",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "제조 ai"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD038",
+    "term": "스마트 팩토리",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "스마트 팩토리"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD039",
+    "term": "항공우주·우주공학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "항공우주 우주공학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD039",
+    "term": "Aerospace engineering",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "aerospace engineering"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD040",
+    "term": "토목·건설공학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "토목 건설공학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD040",
+    "term": "Civil and construction engineering",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "civil and construction engineering"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD040",
+    "term": "Civil Engineering",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "civil engineering"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD041",
+    "term": "교통·모빌리티",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "교통 모빌리티"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD041",
+    "term": "Transport and mobility engineering",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "transport and mobility engineering"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD041",
+    "term": "교통공학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "교통공학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD041",
+    "term": "모빌리티",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "모빌리티"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD042",
+    "term": "의공학·의료기기",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "의공학 의료기기"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD042",
+    "term": "Biomedical engineering and medical devices",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "biomedical engineering and medical devices"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD042",
+    "term": "의료기기",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "의료기기"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD042",
+    "term": "Biomedical Engineering",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "biomedical engineering"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD043",
+    "term": "기후·대기과학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "기후 대기과학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD043",
+    "term": "Climate and atmospheric science",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "climate and atmospheric science"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD043",
+    "term": "기후과학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "기후과학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD043",
+    "term": "Atmospheric Science",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "atmospheric science"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD044",
+    "term": "지구·지질과학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "지구 지질과학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD044",
+    "term": "Earth and geological sciences",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "earth and geological sciences"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD044",
+    "term": "지구과학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "지구과학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD044",
+    "term": "Geology",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "geology"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD045",
+    "term": "환경과학·환경공학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "환경과학 환경공학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD045",
+    "term": "Environmental science and engineering",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "environmental science and engineering"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD045",
+    "term": "환경 과학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "환경 과학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD045",
+    "term": "Environmental Science",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "environmental science"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD046",
+    "term": "해양·수산과학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "해양 수산과학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD046",
+    "term": "Marine and fisheries science",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "marine and fisheries science"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD046",
+    "term": "해양학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "해양학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD046",
+    "term": "Oceanography",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "oceanography"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD047",
+    "term": "원격탐사·지리정보",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "원격탐사 지리정보"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD047",
+    "term": "Remote sensing and geoinformatics",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "remote sensing and geoinformatics"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD047",
+    "term": "Remote Sensing",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "remote sensing"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD047",
+    "term": "GIS 연구",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "gis 연구"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD048",
+    "term": "농업·작물과학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "농업 작물과학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD048",
+    "term": "Agriculture and crop science",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "agriculture and crop science"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD048",
+    "term": "Agronomy",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "agronomy"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD048",
+    "term": "스마트 농업",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "스마트 농업"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD049",
+    "term": "식품과학·식품공학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "식품과학 식품공학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD049",
+    "term": "Food science and technology",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "food science and technology"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD049",
+    "term": "Food Science",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "food science"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD049",
+    "term": "식품공학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "식품공학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD050",
+    "term": "수의·축산과학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "수의 축산과학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD050",
+    "term": "Veterinary and animal science",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "veterinary and animal science"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD050",
+    "term": "Veterinary Science",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "veterinary science"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD050",
+    "term": "축산학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "축산학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD051",
+    "term": "산림·생태자원",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "산림 생태자원"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD051",
+    "term": "Forestry and ecological resources",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "forestry and ecological resources"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD051",
+    "term": "산림과학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "산림과학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD051",
+    "term": "Forestry",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "forestry"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD052",
+    "term": "경제학·계량경제",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "경제학 계량경제"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD052",
+    "term": "Economics and econometrics",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "economics and econometrics"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD052",
+    "term": "계량경제학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "계량경제학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD052",
+    "term": "Econometrics",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "econometrics"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD053",
+    "term": "정치·국제관계",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "정치 국제관계"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD053",
+    "term": "Political science and international relations",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "political science and international relations"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD053",
+    "term": "국제 정치",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "국제 정치"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD053",
+    "term": "Political Science",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "political science"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD054",
+    "term": "사회학·인구학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "사회학 인구학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD054",
+    "term": "Sociology and demography",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "sociology and demography"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD054",
+    "term": "사회학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "사회학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD054",
+    "term": "Demography",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "demography"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD055",
+    "term": "행정·정책평가",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "행정 정책평가"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD055",
+    "term": "Public administration and policy evaluation",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "public administration and policy evaluation"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD055",
+    "term": "정책학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "정책학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD055",
+    "term": "Policy Evaluation",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "policy evaluation"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD056",
+    "term": "사회복지·불평등",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "사회복지 불평등"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD056",
+    "term": "Social welfare and inequality",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "social welfare and inequality"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD056",
+    "term": "사회복지학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "사회복지학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD056",
+    "term": "Social Welfare",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "social welfare"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD057",
+    "term": "도시·지역계획",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "도시 지역계획"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD057",
+    "term": "Urban and regional planning",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "urban and regional planning"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD057",
+    "term": "도시계획",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "도시계획"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD057",
+    "term": "Urban Planning",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "urban planning"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD058",
+    "term": "국제개발·공공협력",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "국제개발 공공협력"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD058",
+    "term": "Development studies and cooperation",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "development studies and cooperation"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD058",
+    "term": "국제개발",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "국제개발"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD058",
+    "term": "Development Studies",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "development studies"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD059",
+    "term": "미디어·커뮤니케이션",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "미디어 커뮤니케이션"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD059",
+    "term": "Media and communication studies",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "media and communication studies"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD059",
+    "term": "언론학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "언론학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD059",
+    "term": "Communication Studies",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "communication studies"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD060",
+    "term": "경영전략·조직",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "경영전략 조직"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD060",
+    "term": "Management and organizational studies",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "management and organizational studies"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD060",
+    "term": "경영학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "경영학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD060",
+    "term": "Management",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "management"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD061",
+    "term": "금융·투자",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "금융 투자"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD061",
+    "term": "Finance and investment",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "finance and investment"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD061",
+    "term": "재무학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "재무학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD061",
+    "term": "Finance",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "finance"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD062",
+    "term": "회계·감사·내부통제",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "회계 감사 내부통제"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD062",
+    "term": "Accounting auditing and internal control",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "accounting auditing and internal control"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD062",
+    "term": "회계학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "회계학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD062",
+    "term": "Internal Audit",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "internal audit"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD063",
+    "term": "마케팅·소비자행동",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "마케팅 소비자행동"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD063",
+    "term": "Marketing and consumer research",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "marketing and consumer research"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD063",
+    "term": "마케팅",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "마케팅"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD064",
+    "term": "운영·공급망 관리",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "운영 공급망 관리"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD064",
+    "term": "Operations and supply chain management",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "operations and supply chain management"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD064",
+    "term": "공급망",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "공급망"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD064",
+    "term": "Supply Chain",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "supply chain"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD065",
+    "term": "법학·법률정보",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "법학 법률정보"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD065",
+    "term": "Law and legal informatics",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "law and legal informatics"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD065",
+    "term": "법학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "법학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD065",
+    "term": "Legal Studies",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "legal studies"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD066",
+    "term": "규제·준법·리스크",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "규제 준법 리스크"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD066",
+    "term": "Regulation compliance and risk studies",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "regulation compliance and risk studies"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD066",
+    "term": "컴플라이언스",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "컴플라이언스"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD066",
+    "term": "Regulatory Studies",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "regulatory studies"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD067",
+    "term": "보험·계리",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "보험 계리"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD067",
+    "term": "Insurance and actuarial science",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "insurance and actuarial science"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD067",
+    "term": "계리학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "계리학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD067",
+    "term": "Actuarial Science",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "actuarial science"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD068",
+    "term": "언어학·문헌학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "언어학 문헌학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD068",
+    "term": "Linguistics and philology",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "linguistics and philology"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD068",
+    "term": "언어학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "언어학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD068",
+    "term": "Linguistics",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "linguistics"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD069",
+    "term": "역사학·사료연구",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "역사학 사료연구"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD069",
+    "term": "History and historical studies",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "history and historical studies"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD069",
+    "term": "역사학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "역사학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD069",
+    "term": "History",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "history"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD070",
+    "term": "철학·윤리학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "철학 윤리학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD070",
+    "term": "Philosophy and ethics",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "philosophy and ethics"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD070",
+    "term": "철학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "철학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD070",
+    "term": "Ethics",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "ethics"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD071",
+    "term": "문학·텍스트 연구",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "문학 텍스트 연구"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD071",
+    "term": "Literary and textual studies",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "literary and textual studies"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD071",
+    "term": "문학 연구",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "문학 연구"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD071",
+    "term": "Literature",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "literature"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD072",
+    "term": "종교·종교문화",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "종교 종교문화"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD072",
+    "term": "Religious studies",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "religious studies"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD072",
+    "term": "종교학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "종교학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD073",
+    "term": "고고·문화유산",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "고고 문화유산"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD073",
+    "term": "Archaeology and heritage studies",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "archaeology and heritage studies"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD073",
+    "term": "고고학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "고고학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD073",
+    "term": "Archaeology",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "archaeology"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD074",
+    "term": "미술·디자인·공연예술",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "미술 디자인 공연예술"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD074",
+    "term": "Art design and performance studies",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "art design and performance studies"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD074",
+    "term": "예술학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "예술학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD074",
+    "term": "Arts",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "arts"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD075",
+    "term": "디지털 인문학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "디지털 인문학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD075",
+    "term": "Digital humanities",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "digital humanities"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD076",
+    "term": "교육학·교육평가",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "교육학 교육평가"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD076",
+    "term": "Education and assessment",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "education and assessment"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD076",
+    "term": "교육학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "교육학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD076",
+    "term": "Education",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "education"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD077",
+    "term": "교육공학·에듀테크",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "교육공학 에듀테크"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD077",
+    "term": "Educational technology",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "educational technology"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD077",
+    "term": "EdTech",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "edtech"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD077",
+    "term": "교육공학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "교육공학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD078",
+    "term": "심리학·행동과학",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "심리학 행동과학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD078",
+    "term": "Psychology and behavioral science",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "psychology and behavioral science"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD078",
+    "term": "심리학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "심리학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD078",
+    "term": "Psychology",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "psychology"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD079",
+    "term": "인지과학·뇌인지",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "인지과학 뇌인지"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD079",
+    "term": "Cognitive science",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "cognitive science"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD079",
+    "term": "인지 과학",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "인지 과학"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD080",
+    "term": "인간컴퓨터상호작용",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "인간컴퓨터상호작용"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD080",
+    "term": "Human-computer interaction",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "human computer interaction"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD080",
+    "term": "HCI",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "hci"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD081",
+    "term": "UX·사용자 연구",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "ux 사용자 연구"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD081",
+    "term": "User experience and user research",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "user experience and user research"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD081",
+    "term": "UX Research",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "ux research"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD081",
+    "term": "사용자 연구",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "사용자 연구"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD082",
+    "term": "학습과학·학습분석",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "학습과학 학습분석"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD082",
+    "term": "Learning sciences and analytics",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "learning sciences and analytics"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD082",
+    "term": "Learning Analytics",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "learning analytics"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD082",
+    "term": "학습 분석",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "학습 분석"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD083",
+    "term": "디자인·서비스 연구",
+    "relation": "PREFERRED",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "디자인 서비스 연구"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD083",
+    "term": "Design and service research",
+    "relation": "EXACT",
+    "language": "en",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "design and service research"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD083",
+    "term": "서비스 디자인",
+    "relation": "EXACT",
+    "language": "ko",
+    "review_status": "pending_review",
+    "auto_match": "yes",
+    "normalized": "서비스 디자인"
+  }
+]

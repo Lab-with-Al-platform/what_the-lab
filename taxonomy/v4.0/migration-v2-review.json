@@ -1,0 +1,762 @@
+[
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK001",
+    "old_label": "데이터 수집·통합",
+    "axis": "capability",
+    "candidate_ids": "CAP001",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK002",
+    "old_label": "데이터 전처리",
+    "axis": "capability",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK003",
+    "old_label": "데이터 라벨링",
+    "axis": "capability",
+    "candidate_ids": "CAP004",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK004",
+    "old_label": "통계·탐색 분석",
+    "axis": "capability",
+    "candidate_ids": "CAP008",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK005",
+    "old_label": "데이터 시각화",
+    "axis": "capability",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK006",
+    "old_label": "데이터 품질 검증",
+    "axis": "capability",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK007",
+    "old_label": "이미지 분류",
+    "axis": "capability",
+    "candidate_ids": "CAP022",
+    "mapping_status": "DIRECT_LABEL_REVIEW",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK008",
+    "old_label": "객체 탐지",
+    "axis": "capability",
+    "candidate_ids": "CAP023",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK009",
+    "old_label": "이미지 분할",
+    "axis": "capability",
+    "candidate_ids": "CAP024",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK010",
+    "old_label": "이미지 복원·개선",
+    "axis": "capability",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK011",
+    "old_label": "영상 추적·동작 분석",
+    "axis": "capability",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK012",
+    "old_label": "텍스트 분류",
+    "axis": "capability",
+    "candidate_ids": "CAP030",
+    "mapping_status": "DIRECT_LABEL_REVIEW",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK013",
+    "old_label": "정보 추출",
+    "axis": "capability",
+    "candidate_ids": "CAP031",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK014",
+    "old_label": "문서 검색·RAG",
+    "axis": "capability",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK015",
+    "old_label": "LLM·문서 요약",
+    "axis": "capability",
+    "candidate_ids": "CAP033",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK016",
+    "old_label": "음성 인식·분석",
+    "axis": "capability",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK017",
+    "old_label": "분류·회귀 예측",
+    "axis": "capability",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK018",
+    "old_label": "시계열 예측",
+    "axis": "capability",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK019",
+    "old_label": "이상 탐지",
+    "axis": "capability",
+    "candidate_ids": "CAP046",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK020",
+    "old_label": "군집화·패턴 발견",
+    "axis": "capability",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK021",
+    "old_label": "추천·유사도 분석",
+    "axis": "capability",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK022",
+    "old_label": "인과 추론·효과 분석",
+    "axis": "capability",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK023",
+    "old_label": "생물정보·오믹스 분석",
+    "axis": "capability",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK024",
+    "old_label": "분자·단백질 분석",
+    "axis": "capability",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK025",
+    "old_label": "시뮬레이션·물리 AI",
+    "axis": "capability",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK026",
+    "old_label": "그래프·네트워크 분석",
+    "axis": "capability",
+    "candidate_ids": "CAP049",
+    "mapping_status": "DIRECT_LABEL_REVIEW",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK027",
+    "old_label": "공간·지리 데이터 분석",
+    "axis": "capability",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK028",
+    "old_label": "생성형 모델 개발",
+    "axis": "capability",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK029",
+    "old_label": "AI 에이전트",
+    "axis": "capability",
+    "candidate_ids": "CAP053",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK030",
+    "old_label": "연구·문서 자동화",
+    "axis": "capability",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK031",
+    "old_label": "합성 데이터 생성",
+    "axis": "capability",
+    "candidate_ids": "CAP057",
+    "mapping_status": "DIRECT_LABEL_REVIEW",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK032",
+    "old_label": "실험·워크플로 자동화",
+    "axis": "capability",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK033",
+    "old_label": "모델 학습·전이학습",
+    "axis": "capability",
+    "candidate_ids": "CAP072",
+    "mapping_status": "DIRECT_LABEL_REVIEW",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK034",
+    "old_label": "모델 평가·검증",
+    "axis": "capability",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK035",
+    "old_label": "모델 최적화·경량화",
+    "axis": "capability",
+    "candidate_ids": "CAP075",
+    "mapping_status": "DIRECT_LABEL_REVIEW",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK036",
+    "old_label": "AI 배포·운영(MLOps)",
+    "axis": "capability",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK037",
+    "old_label": "강화학습",
+    "axis": "capability",
+    "candidate_ids": "CAP061",
+    "mapping_status": "DIRECT_LABEL_REVIEW",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK038",
+    "old_label": "탐색·최적화",
+    "axis": "capability",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK039",
+    "old_label": "시계열 분석",
+    "axis": "capability",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "SK040",
+    "old_label": "기하학·그래프 딥러닝",
+    "axis": "capability",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF001",
+    "old_label": "유전학",
+    "axis": "research_field",
+    "candidate_ids": "FIELD001",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF002",
+    "old_label": "분자생물학",
+    "axis": "research_field",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF003",
+    "old_label": "생물정보학",
+    "axis": "research_field",
+    "candidate_ids": "FIELD003",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF004",
+    "old_label": "세포생물학",
+    "axis": "research_field",
+    "candidate_ids": "FIELD002",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF005",
+    "old_label": "의료영상",
+    "axis": "research_field",
+    "candidate_ids": "FIELD011",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF006",
+    "old_label": "임상의학",
+    "axis": "research_field",
+    "candidate_ids": "FIELD010",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF007",
+    "old_label": "신약개발",
+    "axis": "research_field",
+    "candidate_ids": "FIELD013",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF008",
+    "old_label": "공중보건",
+    "axis": "research_field",
+    "candidate_ids": "FIELD012",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF009",
+    "old_label": "물리학",
+    "axis": "research_field",
+    "candidate_ids": "FIELD023",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF010",
+    "old_label": "화학",
+    "axis": "research_field",
+    "candidate_ids": "FIELD007|FIELD027|FIELD028|FIELD029",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF011",
+    "old_label": "수학",
+    "axis": "research_field",
+    "candidate_ids": "FIELD021",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF012",
+    "old_label": "천문학",
+    "axis": "research_field",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF013",
+    "old_label": "기계공학",
+    "axis": "research_field",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF014",
+    "old_label": "전기전자",
+    "axis": "research_field",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF015",
+    "old_label": "소재공학",
+    "axis": "research_field",
+    "candidate_ids": "FIELD030",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF016",
+    "old_label": "로봇공학",
+    "axis": "research_field",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF017",
+    "old_label": "기후과학",
+    "axis": "research_field",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF018",
+    "old_label": "환경과학",
+    "axis": "research_field",
+    "candidate_ids": "FIELD045",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF019",
+    "old_label": "지구과학",
+    "axis": "research_field",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF020",
+    "old_label": "농업·식품",
+    "axis": "research_field",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF021",
+    "old_label": "경제학",
+    "axis": "research_field",
+    "candidate_ids": "FIELD052",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF022",
+    "old_label": "경영학",
+    "axis": "research_field",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF023",
+    "old_label": "심리학",
+    "axis": "research_field",
+    "candidate_ids": "FIELD078",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF024",
+    "old_label": "정책연구",
+    "axis": "research_field",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF025",
+    "old_label": "언어학",
+    "axis": "research_field",
+    "candidate_ids": "FIELD068",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF026",
+    "old_label": "역사학",
+    "axis": "research_field",
+    "candidate_ids": "FIELD069",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF027",
+    "old_label": "교육학",
+    "axis": "research_field",
+    "candidate_ids": "FIELD076",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF028",
+    "old_label": "예술·문화연구",
+    "axis": "research_field",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF029",
+    "old_label": "인지과학",
+    "axis": "research_field",
+    "candidate_ids": "FIELD079",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF030",
+    "old_label": "의료정보학",
+    "axis": "research_field",
+    "candidate_ids": "FIELD018",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF031",
+    "old_label": "통계학",
+    "axis": "research_field",
+    "candidate_ids": "FIELD022",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF032",
+    "old_label": "산업공학",
+    "axis": "research_field",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF033",
+    "old_label": "화학공학",
+    "axis": "research_field",
+    "candidate_ids": "FIELD029",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF034",
+    "old_label": "원격탐사",
+    "axis": "research_field",
+    "candidate_ids": "FIELD047",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF035",
+    "old_label": "법학",
+    "axis": "research_field",
+    "candidate_ids": "FIELD065",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  },
+  {
+    "version_from": "2.0.0",
+    "old_id": "RF036",
+    "old_label": "문헌정보학",
+    "axis": "research_field",
+    "candidate_ids": "",
+    "mapping_status": "MANUAL_REVIEW_ONLY",
+    "auto_migrate": "NO",
+    "review_note": "실제 전문가 역량·연구분야 재확인 필요; 시연 데이터 자동 승격 금지"
+  }
+]

@@ -1,0 +1,170 @@
+[
+  {
+    "id": "C01",
+    "axis": "capability",
+    "label_ko": "데이터 준비·품질",
+    "label_en": "Data engineering & quality",
+    "sort_order": 1,
+    "status": "pending_review"
+  },
+  {
+    "id": "C02",
+    "axis": "capability",
+    "label_ko": "통계·연구설계",
+    "label_en": "Statistics & research design",
+    "sort_order": 2,
+    "status": "pending_review"
+  },
+  {
+    "id": "C03",
+    "axis": "capability",
+    "label_ko": "예측·일반 머신러닝",
+    "label_en": "Prediction & machine learning",
+    "sort_order": 3,
+    "status": "pending_review"
+  },
+  {
+    "id": "C04",
+    "axis": "capability",
+    "label_ko": "이미지·영상 분석",
+    "label_en": "Image and video analysis",
+    "sort_order": 4,
+    "status": "pending_review"
+  },
+  {
+    "id": "C05",
+    "axis": "capability",
+    "label_ko": "텍스트·문서 분석",
+    "label_en": "Text and document analysis",
+    "sort_order": 5,
+    "status": "pending_review"
+  },
+  {
+    "id": "C06",
+    "axis": "capability",
+    "label_ko": "음성·멀티모달",
+    "label_en": "Audio and multimodal AI",
+    "sort_order": 6,
+    "status": "pending_review"
+  },
+  {
+    "id": "C07",
+    "axis": "capability",
+    "label_ko": "시계열·공간·그래프",
+    "label_en": "Temporal spatial and graph analytics",
+    "sort_order": 7,
+    "status": "pending_review"
+  },
+  {
+    "id": "C08",
+    "axis": "capability",
+    "label_ko": "생성형 AI·지식 활용",
+    "label_en": "Generative AI and knowledge systems",
+    "sort_order": 8,
+    "status": "pending_review"
+  },
+  {
+    "id": "C09",
+    "axis": "capability",
+    "label_ko": "최적화·제어·로봇",
+    "label_en": "Optimization control and robotics",
+    "sort_order": 9,
+    "status": "pending_review"
+  },
+  {
+    "id": "C10",
+    "axis": "capability",
+    "label_ko": "과학 계산·특화 분석",
+    "label_en": "Scientific computing and specialized analytics",
+    "sort_order": 10,
+    "status": "pending_review"
+  },
+  {
+    "id": "C11",
+    "axis": "capability",
+    "label_ko": "모델 개발·검증·운영",
+    "label_en": "Model engineering and responsible AI",
+    "sort_order": 11,
+    "status": "pending_review"
+  },
+  {
+    "id": "F01",
+    "axis": "research_field",
+    "label_ko": "생명과학",
+    "label_en": "Life sciences",
+    "sort_order": 1,
+    "status": "pending_review"
+  },
+  {
+    "id": "F02",
+    "axis": "research_field",
+    "label_ko": "의학·보건·약학",
+    "label_en": "Medical and health sciences",
+    "sort_order": 2,
+    "status": "pending_review"
+  },
+  {
+    "id": "F03",
+    "axis": "research_field",
+    "label_ko": "컴퓨터·수학·물리",
+    "label_en": "Computer mathematical and physical sciences",
+    "sort_order": 3,
+    "status": "pending_review"
+  },
+  {
+    "id": "F04",
+    "axis": "research_field",
+    "label_ko": "화학·재료·에너지",
+    "label_en": "Chemistry materials and energy",
+    "sort_order": 4,
+    "status": "pending_review"
+  },
+  {
+    "id": "F05",
+    "axis": "research_field",
+    "label_ko": "공학·제조·모빌리티",
+    "label_en": "Engineering and manufacturing",
+    "sort_order": 5,
+    "status": "pending_review"
+  },
+  {
+    "id": "F06",
+    "axis": "research_field",
+    "label_ko": "환경·지구·농식품",
+    "label_en": "Environment earth agriculture and food",
+    "sort_order": 6,
+    "status": "pending_review"
+  },
+  {
+    "id": "F07",
+    "axis": "research_field",
+    "label_ko": "사회·정책·공공",
+    "label_en": "Society policy and public sector",
+    "sort_order": 7,
+    "status": "pending_review"
+  },
+  {
+    "id": "F08",
+    "axis": "research_field",
+    "label_ko": "경영·금융·법",
+    "label_en": "Business finance and law",
+    "sort_order": 8,
+    "status": "pending_review"
+  },
+  {
+    "id": "F09",
+    "axis": "research_field",
+    "label_ko": "인문·문화·예술",
+    "label_en": "Humanities culture and arts",
+    "sort_order": 9,
+    "status": "pending_review"
+  },
+  {
+    "id": "F10",
+    "axis": "research_field",
+    "label_ko": "교육·심리·인지·HCI",
+    "label_en": "Education psychology cognition and HCI",
+    "sort_order": 10,
+    "status": "pending_review"
+  }
+]

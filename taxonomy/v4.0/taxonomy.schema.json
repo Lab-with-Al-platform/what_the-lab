@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WHAT THE LAB taxonomy term",
+  "type": "object",
+  "required": [
+    "id",
+    "axis",
+    "category_id",
+    "code",
+    "label_ko",
+    "label_en",
+    "definition",
+    "status",
+    "version"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^(CAP|FIELD)[0-9]{3,}$"
+    },
+    "axis": {
+      "enum": [
+        "capability",
+        "research_field"
+      ]
+    },
+    "category_id": {
+      "type": "string"
+    },
+    "code": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "label_ko": {
+      "type": "string",
+      "minLength": 2
+    },
+    "label_en": {
+      "type": "string",
+      "minLength": 2
+    },
+    "definition": {
+      "type": "string",
+      "minLength": 10
+    },
+    "status": {
+      "enum": [
+        "pending_review",
+        "active",
+        "retired"
+      ]
+    },
+    "version": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": true
+}
