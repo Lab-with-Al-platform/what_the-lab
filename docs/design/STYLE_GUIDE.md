@@ -1,16 +1,16 @@
 # LabBridge — UI/UX 디자인 및 구현 스타일 가이드
 
 > 버전: 1.0 통합 검토본 · 2026-10-09  
-> 병합 근거: `STYLE_GUIDE_ADDENDUM.md` 전체 검토 + 랜딩·사례 상세 승인 방향 + 기존 목록 시안(구조만 참조)  
-> **적용:** 디자인·프론트엔드 UI 기준. 코드 작성 규칙은 `docs/CODING_STYLE.md`를 따른다. 화면별 상세 지시와 검수는 `docs/SCREEN_DESIGN_SPECS.md`, `docs/DESIGN_QA_CHECKLIST.md`를 따른다.  
+> 병합 근거: `docs/archive/design/STYLE_GUIDE_ADDENDUM.md` 전체 검토 + 랜딩·사례 상세 승인 방향 + 기존 목록 시안(구조만 참조)  
+> **적용:** 디자인·프론트엔드 UI 기준. 코드 작성 규칙은 `docs/development/CODING_STYLE.md`를 따른다. 화면별 상세 지시와 검수는 `docs/design/SCREEN_DESIGN_SPECS.md`, `docs/design/DESIGN_QA_CHECKLIST.md`를 따른다.  
 > **중요:** 이 문서의 이미지 기반 픽셀/색상 수치는 **구현 출발점(제안)**이다. Figma 원본 값이나 실제 디자인 승인을 대체하지 않는다.
 
 ## 0. 문서 사용법과 우선순위
 
-1. `docs/MVP_SCOPE.md`, 최신 팀 의사결정 문서가 **기능 구현 범위**를 결정한다.
+1. `docs/product/MVP_SCOPE.md`, 최신 팀 의사결정 문서가 **기능 구현 범위**를 결정한다.
 2. **시각 디자인 기준**은 최신 LabBridge 랜딩 이미지와 `LabBridge 암세포 분석 연구 페이지` 이미지다.
 3. 구형 `WHAT THE LAB` 사례 목록 이미지는 **정보구조·콘텐츠 배열·PC/모바일 전환**만 참고한다. 그 이미지의 글꼴, 배경색, 브랜드, 카드 스타일, 장식 요소는 복사하지 않는다.
-4. `STYLE_GUIDE_ADDENDUM.md`의 승인 관리·콘텐츠 신뢰성·목차 동작·컴포넌트 재사용·접근성·PR 검수 원칙을 통합했다.
+4. `docs/archive/design/STYLE_GUIDE_ADDENDUM.md`의 승인 관리·콘텐츠 신뢰성·목차 동작·컴포넌트 재사용·접근성·PR 검수 원칙을 통합했다.
 5. 디자인 가이드는 **새 기능을 승인하는 문서가 아니다.** 아직 개발 범위 밖인 화면은 디자인 설계/Mock에 한정한다.
 6. 실제 코드가 있으면 기존 공통 컴포넌트·테마·타입을 먼저 조사한다. 문서 예시를 이유로 정상 코드를 무조건 교체하지 않는다.
 
@@ -20,7 +20,7 @@
 |---|---|---|---|
 | P0 | `AI 연구 플랫폼 랩브리지 랜딩페이지.png` | 헤더, 브랜드, 배경, 히어로, 탐색 카드, 인사이트, 인터뷰 | 디자인 방향 합의 |
 | P0 | `LabBridge 암세포 분석 연구 페이지.png` | 기사 상세의 정보 계층, 3열, 요약, 본문, 모바일 목차 | 레이아웃 방향 합의 |
-| P1 | `STYLE_GUIDE_ADDENDUM.md` | 승인·토큰·콘텐츠 신뢰성·반응형·검수 | 병합 반영 |
+| P1 | `docs/archive/design/STYLE_GUIDE_ADDENDUM.md` | 승인·토큰·콘텐츠 신뢰성·반응형·검수 | 병합 반영 |
 | P2 | `case-list_desktop.png` / `case-list_mobile.png` 및 구형 WHAT THE LAB 목록 시안 | 사례 분류, 대표 글, 필터, 목록, 하단 추천 구조 | 구조 참고만 |
 | P2 | AI 전문가 Figma/PDF 및 `design/labbridge-ui-v3/screens/` 12장 | 사례·트렌드·전문가 목록/상세의 정보 구조와 모바일 배치 | 내용·레이아웃 참고만 |
 
@@ -380,7 +380,7 @@ Tailwind 버전에 따라 `@theme` 또는 `tailwind.config` 매핑 방법이 달
 
 ## 11. MVP 범위와 디자인 시안의 충돌·결정 대기
 
-**반드시 확인:** `docs/MVP_SCOPE.md`는 운영형 인사이트를 **MVP+**로 분류한다. 그러나 랜딩 시안은 연구 사례·트렌드·인터뷰를 핵심으로 제시한다. 따라서 **화면 디자인 확정 = 해당 콘텐츠 시스템의 MVP 구현 승인**으로 해석하면 안 된다. 팀이 MVP 범위를 변경하려면 먼저 `MVP_SCOPE.md`와 의사결정 로그를 갱신한다.
+**반드시 확인:** `docs/product/MVP_SCOPE.md`는 운영형 인사이트를 **MVP+**로 분류한다. 그러나 랜딩 시안은 연구 사례·트렌드·인터뷰를 핵심으로 제시한다. 따라서 **화면 디자인 확정 = 해당 콘텐츠 시스템의 MVP 구현 승인**으로 해석하면 안 된다. 팀이 MVP 범위를 변경하려면 먼저 `docs/product/MVP_SCOPE.md`와 의사결정 로그를 갱신한다.
 
 추가 결정 대기:
 - 검색 아이콘과 랜딩 `지금 시작하기`의 실제 목적지
@@ -395,19 +395,19 @@ Tailwind 버전에 따라 `@theme` 또는 `tailwind.config` 매핑 방법이 달
 
 ## 12. 관련 문서
 
-- `docs/CODING_STYLE.md` — 공통 코딩 규칙, AI 코딩·검증·PR
-- `archive/STYLE_GUIDE_original_coding.md` — 기존 `STYLE_GUIDE.md` 원본 보존(배포 패키지 기준)
-- `docs/MVP_SCOPE.md` — 현재 MVP 구현 범위(원본 변경하지 않음)
-- `docs/03_DECISION_LOG.md` — 제품 의사결정
+- `docs/development/CODING_STYLE.md` — 공통 코딩 규칙, AI 코딩·검증·PR
+- `archive/STYLE_GUIDE_original_coding.md` — 기존 `docs/design/STYLE_GUIDE.md` 원본 보존(배포 패키지 기준)
+- `docs/product/MVP_SCOPE.md` — 현재 MVP 구현 범위(원본 변경하지 않음)
+- `docs/product/03_DECISION_LOG.md` — 제품 의사결정
 - `AGENTS.md` — AI 코딩 도구 작업 지침
-- `docs/TEAM_WORKFLOW.md` — 팀 Git/PR 운영
+- `docs/development/TEAM_WORKFLOW.md` — 팀 Git/PR 운영
 
 
 ## 13. 시안 충실도를 보장하는 구현 계약 (필수)
 
-- 화면 개발자는 `SCREEN_DESIGN_SPECS.md`의 해당 화면 섹션을 **코드 작성 전에** 읽는다.
+- 화면 개발자는 `docs/design/SCREEN_DESIGN_SPECS.md`의 해당 화면 섹션을 **코드 작성 전에** 읽는다.
 - 각 화면은 레이아웃/타이포/이미지/디테일의 4단계로 나눠 비교한다. 한 단계가 크게 다르면 다음 단계로 넘어가기 전에 수정한다.
 - 시안에서 표현된 고급스러움은 단순한 HEX 복사로 재현되지 않는다. **원본 이미지 에셋, 정확한 크롭, 폰트 가중치, 콘텐츠 밀도, 기준선 정렬, 모바일 콘텐츠 순서**를 함께 맞춘다.
 - 기존 목록/전문가 시안에서 시각 요소를 복사하지 않는다. `P0` 랜딩·상세에서 공통 스타일을 도출하고, `P1`에서는 정보 구조만 채택한다.
-- `DESIGN_QA_CHECKLIST.md`의 1440/768/390px 캡처·차이 기록 없이 UI 작업을 완료로 선언하지 않는다.
-- `STYLE_GUIDE_ADDENDUM.md`는 본 문서에 병합 완료했다. 원본/병합 위치는 `ADDENDUM_MERGE_MAP.md` 참조.
+- `docs/design/DESIGN_QA_CHECKLIST.md`의 1440/768/390px 캡처·차이 기록 없이 UI 작업을 완료로 선언하지 않는다.
+- `docs/archive/design/STYLE_GUIDE_ADDENDUM.md`는 본 문서에 병합 완료했다. 원본/병합 위치는 `docs/archive/design/ADDENDUM_MERGE_MAP.md` 참조.
