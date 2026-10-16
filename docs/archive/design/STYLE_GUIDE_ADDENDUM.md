@@ -1,6 +1,6 @@
 # LabBridge — UI/UX 스타일 가이드 보강안
 
-> 버전: 0.1 (기존 `docs/STYLE_GUIDE.md`에 병합할 제안 문서)  
+> 버전: 0.1 (기존 `docs/design/STYLE_GUIDE.md`에 병합할 제안 문서)  
 > 목적: 확정 디자인과 작업 중인 시안을 구분하고, 3명이 일관된 UI를 구현하도록 돕는다.  
 > **주의:** 이 파일은 기존 스타일 가이드를 직접 수정한 결과가 아니다. 기존 문서와 대조해 중복·충돌을 확인한 뒤 병합한다.
 
@@ -139,7 +139,7 @@ breakpoint.mobile / tablet / desktop
 1. 담당자가 PC·모바일 시안을 준비한다.
 2. 기존 메인·상세의 토큰·타이포그래피·컴포넌트와 비교한다.
 3. 팀에서 승인 여부를 기록한다 (`Approved/Review/Proposed/Deferred`).
-4. 승인된 변경만 Figma와 `STYLE_GUIDE.md`에 반영한다.
+4. 승인된 변경만 Figma와 `docs/design/STYLE_GUIDE.md`에 반영한다.
 5. 구현 PR에 디자인 출처(Figma 프레임/링크), 화면 캡처, 변경 사항을 적는다.
 6. 공통 UI 변경은 다른 화면 영향도와 함께 검토한다.
 
@@ -166,10 +166,10 @@ breakpoint.mobile / tablet / desktop
 
 ## 11. 다른 문서에 반영할 사항
 
-- `docs/MVP_SCOPE.md`: 최신 MVP의 포함/제외 기능, 매칭의 실제 종료 지점, 확정되지 않은 CTA를 구분.
+- `docs/product/MVP_SCOPE.md`: 최신 MVP의 포함/제외 기능, 매칭의 실제 종료 지점, 확정되지 않은 CTA를 구분.
 - `docs/TEAM_ROLES.md`: 공통 UI 승인자, 화면 담당자, 디자인 검토 책임을 구분.
-- `docs/TEAM_WORKFLOW.md`: UI PR에는 PC/모바일 캡처 및 승인 시안 링크 첨부.
-- `AGENTS.md`: `docs/CODING_STYLE.md`와 `docs/STYLE_GUIDE.md`를 필수 참고 문서로 명시.
+- `docs/development/TEAM_WORKFLOW.md`: UI PR에는 PC/모바일 캡처 및 승인 시안 링크 첨부.
+- `AGENTS.md`: `docs/development/CODING_STYLE.md`와 `docs/design/STYLE_GUIDE.md`를 필수 참고 문서로 명시.
 - 루트 `README.md`: 팀 개발 규칙 문서 링크 추가.
 
 > 기존 로컬 문서의 내용과 충돌할 수 있으므로, 이 보강안을 **그대로 덮어쓰기하지 말고 차이점을 검토해 병합**한다.

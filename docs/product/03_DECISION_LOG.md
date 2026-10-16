@@ -12,7 +12,7 @@
 |---|---|---|
 | S1 | 현재 팀 합의와 참조 대화 `토이프로젝트_플랫폼` | 최종 결정의 최우선 기준 |
 | S2 | 업로드된 통합 기획 `research_ai_collaboration_platform_planning.md` | 제품 구조·화면·상태·MVP 근거 |
-| S3 | 업로드된 시장조사·시니어 피드백 `research_platform_market_analysis.md` | 문제·리스크·확장 아이디어의 참고 근거 |
+| S3 | 업로드된 시장조사·시니어 피드백 `docs/research/research_platform_market_analysis.md` | 문제·리스크·확장 아이디어의 참고 근거 |
 | S4 | 2차 회의 및 강사 의견을 정리한 대화 내용 | 초기 범위·우선순위 검토 근거 |
 
 ### 해석 규칙

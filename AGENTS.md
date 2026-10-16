@@ -13,9 +13,9 @@
 
 ## 2. 제품 범위
 
-- 구현 전 `docs/MVP_SCOPE.md`와 `docs/03_DECISION_LOG.md`를 확인합니다.
-- UI 작업 전 `docs/STYLE_GUIDE.md`, `docs/SCREEN_DESIGN_SPECS.md`, `docs/DESIGN_QA_CHECKLIST.md`를 읽고 P0 디자인 이미지와 비교합니다.
-- 코드 작업 전 `docs/CODING_STYLE.md`를 읽고 강사님 스타일 기반의 간결하고 설명 가능한 코드를 작성합니다.
+- 구현 전 `docs/product/MVP_SCOPE.md`와 `docs/product/03_DECISION_LOG.md`를 확인합니다.
+- UI 작업 전 `docs/design/STYLE_GUIDE.md`, `docs/design/SCREEN_DESIGN_SPECS.md`, `docs/design/DESIGN_QA_CHECKLIST.md`를 읽고 P0 디자인 이미지와 비교합니다.
+- 코드 작업 전 `docs/development/CODING_STYLE.md`를 읽고 강사님 스타일 기반의 간결하고 설명 가능한 코드를 작성합니다.
 - 최신 팀 합의가 시장조사 자료나 과거 제안보다 우선합니다.
 - MVP+ 또는 Later 기능은 별도 합의 없이 구현하지 않습니다.
 - 특히 실시간 DM, 결제·계약, 기관/B2B, AI 블로그 자동화, 개인화 추천은 현재 MVP에서 제외합니다.
@@ -53,7 +53,7 @@
 - 최종 시각 기준은 `design/AI 연구 플랫폼 랩브리지 랜딩페이지.png`, `design/LabBridge 암세포 분석 연구 페이지.png`입니다.
 - `design/labbridge-ui-v3/`의 목록·전문가 화면 및 구형 WHAT THE LAB 시안은 **정보 구조·레이아웃만** 참고합니다. 색상·서체·그림자·로고는 복사하지 않습니다.
 - UI 변경 PR에는 1440/768/390px 스크린샷 비교와 미검증 항목을 기록합니다.
-- 인사이트는 현재 `MVP_SCOPE.md`에서 MVP+입니다. 디자인 문서만으로 구현 범위를 바꾸지 않습니다.
+- 인사이트는 현재 `docs/product/MVP_SCOPE.md`에서 MVP+입니다. 디자인 문서만으로 구현 범위를 바꾸지 않습니다.
 
 ## 7. 설명 방식
 
