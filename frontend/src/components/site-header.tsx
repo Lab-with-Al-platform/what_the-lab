@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PageContainer } from "@/components/page-container";
 import { requestApi } from "@/lib/api";
 
@@ -49,6 +49,7 @@ export function SiteHeader() {
   const [me, setMe] = useState<Me | null>(null);
   const [meLoading, setMeLoading] = useState(true);
   const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function closeOnEscape(event: KeyboardEvent) {
@@ -71,6 +72,21 @@ export function SiteHeader() {
       .catch(() => setMe(null))
       .finally(() => setMeLoading(false));
   }, []);
+
+  // 드롭다운이 열려 있을 때, 프로필 영역 바깥을 누르면 닫기
+  useEffect(() => {
+    if (!profileOpen) return;
+
+    function closeOnOutsideClick(event: MouseEvent) {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setProfileOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", closeOnOutsideClick);
+    return () => document.removeEventListener("mousedown", closeOnOutsideClick);
+  }, [profileOpen]);
+
 
   // 로그아웃: 백엔드가 쿠키를 지우고, 홈으로 새로 불러오기
   async function logout() {
@@ -135,7 +151,7 @@ export function SiteHeader() {
               가입 이어하기
             </Link>
           ) : (
-            <div className="relative hidden sm:block">
+            <div ref={profileRef} className="relative hidden sm:block">
               <button
                 type="button"
                 className="inline-flex h-11 items-center gap-2 rounded-button px-2 text-sm font-semibold text-ink hover:bg-page"
@@ -218,10 +234,40 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
-          <div className="mt-2 grid gap-2 sm:hidden">
-            <Link href="/login" className="flex min-h-11 items-center justify-center rounded-button bg-ink text-sm font-semibold text-white">
-              디스코드로 로그인
-            </Link>
+          <div className="mt-2 grid gap-1 border-t border-line pt-3 sm:hidden">
+            {meLoading ? null : !me ? (
+              <Link href="/login" className="flex min-h-11 items-center justify-center rounded-button bg-ink text-sm font-semibold text-white">
+                디스코드로 로그인
+              </Link>
+            ) : me.signup_step !== "done" ? (
+              <Link href="/signup" className="flex min-h-11 items-center justify-center rounded-button bg-ink text-sm font-semibold text-white">
+                가입 이어하기
+              </Link>
+            ) : (
+              <>
+                <div className="flex items-center gap-2 px-3 py-2">
+                  <img src={profileImageOf(me)} alt="" className="h-8 w-8 rounded-full object-cover" />
+                  <span className="text-sm font-semibold text-ink">{me.nickname}</span>
+                </div>
+                {(me.user_role === "expert" ? EXPERT_MENU : RESEARCHER_MENU).map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="flex min-h-11 items-center rounded-button px-3 text-sm font-medium hover:bg-page"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+                <button
+                  type="button"
+                  className="flex min-h-11 w-full items-center rounded-button px-3 text-sm font-medium hover:bg-page"
+                  onClick={logout}
+                >
+                  로그아웃
+                </button>
+              </>
+            )}
           </div>
           </PageContainer>
         </nav>
