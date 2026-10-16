@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PageContainer } from "@/components/page-container";
+import { requestApi } from "@/lib/api";
+
 
 const NAV_ITEMS = [
   { href: "/", label: "홈" },
@@ -11,6 +13,13 @@ const NAV_ITEMS = [
   { href: "/trends", label: "AI 트렌드" },
   { href: "/experts", label: "AI 전문가 찾기" },
 ];
+
+type Me = {
+  nickname: string;
+  user_role: "researcher" | "expert" | null;
+  user_photo: string | null;
+  signup_step: string;
+};
 
 function isCurrent(pathname: string, href: string): boolean {
   if (href === "/") {
@@ -23,6 +32,8 @@ export function SiteHeader() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [me, setMe] = useState<Me | null>(null);
+  const [meLoading, setMeLoading] = useState(true);
 
   useEffect(() => {
     function closeOnEscape(event: KeyboardEvent) {
@@ -35,6 +46,13 @@ export function SiteHeader() {
 
     window.addEventListener("keydown", closeOnEscape);
     return () => window.removeEventListener("keydown", closeOnEscape);
+  }, []);
+
+  useEffect(() => {
+  requestApi<Me>("/auth/me")
+    .then(setMe)
+    .catch(() => setMe(null))
+    .finally(() => setMeLoading(false));
   }, []);
 
   return (
@@ -79,12 +97,29 @@ export function SiteHeader() {
             <SearchIcon />
           </button>
           
-          <Link
-            href="/login"
-            className="hidden h-11 items-center rounded-button bg-ink px-4 text-sm font-semibold text-white hover:bg-brand-hover sm:inline-flex"
-          >
-            디스코드로 로그인
-          </Link>
+          {meLoading ? null : !me ? (
+            <Link
+              href="/login"
+              className="hidden h-11 items-center rounded-button bg-ink px-4 text-sm font-semibold text-white hover:bg-brand-hover sm:inline-flex"
+            >
+              디스코드로 로그인
+            </Link>
+          ) : me.signup_step !== "done" ? (
+            <Link
+              href="/signup"
+              className="hidden h-11 items-center rounded-button bg-ink px-4 text-sm font-semibold text-white hover:bg-brand-hover sm:inline-flex"
+            >
+              가입 이어하기
+            </Link>
+          ) : (
+            <button
+              type="button"
+              className="hidden h-11 items-center gap-2 rounded-button px-2 text-sm font-semibold text-ink hover:bg-page sm:inline-flex"
+            >
+              <img src={profileImageOf(me)} alt="" className="h-8 w-8 rounded-full object-cover" />
+              <span>{me.nickname}</span>
+            </button>
+          )}
           <button
             type="button"
             className="grid h-11 w-11 place-items-center rounded-button hover:bg-page lg:hidden"
@@ -160,3 +195,12 @@ function MenuIcon() {
     </svg>
   );
 }
+
+function profileImageOf(me: Me): string {
+  if (me.user_photo) return me.user_photo;
+  return me.user_role === "expert"
+    ? "/profile-images/default-expert.png"
+    : "/profile-images/default-researcher.png";
+}
+
+
