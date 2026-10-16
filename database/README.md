@@ -2,6 +2,16 @@
 
 PostgreSQL/Supabase 데이터 구조와 변경 이력을 관리합니다.
 
+## 현재 인사이트 변경 이력
+
+2026-10-16 확정 DB는 Supabase(PostgreSQL)입니다. 첫 인사이트 마이그레이션은 FastAPI 모델과 함께 관리하기 위해 `backend/migrations/`에 두었습니다. 이 폴더에 같은 SQL을 중복 복사하지 않습니다. 사용자 승인 후 개발용 `labbridge-dev`에 `20261016_01`을 적용하고 구조·역할 권한·동시성 검사를 완료했습니다. 운영 DB 적용이나 공개 서비스 배포는 아닙니다.
+
+- [최초 마이그레이션](../backend/migrations/versions/20261016_01_insight_foundation.py): 서버 전용 insight_private schema와 5개 테이블
+- [실행·안전 확인 순서](../docs/ai-case-automation/FOUNDATION_RUNBOOK.md): 개발 DB 확인, 권한, 테스트, 파괴적인 되돌리기 주의
+- [개발용 DB 검증 결과](../docs/qa/INSIGHT_SUPABASE_MIGRATION_2026-10-16.md): 인사이트 테이블 5개와 public의 버전 테이블 1개, 실제 콘텐츠는 0건
+
+공개는 FastAPI의 승인 완료 스냅샷 API를 통해서만 합니다. 이 단계는 기존 회원·프로젝트 테이블을 생성하거나 변경하지 않습니다.
+
 ## 이 폴더에 둘 것
 
 - 재현 가능한 마이그레이션 파일

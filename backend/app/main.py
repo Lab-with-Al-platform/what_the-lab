@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import CORS_ORIGINS
 
-from app.routers import auth
+from app.routers import auth, insights
 
 app = FastAPI(title="LabBridge API")
 
@@ -23,3 +23,4 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 app.include_router(auth.router)
+app.include_router(insights.router)

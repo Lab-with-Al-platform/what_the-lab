@@ -1,5 +1,7 @@
 # WHAT THE LAB — AI 연구사례 자동화 구현 문서 패키지
 
+> **첫 백엔드 구현·개발 DB 적용 (2026-10-16):** [실행·검증 안내](FOUNDATION_RUNBOOK.md), [Phase 0 확인 결과](PHASE_0_FINDINGS.md), [실제 DB 검증 결과](../qa/INSIGHT_SUPABASE_MIGRATION_2026-10-16.md)를 먼저 읽습니다. 개발용 Supabase 연결·최초 migration·PostgreSQL 동시성 검사까지 완료했으며 운영 적용·화면 연결은 미완료입니다. 아래의 저장소·자료 미제공 표시는 최초 작성 시점 기록입니다.
+
 > **편집·운영 기준 추가 (2026-10-16):** [인사이트 편집·정기 게시 운영 기준서](INSIGHT_EDITORIAL_OPERATING_STANDARD.md)를 함께 읽습니다. 연구자에게 주는 도움과 근거를 우선하며, 주 1회는 시범 운영 제안입니다. 아래의 과거 경로·자료 상태는 [통합 실행 지시서](WHAT_THE_LAB_AI_CASE_AND_TREND_AUTOMATION_CODEX_SPEC.md)와 Phase 0 조사 결과로 재확인합니다.
 
 - 문서 버전: 1.0 / 2026-10-09
