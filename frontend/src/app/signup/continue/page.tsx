@@ -21,7 +21,7 @@ const RESUME = {
   steps: [
     { label: "디스코드 로그인", status: "done" },
     { label: "회원 유형 선택", detail: "연구회원", status: "done" },
-    { label: "소속 인증", detail: "대학·연구기관 이메일 또는 증명서", status: "current" },
+    { label: "소속 인증", detail: "대학·연구기관 이메일", status: "current" },
     { label: "기본 정보", status: "todo" },
   ] satisfies ResumeStep[],
 };

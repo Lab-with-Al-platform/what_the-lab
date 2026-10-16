@@ -57,3 +57,8 @@ logs/
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# 시드 원본·점검 결과 (스크립트로 다시 만듦)
+database/seed/*.json
+database/seed/needs_korean_name.csv
+database/seed/missing_homepage.csv

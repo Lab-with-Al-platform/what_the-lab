@@ -1,35 +1,33 @@
-"""회원 저장소.
+"""회원 저장소. user 테이블을 읽고 씁니다.
 
-TODO: DB가 생기면 이 파일의 함수 안쪽만 DB 코드로 바꿉니다.
-지금은 서버 메모리에 저장해서, 서버를 껐다 켜면 회원이 모두 사라집니다.
+함수 이름과 돌려주는 모양(dict)은 메모리 버전과 같아서, auth.py는 바꿀 필요가 거의 없습니다.
 """
-import uuid
+from app.db import get_connection
 
-_users_by_id: dict[str, dict] = {}
-_user_id_by_discord: dict[str, str] = {}
+USER_COLUMNS = "user_id, discord_id, nickname, user_role, signup_step, user_photo, status"
 
 
 def find_by_discord_id(discord_id: str) -> dict | None:
     """디스코드 번호로 회원을 찾습니다. 없으면 None (= 처음 온 사람)."""
-    user_id = _user_id_by_discord.get(discord_id)
-    return _users_by_id.get(user_id) if user_id else None
+    with get_connection() as conn, conn.cursor() as cursor:
+        cursor.execute(f"SELECT {USER_COLUMNS} FROM `user` WHERE discord_id = %s", (discord_id,))
+        return cursor.fetchone()
 
 
-def find_by_id(user_id: str) -> dict | None:
+def find_by_id(user_id: int) -> dict | None:
     """우리 user_id로 회원을 찾습니다."""
-    return _users_by_id.get(user_id)
+    with get_connection() as conn, conn.cursor() as cursor:
+        cursor.execute(f"SELECT {USER_COLUMNS} FROM `user` WHERE user_id = %s", (user_id,))
+        return cursor.fetchone()
 
 
 def create_user(discord_user: dict) -> dict:
-    """디스코드 정보로 새 회원을 만듭니다. (= 가입 시작)"""
-    user = {
-        "user_id": str(uuid.uuid4()),
-        "discord_id": discord_user["id"],
-        "nickname": discord_user["username"],  # TODO: 닉네임 중복 확인
-        "avatar": discord_user.get("avatar"),
-        "role": None,  # 회원 유형 선택 전
-        "signup_step": "role",
-    }
-    _users_by_id[user["user_id"]] = user
-    _user_id_by_discord[user["discord_id"]] = user["user_id"]
-    return user
+    """디스코드 정보로 새 회원을 만듭니다. (= 가입 시작, signup_step은 기본값 'role')"""
+    with get_connection() as conn, conn.cursor() as cursor:
+        cursor.execute(
+            "INSERT INTO `user` (discord_id, nickname, user_photo) VALUES (%s, %s, %s)",
+            # TODO: 닉네임이 겹치면 UNIQUE 에러가 납니다. 겹칠 때 처리 방법은 팀과 정하기
+            (discord_user["id"], discord_user["username"], discord_user.get("avatar")),
+        )
+        new_user_id = cursor.lastrowid  # 방금 AUTO_INCREMENT로 생긴 번호
+    return find_by_id(new_user_id)

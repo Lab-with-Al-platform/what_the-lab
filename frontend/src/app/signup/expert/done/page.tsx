@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { ExpertWelcomeTitle } from "@/components/expert-welcome-title";
+
 export const metadata: Metadata = { title: "가입 완료" };
 
 // 프로필 공개까지 남은 일. 항목을 바꿀 때 여기만 고치면 됩니다.
@@ -17,7 +19,7 @@ export default function ExpertSignupDonePage() {
   return (
     <section className="mx-auto max-w-xl px-4 py-16 md:px-6">
       <div className="rounded-card border border-line bg-card p-8 shadow-card">
-        <h1 className="text-2xl font-bold">가입을 환영해요, {nickname} 님!</h1>
+        <ExpertWelcomeTitle />
         <p className="mt-2 text-sm text-muted">아래 세 가지를 채우면 AI 전문가 찾기 목록에 보여요</p>
 
         <ol className="mt-6 divide-y divide-line rounded-button border border-line">

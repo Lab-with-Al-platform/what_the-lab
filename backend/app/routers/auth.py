@@ -12,6 +12,13 @@ from app.security import create_access_token, read_user_id
 
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 
+TOKEN_MAX_AGE = 7 * 24 * 60 * 60  # 7일(초)
+NEXT_PATH_BY_STEP = {  # 가입 단계별로 보낼 화면
+    "role": "/signup",
+    "info": "/signup/researcher/info",
+    "done": "/",
+}
+
 DISCORD_AUTHORIZE_URL = "https://discord.com/oauth2/authorize"
 DISCORD_TOKEN_URL = "https://discord.com/api/oauth2/token"
 DISCORD_ME_URL = "https://discord.com/api/users/@me"
@@ -21,8 +28,13 @@ TOKEN_MAX_AGE = 7 * 24 * 60 * 60  # 7일(초)
 
 
 @router.get("/discord/login")
-def discord_login() -> RedirectResponse:
-    """① 디스코드 승인 화면으로 보냅니다."""
+def discord_login(access_token: str | None = Cookie(default=None)) -> RedirectResponse:
+    """① 이미 로그인했으면 가입 단계 화면으로, 아니면 디스코드 승인 화면으로 보냅니다."""
+    user_id = read_user_id(access_token) if access_token else None
+    user = user_store.find_by_id(user_id) if user_id else None
+    if user is not None:
+        return RedirectResponse(f"{FRONTEND_URL}{next_path_for(user)}")
+
     state = secrets.token_urlsafe(16)
     params = {
         "client_id": DISCORD_CLIENT_ID,
@@ -56,7 +68,7 @@ def discord_callback(
     if user is None:
         user = user_store.create_user(discord_user)  # 처음 온 사람 = 가입
 
-    next_path = "/" if user["signup_step"] == "done" else "/signup"
+    next_path = next_path_for(user)
     response = RedirectResponse(f"{FRONTEND_URL}{next_path}")
     response.set_cookie(
         TOKEN_COOKIE,
@@ -78,6 +90,12 @@ def me(access_token: str | None = Cookie(default=None)) -> dict:
         raise HTTPException(status_code=401, detail="로그인이 필요합니다")
     return user
 
+
+
+
+def next_path_for(user: dict) -> str:
+    """가입 진행 단계(signup_step)에 따라 보낼 화면을 정합니다. 모르는 값이면 회원 유형 선택으로."""
+    return NEXT_PATH_BY_STEP.get(user["signup_step"], "/signup")
 
 def fetch_discord_user(code: str) -> dict:
     """일회용 code → 디스코드 토큰 → 사용자 정보."""
