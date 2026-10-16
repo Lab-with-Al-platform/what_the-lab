@@ -42,6 +42,60 @@
   --insight-page-title: clamp(32px, 3.4vw, 48px);
   --insight-feature-title: clamp(28px, 3vw, 42px);
   --insight-quote-title: clamp(24px, 2.2vw, 30px);
+  --home-card-lift: -4px;
+  --home-card-image-scale: 1.025;
+  --home-card-motion-duration: 250ms;
+  --home-card-motion-easing: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --home-card-hover-shadow: 0 12px 32px rgb(18 32 75 / 0.1);
+}
+
+/* 위치를 바꾸어도 주변 카드가 밀리지 않도록 여백 대신 transform을 사용합니다. */
+.home-entry-card {
+  transition:
+    transform var(--home-card-motion-duration) var(--home-card-motion-easing),
+    box-shadow var(--home-card-motion-duration) var(--home-card-motion-easing),
+    border-color var(--home-card-motion-duration) var(--home-card-motion-easing);
+}
+
+.home-entry-card__image {
+  transition: transform var(--home-card-motion-duration) var(--home-card-motion-easing);
+}
+
+.home-entry-card:focus-within {
+  border-color: color-mix(in srgb, var(--color-brand) 30%, var(--color-line));
+  box-shadow: var(--home-card-hover-shadow);
+}
+
+/* 카드 가장자리에서 포커스 테두리가 잘리지 않도록 안쪽에 표시합니다. */
+.home-entry-card__link:focus-visible,
+.home-entry-card__tag:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: -3px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .home-entry-card:hover {
+    border-color: color-mix(in srgb, var(--color-brand) 30%, var(--color-line));
+    box-shadow: var(--home-card-hover-shadow);
+  }
+}
+
+/* 터치 화면과 '동작 줄이기' 설정에서는 이동·확대 없이 강조만 유지합니다. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .home-entry-card:hover {
+    transform: translateY(var(--home-card-lift));
+  }
+
+  .home-entry-card:hover .home-entry-card__image {
+    transform: scale(var(--home-card-image-scale));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-entry-card,
+  .home-entry-card__image {
+    transition: none;
+  }
 }
 
 /* 목록 두 페이지의 배경·페이드 색을 하나로 맞춰 사진 경계가 생기지 않게 합니다. */
