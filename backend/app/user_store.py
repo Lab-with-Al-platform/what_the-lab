@@ -25,9 +25,9 @@ def create_user(discord_user: dict) -> dict:
     """디스코드 정보로 새 회원을 만듭니다. (= 가입 시작, signup_step은 기본값 'role')"""
     with get_connection() as conn, conn.cursor() as cursor:
         cursor.execute(
-            "INSERT INTO `user` (discord_id, nickname, user_photo) VALUES (%s, %s, %s)",
+            "INSERT INTO `user` (discord_id, nickname) VALUES (%s, %s)",
             # TODO: 닉네임이 겹치면 UNIQUE 에러가 납니다. 겹칠 때 처리 방법은 팀과 정하기
-            (discord_user["id"], discord_user["username"], discord_user.get("avatar")),
+            (discord_user["id"], discord_user["username"]),
         )
         new_user_id = cursor.lastrowid  # 방금 AUTO_INCREMENT로 생긴 번호
     return find_by_id(new_user_id)

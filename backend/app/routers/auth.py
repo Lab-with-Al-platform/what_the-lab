@@ -4,7 +4,7 @@ from urllib.parse import urlencode
 
 import httpx
 from fastapi import APIRouter, Cookie, HTTPException
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, Response
 
 from app import user_store
 from app.config import DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, DISCORD_REDIRECT_URI, FRONTEND_URL
@@ -89,6 +89,13 @@ def me(access_token: str | None = Cookie(default=None)) -> dict:
     if user is None:
         raise HTTPException(status_code=401, detail="로그인이 필요합니다")
     return user
+
+@router.post("/logout")
+def logout() -> Response:
+    """④ 로그인 쿠키(JWT)를 지워서 로그아웃합니다."""
+    response = Response(status_code=204)
+    response.delete_cookie(TOKEN_COOKIE, httponly=True, samesite="lax")
+    return response
 
 
 
