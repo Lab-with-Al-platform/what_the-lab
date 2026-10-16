@@ -14,3 +14,14 @@ DISCORD_REDIRECT_URI = os.environ["DISCORD_REDIRECT_URI"]
 JWT_SECRET = os.environ["JWT_SECRET"]
 FRONTEND_URL = os.getenv("NEXT_PUBLIC_APP_URL", "http://localhost:3000")
 CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
+
+
+# MySQL (docker-compose로 띄운 DB)
+DB_HOST = os.getenv("DB_HOST", "127.0.0.1")
+DB_PORT = int(os.getenv("DB_PORT", "3309"))
+DB_NAME = os.environ["DB_NAME"]
+DB_USER = os.environ["DB_USER"]
+DB_PASSWORD = os.environ["DB_PASSWORD"]
+
+# 실행 환경. development일 때만 인증번호를 화면에 보여 줍니다.
+APP_ENV = os.getenv("APP_ENV", "production")

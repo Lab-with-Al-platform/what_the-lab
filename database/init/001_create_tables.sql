@@ -1,0 +1,89 @@
+-- 회원가입에 필요한 기본 테이블입니다.
+-- 순서가 중요합니다: 다른 테이블이 가리키는 부모(user)를 먼저 만듭니다.
+
+SET NAMES utf8mb4;  -- 한글 COMMENT가 깨지지 않게 이 파일을 utf8mb4로 읽으라고 알려 줍니다.
+
+-- 1) 회원: 디스코드로 로그인한 모든 사람
+CREATE TABLE `user` (
+  user_id      BIGINT        NOT NULL AUTO_INCREMENT,
+  discord_id   VARCHAR(30)   NOT NULL,
+  nickname     VARCHAR(30)   NOT NULL,
+  user_role    VARCHAR(20)   NULL      COMMENT 'researcher=연구회원 / expert=AI 전문가',
+  signup_step  VARCHAR(20)   NOT NULL  DEFAULT 'role' COMMENT 'role / verify / info / done',
+  user_photo   VARCHAR(255)  NULL,
+  status       VARCHAR(20)   NOT NULL  DEFAULT 'active' COMMENT 'active / suspended / deleted',
+  is_admin     BOOLEAN       NOT NULL  DEFAULT FALSE,
+  created_at   DATETIME      NOT NULL  DEFAULT CURRENT_TIMESTAMP,
+  updated_at   DATETIME      NOT NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id),
+  UNIQUE KEY uq_user_discord_id (discord_id),
+  UNIQUE KEY uq_user_nickname (nickname)
+);
+
+-- 2) AI 전문가: user와 1:1 (user_id를 그대로 PK로 씀)
+CREATE TABLE expert (
+  user_id      BIGINT        NOT NULL,
+  current_job  VARCHAR(20)   NOT NULL  COMMENT 'grad_student=대학원생 / researcher=연구원 / employee=기업 재직 / freelancer=프리랜서 / professor=교수 / etc=기타',
+  ai_career    VARCHAR(20)   NOT NULL  COMMENT 'lt1=1년 미만 / 1_3=1~3년 / 3_5=3~5년 / 5_10=5~10년 / gt10=10년 이상',
+  affiliation  VARCHAR(100)  NULL,
+  introduce    VARCHAR(100)  NULL,
+  is_public    BOOLEAN       NOT NULL  DEFAULT FALSE COMMENT '프로필을 채우면 공개',
+  created_at   DATETIME      NOT NULL  DEFAULT CURRENT_TIMESTAMP,
+  updated_at   DATETIME      NOT NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id),
+  CONSTRAINT fk_expert_user
+    FOREIGN KEY (user_id) REFERENCES `user`(user_id) ON DELETE CASCADE
+);
+
+-- 3) 연구회원: user와 1:1. 이메일은 저장하지 않고 기관명만 남깁니다.
+CREATE TABLE researcher_profile (
+  user_id           BIGINT        NOT NULL,
+  institution_name  VARCHAR(100)  NULL      COMMENT '목록에 있으면 자동 입력. 없으면 인증 직후 직접 입력',
+  institution_source VARCHAR(20)  NOT NULL  DEFAULT 'list' COMMENT 'list=기관 목록에서 자동 / manual=직접 입력(관리자 확인 필요)',
+  department        VARCHAR(100)  NULL,
+  position          VARCHAR(20)   NULL,
+  is_verified       BOOLEAN       NOT NULL  DEFAULT FALSE,
+  verified_at       DATETIME      NULL,
+  created_at        DATETIME      NOT NULL  DEFAULT CURRENT_TIMESTAMP,
+  updated_at        DATETIME      NOT NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id),
+  CONSTRAINT fk_researcher_user
+    FOREIGN KEY (user_id) REFERENCES `user`(user_id) ON DELETE CASCADE
+);
+
+-- 4) 기관 목록: 이메일 도메인으로 기관 이름을 찾을 때 씁니다.
+--    데이터는 database/seed/build_institution_seed.py 가 만든 002_seed_institutions.sql 에서 넣습니다.
+CREATE TABLE institution (
+  domain            VARCHAR(100)  NOT NULL  COMMENT '이메일 @ 뒤 대표 도메인 (예: snu.ac.kr)',
+  name              VARCHAR(200)  NOT NULL  COMMENT '화면에 보여줄 기관명 (한글이 없으면 영어)',
+  name_en           VARCHAR(200)  NULL      COMMENT 'Hipo 영어 이름 (대조용)',
+  country_code      CHAR(2)       NOT NULL  DEFAULT 'KR' COMMENT '나라 코드 (KR, US ...)',
+  institution_type  VARCHAR(20)   NOT NULL  DEFAULT 'university' COMMENT 'university=대학 / research=연구기관',
+  source            VARCHAR(20)   NOT NULL  COMMENT 'hipo / public / research / manual : 값을 가져온 곳',
+  created_at        DATETIME      NOT NULL  DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (domain)
+);
+
+-- 2-1) 할 수 있는 일 기준표: 택소노미 v4 UG(11개). 데이터는 003_seed_able_work.sql 에서 넣습니다.
+CREATE TABLE able_work (
+  able_work_id  VARCHAR(10)   NOT NULL  COMMENT '택소노미 UG ID (UG01 ~ UG11)',
+  name          VARCHAR(50)   NOT NULL  COMMENT '화면 이름 (예: 이미지·영상 분석)',
+  sort_order    INT           NOT NULL  COMMENT '표시 순서',
+  show_default  BOOLEAN       NOT NULL  DEFAULT TRUE COMMENT 'FALSE면 [더 보기]를 눌러야 보임',
+  status        VARCHAR(20)   NOT NULL  DEFAULT 'pending_review' COMMENT 'pending_review / active / retired',
+  taxonomy_ver  VARCHAR(10)   NOT NULL  COMMENT '분류표 버전 (예: 4.0)',
+  PRIMARY KEY (able_work_id)
+);
+
+-- 2-2) 전문가가 고른 할 수 있는 일: expert 1 : N (가입 때 최대 3개)
+CREATE TABLE expert_able_work (
+  expert_able_work_id  BIGINT       NOT NULL AUTO_INCREMENT,
+  user_id              BIGINT       NOT NULL,
+  expert_capability    VARCHAR(10)  NOT NULL  COMMENT 'able_work.able_work_id (예: UG04)',
+  PRIMARY KEY (expert_able_work_id),
+  UNIQUE KEY uq_expert_capability (user_id, expert_capability),  -- 같은 사람이 같은 일을 두 번 고르지 못하게
+  CONSTRAINT fk_able_work_expert
+    FOREIGN KEY (user_id) REFERENCES expert(user_id) ON DELETE CASCADE,
+  CONSTRAINT fk_able_work_code
+    FOREIGN KEY (expert_capability) REFERENCES able_work(able_work_id)
+);
