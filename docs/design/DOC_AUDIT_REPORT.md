@@ -7,10 +7,10 @@
 
 | 자료 | 확인한 내용 | 적용 |
 |---|---|---|
-| `README.md`, `AGENTS.md`, `TEAM_WORKFLOW.md` | AI 작업 규칙·역할·Git PR 규칙 | 새 가이드 참조 연결 |
-| `MVP_SCOPE.md`, `03_DECISION_LOG.md`, `02_SCREEN_GUIDE.md` | 기능 단계·용어·정보 구조·상태 모델 | 디자인과 기능 범위 충돌 기록 |
-| `STYLE_GUIDE.md`, `STYLE_GUIDE_ADDENDUM.md`, `CODING_STYLE.md` | 기존 코딩/디자인 원칙과 병합 중복 | 스타일·코딩 분리, Addendum 반영 |
-| `CURSOR_UI_REVISION_GUIDE.md` | 오래된 화면별 UX 수정 지침 | 제품 구조·입력 규칙은 참고, P0 시각 기준을 대체하지 않음 |
+| `README.md`, `AGENTS.md`, `docs/development/TEAM_WORKFLOW.md` | AI 작업 규칙·역할·Git PR 규칙 | 새 가이드 참조 연결 |
+| `docs/product/MVP_SCOPE.md`, `docs/product/03_DECISION_LOG.md`, `docs/product/02_SCREEN_GUIDE.md` | 기능 단계·용어·정보 구조·상태 모델 | 디자인과 기능 범위 충돌 기록 |
+| `docs/design/STYLE_GUIDE.md`, `docs/archive/design/STYLE_GUIDE_ADDENDUM.md`, `docs/development/CODING_STYLE.md` | 기존 코딩/디자인 원칙과 병합 중복 | 스타일·코딩 분리, Addendum 반영 |
+| `docs/design/CURSOR_UI_REVISION_GUIDE.md` | 오래된 화면별 UX 수정 지침 | 제품 구조·입력 규칙은 참고, P0 시각 기준을 대체하지 않음 |
 | `design/AI 연구 플랫폼 랩브리지 랜딩페이지.png` | P0 랜딩 화면 요소 | 최종 시각 기준 |
 | `design/LabBridge 암세포 분석 연구 페이지.png` | P0 사례 상세 PC·모바일 구성 | 최종 시각 기준 |
 | `design/labbridge-ui-v3/screens/*.png` 12장 | 사례/트렌드/전문가 목록·상세 PC/모바일 구조 | P1 배치/콘텐츠 참조만 |
@@ -23,14 +23,14 @@
 
 | ID | 심각도 | 출처/현상 | 조치 및 결정 필요 |
 |---|---|---|---|
-| A-01 | **높음** | `MVP_SCOPE.md`·`03_DECISION_LOG.md`·`02_SCREEN_GUIDE.md`: 운영형 인사이트 `MVP+`. 반면 P0 랜딩은 사례/트렌드/인터뷰를 주 탐색으로 제시 | **미결정**. 시각 설계와 개발 범위를 분리. MVP로 앞당길지, 정적 샘플로만 노출할지 팀 결정 후 범위·로그 동시 수정 |
-| A-02 | **높음** | ZIP `STYLE_GUIDE.md` 제목은 스타일 가이드지만 본문은 코딩 규칙 | 기존 원본 `archive/STYLE_GUIDE_original_coding.md` 보존. 새 `docs/STYLE_GUIDE.md`를 디자인 문서로 교체하고 코딩 규칙은 `CODING_STYLE.md`로 통합 |
-| A-03 | **높음** | 구형 WHAT THE LAB 목록과 v3 목록 시안의 시각 스타일을 P0처럼 구현할 위험 | 구형/목록 시안은 **정보구조만** 사용. 새 스타일의 목록 명세를 `SCREEN_DESIGN_SPECS.md`에 별도 기술 |
+| A-01 | **높음** | `docs/product/MVP_SCOPE.md`·`docs/product/03_DECISION_LOG.md`·`docs/product/02_SCREEN_GUIDE.md`: 운영형 인사이트 `MVP+`. 반면 P0 랜딩은 사례/트렌드/인터뷰를 주 탐색으로 제시 | **미결정**. 시각 설계와 개발 범위를 분리. MVP로 앞당길지, 정적 샘플로만 노출할지 팀 결정 후 범위·로그 동시 수정 |
+| A-02 | **높음** | ZIP `docs/design/STYLE_GUIDE.md` 제목은 스타일 가이드지만 본문은 코딩 규칙 | 기존 원본 `archive/STYLE_GUIDE_original_coding.md` 보존. 새 `docs/design/STYLE_GUIDE.md`를 디자인 문서로 교체하고 코딩 규칙은 `docs/development/CODING_STYLE.md`로 통합 |
+| A-03 | **높음** | 구형 WHAT THE LAB 목록과 v3 목록 시안의 시각 스타일을 P0처럼 구현할 위험 | 구형/목록 시안은 **정보구조만** 사용. 새 스타일의 목록 명세를 `docs/design/SCREEN_DESIGN_SPECS.md`에 별도 기술 |
 | A-04 | **높음** | 정적 모바일 상세 이미지에서 TOC sticky의 정확한 시점·복귀·현재 섹션 갱신은 확인 불가 | 합의된 동작을 5상태로 명세. 브라우저 실제 스크롤 QA 의무화 |
 | A-05 | **높음** | 시안 속 논문·기관·DOI·정확도·리뷰·가상 전문가 데이터는 샘플 | 출처 검증 전 실제 성과처럼 게시 금지. Mock/실데이터 표시 및 이미지 라이선스 관리 |
-| A-06 | **중간** | `CODING_STYLE.md`의 '프로젝트 관리 등 확정되지 않은 기능' 표현은 현재 `MVP_SCOPE.md`와 충돌 가능 | 프로젝트 확정·마일스톤·종료·평가는 **현재 문서상 MVP**, 계약/결제/정산 등은 제외라고 명확화 |
-| A-07 | **중간** | `TEAM_WORKFLOW.md`는 인사이트 담당을 미래 후보(MVP+)로 설명하지만 현재 디자인 작업은 사례·트렌드 중심 | **역할과 구현 우선순위 분리**. 디자인 담당은 가능하되 MVP 기능 우선순위는 변경하지 않음 |
-| A-08 | **중간** | `STYLE_GUIDE_ADDENDUM.md`와 기존 병합본에 중복 원칙·미확정 토큰이 혼재 | 항목별 병합표 작성, 수치는 `Proposed` 표기, 원본 보존 |
+| A-06 | **중간** | `docs/development/CODING_STYLE.md`의 '프로젝트 관리 등 확정되지 않은 기능' 표현은 현재 `docs/product/MVP_SCOPE.md`와 충돌 가능 | 프로젝트 확정·마일스톤·종료·평가는 **현재 문서상 MVP**, 계약/결제/정산 등은 제외라고 명확화 |
+| A-07 | **중간** | `docs/development/TEAM_WORKFLOW.md`는 인사이트 담당을 미래 후보(MVP+)로 설명하지만 현재 디자인 작업은 사례·트렌드 중심 | **역할과 구현 우선순위 분리**. 디자인 담당은 가능하되 MVP 기능 우선순위는 변경하지 않음 |
+| A-08 | **중간** | `docs/archive/design/STYLE_GUIDE_ADDENDUM.md`와 기존 병합본에 중복 원칙·미확정 토큰이 혼재 | 항목별 병합표 작성, 수치는 `Proposed` 표기, 원본 보존 |
 | A-09 | **중간** | v3 시안의 저장 아이콘·전문가 CTA·검색·정렬 등은 실제 동작이 연결되지 않았거나 기능 범위가 다름 | 실제 라우트/데이터/인증 연결 확인 전 Mock로 표시. `저장`은 현 문서상 MVP+ |
 | A-10 | **중간** | 오래된 화면 인계·Cursor 지시서에는 `WHAT THE LAB`, 프로젝트 중심 화면, 과거 디자인 기준이 혼재 | 문서 삭제 금지. `MVP_SCOPE`는 기능 범위, P0 이미지는 시각 기준, 오래된 지시서는 도메인/정보구조 참고로 우선순위 선언 |
 | A-11 | **중간** | 화면 이미지와 실제 프론트엔드 결과 사이 픽셀/에셋/폰트/스크롤 품질 검증 절차 부재 | 디자인 QA와 PR 비교 양식 추가. 1440/768/390 기준 캡처·차이 기록 |
@@ -53,25 +53,25 @@
 
 ## 4. 문서 적용 우선순위(충돌 방지)
 
-1. 제품 기능 범위: `MVP_SCOPE.md`와 **실제로 승인·기록된 최신** `03_DECISION_LOG.md`.
-2. 시각 디자인: `STYLE_GUIDE.md` + P0 랜딩/상세 이미지.
-3. 화면별 배치·동작: `SCREEN_DESIGN_SPECS.md`, `02_SCREEN_GUIDE.md`(도메인 기능만).
-4. 코딩: `CODING_STYLE.md`, 루트 `AGENTS.md`.
-5. Git 협업: `TEAM_WORKFLOW.md`.
+1. 제품 기능 범위: `docs/product/MVP_SCOPE.md`와 **실제로 승인·기록된 최신** `docs/product/03_DECISION_LOG.md`.
+2. 시각 디자인: `docs/design/STYLE_GUIDE.md` + P0 랜딩/상세 이미지.
+3. 화면별 배치·동작: `docs/design/SCREEN_DESIGN_SPECS.md`, `docs/product/02_SCREEN_GUIDE.md`(도메인 기능만).
+4. 코딩: `docs/development/CODING_STYLE.md`, 루트 `AGENTS.md`.
+5. Git 협업: `docs/development/TEAM_WORKFLOW.md`.
 6. 구형 화면 인계서/시장조사/구형 WHAT THE LAB 시안: 참고 자료. **최신 결정을 덮어쓰지 않음**.
 
 서로 다른 기준의 최신 승인 여부가 불명확하면 **추측해 덮어쓰지 말고 팀 결정 대기**로 남긴다.
 
 ## 5. 팀에서 결정할 질문
 
-1. `인사이트`(사례·트렌드 목록/상세/인터뷰)는 MVP에 포함할까, 아니면 정적 데모/후속 개발로 둘까? 선택에 따라 `MVP_SCOPE.md`, `03_DECISION_LOG.md`, `TEAM_WORKFLOW.md`를 같은 PR에서 변경.
+1. `인사이트`(사례·트렌드 목록/상세/인터뷰)는 MVP에 포함할까, 아니면 정적 데모/후속 개발로 둘까? 선택에 따라 `docs/product/MVP_SCOPE.md`, `docs/product/03_DECISION_LOG.md`, `docs/development/TEAM_WORKFLOW.md`를 같은 PR에서 변경.
 2. `지금 시작하기`, 검색, 저장, 협업 요청 버튼의 목적지·권한·미구현 상태를 어떻게 표현할까?
 3. Figma 원본에서 확정할 색·폰트·에셋·반응형 기준은 무엇인가?
 4. 전문가 목록 2열/3열, 사례·트렌드 대표 카드, 모바일 필터 UI는 어느 안으로 승인할까?
 
 ## 6. 실제 저장소 반영 시 주의
 
-- ZIP의 `docs/STYLE_GUIDE.md`는 **기존 코딩 문서와 내용이 다르다**. 기존 파일은 `archive/STYLE_GUIDE_original_coding.md`로 보존한 뒤 교체.
-- 기존 `CODING_STYLE.md`는 교체 전에 diff 확인. 변경 사항은 코딩 스타일 유지 + UI 충실도 규칙/범위 문구 수정 중심.
+- ZIP의 `docs/design/STYLE_GUIDE.md`는 **기존 코딩 문서와 내용이 다르다**. 기존 파일은 `archive/STYLE_GUIDE_original_coding.md`로 보존한 뒤 교체.
+- 기존 `docs/development/CODING_STYLE.md`는 교체 전에 diff 확인. 변경 사항은 코딩 스타일 유지 + UI 충실도 규칙/범위 문구 수정 중심.
 - `AGENTS.md`와 `docs/README.md`는 기존 내용 유지 후 링크만 추가한 제안본이다.
 - 이 패키지는 로컬/GitHub에 자동 반영되지 않았다. `feature/docs-design-fidelity` 브랜치에서 리뷰 후 `develop` PR을 생성한다.

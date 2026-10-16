@@ -1,0 +1,14 @@
+# 개발·팀 협업
+
+코드를 작성하고 리뷰하며 Git으로 함께 작업할 때 읽는 문서입니다.
+
+| 문서 | 내용 |
+|---|---|
+| [CODING_STYLE.md](CODING_STYLE.md) | 간결한 코드, 한국어 학습용 설명, 검증·리뷰 규칙 |
+| [TEAM_WORKFLOW.md](TEAM_WORKFLOW.md) | 역할, feature 브랜치, PR·통합 방식 |
+
+코드 작성 전에 저장소 루트의 [AGENTS.md](../../AGENTS.md), [제품 범위](../product/MVP_SCOPE.md), 담당 기능 문서를 함께 확인합니다.
+
+화면 작업은 [디자인 기준](../design/README.md), 검증 결과는 [QA 기록](../qa/README.md)을 참고합니다.
+
+[전체 문서 안내](../README.md)

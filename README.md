@@ -15,7 +15,7 @@
      → 마일스톤 → 종료 → 양방향 평가
 ```
 
-상세 범위는 [docs/MVP_SCOPE.md](docs/MVP_SCOPE.md)를 기준으로 판단합니다.
+상세 범위는 [docs/product/MVP_SCOPE.md](docs/product/MVP_SCOPE.md)를 기준으로 판단합니다.
 
 ## 모노레포 구조
 
@@ -52,7 +52,7 @@
 
 `dev`라는 폴더를 별도로 만들지 않습니다. **브랜치 `develop`**은 코드 통합 흐름이고, **개발 환경(development environment)**은 로컬 실행 설정을 뜻합니다. 둘은 서로 다른 개념입니다.
 
-자세한 작업 순서는 [docs/TEAM_WORKFLOW.md](docs/TEAM_WORKFLOW.md)를 따릅니다.
+자세한 작업 순서는 [docs/development/TEAM_WORKFLOW.md](docs/development/TEAM_WORKFLOW.md)를 따릅니다.
 
 ## 시작하기
 
@@ -71,9 +71,9 @@ Copy-Item .env.example .env
 
 결정이 충돌하면 다음 순서로 확인합니다.
 
-1. 최신 팀 합의와 `docs/03_DECISION_LOG.md`
-2. `docs/MVP_SCOPE.md`
-3. `docs/02_SCREEN_GUIDE.md`
+1. 최신 팀 합의와 `docs/product/03_DECISION_LOG.md`
+2. `docs/product/MVP_SCOPE.md`
+3. `docs/product/02_SCREEN_GUIDE.md`
 4. 기타 기획·시장조사 자료
 
 시장조사 제안이나 미래 아이디어는 자동으로 MVP가 되지 않습니다. 범위를 바꾸려면 팀 합의와 문서 수정이 먼저입니다.
