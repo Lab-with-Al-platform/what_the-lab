@@ -2,14 +2,37 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PageContainer } from "@/components/page-container";
+import { requestApi } from "@/lib/api";
 
 const NAV_ITEMS = [
   { href: "/", label: "홈" },
   { href: "/cases", label: "AI 연구 협업 사례" },
   { href: "/trends", label: "AI 트렌드" },
   { href: "/experts", label: "AI 전문가 찾기" },
+];
+
+type Me = {
+  nickname: string;
+  user_role: "researcher" | "expert" | null;
+  user_photo: string | null;
+  signup_step: string;
+};
+
+// 프로필 드롭다운 메뉴 (주소는 임시, 페이지 만들 때 팀과 맞추기)
+const RESEARCHER_MENU = [
+  { href: "/requests", label: "요청관리" },
+  { href: "/workspace", label: "협업공간" },
+  { href: "/my-research", label: "내 연구" },
+  { href: "/settings/profile", label: "프로필 설정" },
+];
+
+const EXPERT_MENU = [
+  { href: "/requests", label: "요청관리" },
+  { href: "/workspace", label: "협업공간" },
+  { href: "/my-career", label: "내 이력" },
+  { href: "/settings/profile", label: "프로필 설정" },
 ];
 
 function isCurrent(pathname: string, href: string): boolean {
@@ -23,6 +46,10 @@ export function SiteHeader() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [me, setMe] = useState<Me | null>(null);
+  const [meLoading, setMeLoading] = useState(true);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function closeOnEscape(event: KeyboardEvent) {
@@ -31,11 +58,41 @@ export function SiteHeader() {
       }
       setMenuOpen(false);
       setSearchOpen(false);
+      setProfileOpen(false);
     }
 
     window.addEventListener("keydown", closeOnEscape);
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, []);
+
+  // 로그인한 사람 정보 불러오기 (401이면 비로그인)
+  useEffect(() => {
+    requestApi<Me>("/auth/me")
+      .then(setMe)
+      .catch(() => setMe(null))
+      .finally(() => setMeLoading(false));
+  }, []);
+
+  // 드롭다운이 열려 있을 때, 프로필 영역 바깥을 누르면 닫기
+  useEffect(() => {
+    if (!profileOpen) return;
+
+    function closeOnOutsideClick(event: MouseEvent) {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setProfileOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", closeOnOutsideClick);
+    return () => document.removeEventListener("mousedown", closeOnOutsideClick);
+  }, [profileOpen]);
+
+
+  // 로그아웃: 백엔드가 쿠키를 지우고, 홈으로 새로 불러오기
+  async function logout() {
+    await requestApi("/auth/logout", { method: "POST" });
+    window.location.href = "/";
+  }
 
   return (
     <header className="sticky top-0 z-40 border-b border-line/80 bg-white/95 backdrop-blur">
@@ -78,13 +135,59 @@ export function SiteHeader() {
             <span className="sr-only">인사이트 검색 열기</span>
             <SearchIcon />
           </button>
-          
-          <Link
-            href="/login"
-            className="hidden h-11 items-center rounded-button bg-ink px-4 text-sm font-semibold text-white hover:bg-brand-hover sm:inline-flex"
-          >
-            디스코드로 로그인
-          </Link>
+
+          {meLoading ? null : !me ? (
+            <Link
+              href="/login"
+              className="hidden h-11 items-center rounded-button bg-ink px-4 text-sm font-semibold text-white hover:bg-brand-hover sm:inline-flex"
+            >
+              디스코드로 로그인
+            </Link>
+          ) : me.signup_step !== "done" ? (
+            <Link
+              href="/signup"
+              className="hidden h-11 items-center rounded-button bg-ink px-4 text-sm font-semibold text-white hover:bg-brand-hover sm:inline-flex"
+            >
+              가입 이어하기
+            </Link>
+          ) : (
+            <div ref={profileRef} className="relative hidden sm:block">
+              <button
+                type="button"
+                className="inline-flex h-11 items-center gap-2 rounded-button px-2 text-sm font-semibold text-ink hover:bg-page"
+                aria-expanded={profileOpen}
+                onClick={() => setProfileOpen((open) => !open)}
+              >
+                <img src={profileImageOf(me)} alt="" className="h-8 w-8 rounded-full object-cover" />
+                <span>{me.nickname}</span>
+              </button>
+
+              {profileOpen ? (
+                <div className="absolute right-0 top-full mt-2 w-44 rounded-button border border-line bg-white py-2 shadow-lg">
+                  {(me.user_role === "expert" ? EXPERT_MENU : RESEARCHER_MENU).map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="flex min-h-10 items-center px-4 text-sm hover:bg-page"
+                      onClick={() => setProfileOpen(false)}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+
+                  <div className="my-2 border-t border-line" />
+                  <button
+                    type="button"
+                    className="flex min-h-10 w-full items-center px-4 text-sm text-ink hover:bg-page"
+                    onClick={logout}
+                  >
+                    로그아웃
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          )}
+
           <button
             type="button"
             className="grid h-11 w-11 place-items-center rounded-button hover:bg-page lg:hidden"
@@ -131,11 +234,40 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
-          <div className="mt-2 grid gap-2 sm:hidden">
-            
-            <Link href="/login" className="flex min-h-11 items-center justify-center rounded-button bg-ink text-sm font-semibold text-white">
-              디스코드로 로그인
-            </Link>
+          <div className="mt-2 grid gap-1 border-t border-line pt-3 sm:hidden">
+            {meLoading ? null : !me ? (
+              <Link href="/login" className="flex min-h-11 items-center justify-center rounded-button bg-ink text-sm font-semibold text-white">
+                디스코드로 로그인
+              </Link>
+            ) : me.signup_step !== "done" ? (
+              <Link href="/signup" className="flex min-h-11 items-center justify-center rounded-button bg-ink text-sm font-semibold text-white">
+                가입 이어하기
+              </Link>
+            ) : (
+              <>
+                <div className="flex items-center gap-2 px-3 py-2">
+                  <img src={profileImageOf(me)} alt="" className="h-8 w-8 rounded-full object-cover" />
+                  <span className="text-sm font-semibold text-ink">{me.nickname}</span>
+                </div>
+                {(me.user_role === "expert" ? EXPERT_MENU : RESEARCHER_MENU).map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="flex min-h-11 items-center rounded-button px-3 text-sm font-medium hover:bg-page"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+                <button
+                  type="button"
+                  className="flex min-h-11 w-full items-center rounded-button px-3 text-sm font-medium hover:bg-page"
+                  onClick={logout}
+                >
+                  로그아웃
+                </button>
+              </>
+            )}
           </div>
           </PageContainer>
         </nav>
@@ -159,4 +291,11 @@ function MenuIcon() {
       <path d="M5 7h14M5 12h14M5 17h14" strokeLinecap="round" />
     </svg>
   );
+}
+
+function profileImageOf(me: Me): string {
+  if (me.user_photo) return me.user_photo;
+  return me.user_role === "expert"
+    ? "/profile-images/default-expert.png"
+    : "/profile-images/default-researcher.png";
 }

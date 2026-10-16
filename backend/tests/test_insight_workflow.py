@@ -71,6 +71,36 @@ def client(tmp_path, monkeypatch):
     monkeypatch.setenv("INSIGHTS_ENABLED", "true")
     monkeypatch.setenv("INSIGHT_ADMIN_DISCORD_IDS", ADMIN_ID)
     monkeypatch.setenv("INSIGHT_ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:8000")
+    # 회원 저장소의 구현이 바뀌어도 인사이트 검사는 실제 회원 DB에 접속하지 않습니다.
+    users: dict[int, dict] = {}
+
+    def find_test_user(user_id: int) -> dict | None:
+        return users.get(user_id)
+
+    def find_test_discord_user(discord_id: str) -> dict | None:
+        return next((user for user in users.values() if user["discord_id"] == discord_id), None)
+
+    def create_test_user(discord_user: dict) -> dict:
+        user_id = len(users) + 1
+        user = {
+            "user_id": user_id,
+            "discord_id": discord_user["id"],
+            "nickname": discord_user["username"],
+            "user_role": None,
+            "signup_step": "role",
+            "user_photo": None,
+            "status": "active",
+        }
+        users[user_id] = user
+        return user
+
+    def reject_real_member_db() -> None:
+        raise AssertionError("인사이트 단위 테스트는 실제 회원 DB에 접속하면 안 됩니다.")
+
+    monkeypatch.setattr(user_store, "find_by_id", find_test_user)
+    monkeypatch.setattr(user_store, "find_by_discord_id", find_test_discord_user)
+    monkeypatch.setattr(user_store, "create_user", create_test_user)
+    monkeypatch.setattr(user_store, "get_connection", reject_real_member_db)
     engine = build_engine(f"sqlite:///{tmp_path / 'insight.db'}", allow_sqlite=True)
     Base.metadata.create_all(engine)
 
@@ -79,7 +109,7 @@ def client(tmp_path, monkeypatch):
             yield session
 
     app.dependency_overrides[get_session] = test_session
-    with TestClient(app) as test_client:
+    with TestClient(app, base_url="http://testserver.local") as test_client:
         yield test_client
     app.dependency_overrides.clear()
     engine.dispose()
@@ -89,7 +119,13 @@ def login(client: TestClient, discord_id: str = ADMIN_ID) -> dict:
     user = user_store.find_by_discord_id(discord_id)
     if user is None:
         user = user_store.create_user({"id": discord_id, "username": "테스트 계정"})
-    client.cookies.set("access_token", create_access_token(user["user_id"]))
+    # 실제 브라우저처럼 호스트·경로를 맞춰야 로그아웃의 쿠키 삭제도 검증할 수 있습니다.
+    client.cookies.set(
+        "access_token",
+        create_access_token(user["user_id"]),
+        domain=client.base_url.host,
+        path="/",
+    )
     return user
 
 
@@ -189,6 +225,30 @@ def test_flag_disabled_keeps_health_and_auth_working(client, monkeypatch):
     assert client.get("/api/v1/health").json() == {"status": "ok"}
     login(client)
     assert client.get("/api/v1/auth/me").status_code == 200
+
+
+def test_merge_keeps_member_and_insight_routes_registered(client):
+    paths = set(app.openapi()["paths"])
+    assert {
+        "/api/v1/auth/me",
+        "/api/v1/auth/logout",
+        "/api/v1/researcher/profile",
+        "/api/v1/expert/signup",
+        PUBLIC_PATH,
+        ADMIN_PATH,
+    } <= paths
+
+
+def test_member_id_and_logout_still_work_with_insights(client):
+    user = login(client)
+    assert isinstance(user["user_id"], int)
+    assert client.get("/api/v1/auth/me").json()["discord_id"] == ADMIN_ID
+    assert client.get(ADMIN_PATH).status_code == 200
+    response = client.post("/api/v1/auth/logout")
+    assert response.status_code == 204
+    assert "access_token" not in client.cookies
+    assert client.get("/api/v1/auth/me").status_code == 401
+    assert client.get(ADMIN_PATH).status_code == 401
 
 
 def test_empty_admin_allowlist_denies_everyone(client, monkeypatch):

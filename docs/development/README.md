@@ -7,6 +7,8 @@
 | [CODING_STYLE.md](CODING_STYLE.md) | 간결한 코드, 한국어 학습용 설명, 검증·리뷰 규칙 |
 | [TEAM_WORKFLOW.md](TEAM_WORKFLOW.md) | 역할, feature 브랜치, PR·통합 방식 |
 
+| [SIGNUP_LOGIN_GUIDE.md](SIGNUP_LOGIN_GUIDE.md) | 회원가입·로그인 로컬 실행·테스트 (DB, 백엔드, 프론트) |
+
 코드 작성 전에 저장소 루트의 [AGENTS.md](../../AGENTS.md), [제품 범위](../product/MVP_SCOPE.md), 담당 기능 문서를 함께 확인합니다.
 
 화면 작업은 [디자인 기준](../design/README.md), 검증 결과는 [QA 기록](../qa/README.md)을 참고합니다.
