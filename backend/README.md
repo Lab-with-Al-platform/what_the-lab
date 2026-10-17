@@ -2,6 +2,8 @@
 
 FastAPI 기반 API와 서버의 비즈니스 규칙을 담당합니다.
 
+> 2026-10-17 PR #10 충돌 해결: 회원·인증·로그아웃 API와 인사이트 API를 함께 등록했습니다. **회원은 develop의 MySQL 코드, 인사이트는 PostgreSQL 코드**를 임시로 유지합니다. 공통 DB를 PostgreSQL로 통일하는 결정은 그대로이며, 회원 DB 전환은 이번 충돌 해결에서 수행하지 않았습니다. [검증·미완료 사항](../docs/qa/PR10_MERGE_RESOLUTION_2026-10-17.md)을 참고하세요.
+
 ## 현재 구현 상태
 
 - [x] FastAPI 서버 뼈대 (`/api/v1/health`)
@@ -9,9 +11,10 @@ FastAPI 기반 API와 서버의 비즈니스 규칙을 담당합니다.
 - [x] 처음 로그인한 디스코드 계정은 자동으로 회원 생성 (= 가입 시작)
 - [x] 자체 JWT 발급 → httpOnly 쿠키 저장 (7일)
 - [x] 로그인 사용자 확인 (`/api/v1/auth/me`)
-- [ ] DB 연결 (현재는 서버 메모리에 임시 저장)
-- [ ] 가입 정보 저장 (회원 유형, 소속, 프로필)
-- [ ] 로그아웃
+- [x] 회원 DB 연결 코드 (현재 MySQL, PostgreSQL 전환·실제 통합 검증은 미완료)
+- [x] 인사이트 전용 PostgreSQL 연결 코드·마이그레이션·승인/공개 API (개발용 Supabase 적용·검증 완료, 기본 비활성, 운영 적용 아님)
+- [x] 가입 정보 저장 코드 (회원 유형, 소속, 프로필. 실제 회원 DB 동작은 별도 검증 필요)
+- [x] 로그아웃 API와 프론트 연결 코드
 - [ ] 닉네임 중복 처리
 
 ## 로컬 실행
@@ -110,9 +113,23 @@ uv run uvicorn app.main:app --reload --port 8000
 
 ## 현재 한계
 
-- **DB 없음**: 서버를 재시작하면 회원 정보가 모두 사라집니다. 다시 로그인하면 새 회원으로 만들어집니다.
-- **가입 정보 미저장**: 가입 화면의 [가입 완료]가 아직 서버에 저장하지 않아, 다시 로그인해도 계속 `/signup`으로 이동합니다.
+- **회원 DB 전환 대기**: 기존 메모리 저장소는 develop의 MySQL 저장소로 바뀌었습니다. 인사이트 PostgreSQL과 회원 DB를 통합 완료한 상태는 아닙니다.
+- **실행 설정 주의**: 현재 `app/config.py`는 `DB_NAME`, `DB_USER`, `DB_PASSWORD`를 시작 시 읽습니다. `DATABASE_URL`만 있는 환경은 실행 시 설정 오류가 날 수 있습니다. 회원 DB의 PostgreSQL 전환 전까지 `.env.example`의 임시 MySQL 항목과 [회원가입 안내](../docs/development/SIGNUP_LOGIN_GUIDE.md)를 함께 확인하세요. 이번 작업에서 실제 `.env`를 자동 변경하지 않았습니다.
+- 이번 회귀 검사는 가상 회원 저장소를 사용했습니다. 실제 MySQL 회원가입·로그인·기관 인증 SQL과 PostgreSQL 회원 전환은 검증하지 않았습니다.
 - 디스코드 토큰(access/refresh)은 저장하지 않습니다. 사용자 확인에 한 번만 사용합니다.
+
+## 인사이트 첫 백엔드
+
+자세한 순서와 제한은 [실행 안내](../docs/ai-case-automation/FOUNDATION_RUNBOOK.md)를 읽습니다. `INSIGHTS_ENABLED=false`가 기본이며 기존 정적 사례·트렌드 화면은 바꾸지 않았습니다.
+
+2026-10-16 `labbridge-dev`에 최초 migration을 적용했고 실제 PostgreSQL 동시성 검사를 포함한 테스트 29개가 통과했습니다. 이후 사용자가 제공한 본인 ID를 로컬 관리자 목록에 등록하고 개발 API를 활성화했습니다. [DB·관리자 설정 검증 기록](../docs/qa/INSIGHT_SUPABASE_MIGRATION_2026-10-16.md)을 참고하세요. 백엔드 재시작 후 실제 Discord 로그인 확인, 실제 사례·화면 연결은 아직입니다.
+
+- `app/insights/`: DB 모델·입력 검증·권한·검토/승인/공개 규칙
+- `app/routers/insights.py`: 관리자 후보 API와 공개 전용 API
+- `migrations/`: 인사이트 schema 변경 이력 (2026-10-16 지정 개발용 Supabase 적용, 운영 적용 아님)
+- `tests/`: 가상 자료·임시 DB 기반 테스트 및 명시적으로 선택하는 PostgreSQL 검사
+
+인사이트 감사 이력은 서버가 확인한 `discord_id`를 사용합니다. 최신 회원 저장소의 정수형 `user_id`로 로그인한 뒤에도 같은 Discord 계정의 관리자 여부를 확인하도록 회귀 검사했습니다. 실제 회원 DB와 연결한 전체 로그인 검사는 별도로 필요합니다.
 
 ## 중요한 원칙
 

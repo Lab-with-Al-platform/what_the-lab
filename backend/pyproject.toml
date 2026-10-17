@@ -10,4 +10,22 @@ dependencies = [
     "pymysql>=1.2.3",
     "python-dotenv>=1.2.4",
     "uvicorn[standard]>=0.54.0",
+    "pydantic>=2.10,<3",
+    "sqlalchemy>=2.0,<2.1",
+    "alembic>=1.13,<2",
+    "psycopg[binary]>=3.2,<4",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=8,<10",
+    "ruff>=0.12,<1",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100

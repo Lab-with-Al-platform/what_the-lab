@@ -90,32 +90,27 @@ export function HomePage() {
 
       <PageContainer id="paths" className="grid gap-4 py-0 lg:grid-cols-3">
         {ENTRY_CARDS.map((card) => (
-          <article key={card.href} className="relative flex h-full min-h-[214px] flex-col overflow-hidden rounded-card border border-line bg-card p-7 shadow-card">
+          <article key={card.href} className="home-entry-card relative flex h-full min-h-[214px] flex-col overflow-hidden rounded-card border border-line bg-card p-7 shadow-card">
             <Image
               src={card.image}
               alt=""
               fill
               sizes="(min-width: 1024px) 33vw, 100vw"
-              className={`pointer-events-none object-cover object-center ${card.imageClass}`}
+              className={`home-entry-card__image pointer-events-none object-cover object-center ${card.imageClass}`}
             />
             <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,#ffffff_0%,rgba(255,255,255,0.96)_42%,rgba(255,255,255,0.20)_78%,rgba(255,255,255,0.05)_100%)]" />
+            {/* 카드를 링크로 감싸면 키워드 링크가 중첩되므로 별도 링크로 둡니다. */}
+            <Link href={card.href} className="home-entry-card__link absolute inset-0 z-10">
+              <span className="sr-only">{card.title}로 이동</span>
+            </Link>
             <div className="relative">
               <p className={`text-[11px] font-semibold tracking-[0.16em] ${card.accent}`}>{card.kicker}</p>
-              <div className="mt-3 flex items-start justify-between gap-3">
-                <h2 className="text-[26px] font-bold tracking-tight">{card.title}</h2>
-                <Link
-                  href={card.href}
-                  className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-line bg-white text-ink"
-                  aria-label={`${card.title}로 이동`}
-                >
-                  <span aria-hidden="true">→</span>
-                </Link>
-              </div>
+              <h2 className="mt-3 min-h-11 text-[26px] font-bold tracking-tight">{card.title}</h2>
               <p className="mt-2 max-w-[250px] text-sm leading-6 text-muted">{card.body}</p>
               <ul className="mt-5 flex flex-wrap gap-2">
                 {card.tags.map((tag) => (
                   <li key={tag.label}>
-                    <Link href={tag.href} className="inline-flex min-h-8 items-center rounded-full border border-line bg-white/80 px-3 text-xs text-muted hover:text-ink">
+                    <Link href={tag.href} className="home-entry-card__tag relative z-20 inline-flex min-h-8 items-center rounded-full border border-line bg-white/80 px-3 text-xs text-muted hover:text-ink">
                       {tag.label}
                     </Link>
                   </li>

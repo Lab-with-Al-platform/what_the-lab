@@ -26,6 +26,9 @@
 
 ## 인사이트 작업 바로가기
 
+- [개발용 Supabase 적용·검증 결과](qa/INSIGHT_SUPABASE_MIGRATION_2026-10-16.md): 실제 DB 테이블 생성·역할 권한·PostgreSQL 동시성 검사
+- [첫 백엔드 실행·검증 안내](ai-case-automation/FOUNDATION_RUNBOOK.md): 구현 범위, 테스트 실행, 개발용 Supabase 연결 전 확인 사항
+- [Phase 0 확인 결과](ai-case-automation/PHASE_0_FINDINGS.md): 실제 코드·자료·분류체계와 미확인 항목
 - [편집·정기 게시 운영 기준서](ai-case-automation/INSIGHT_EDITORIAL_OPERATING_STANDARD.md): 근거와 연구자 유용성, 후보·편성·승인·보류
 - [통합 Codex 실행 지시서](ai-case-automation/WHAT_THE_LAB_AI_CASE_AND_TREND_AUTOMATION_CODEX_SPEC.md): 실제 저장소 확인부터 연구사례 자동화·AI 트렌드 확장까지
 - [분할 개발 명세와 근거 자료](ai-case-automation/README.md): 요구사항·데이터·수집·근거·키워드·API·관리자·테스트
