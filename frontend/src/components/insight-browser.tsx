@@ -112,7 +112,7 @@ export function InsightBrowser({
         <PageContainer className="insight-feature">
           {/* 사진 위에 배경색 그라데이션을 겹쳐 글과 이미지의 경계를 없앱니다. */}
           <div className="insight-feature__art" aria-hidden="true">
-            <CoverArt theme={featured.cover} className="h-full w-full" />
+            <CoverArt theme={featured.cover} src={featured.coverSrc} className="h-full w-full" />
           </div>
           <div className="relative z-10">
             <div className="insight-feature__copy">

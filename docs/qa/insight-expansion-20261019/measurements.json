@@ -1,0 +1,752 @@
+{
+  "date": "2026-10-19",
+  "articles": 31,
+  "checks": [
+    {
+      "slug": "lettuce-biomass-estimation",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "lettuce-biomass-estimation",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "lettuce-biomass-estimation",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "periodontal-bone-loss-analysis",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 0,
+      "notes": 6
+    },
+    {
+      "slug": "periodontal-bone-loss-analysis",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 0,
+      "notes": 6
+    },
+    {
+      "slug": "periodontal-bone-loss-analysis",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 0,
+      "notes": 6
+    },
+    {
+      "slug": "concrete-crack-segmentation",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "concrete-crack-segmentation",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "concrete-crack-segmentation",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "cancer-cell-classification",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "cancer-cell-classification",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "cancer-cell-classification",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "microscope-cell-drawing",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "microscope-cell-drawing",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "microscope-cell-drawing",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "eeg-behavior",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "eeg-behavior",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "eeg-behavior",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "protein-structure",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "protein-structure",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "protein-structure",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "battery-life",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "battery-life",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "battery-life",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "weather-graph",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "weather-graph",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "weather-graph",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "protein-design",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "protein-design",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "protein-design",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "fluid-simulation",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "fluid-simulation",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "fluid-simulation",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "retrosynthesis",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "retrosynthesis",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "retrosynthesis",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "ancient-inscription",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "ancient-inscription",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "ancient-inscription",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "solar-panels",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "solar-panels",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "solar-panels",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "orca-audio",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "orca-audio",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "orca-audio",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "metastasis-multimodal",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "metastasis-multimodal",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "metastasis-multimodal",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "research-agent",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 3
+    },
+    {
+      "slug": "research-agent",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 3
+    },
+    {
+      "slug": "research-agent",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 3
+    },
+    {
+      "slug": "mattergen-material-design",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 5,
+      "notes": 5
+    },
+    {
+      "slug": "mattergen-material-design",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 5,
+      "notes": 5
+    },
+    {
+      "slug": "mattergen-material-design",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 5,
+      "notes": 5
+    },
+    {
+      "slug": "mattergen-experimental-validation",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 7,
+      "notes": 10
+    },
+    {
+      "slug": "mattergen-experimental-validation",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 7,
+      "notes": 10
+    },
+    {
+      "slug": "mattergen-experimental-validation",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 7,
+      "notes": 10
+    },
+    {
+      "slug": "alphaevolve-algorithm-discovery",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 2
+    },
+    {
+      "slug": "alphaevolve-algorithm-discovery",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 2
+    },
+    {
+      "slug": "alphaevolve-algorithm-discovery",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 2
+    },
+    {
+      "slug": "literature-review-llm",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "literature-review-llm",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "literature-review-llm",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "surrogate-models",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "surrogate-models",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "surrogate-models",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "few-shot-vision",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "few-shot-vision",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "few-shot-vision",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "diffusion-molecules",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "diffusion-molecules",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "diffusion-molecules",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "sensor-logs",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "sensor-logs",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "sensor-logs",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "experiment-optimization",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "experiment-optimization",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "experiment-optimization",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "reproducibility-checklist",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "reproducibility-checklist",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "reproducibility-checklist",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "graph-neural-nets",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "graph-neural-nets",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "graph-neural-nets",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "private-data-ai",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "private-data-ai",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "private-data-ai",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "food-image-quality",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "food-image-quality",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "food-image-quality",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "medical-imaging-limits",
+      "width": 1440,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "medical-imaging-limits",
+      "width": 768,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    },
+    {
+      "slug": "medical-imaging-limits",
+      "width": 390,
+      "overflow": false,
+      "brokenImages": 0,
+      "glossary": 3,
+      "notes": 4
+    }
+  ],
+  "errors": [],
+  "interaction": "새 글의 용어 click/Enter/Space, 모바일 역할 섹션 이동·목차 접힘 통과"
+}
