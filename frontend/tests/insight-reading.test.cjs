@@ -44,6 +44,14 @@ const researchCase = getInsight("mattergen-experimental-validation");
 const textOf = (paragraph) => typeof paragraph === "string" ? paragraph : paragraph.text;
 const hashOf = (value) => crypto.createHash("sha256").update(JSON.stringify(value)).digest("hex");
 
+/** 표시 URL이 최적화 주소로 바뀌어도 같은 원본 표지를 가리키는지 검사합니다. */
+function originalImageSource(markup) {
+  const src = markup.match(/<img[^>]*\ssrc="([^"]+)"/)?.[1];
+  assert.ok(src, "img src가 필요합니다");
+  const url = new URL(src.replaceAll("&amp;", "&"), "http://localhost");
+  return url.searchParams.get("url") ?? url.pathname;
+}
+
 test("31개 글의 최종 표지 경로와 실제 파일이 중복되지 않는다", () => {
   const coverSource = fs.readFileSync(path.resolve(__dirname, "../src/components/cover-art.tsx"), "utf8");
   const defaults = Object.fromEntries([...coverSource.matchAll(/(\w+): "([^"]+)"/g)].map((match) => [match[1], match[2]]));
@@ -64,10 +72,10 @@ test("31개 글의 최종 표지 경로와 실제 파일이 중복되지 않는�
 });
 
 test("전용 표지 우선·공통 사진 폴백과 생성 이미지 설명을 유지한다", () => {
-  const custom = renderToStaticMarkup(React.createElement(CoverArt, { theme: "battery", src: "/generated/custom.png", className: "aspect-video", alt: "설명" }));
-  const fallback = renderToStaticMarkup(React.createElement(CoverArt, { theme: "battery", className: "aspect-video" }));
-  assert.ok(custom.includes('src="/generated/custom.png"'));
-  assert.ok(fallback.includes('src="/photos/chart.jpg"'));
+  const custom = renderToStaticMarkup(React.createElement(CoverArt, { theme: "battery", src: "/generated/custom.png", className: "aspect-video", sizes: "320px", alt: "설명" }));
+  const fallback = renderToStaticMarkup(React.createElement(CoverArt, { theme: "battery", className: "aspect-video", sizes: "64px" }));
+  assert.equal(originalImageSource(custom), "/generated/custom.png");
+  assert.equal(originalImageSource(fallback), "/photos/chart.jpg");
   for (const slug of Object.keys(GENERATED_INSIGHT_COVERS)) {
     const article = getInsight(slug);
     assert.ok(article, slug);
@@ -82,8 +90,44 @@ test("목록·홈·추천·상세·관련 글에서 전용 표지를 전달한�
     const source = fs.readFileSync(path.resolve(__dirname, "../src/components", file), "utf8");
     const covers = [...source.matchAll(/<CoverArt\b[^>]*\/>/g)].map((match) => match[0]);
     assert.ok(covers.length > 0, file);
-    for (const cover of covers) assert.match(cover, /src=\{(?:article|item|featured)\.coverSrc\}/, file);
+    for (const cover of covers) {
+      assert.match(cover, /src=\{(?:article|item|featured)\.coverSrc\}/, file);
+      assert.match(cover, /sizes=/, `${file}: 실제 표시 폭을 지정해야 합니다`);
+    }
   }
+});
+
+test("표지는 원본 URL 대신 최적화 URL·srcset·sizes를 제공하고 기본 지연 로딩한다", () => {
+  const html = renderToStaticMarkup(React.createElement(CoverArt, {
+    theme: "battery", src: "/generated/custom.png", className: "aspect-video", sizes: "64px", alt: "원본 설명",
+  }));
+  assert.match(html, /src="\/_next\/image\?/);
+  assert.match(html, /srcSet=/);
+  assert.match(html, /sizes="64px"/);
+  assert.match(html, /loading="lazy"/);
+  assert.match(html, /decoding="async"/);
+  assert.match(html, /alt="원본 설명"/);
+});
+
+test("첫 화면 대표 표지만 우선 로딩하고 일반 목록 카드는 지연 로딩한다", () => {
+  const html = renderToStaticMarkup(React.createElement(CoverArt, {
+    theme: "battery", className: "aspect-video", sizes: "280px", priority: true,
+  }));
+  assert.ok(!html.includes('loading="lazy"'));
+  const cardSource = fs.readFileSync(path.resolve(__dirname, "../src/components/insight-card.tsx"), "utf8");
+  assert.ok(!/<CoverArt\b[^>]*\bpriority/.test(cardSource));
+  const detailSource = fs.readFileSync(path.resolve(__dirname, "../src/components/article-view.tsx"), "utf8");
+  assert.match(detailSource, /sizes="64px"/);
+});
+
+test("넓은 화면의 크기 상한과 모바일 메인 이미지 다운로드 방지를 명시한다", () => {
+  const cardSource = fs.readFileSync(path.resolve(__dirname, "../src/components/insight-card.tsx"), "utf8");
+  assert.match(cardSource, /min-width: 1440px\) 440px/);
+  const homeSource = fs.readFileSync(path.resolve(__dirname, "../src/components/home-page.tsx"), "utf8");
+  assert.match(homeSource, /getImageProps/);
+  assert.match(homeSource, /<source media="\(min-width: 1024px\)" srcSet=\{srcSet\}/);
+  assert.match(homeSource, /src="data:image\/gif;base64,/);
+  assert.match(homeSource, /fetchPriority="high"/);
 });
 
 test("기존 치주골·MatterGen 내용은 보존하고 허용된 트렌드 표지만 변경한다", () => {
