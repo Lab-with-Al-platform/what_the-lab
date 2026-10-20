@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image, { getImageProps } from "next/image";
 import Link from "next/link";
 import { InsightCard } from "@/components/insight-card";
 import { PageContainer } from "@/components/page-container";
@@ -95,7 +95,7 @@ export function HomePage() {
               src={card.image}
               alt=""
               fill
-              sizes="(min-width: 1024px) 33vw, 100vw"
+              sizes="(min-width: 1440px) 460px, (min-width: 1024px) 33vw, 100vw"
               className={`home-entry-card__image pointer-events-none object-cover object-center ${card.imageClass}`}
             />
             <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,#ffffff_0%,rgba(255,255,255,0.96)_42%,rgba(255,255,255,0.20)_78%,rgba(255,255,255,0.05)_100%)]" />
@@ -144,17 +144,24 @@ export function HomePage() {
 }
 
 function HeroCollage() {
+  // CSS로 숨기는 것만으로는 다운로드를 막지 못합니다. media로 PC 사진을 선택합니다.
+  const sizes = "(min-width: 1440px) 760px, 55vw";
+  const { props: { srcSet } } = getImageProps({
+    src: "/generated/labbridge-hero-v1.png", alt: "", fill: true, sizes,
+  });
+
   return (
     <div className="relative hidden h-[378px] min-w-0 lg:block">
       <div className="absolute inset-0 overflow-hidden">
-        <Image
-          src="/generated/labbridge-hero-v1.png"
-          alt=""
-          fill
-          priority
-          sizes="(min-width: 1024px) 58vw, 0px"
-          className="object-cover object-center"
-        />
+        <picture>
+          <source media="(min-width: 1024px)" srcSet={srcSet} sizes={sizes} />
+          {/* 모바일은 네트워크 요청이 없는 투명 픽셀을 사용하고 기존 숨김 배치를 유지합니다. */}
+          <img
+            src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+            alt="" loading="lazy" decoding="async" fetchPriority="high"
+            className="absolute inset-0 h-full w-full object-cover object-center"
+          />
+        </picture>
         <div className="absolute inset-0 bg-[linear-gradient(90deg,#ffffff_0%,rgba(255,255,255,0.72)_11%,rgba(255,255,255,0)_34%)]" />
       </div>
       <FloatingNote

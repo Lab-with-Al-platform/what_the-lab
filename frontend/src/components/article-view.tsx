@@ -1,10 +1,12 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArticleToc } from "@/components/article-toc";
 import { PageContainer } from "@/components/page-container";
 import { CoverArt } from "@/components/cover-art";
 import { KeywordTag } from "@/components/keyword-tag";
 import { InsightCard } from "@/components/insight-card";
-import { articlePath, kindLabel, relatedInsights, type InsightArticle } from "@/lib/insights";
+import { ArticleGlossary, ArticleParagraph } from "@/components/article-editorial";
+import { articlePath, getInsight, kindLabel, relatedInsights, type InsightArticle } from "@/lib/insights";
 
 /** 같은 현미경 사진을 다른 위치로 잘라, 세포 종류마다 다른 연구 그림인 것처럼 보이지 않게 합니다. */
 const CHIP_CROPS = ["object-[18%_35%]", "object-[72%_28%]", "object-[40%_78%]", "object-[82%_68%]"];
@@ -103,6 +105,7 @@ function HighlightIcon({ index }: { index: number }) {
 
 export function ArticleView({ article }: ArticleViewProps) {
   const related = relatedInsights(article);
+  const companion = article.companionSlug ? getInsight(article.companionSlug) : undefined;
   const sectionName = article.kind === "case" ? "AI 연구 협업 사례" : "AI 트렌드";
   const listHref = article.kind === "case" ? "/cases" : "/trends";
   const expertQuery = encodeURIComponent(article.technologies[0]?.title ?? article.topicLabel);
@@ -132,6 +135,9 @@ export function ArticleView({ article }: ArticleViewProps) {
             <figure className="xl:col-start-2 xl:row-start-1">
               <CoverArt
                 theme={article.cover}
+                src={article.coverSrc}
+                priority
+                sizes={`(min-width: 1280px) ${HEADER_FIGURE_WIDTH}px, (min-width: 768px) calc(100vw - 112px), calc(100vw - 40px)`}
                 className="aspect-[4/2.6] w-full rounded-[8px] xl:aspect-auto xl:h-[232px]"
                 alt={article.imageAlt}
               />
@@ -191,6 +197,17 @@ export function ArticleView({ article }: ArticleViewProps) {
           </ul>
           {article.sampleNotice ? <p className="mt-2 text-[10px] leading-4 text-faint">{article.sampleNotice}</p> : null}
 
+          {companion ? (
+            <nav aria-label="같은 주제, 다른 관점" className="article-companion mt-5 rounded-card border border-line p-4">
+              <p className="text-xs font-semibold text-muted">같은 주제, 다른 관점</p>
+              <Link href={articlePath(companion)} className="mt-1 flex min-h-11 items-center justify-between gap-3 text-sm font-semibold text-brand hover:text-ink">
+                <span>{article.kind === "case" ? "작동 원리를 쉽게 이해하기" : "실제 연구 적용 과정 살펴보기"}<span className="mt-1 block font-normal text-muted">{companion.title}</span></span>
+                <span aria-hidden="true">→</span>
+              </Link>
+              <p className="mt-1 text-xs leading-5 text-muted">같은 연구를 서로 다른 관점에서 설명합니다. 별개의 연구 성과가 아닙니다.</p>
+            </nav>
+          ) : null}
+
           <section className="mt-5 rounded-card bg-[linear-gradient(135deg,#f7f5ff_0%,#f2f1ff_100%)] p-4" aria-labelledby="summary-heading">
             <div className="flex flex-wrap items-baseline gap-3">
               <h2 id="summary-heading" className="text-sm font-bold text-brand">
@@ -222,19 +239,23 @@ export function ArticleView({ article }: ArticleViewProps) {
                   <span className="text-brand">{String(index + 1).padStart(2, "0")}.</span>{" "}
                   <ReadableText text={section.title} />
                 </h2>
-                {section.paragraphs.map((paragraph) => (
-                  <p key={paragraph} className="mt-3 text-[14px] leading-7 text-pretty text-muted">
-                    <ReadableText text={paragraph} />
-                  </p>
+                {section.paragraphs.map((paragraph, paragraphIndex) => (
+                  <ArticleParagraph key={`${section.id}-${paragraphIndex}`} paragraph={paragraph}>
+                    <ReadableText text={typeof paragraph === "string" ? paragraph : paragraph.text} />
+                  </ArticleParagraph>
                 ))}
+                <ArticleGlossary terms={(article.glossary ?? []).filter((term) => section.termIds?.includes(term.id))} />
                 {section.chips ? (
                   <figure className="mt-5">
                     <ul className="grid grid-cols-4 gap-2 md:gap-3">
                       {section.chips.map((chip, chipIndex) => (
                         <li key={chip}>
-                          <img
+                          <Image
                             src="/photos/histology.jpg"
                             alt=""
+                            width={320}
+                            height={192}
+                            sizes="(min-width: 1280px) 160px, 25vw"
                             className={`h-16 w-full rounded-[6px] object-cover md:h-24 ${CHIP_CROPS[chipIndex % CHIP_CROPS.length]}`}
                           />
                           <p className="mt-1.5 text-center text-[9px] leading-4 text-muted md:text-xs">{chip}</p>
@@ -317,7 +338,7 @@ export function ArticleView({ article }: ArticleViewProps) {
                 {related.map((item) => (
                   <li key={item.slug}>
                     <Link href={articlePath(item)} className="flex gap-3 rounded-2xl hover:text-brand">
-                      <CoverArt theme={item.cover} className="h-14 w-16 shrink-0 rounded-lg" />
+                      <CoverArt theme={item.cover} src={item.coverSrc} className="h-14 w-16 shrink-0 rounded-lg" sizes="64px" />
                       <span>
                         <span className="block text-sm font-semibold">{item.title}</span>
                         <span className="mt-1 block text-xs text-muted">{item.publishedOn}</span>

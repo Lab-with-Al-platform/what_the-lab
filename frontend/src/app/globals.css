@@ -27,10 +27,91 @@
   --color-trend-soft: #fff1ec;
   --color-expert: #087e83;
   --color-expert-soft: #e7f4f4;
+  --color-editorial-application: #06696d;
+  --color-editorial-warning: #805211;
+  --color-editorial-warning-soft: #fff8e8;
   --color-navy: #101c3c;
   --radius-card: 12px;
   --radius-button: 10px;
   --shadow-card: 0 6px 24px rgb(18 32 75 / 0.04);
+}
+
+/* 본문은 충분히 크게 유지하고 편집자 노트만 절제된 색과 라벨로 구별합니다. */
+.article-body-paragraph {
+  font-size: 1rem;
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+}
+
+.article-note {
+  margin-top: 20px;
+  padding: 16px;
+  border-inline-start: 3px solid var(--note-color);
+  border-radius: var(--radius-button);
+  background: var(--note-background);
+}
+
+.article-note--interpretation {
+  --note-color: var(--color-brand);
+  --note-background: var(--color-brand-soft);
+}
+
+.article-note--application {
+  --note-color: var(--color-editorial-application);
+  --note-background: var(--color-expert-soft);
+}
+
+.article-note--caution {
+  --note-color: var(--color-editorial-warning);
+  --note-background: var(--color-editorial-warning-soft);
+}
+
+.article-note__label {
+  color: var(--note-color);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.article-note__credit {
+  margin-top: 4px;
+  color: var(--color-muted);
+  font-size: 0.75rem;
+  line-height: 1.6;
+}
+
+.article-glossary {
+  padding: 12px 16px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-button);
+  background: var(--color-page);
+}
+
+.article-glossary__item + .article-glossary__item {
+  border-top: 1px solid var(--color-line);
+}
+
+.article-glossary__trigger {
+  min-height: 44px;
+  padding-block: 10px;
+  cursor: pointer;
+  color: var(--color-brand);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.article-glossary__definition {
+  padding-bottom: 12px;
+  color: var(--color-muted);
+  font-size: 0.9375rem;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+.article-glossary__trigger:focus-visible,
+.article-companion a:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 3px;
+  border-radius: 4px;
 }
 
 :root {
