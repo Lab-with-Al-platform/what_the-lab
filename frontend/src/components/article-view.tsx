@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArticleToc } from "@/components/article-toc";
 import { PageContainer } from "@/components/page-container";
@@ -135,6 +136,8 @@ export function ArticleView({ article }: ArticleViewProps) {
               <CoverArt
                 theme={article.cover}
                 src={article.coverSrc}
+                priority
+                sizes={`(min-width: 1280px) ${HEADER_FIGURE_WIDTH}px, (min-width: 768px) calc(100vw - 112px), calc(100vw - 40px)`}
                 className="aspect-[4/2.6] w-full rounded-[8px] xl:aspect-auto xl:h-[232px]"
                 alt={article.imageAlt}
               />
@@ -247,9 +250,12 @@ export function ArticleView({ article }: ArticleViewProps) {
                     <ul className="grid grid-cols-4 gap-2 md:gap-3">
                       {section.chips.map((chip, chipIndex) => (
                         <li key={chip}>
-                          <img
+                          <Image
                             src="/photos/histology.jpg"
                             alt=""
+                            width={320}
+                            height={192}
+                            sizes="(min-width: 1280px) 160px, 25vw"
                             className={`h-16 w-full rounded-[6px] object-cover md:h-24 ${CHIP_CROPS[chipIndex % CHIP_CROPS.length]}`}
                           />
                           <p className="mt-1.5 text-center text-[9px] leading-4 text-muted md:text-xs">{chip}</p>
@@ -332,7 +338,7 @@ export function ArticleView({ article }: ArticleViewProps) {
                 {related.map((item) => (
                   <li key={item.slug}>
                     <Link href={articlePath(item)} className="flex gap-3 rounded-2xl hover:text-brand">
-                      <CoverArt theme={item.cover} src={item.coverSrc} className="h-14 w-16 shrink-0 rounded-lg" />
+                      <CoverArt theme={item.cover} src={item.coverSrc} className="h-14 w-16 shrink-0 rounded-lg" sizes="64px" />
                       <span>
                         <span className="block text-sm font-semibold">{item.title}</span>
                         <span className="mt-1 block text-xs text-muted">{item.publishedOn}</span>
