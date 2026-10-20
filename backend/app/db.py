@@ -1,8 +1,12 @@
 """MySQL 접속을 한곳에서 만듭니다."""
+
+from contextlib import contextmanager
+
 import pymysql
 from pymysql.cursors import DictCursor
 
 from app import config
+
 
 
 def get_connection() -> pymysql.connections.Connection:
@@ -17,3 +21,20 @@ def get_connection() -> pymysql.connections.Connection:
         cursorclass=DictCursor,  # 조회 결과를 dict로 받습니다.
         autocommit=True,  # SQL 한 줄은 실행 즉시 저장합니다.
     )
+
+
+@contextmanager
+def transaction():
+    """with 블록 안의 SQL을 한 묶음으로 저장합니다. 중간에 실패하면 전부 취소돼요.
+
+    사용법: with transaction() as cursor: cursor.execute(...)
+    """
+    with get_connection() as conn:
+        conn.begin()
+        try:
+            with conn.cursor() as cursor:
+                yield cursor
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            raise

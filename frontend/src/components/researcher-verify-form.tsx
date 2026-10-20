@@ -38,10 +38,10 @@ export function ResearcherVerifyForm() {
   const [codeError, setCodeError] = useState<string | null>(null);
   const [institutionName, setInstitutionName] = useState(""); // name 단계에서 직접 입력하는 기관명
   const [nameError, setNameError] = useState<string | null>(null);
+  const [verifying, setVerifying] = useState(false); // [인증하기]를 두 번 눌러 요청이 두 번 가지 않게
 
   const expired = step === "code" && secondsLeft === 0;
-  const canVerify = step === "code" && code.length === CODE_LENGTH && !expired;
-
+  const canVerify = step === "code" && code.length === CODE_LENGTH && !expired && !verifying;
   useEffect(() => {
     if (step !== "code" || secondsLeft <= 0) {
       return;
@@ -96,18 +96,22 @@ export function ResearcherVerifyForm() {
   }
 
   async function verify() {
+    if (verifying) return; // 이미 확인 중이면 무시
+    setVerifying(true);
     try {
       const data = await requestApi<NextResponse>("/verification/email/confirm", {
         method: "POST",
         body: JSON.stringify({ code }),
       });
       if (data.institution_name) {
-        router.push(data.next);
+        router.push(data.next); // 화면이 넘어갈 때까지 버튼은 계속 막아 둡니다.
       } else {
         setStep("name"); // 목록에 없던 기관: 인증은 끝났고 기관명만 받습니다.
+        setVerifying(false);
       }
     } catch (error) {
       setCodeError(toMessage(error));
+      setVerifying(false);
     }
   }
 
@@ -219,7 +223,7 @@ export function ResearcherVerifyForm() {
               disabled={!canVerify}
               className="mt-7 h-[52px] w-full rounded-xl bg-brand text-base font-semibold text-white hover:bg-brand-hover disabled:bg-line disabled:text-faint"
             >
-              인증하기
+              {verifying ? "확인하는 중…" : "인증하기"}
             </button>
           </>
         )}

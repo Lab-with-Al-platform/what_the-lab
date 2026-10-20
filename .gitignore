@@ -62,3 +62,5 @@ Desktop.ini
 database/seed/*.json
 database/seed/needs_korean_name.csv
 database/seed/missing_homepage.csv
+
+backend/uploads/
