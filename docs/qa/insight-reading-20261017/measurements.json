@@ -1,0 +1,305 @@
+[
+  {
+    "page": "trend",
+    "bodyFont": "16px",
+    "brokenImages": 0,
+    "height": 900,
+    "noteStyles": [
+      {
+        "background": "rgb(243, 242, 255)",
+        "foreground": "rgb(80, 54, 244)",
+        "label": "연구자에게 주는 의미"
+      },
+      {
+        "background": "rgb(231, 244, 244)",
+        "foreground": "rgb(6, 105, 109)",
+        "label": "내 연구에 적용한다면"
+      },
+      {
+        "background": "rgb(243, 242, 255)",
+        "foreground": "rgb(80, 54, 244)",
+        "label": "연구자에게 주는 의미"
+      },
+      {
+        "background": "rgb(231, 244, 244)",
+        "foreground": "rgb(6, 105, 109)",
+        "label": "내 연구에 적용한다면"
+      },
+      {
+        "background": "rgb(255, 248, 232)",
+        "foreground": "rgb(128, 82, 17)",
+        "label": "주의할 점 · 적용의 경계"
+      }
+    ],
+    "notes": 5,
+    "overflow": false,
+    "sections": 7,
+    "terms": 5,
+    "width": 1440
+  },
+  {
+    "page": "case",
+    "bodyFont": "16px",
+    "brokenImages": 0,
+    "height": 900,
+    "noteStyles": [
+      {
+        "background": "rgb(243, 242, 255)",
+        "foreground": "rgb(80, 54, 244)",
+        "label": "연구자에게 주는 의미"
+      },
+      {
+        "background": "rgb(231, 244, 244)",
+        "foreground": "rgb(6, 105, 109)",
+        "label": "내 연구에 적용한다면"
+      },
+      {
+        "background": "rgb(243, 242, 255)",
+        "foreground": "rgb(80, 54, 244)",
+        "label": "연구자에게 주는 의미"
+      },
+      {
+        "background": "rgb(243, 242, 255)",
+        "foreground": "rgb(80, 54, 244)",
+        "label": "연구자에게 주는 의미"
+      },
+      {
+        "background": "rgb(243, 242, 255)",
+        "foreground": "rgb(80, 54, 244)",
+        "label": "연구자에게 주는 의미"
+      },
+      {
+        "background": "rgb(231, 244, 244)",
+        "foreground": "rgb(6, 105, 109)",
+        "label": "내 연구에 적용한다면"
+      },
+      {
+        "background": "rgb(231, 244, 244)",
+        "foreground": "rgb(6, 105, 109)",
+        "label": "내 연구에 적용한다면"
+      },
+      {
+        "background": "rgb(255, 248, 232)",
+        "foreground": "rgb(128, 82, 17)",
+        "label": "주의할 점 · 적용의 경계"
+      },
+      {
+        "background": "rgb(231, 244, 244)",
+        "foreground": "rgb(6, 105, 109)",
+        "label": "내 연구에 적용한다면"
+      },
+      {
+        "background": "rgb(231, 244, 244)",
+        "foreground": "rgb(6, 105, 109)",
+        "label": "내 연구에 적용한다면"
+      }
+    ],
+    "notes": 10,
+    "overflow": false,
+    "sections": 10,
+    "terms": 7,
+    "width": 1440
+  },
+  {
+    "page": "trend",
+    "bodyFont": "16px",
+    "brokenImages": 0,
+    "height": 1024,
+    "noteStyles": [
+      {
+        "background": "rgb(243, 242, 255)",
+        "foreground": "rgb(80, 54, 244)",
+        "label": "연구자에게 주는 의미"
+      },
+      {
+        "background": "rgb(231, 244, 244)",
+        "foreground": "rgb(6, 105, 109)",
+        "label": "내 연구에 적용한다면"
+      },
+      {
+        "background": "rgb(243, 242, 255)",
+        "foreground": "rgb(80, 54, 244)",
+        "label": "연구자에게 주는 의미"
+      },
+      {
+        "background": "rgb(231, 244, 244)",
+        "foreground": "rgb(6, 105, 109)",
+        "label": "내 연구에 적용한다면"
+      },
+      {
+        "background": "rgb(255, 248, 232)",
+        "foreground": "rgb(128, 82, 17)",
+        "label": "주의할 점 · 적용의 경계"
+      }
+    ],
+    "notes": 5,
+    "overflow": false,
+    "sections": 7,
+    "terms": 5,
+    "width": 768
+  },
+  {
+    "page": "case",
+    "bodyFont": "16px",
+    "brokenImages": 0,
+    "height": 1024,
+    "noteStyles": [
+      {
+        "background": "rgb(243, 242, 255)",
+        "foreground": "rgb(80, 54, 244)",
+        "label": "연구자에게 주는 의미"
+      },
+      {
+        "background": "rgb(231, 244, 244)",
+        "foreground": "rgb(6, 105, 109)",
+        "label": "내 연구에 적용한다면"
+      },
+      {
+        "background": "rgb(243, 242, 255)",
+        "foreground": "rgb(80, 54, 244)",
+        "label": "연구자에게 주는 의미"
+      },
+      {
+        "background": "rgb(243, 242, 255)",
+        "foreground": "rgb(80, 54, 244)",
+        "label": "연구자에게 주는 의미"
+      },
+      {
+        "background": "rgb(243, 242, 255)",
+        "foreground": "rgb(80, 54, 244)",
+        "label": "연구자에게 주는 의미"
+      },
+      {
+        "background": "rgb(231, 244, 244)",
+        "foreground": "rgb(6, 105, 109)",
+        "label": "내 연구에 적용한다면"
+      },
+      {
+        "background": "rgb(231, 244, 244)",
+        "foreground": "rgb(6, 105, 109)",
+        "label": "내 연구에 적용한다면"
+      },
+      {
+        "background": "rgb(255, 248, 232)",
+        "foreground": "rgb(128, 82, 17)",
+        "label": "주의할 점 · 적용의 경계"
+      },
+      {
+        "background": "rgb(231, 244, 244)",
+        "foreground": "rgb(6, 105, 109)",
+        "label": "내 연구에 적용한다면"
+      },
+      {
+        "background": "rgb(231, 244, 244)",
+        "foreground": "rgb(6, 105, 109)",
+        "label": "내 연구에 적용한다면"
+      }
+    ],
+    "notes": 10,
+    "overflow": false,
+    "sections": 10,
+    "terms": 7,
+    "width": 768
+  },
+  {
+    "page": "trend",
+    "bodyFont": "16px",
+    "brokenImages": 0,
+    "height": 844,
+    "noteStyles": [
+      {
+        "background": "rgb(243, 242, 255)",
+        "foreground": "rgb(80, 54, 244)",
+        "label": "연구자에게 주는 의미"
+      },
+      {
+        "background": "rgb(231, 244, 244)",
+        "foreground": "rgb(6, 105, 109)",
+        "label": "내 연구에 적용한다면"
+      },
+      {
+        "background": "rgb(243, 242, 255)",
+        "foreground": "rgb(80, 54, 244)",
+        "label": "연구자에게 주는 의미"
+      },
+      {
+        "background": "rgb(231, 244, 244)",
+        "foreground": "rgb(6, 105, 109)",
+        "label": "내 연구에 적용한다면"
+      },
+      {
+        "background": "rgb(255, 248, 232)",
+        "foreground": "rgb(128, 82, 17)",
+        "label": "주의할 점 · 적용의 경계"
+      }
+    ],
+    "notes": 5,
+    "overflow": false,
+    "sections": 7,
+    "terms": 5,
+    "width": 390
+  },
+  {
+    "page": "case",
+    "bodyFont": "16px",
+    "brokenImages": 0,
+    "height": 844,
+    "noteStyles": [
+      {
+        "background": "rgb(243, 242, 255)",
+        "foreground": "rgb(80, 54, 244)",
+        "label": "연구자에게 주는 의미"
+      },
+      {
+        "background": "rgb(231, 244, 244)",
+        "foreground": "rgb(6, 105, 109)",
+        "label": "내 연구에 적용한다면"
+      },
+      {
+        "background": "rgb(243, 242, 255)",
+        "foreground": "rgb(80, 54, 244)",
+        "label": "연구자에게 주는 의미"
+      },
+      {
+        "background": "rgb(243, 242, 255)",
+        "foreground": "rgb(80, 54, 244)",
+        "label": "연구자에게 주는 의미"
+      },
+      {
+        "background": "rgb(243, 242, 255)",
+        "foreground": "rgb(80, 54, 244)",
+        "label": "연구자에게 주는 의미"
+      },
+      {
+        "background": "rgb(231, 244, 244)",
+        "foreground": "rgb(6, 105, 109)",
+        "label": "내 연구에 적용한다면"
+      },
+      {
+        "background": "rgb(231, 244, 244)",
+        "foreground": "rgb(6, 105, 109)",
+        "label": "내 연구에 적용한다면"
+      },
+      {
+        "background": "rgb(255, 248, 232)",
+        "foreground": "rgb(128, 82, 17)",
+        "label": "주의할 점 · 적용의 경계"
+      },
+      {
+        "background": "rgb(231, 244, 244)",
+        "foreground": "rgb(6, 105, 109)",
+        "label": "내 연구에 적용한다면"
+      },
+      {
+        "background": "rgb(231, 244, 244)",
+        "foreground": "rgb(6, 105, 109)",
+        "label": "내 연구에 적용한다면"
+      }
+    ],
+    "notes": 10,
+    "overflow": false,
+    "sections": 10,
+    "terms": 7,
+    "width": 390
+  }
+]

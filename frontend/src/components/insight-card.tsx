@@ -22,7 +22,7 @@ export function InsightCard({ article, variant = "default" }: InsightCardProps) 
       <article className="insight-editorial-card">
         {/* 카드 전체를 링크 하나로 묶어 클릭과 키보드 탐색을 모두 쉽게 합니다. */}
         <Link href={href} className="group flex h-full flex-col" aria-label={`${kindLabel(article.kind)}: ${article.title}`}>
-          <CoverArt theme={article.cover} className={INSIGHT_CARD_COVER_CLASS} />
+          <CoverArt theme={article.cover} src={article.coverSrc} className={INSIGHT_CARD_COVER_CLASS} />
           <div className="flex flex-1 flex-col p-5">
             <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-5">
               <span className={`font-semibold ${article.kind === "case" ? "text-brand" : "text-trend"}`}>{kindLabel(article.kind)}</span>
@@ -47,7 +47,7 @@ export function InsightCard({ article, variant = "default" }: InsightCardProps) 
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-card border border-line bg-card shadow-card">
       <Link href={href} className="relative block shrink-0">
-        <CoverArt theme={article.cover} className={isLanding ? "h-[132px] w-full shrink-0" : INSIGHT_CARD_COVER_CLASS} />
+        <CoverArt theme={article.cover} src={article.coverSrc} className={isLanding ? "h-[132px] w-full shrink-0" : INSIGHT_CARD_COVER_CLASS} />
         <span className={`absolute inset-x-0 bottom-0 flex flex-wrap gap-1.5 bg-gradient-to-t from-black/55 to-transparent px-3 pb-2 ${isLanding ? "pt-8" : "pt-10"}`}>
           <KindBadge kind={article.kind} />
           <span className="rounded-md bg-white/20 px-2 py-1 text-[11px] font-medium text-white backdrop-blur-sm">{article.field}</span>
