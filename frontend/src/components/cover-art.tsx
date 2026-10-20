@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { CoverTheme } from "@/lib/insights";
 
 /**
@@ -34,6 +35,10 @@ interface CoverArtProps {
   src?: string;
   /** 부모가 정한 칸을 채웁니다. 높이를 주지 않으면 사진이 0으로 줄어듭니다. */
   className: string;
+  /** 실제 표시 폭을 브라우저에 알려 작은 칸에 큰 이미지를 받지 않게 합니다. */
+  sizes: string;
+  /** 첫 화면의 대표 표지에만 사용합니다. 나머지는 기본 지연 로딩입니다. */
+  priority?: boolean;
   /** 상세 화면에서는 사진의 의미를 설명하고, 장식용 카드에서는 비워 둡니다. */
   alt?: string;
 }
@@ -45,11 +50,11 @@ interface CoverArtProps {
  */
 export const INSIGHT_CARD_COVER_CLASS = "aspect-video w-full shrink-0";
 
-export function CoverArt({ theme, src, className, alt = "" }: CoverArtProps) {
+export function CoverArt({ theme, src, className, sizes, priority = false, alt = "" }: CoverArtProps) {
   return (
     <div className={`relative overflow-hidden bg-page ${className}`}>
-      {/* 절대 위치로 두어야 원본 사진 크기가 칸 높이를 밀지 않습니다. */}
-      <img src={src ?? COVER_SRC[theme]} alt={alt} className="absolute inset-0 h-full w-full object-cover" />
+      {/* fill은 기존 사진 칸을 유지하고, 최적화된 크기·형식만 바꿔 전달합니다. */}
+      <Image src={src ?? COVER_SRC[theme]} alt={alt} fill sizes={sizes} priority={priority} className="object-cover" />
     </div>
   );
 }
