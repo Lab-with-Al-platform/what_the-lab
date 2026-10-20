@@ -66,12 +66,14 @@ export function SiteHeader() {
   }, []);
 
   // 로그인한 사람 정보 불러오기 (401이면 비로그인)
+  // 헤더는 페이지를 옮겨도 그대로 남아 있어서, 주소가 바뀔 때마다 다시 불러옵니다.
+  // (가입을 끝내고 홈으로 왔을 때 새로고침 없이 닉네임·사진이 보이게)
   useEffect(() => {
     requestApi<Me>("/auth/me")
       .then(setMe)
       .catch(() => setMe(null))
       .finally(() => setMeLoading(false));
-  }, []);
+  }, [pathname]);
 
   // 드롭다운이 열려 있을 때, 프로필 영역 바깥을 누르면 닫기
   useEffect(() => {

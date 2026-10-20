@@ -49,10 +49,9 @@ export function ResearcherSignupDone() {
 
       {/* TODO: 디스코드 DM 발송이 생기면 실제 결과에 따라 보여 줍니다. 실패하면 DM 허용 안내로 바꿉니다. */}
       <div className="mt-6 rounded-[10px] bg-brand-soft px-4 py-3 text-left">
-        <p className="text-sm font-semibold text-brand">디스코드 DM으로 환영 메시지를 보냈어요</p>
-        <p className="mt-0.5 text-xs text-muted">요청 도착, 수락, 일정 같은 알림도 이 DM으로 받아요</p>
+        <p className="text-sm font-semibold text-brand">요청 알림은 디스코드 DM으로 받게 될 거예요</p>
+        <p className="mt-0.5 text-xs text-muted">요청 도착, 수락, 일정 같은 알림을 준비하고 있어요</p>      
       </div>
-
       <Link
         href="/"
         className="mt-8 flex h-[52px] items-center justify-center rounded-xl bg-brand text-base font-semibold text-white hover:bg-brand-hover"

@@ -25,3 +25,7 @@ DB_PASSWORD = os.environ["DB_PASSWORD"]
 
 # 실행 환경. development일 때만 인증번호를 화면에 보여 줍니다.
 APP_ENV = os.getenv("APP_ENV", "production")
+
+
+# 포트폴리오 PDF처럼 사용자가 올린 파일을 두는 폴더. git에 올리지 않습니다(.gitignore).
+UPLOAD_DIR = Path(os.getenv("UPLOAD_DIR", str(ROOT_DIR / "backend" / "uploads")))

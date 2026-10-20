@@ -2,7 +2,18 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import CORS_ORIGINS
-from app.routers import auth, expert, insights, researcher, verification
+from app.routers import (
+    auth,
+    expert,
+    expert_history,
+    expert_portfolio,
+    expert_profile,
+    insights,
+    researcher,
+    researcher_research,
+    taxonomy,
+    verification,
+)
 
 app = FastAPI(title="LabBridge API")
 
@@ -26,5 +37,11 @@ def health() -> dict[str, str]:
 app.include_router(auth.router)
 app.include_router(verification.router)
 app.include_router(researcher.router)
-app.include_router(expert.router)
 app.include_router(insights.router)
+
+app.include_router(expert.router)
+app.include_router(expert_profile.router)
+app.include_router(expert_portfolio.router)
+app.include_router(expert_history.router)
+app.include_router(taxonomy.router)
+app.include_router(researcher_research.router)
