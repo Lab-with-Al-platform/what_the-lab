@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
-from app.db import get_connection
+from app.db import get_connection, transaction
 from app.security import get_current_user_id
 
 router = APIRouter(prefix="/api/v1/researcher", tags=["researcher"])
@@ -32,7 +32,6 @@ def get_profile(user_id: int = Depends(get_current_user_id)) -> dict:
         profile = cursor.fetchone()
     if profile is None:
         raise HTTPException(status_code=404, detail="소속 인증을 먼저 해 주세요")
-    profile["is_verified"] = bool(profile["is_verified"])  # MySQL은 TRUE를 1로 돌려줘서 true/false로 바꿉니다.
     return profile
 
 
@@ -41,22 +40,15 @@ def save_profile(body: ProfileRequest, user_id: int = Depends(get_current_user_i
     """[가입 완료]. 학과·직위를 저장하고 가입을 끝냅니다 (signup_step = 'done')."""
     department = clean_department(body.department)
     position = clean_position(body.position)
-    with get_connection() as conn:
-        conn.begin()
-        try:
-            with conn.cursor() as cursor:
-                # 소속 인증을 마치고 기관명까지 있는 사람만 가입을 끝낼 수 있습니다.
-                if not is_ready_to_finish(cursor, user_id):
-                    raise HTTPException(status_code=409, detail="소속 인증을 먼저 해 주세요")
-                cursor.execute(
-                    "UPDATE researcher_profile SET department = %s, position = %s WHERE user_id = %s",
-                    (department, position, user_id),
-                )
-                cursor.execute("UPDATE `user` SET signup_step = 'done' WHERE user_id = %s", (user_id,))
-            conn.commit()
-        except Exception:
-            conn.rollback()  # 하나라도 실패하면 둘 다 취소
-            raise
+    with transaction() as cursor:  # 하나라도 실패하면 둘 다 취소
+        # 소속 인증을 마치고 기관명까지 있는 사람만 가입을 끝낼 수 있습니다.
+        if not is_ready_to_finish(cursor, user_id):
+            raise HTTPException(status_code=409, detail="소속 인증을 먼저 해 주세요")
+        cursor.execute(
+            "UPDATE researcher_profile SET department = %s, position = %s WHERE user_id = %s",
+            (department, position, user_id),
+        )
+        cursor.execute("UPDATE users SET signup_step = 'done' WHERE user_id = %s", (user_id,))
     return {"next": "/signup/researcher/done"}
 
 

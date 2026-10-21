@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from app import user_store
-from app.db import get_connection
+from app.db import get_connection , transaction
 from app.security import get_current_user_id
 
 router = APIRouter(prefix="/api/v1/expert", tags=["expert"])
@@ -34,10 +34,7 @@ def list_able_works() -> list[dict]:
             ORDER BY sort_order
             """
         )
-        rows = cursor.fetchall()
-    for row in rows:
-        row["show_default"] = bool(row["show_default"])  # MySQL은 TRUE를 1로 돌려줘서 true/false로 바꿉니다.
-    return rows
+        return cursor.fetchall()
 
 
 @router.post("/signup")
@@ -49,27 +46,20 @@ def signup_expert(body: ExpertSignupRequest, user_id: int = Depends(get_current_
     check_code(body.ai_career, CAREER_CODES, "AI 관련 경력")
     affiliation = clean_affiliation(body.affiliation)
 
-    with get_connection() as conn:
-        conn.begin()
-        try:
-            with conn.cursor() as cursor:
-                check_able_works_exist(cursor, able_works)
-                cursor.execute(
-                    "INSERT INTO expert (user_id, current_job, ai_career, affiliation) VALUES (%s, %s, %s, %s)",
-                    (user_id, body.current_job, body.ai_career, affiliation),
-                )
-                cursor.executemany(
-                    "INSERT INTO expert_able_work (user_id, expert_capability) VALUES (%s, %s)",
-                    [(user_id, able_work_id) for able_work_id in able_works],
-                )
-                cursor.execute(
-                    "UPDATE `user` SET user_role = 'expert', signup_step = 'done' WHERE user_id = %s",
-                    (user_id,),
-                )
-            conn.commit()
-        except Exception:
-            conn.rollback()  # 하나라도 실패하면 전부 취소
-            raise
+    with transaction() as cursor:  # 하나라도 실패하면 전부 취소
+        check_able_works_exist(cursor, able_works)
+        cursor.execute(
+            "INSERT INTO expert (user_id, current_job, ai_career, affiliation) VALUES (%s, %s, %s, %s)",
+            (user_id, body.current_job, body.ai_career, affiliation),
+        )
+        cursor.executemany(
+            "INSERT INTO expert_able_work (user_id, able_work_id) VALUES (%s, %s)",
+            [(user_id, able_work_id) for able_work_id in able_works],
+        )
+        cursor.execute(
+            "UPDATE users SET user_role = 'expert', signup_step = 'done' WHERE user_id = %s",
+            (user_id,),
+        )
     return {"next": "/signup/expert/done"}
 
 
