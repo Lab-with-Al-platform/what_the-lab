@@ -4,7 +4,7 @@
 """
 from app.db import get_connection
 
-USER_COLUMNS = "user_id, discord_id, nickname, user_role, signup_step, user_photo, status"
+USER_COLUMNS = "user_id, discord_id, nickname, user_role, signup_step, user_photo, status, is_admin"
 
 
 def find_by_discord_id(discord_id: str) -> dict | None:

@@ -1,11 +1,11 @@
 """기존 로그인과 인사이트 관리자 권한을 연결합니다."""
 
 import os
+from typing import Annotated
 
-from fastapi import Cookie, Depends, HTTPException, Request
+from fastapi import Depends, HTTPException, Request
 
-from app import user_store
-from app.security import read_user_id
+from app.security import get_current_user
 
 
 def require_enabled() -> None:
@@ -13,21 +13,16 @@ def require_enabled() -> None:
         raise HTTPException(404, "인사이트 기능이 활성화되지 않았습니다.")
 
 
-def current_discord_id(access_token: str | None = Cookie(default=None)) -> str:
-    user_id = read_user_id(access_token) if access_token else None
-    user = user_store.find_by_id(user_id) if user_id else None
-    if user is None:
-        raise HTTPException(401, "로그인이 필요합니다.")
-    return user["discord_id"]
-
-
-def require_admin(discord_id: str = Depends(current_discord_id)) -> str:
+def require_admin(user: Annotated[dict, Depends(get_current_user)]) -> str:
+    discord_id = user["discord_id"]
     allowed = {
         item.strip()
         for item in os.getenv("INSIGHT_ADMIN_DISCORD_IDS", "").split(",")
         if item.strip()
     }
-    if discord_id not in allowed:
+    # 공통 관리자 필드를 사용하되 기존 인사이트 전용 지정도 호환합니다.
+    # 허용 목록은 users.is_admin을 변경하거나 다른 기능의 권한을 부여하지 않습니다.
+    if user.get("is_admin") is not True and discord_id not in allowed:
         raise HTTPException(403, "인사이트 관리자 권한이 필요합니다.")
     return discord_id
 

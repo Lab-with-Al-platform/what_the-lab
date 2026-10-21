@@ -1,11 +1,11 @@
-"""인사이트 전용 schema의 변경 이력을 적용합니다."""
+"""공통 DB 변경 이력. 자동 비교는 인사이트에만 제한합니다."""
 
-import os
 from pathlib import Path
 
 from alembic import context
 from dotenv import load_dotenv
 
+from app.database_config import get_database_url
 from app.insights import models  # noqa: F401 - 메타데이터에 테이블을 등록합니다.
 from app.insights.database import SCHEMA, Base, build_engine
 
@@ -22,9 +22,6 @@ def include_insight_names(
 
 
 load_dotenv(Path(__file__).resolve().parents[2] / ".env")
-database_url = os.getenv("DATABASE_URL", "")
-if not database_url and not context.is_offline_mode():
-    raise RuntimeError("마이그레이션용 DATABASE_URL을 로컬 환경에 설정해 주세요.")
 
 if context.is_offline_mode():
     # URL에는 비밀값이 있으므로 출력용 SQL에는 dialect 정보만 전달합니다.
@@ -39,9 +36,8 @@ if context.is_offline_mode():
     with context.begin_transaction():
         context.run_migrations()
 else:
-    engine = build_engine(database_url)
-    with engine.connect() as connection:
-        # 관리 이력 테이블은 기본 public에 두되 내용은 버전 번호만 저장합니다.
+    def run_migrations(connection) -> None:
+        # 기존에 적용된 이력 테이블 이름을 유지하며 회원 후속 변경도 기록합니다.
         context.configure(
             connection=connection,
             target_metadata=Base.metadata,
@@ -51,3 +47,15 @@ else:
         )
         with context.begin_transaction():
             context.run_migrations()
+
+    supplied_connection = context.config.attributes.get("connection")
+    if supplied_connection is not None:
+        # 사전 검증·적용·사후 검증을 호출자가 연 하나의 트랜잭션으로 묶습니다.
+        run_migrations(supplied_connection)
+    else:
+        engine = build_engine(get_database_url())
+        try:
+            with engine.connect() as connection:
+                run_migrations(connection)
+        finally:
+            engine.dispose()

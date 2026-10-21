@@ -2,6 +2,14 @@
 
 PostgreSQL/Supabase 데이터 구조와 변경 이력을 관리합니다.
 
+## 2026-10-21 공통 Supabase 적용
+
+팀 기본 DB는 Supabase로 통합합니다. 회원·프로필·연구·인사이트가 서버 전용 DATABASE_URL 하나를 사용합니다. 조직 생성·초대와 실행은 [팀 시작 안내](../docs/development/SUPABASE_TEAM_ONBOARDING.md)를 참고하세요.
+
+후속 migration `20261021_02`는 기존 개발용 labbridge-dev에 회원 23개 표·기준표를 추가하고 RLS/API 역할 접근 차단을 적용했습니다. `backend/migrations/sql/20261021_02/`는 PR #16 init SQL의 동결본입니다. 이미 적용된 SQL을 나중에 init 파일 변경에 따라 바꾸지 않기 위해 별도 보관합니다. 후속 구조 변경은 새 revision으로 만듭니다. 기존 `insight_alembic_version` 이름은 이력 호환을 위해 유지합니다.
+
+`database/init/`는 빈 Docker DB의 선택적 초기화용입니다. 공용 Supabase에 직접 재실행하거나 기존 회원 데이터를 삭제하지 않습니다. 기존 MySQL 데이터는 보존하며 자동 이전하지 않았습니다.
+
 ## 현재 인사이트 변경 이력
 
 2026-10-16 확정 DB는 Supabase(PostgreSQL)입니다. 첫 인사이트 마이그레이션은 FastAPI 모델과 함께 관리하기 위해 `backend/migrations/`에 두었습니다. 이 폴더에 같은 SQL을 중복 복사하지 않습니다. 사용자 승인 후 개발용 `labbridge-dev`에 `20261016_01`을 적용하고 구조·역할 권한·동시성 검사를 완료했습니다. 운영 DB 적용이나 공개 서비스 배포는 아닙니다.
