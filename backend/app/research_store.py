@@ -35,8 +35,6 @@ def load_researches(user_id: int) -> list[dict]:
         children = {name: load_child(cursor, ids, *table) for name, table in CHILD_TABLES.items()}
 
     for research in researches:
-        research["is_primary"] = bool(research["is_primary"])  # MySQL은 TRUE를 1로 돌려줘요.
-        research["task_unsure"] = bool(research["task_unsure"])
         research["description"] = research["description"] or ""
         for name, values in children.items():
             research[name] = values.get(research["research_id"], [])
@@ -62,7 +60,7 @@ def require_researcher(user_id: int) -> None:
     with get_connection() as conn, conn.cursor() as cursor:
         cursor.execute(
             """
-            SELECT 1 FROM `user` u
+            SELECT 1 FROM users u
             JOIN researcher_profile r ON r.user_id = u.user_id
             WHERE u.user_id = %s AND u.user_role = 'researcher'
             """,

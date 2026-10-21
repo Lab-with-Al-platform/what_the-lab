@@ -1,19 +1,28 @@
+# 로컬 개발용 PostgreSQL. 팀원 모두 같은 접속 정보를 씁니다.
+#   접속: localhost:5433 / DB labbridge / 아이디 admin / 비밀번호 admin123
+#   ⚠️ 내 PC 안에서만 쓰는 개발용 값입니다. 배포(Supabase)에는 절대 쓰지 않습니다.
 services:
-  mysql:
-    image: mysql:8.4
-    container_name: labbridge-mysql
+  postgres:
+    image: postgres:17
+    container_name: labbridge-postgres
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_USER: ${DB_USER}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-      TZ: Asia/Seoul
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: labbridge          # 처음 켤 때 이 이름으로 DB를 만듭니다.
+      TZ: Asia/Seoul                  # DB 시간대를 한국 시간으로
+      PGTZ: Asia/Seoul
     ports:
-      - "3309:3306"
+      - "127.0.0.1:5433:5432"         # 내 PC(localhost)에서만 5433으로 접속. 같은 와이파이의 다른 PC는 못 들어옵니다.
     volumes:
-      - mysql_3309_data:/var/lib/mysql
-      - ./database/init:/docker-entrypoint-initdb.d
+      - postgres_data:/var/lib/postgresql/data
+      # DB가 비어 있을 때(처음 켤 때) 이 폴더의 SQL을 이름 순서대로 실행해서 테이블을 만듭니다.
+      - ./database/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d labbridge"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
 volumes:
-  mysql_3309_data:
+  postgres_data:

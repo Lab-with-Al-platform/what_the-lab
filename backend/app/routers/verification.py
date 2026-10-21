@@ -15,7 +15,7 @@ from pydantic import BaseModel
 
 from app import institution_store, user_store
 from app.config import APP_ENV
-from app.db import get_connection
+from app.db import get_connection, transaction
 from app.security import get_current_user_id
 
 router = APIRouter(prefix="/api/v1/verification", tags=["verification"])
@@ -135,28 +135,22 @@ def reject_if_expert(user_id: int) -> None:
 
 def save_verified_researcher(user_id: int, institution_name: str | None, source: str) -> None:
     """연구회원 정보 저장 + 회원 유형 확정. 둘 중 하나만 저장되면 안 되므로 한 묶음(트랜잭션)으로 처리합니다."""
-    with get_connection() as conn:
-        conn.begin()
-        try:
-            with conn.cursor() as cursor:
-                cursor.execute(
-                    """
-                    INSERT INTO researcher_profile
-                      (user_id, institution_name, institution_source, is_verified, verified_at)
-                    VALUES (%s, %s, %s, TRUE, NOW())
-                    ON DUPLICATE KEY UPDATE
-                      institution_name = VALUES(institution_name),
-                      institution_source = VALUES(institution_source),
-                      is_verified = TRUE,
-                      verified_at = NOW()
-                    """,
-                    (user_id, institution_name, source),
-                )
-                cursor.execute(
-                    "UPDATE `user` SET user_role = 'researcher', signup_step = 'info' WHERE user_id = %s",
-                    (user_id,),
-                )
-            conn.commit()
-        except Exception:
-            conn.rollback()  # 하나라도 실패하면 둘 다 취소
-            raise
+    with transaction() as cursor:  # 하나라도 실패하면 둘 다 취소
+        # 이미 있으면(ON CONFLICT) 새 값(EXCLUDED)으로 바꿉니다.
+        cursor.execute(
+            """
+            INSERT INTO researcher_profile
+              (user_id, institution_name, institution_source, is_verified, verified_at)
+            VALUES (%s, %s, %s, TRUE, now())
+            ON CONFLICT (user_id) DO UPDATE SET
+              institution_name = EXCLUDED.institution_name,
+              institution_source = EXCLUDED.institution_source,
+              is_verified = TRUE,
+              verified_at = now()
+            """,
+            (user_id, institution_name, source),
+        )
+        cursor.execute(
+            "UPDATE users SET user_role = 'researcher', signup_step = 'info' WHERE user_id = %s",
+            (user_id,),
+        )

@@ -9,7 +9,7 @@ os.environ.update(
         "DISCORD_REDIRECT_URI": "http://localhost:8000/api/v1/auth/discord/callback",
         "JWT_SECRET": "test-only-jwt-secret-not-for-real-users-0123456789",
         "DATABASE_URL": "postgresql://test:test@127.0.0.1:1/not_a_live_database",
-        # 회원 DB 전환 전에도 로컬 .env의 MySQL 설정을 테스트에 사용하지 않습니다.
+        # 로컬 .env의 회원 DB(PostgreSQL) 설정을 테스트에 사용하지 않습니다.
         "DB_HOST": "127.0.0.1",
         "DB_PORT": "1",
         "DB_NAME": "not_a_live_database",

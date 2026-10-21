@@ -165,7 +165,6 @@ def write_seed_sql(rows: dict[str, dict]) -> None:
     )
     OUTPUT_SQL.write_text(
         "-- build_institution_seed.py 가 만든 파일입니다. 직접 고치지 말고 스크립트를 다시 실행하세요.\n"
-        "SET NAMES utf8mb4;  -- 한글이 깨지지 않게 utf8mb4로 읽으라고 알려 줍니다.\n"
         f"INSERT INTO institution ({', '.join(columns)}) VALUES\n{values};\n",
         encoding="utf-8",
     )

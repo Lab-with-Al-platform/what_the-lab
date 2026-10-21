@@ -38,12 +38,12 @@ def add_portfolio(body: PortfolioRequest, user_id: int = Depends(get_current_use
 
     with transaction() as cursor:
         check_able_works_exist(cursor, able_work_ids)
+        # RETURNING = 방금 만든 포트폴리오 번호를 바로 돌려받습니다.
         cursor.execute(
-            "INSERT INTO portfolio (user_id, title, role) VALUES (%s, %s, %s)",
+            "INSERT INTO portfolio (user_id, title, role) VALUES (%s, %s, %s) RETURNING portfolio_id",
             (user_id, title, role),
         )
-        # lastrowid = 방금 INSERT로 만들어진 포트폴리오 번호
-        insert_children(cursor, cursor.lastrowid, able_work_ids, skills)
+        insert_children(cursor, cursor.fetchone()["portfolio_id"], able_work_ids, skills)
     return load_profile(user_id)
 
 

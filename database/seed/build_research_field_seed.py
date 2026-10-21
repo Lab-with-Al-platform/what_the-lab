@@ -44,7 +44,7 @@ def main() -> None:
 
     OUTPUT_SQL.write_text(
         "-- build_research_field_seed.py 가 만든 파일입니다. 직접 고치지 말고 스크립트를 다시 실행하세요.\n"
-        "SET NAMES utf8mb4;  -- 한글이 깨지지 않게 utf8mb4로 읽으라고 알려 줍니다.\n\n"
+        "\n"
         "INSERT INTO field_category (field_category_id, name, sort_order, status, taxonomy_ver) VALUES\n"
         + ",\n".join(category_rows)
         + ";\n\n"
