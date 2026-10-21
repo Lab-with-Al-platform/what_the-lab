@@ -2,7 +2,7 @@
 
 FastAPI 기반 API와 서버의 비즈니스 규칙을 담당합니다.
 
-> 2026-10-17 PR #10 충돌 해결: 회원·인증·로그아웃 API와 인사이트 API를 함께 등록했습니다. **회원은 develop의 MySQL 코드, 인사이트는 PostgreSQL 코드**를 임시로 유지합니다. 공통 DB를 PostgreSQL로 통일하는 결정은 그대로이며, 회원 DB 전환은 이번 충돌 해결에서 수행하지 않았습니다. [검증·미완료 사항](../docs/qa/PR10_MERGE_RESOLUTION_2026-10-17.md)을 참고하세요.
+> 2026-10-21: 팀 기본 DB는 **Supabase**입니다. 회원·인사이트·migration이 공통 `DATABASE_URL`을 사용하며, 기존 개발용 labbridge-dev에 회원 23개 표와 보호 설정을 추가했습니다. 로그인 검사·계정 상태·공통 관리자 필드도 연결했습니다. **코드·구조 통합과 기존 데이터 이전은 다릅니다.** 기존 MySQL 데이터는 삭제·자동 이전하지 않았습니다. [조직 생성·초대·실행 따라 하기](../docs/development/SUPABASE_TEAM_ONBOARDING.md), [공통 DB 안내](../docs/development/SHARED_DATABASE_GUIDE.md)를 참고하세요.
 
 ## 현재 구현 상태
 
@@ -11,13 +11,15 @@ FastAPI 기반 API와 서버의 비즈니스 규칙을 담당합니다.
 - [x] 처음 로그인한 디스코드 계정은 자동으로 회원 생성 (= 가입 시작)
 - [x] 자체 JWT 발급 → httpOnly 쿠키 저장 (7일)
 - [x] 로그인 사용자 확인 (`/api/v1/auth/me`)
-- [x] 회원 DB 연결 코드 (현재 MySQL, PostgreSQL 전환·실제 통합 검증은 미완료)
+- [x] 회원·인사이트 공통 Supabase 구조 적용·실제 DB 검증 (본인 브라우저의 Discord 승인은 별도 확인)
 - [x] 인사이트 전용 PostgreSQL 연결 코드·마이그레이션·승인/공개 API (개발용 Supabase 적용·검증 완료, 기본 비활성, 운영 적용 아님)
 - [x] 가입 정보 저장 코드 (회원 유형, 소속, 프로필. 실제 회원 DB 동작은 별도 검증 필요)
 - [x] 로그아웃 API와 프론트 연결 코드
 - [ ] 닉네임 중복 처리
 
 ## 로컬 실행
+
+먼저 [팀 시작 안내](../docs/development/SUPABASE_TEAM_ONBOARDING.md)에 따라 같은 Supabase 개발 프로젝트의 접속 정보를 설정합니다. Docker는 필요하지 않습니다. 기존 `.env`의 `3309`는 MySQL 포트이므로 PostgreSQL 접속에 쓰지 않습니다.
 
 ### 1. 환경변수
 
@@ -93,29 +95,33 @@ uv run uvicorn app.main:app --reload --port 8000
 
 ```json
 {
-  "user_id": "f3f72618-3318-4d0c-b61e-f26f9fdae832",
-  "discord_id": "432511801264046083",
-  "nickname": "cayongu",
-  "avatar": null,
-  "role": null,
-  "signup_step": "role"
+  "user_id": 1,
+  "discord_id": "100000000000000001",
+  "nickname": "example-researcher",
+  "user_photo": null,
+  "user_role": null,
+  "signup_step": "role",
+  "status": "active",
+  "is_admin": false
 }
 ```
 
 | 필드 | 설명 |
 |---|---|
-| `user_id` | 서비스 고유 ID (uuid). 다른 데이터는 모두 이 값으로 연결 |
+| `user_id` | 서비스 내부 정수 ID. 다른 데이터는 이 값으로 연결하되, DB 간 이전 시 번호가 같다는 이유로 같은 회원으로 보지 않음 |
 | `discord_id` | 디스코드 고유 번호. 로그인 시 기존 회원 확인 기준 |
 | `nickname` | 서비스 닉네임. 처음에는 디스코드 사용자명으로 채움 |
-| `avatar` | 디스코드 프로필 사진 코드 (없으면 null) |
-| `role` | `researcher` / `expert`. 회원 유형 선택 전에는 null |
+| `user_photo` | 프로필 사진 정보 (없으면 null) |
+| `user_role` | `researcher` / `expert`. 회원 유형 선택 전에는 null |
 | `signup_step` | 가입 진행 단계. `role` → … → `done` |
+| `status` / `is_admin` | 계정 사용 가능 상태와 공통 관리자 여부. 연구자/전문가 역할과 별개 |
 
 ## 현재 한계
 
-- **회원 DB 전환 대기**: 기존 메모리 저장소는 develop의 MySQL 저장소로 바뀌었습니다. 인사이트 PostgreSQL과 회원 DB를 통합 완료한 상태는 아닙니다.
-- **실행 설정 주의**: 현재 `app/config.py`는 `DB_NAME`, `DB_USER`, `DB_PASSWORD`를 시작 시 읽습니다. `DATABASE_URL`만 있는 환경은 실행 시 설정 오류가 날 수 있습니다. 회원 DB의 PostgreSQL 전환 전까지 `.env.example`의 임시 MySQL 항목과 [회원가입 안내](../docs/development/SIGNUP_LOGIN_GUIDE.md)를 함께 확인하세요. 이번 작업에서 실제 `.env`를 자동 변경하지 않았습니다.
-- 이번 회귀 검사는 가상 회원 저장소를 사용했습니다. 실제 MySQL 회원가입·로그인·기관 인증 SQL과 PostgreSQL 회원 전환은 검증하지 않았습니다.
+- **데이터 이전은 별도**: PostgreSQL 코드 전환만으로 기존 MySQL 계정·프로필이 복사되지는 않습니다. 원본 DB를 보존하고 Discord 사용자 ID로 대조해야 합니다.
+- **설정 우선순위**: 공통 `DATABASE_URL` → 비어 있을 때만 `DB_*`. 연결 대상 변경 후 백엔드를 재시작해야 합니다. 같은 DB 안에서 회원은 `public.users`, 인사이트는 `insight_private`를 사용합니다.
+- **로그인 갱신**: JWT에 내부 user_id와 Discord ID를 함께 검증합니다. 이전 형식의 쿠키는 한 번 다시 로그인해야 합니다. 정지·탈퇴·존재하지 않는 회원은 쿠키가 남아 있어도 접근하지 못합니다.
+- 회귀 검사 외에 실제 Supabase 회원 구조·보호 설정을 적용하고 가상 Discord 응답으로 회원 생성·전문가 가입·프로필·관리자·로그아웃을 검증했습니다. 테스트 행은 모두 rollback했습니다. 본인 브라우저의 실제 Discord 승인과 기존 MySQL 데이터 이전은 별도입니다. 실파일 `.env`의 기존 Supabase URL을 사용했으며 비밀값은 변경하지 않았습니다.
 - 디스코드 토큰(access/refresh)은 저장하지 않습니다. 사용자 확인에 한 번만 사용합니다.
 
 ## 인사이트 첫 백엔드

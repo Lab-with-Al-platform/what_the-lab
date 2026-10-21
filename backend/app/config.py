@@ -16,12 +16,8 @@ FRONTEND_URL = os.getenv("NEXT_PUBLIC_APP_URL", "http://localhost:3000")
 CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
 
 
-# PostgreSQL (docker-compose로 띄운 DB)
-DB_HOST = os.getenv("DB_HOST", "127.0.0.1")
-DB_PORT = int(os.getenv("DB_PORT", "5433"))
-DB_NAME = os.environ["DB_NAME"]
-DB_USER = os.environ["DB_USER"]
-DB_PASSWORD = os.environ["DB_PASSWORD"]
+# DB 설정의 해석은 app.database_config에서 공통 처리합니다.
+# DATABASE_URL만 설정해도 회원·인사이트가 같은 DB에 연결됩니다.
 
 # 실행 환경. development일 때만 인증번호를 화면에 보여 줍니다.
 APP_ENV = os.getenv("APP_ENV", "production")

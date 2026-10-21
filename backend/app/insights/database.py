@@ -1,14 +1,15 @@
 """서버 전용 DB 연결. 앱 시작만으로 테이블을 만들지는 않습니다."""
 
-import os
 from collections.abc import Iterator
 from functools import lru_cache
 
 from fastapi import HTTPException
 from sqlalchemy import Engine, create_engine, event
-from sqlalchemy.engine import make_url
+from sqlalchemy.engine import URL, make_url
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import DeclarativeBase, Session
+
+from app.database_config import get_database_url
 
 SCHEMA = "insight_private"
 
@@ -17,7 +18,7 @@ class Base(DeclarativeBase):
     pass
 
 
-def build_engine(database_url: str, *, allow_sqlite: bool = False) -> Engine:
+def build_engine(database_url: str | URL, *, allow_sqlite: bool = False) -> Engine:
     """운영은 PostgreSQL, 단위 테스트만 명시적으로 SQLite를 허용합니다."""
     url = make_url(database_url)
     if url.drivername in {"postgres", "postgresql"}:
@@ -41,11 +42,8 @@ def build_engine(database_url: str, *, allow_sqlite: bool = False) -> Engine:
 
 @lru_cache(maxsize=1)
 def get_engine() -> Engine:
-    database_url = os.getenv("DATABASE_URL", "")
-    if not database_url:
-        raise HTTPException(503, "인사이트 DB 연결이 설정되지 않았습니다.")
     try:
-        return build_engine(database_url)
+        return build_engine(get_database_url())
     except (ValueError, TypeError):
         # 연결 문자열에는 비밀번호가 있어 원래 예외 내용을 응답에 포함하지 않습니다.
         raise HTTPException(503, "인사이트 DB 연결 설정을 확인해 주세요.") from None

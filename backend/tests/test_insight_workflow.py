@@ -2,6 +2,7 @@
 
 from datetime import timedelta
 
+import jwt
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import select
@@ -10,6 +11,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.schema import CreateTable
 
 from app import user_store
+from app.config import JWT_SECRET
 from app.insights.database import SCHEMA, Base, build_engine, get_session
 from app.insights.models import Publication, utc_now
 from app.insights.schemas import SCORE_MAXIMUMS, normalize_doi
@@ -90,6 +92,7 @@ def client(tmp_path, monkeypatch):
             "signup_step": "role",
             "user_photo": None,
             "status": "active",
+            "is_admin": False,
         }
         users[user_id] = user
         return user
@@ -122,7 +125,7 @@ def login(client: TestClient, discord_id: str = ADMIN_ID) -> dict:
     # 실제 브라우저처럼 호스트·경로를 맞춰야 로그아웃의 쿠키 삭제도 검증할 수 있습니다.
     client.cookies.set(
         "access_token",
-        create_access_token(user["user_id"]),
+        create_access_token(user["user_id"], user["discord_id"]),
         domain=client.base_url.host,
         path="/",
     )
@@ -255,6 +258,86 @@ def test_empty_admin_allowlist_denies_everyone(client, monkeypatch):
     login(client)
     monkeypatch.setenv("INSIGHT_ADMIN_DISCORD_IDS", "")
     assert client.get(ADMIN_PATH).status_code == 403
+
+
+def test_common_admin_flag_can_manage_insights(client, monkeypatch):
+    user = login(client, "100000000000000003")
+    monkeypatch.setenv("INSIGHT_ADMIN_DISCORD_IDS", "")
+    assert client.get(ADMIN_PATH).status_code == 403
+    user["is_admin"] = True  # 실제 DB 권한을 변경하지 않는 가상 회원입니다.
+    assert client.get("/api/v1/auth/me").json()["is_admin"] is True
+    assert client.get(ADMIN_PATH).status_code == 200
+    user["is_admin"] = False
+    assert client.get(ADMIN_PATH).status_code == 403
+
+
+@pytest.mark.parametrize("status", ["suspended", "deleted"])
+def test_inactive_accounts_denied_in_member_and_insight_apis(client, status):
+    user = login(client)
+    user["is_admin"] = True
+    user["status"] = status
+    for path in ("/api/v1/auth/me", "/api/v1/researcher/profile", ADMIN_PATH):
+        assert client.get(path).status_code == 403
+    response = client.get("/api/v1/auth/discord/login", follow_redirects=False)
+    assert response.status_code == 403
+
+
+def test_missing_account_denied_in_member_and_insight_apis(client, monkeypatch):
+    login(client)
+    monkeypatch.setattr(user_store, "find_by_id", lambda _user_id: None)
+    for path in ("/api/v1/auth/me", "/api/v1/researcher/profile", ADMIN_PATH):
+        assert client.get(path).status_code == 401
+
+
+def test_legacy_insight_allowlist_does_not_grant_global_admin(client):
+    user = login(client)
+    assert user["is_admin"] is False
+    assert client.get(ADMIN_PATH).status_code == 200
+    assert client.get("/api/v1/auth/me").json()["is_admin"] is False
+
+
+def test_old_cookie_cannot_impersonate_reassigned_user_id(client):
+    user = login(client)
+    user["discord_id"] = "100000000000000099"  # DB 이전으로 내부 번호의 주인이 달라진 상황
+    for path in ("/api/v1/auth/me", "/api/v1/researcher/profile", ADMIN_PATH):
+        assert client.get(path).status_code == 401
+
+
+def test_legacy_cookie_requires_discord_login_again(client):
+    user = login(client)
+    old_token = jwt.encode(
+        {"sub": str(user["user_id"]), "exp": (utc_now() + timedelta(days=1)).timestamp()},
+        JWT_SECRET, algorithm="HS256",
+    )
+    client.cookies.clear()
+    client.cookies.set("access_token", old_token, domain=client.base_url.host, path="/")
+    assert client.get("/api/v1/auth/me").status_code == 401
+    response = client.get("/api/v1/auth/discord/login", follow_redirects=False)
+    assert response.status_code == 307
+    assert response.headers["location"].startswith("https://discord.com/oauth2/authorize?")
+
+
+def test_discord_callback_reuses_same_member_for_all_features(client, monkeypatch):
+    # Discord에 실제 접속하지 않고, 같은 외부 고유 번호로 두 번 로그인합니다.
+    from app.routers import auth
+
+    monkeypatch.setattr(
+        auth, "fetch_discord_user",
+        lambda _code: {"id": ADMIN_ID, "username": "가상 테스트 회원"},
+    )
+    user_ids = []
+    for _attempt in range(2):
+        client.cookies.set("oauth_state", "test-state", domain=client.base_url.host, path="/")
+        response = client.get(
+            "/api/v1/auth/discord/callback?code=fake-code&state=test-state",
+            follow_redirects=False,
+        )
+        assert response.status_code == 307
+        member = client.get("/api/v1/auth/me").json()
+        assert member["discord_id"] == ADMIN_ID
+        assert client.get(ADMIN_PATH).status_code == 200
+        user_ids.append(member["user_id"])
+    assert user_ids == [1, 1]
 
 
 def test_duplicate_doi_normalization(client):
