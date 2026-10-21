@@ -10,6 +10,8 @@ PostgreSQL/Supabase 데이터 구조와 변경 이력을 관리합니다.
 
 `database/init/`는 빈 Docker DB의 선택적 초기화용입니다. 공용 Supabase에 직접 재실행하거나 기존 회원 데이터를 삭제하지 않습니다. 기존 MySQL 데이터는 보존하며 자동 이전하지 않았습니다.
 
+후속 migration `20261021_03`은 `public.set_updated_at()`의 `search_path`를 `pg_catalog`로 고정합니다. 함수 본문·트리거·권한·회원 데이터를 바꾸지 않습니다. 새 Docker DB의 init SQL에도 같은 설정을 넣었지만, 동결된 `20261021_02` SQL은 보존합니다. 이미 초기화된 Docker 볼륨에는 init 수정이 재실행되지 않으므로 볼륨을 삭제하지 말고 후속 설정만 별도 적용하세요. [원인·적용·검증 기록](../docs/qa/SET_UPDATED_AT_SEARCH_PATH_2026-10-21.md)을 참고하세요.
+
 ## 현재 인사이트 변경 이력
 
 2026-10-16 확정 DB는 Supabase(PostgreSQL)입니다. 첫 인사이트 마이그레이션은 FastAPI 모델과 함께 관리하기 위해 `backend/migrations/`에 두었습니다. 이 폴더에 같은 SQL을 중복 복사하지 않습니다. 사용자 승인 후 개발용 `labbridge-dev`에 `20261016_01`을 적용하고 구조·역할 권한·동시성 검사를 완료했습니다. 운영 DB 적용이나 공개 서비스 배포는 아닙니다.
