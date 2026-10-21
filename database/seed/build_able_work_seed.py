@@ -33,7 +33,6 @@ def main() -> None:
     values = ",\n".join(to_values_row(group) for group in sorted(groups, key=lambda g: g["sort_order"]))
     OUTPUT_SQL.write_text(
         "-- build_able_work_seed.py 가 만든 파일입니다. 직접 고치지 말고 스크립트를 다시 실행하세요.\n"
-        "SET NAMES utf8mb4;  -- 한글이 깨지지 않게 utf8mb4로 읽으라고 알려 줍니다.\n"
         "INSERT INTO able_work (able_work_id, name, sort_order, show_default, status, taxonomy_ver) VALUES\n"
         f"{values};\n",
         encoding="utf-8",

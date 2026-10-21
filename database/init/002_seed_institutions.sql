@@ -1,5 +1,4 @@
 -- build_institution_seed.py 가 만든 파일입니다. 직접 고치지 말고 스크립트를 다시 실행하세요.
-SET NAMES utf8mb4;  -- 한글이 깨지지 않게 utf8mb4로 읽으라고 알려 줍니다.
 INSERT INTO institution (domain, name, name_en, country_code, institution_type, source) VALUES
   ('acts.ac.kr', 'Asian United Theological University', 'Asian United Theological University', 'KR', 'university', 'hipo'),
   ('afa.ac.kr', 'Republic of Korea Air Force Academy', 'Republic of Korea Air Force Academy', 'KR', 'university', 'hipo'),
