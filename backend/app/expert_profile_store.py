@@ -12,7 +12,7 @@ def load_profile(user_id: int) -> dict | None:
         cursor.execute(
             """
             SELECT u.nickname, u.user_photo, e.introduce, e.current_job, e.ai_career, e.is_public
-            FROM `user` u
+            FROM users u
             JOIN expert e ON e.user_id = u.user_id
             WHERE u.user_id = %s
             """,
@@ -21,16 +21,16 @@ def load_profile(user_id: int) -> dict | None:
         profile = cursor.fetchone()
         if profile is None:
             return None
-        profile["is_public"] = bool(profile["is_public"])  # MySQL은 TRUE를 1로 돌려줘요.
-
         profile["able_work_ids"] = select_column(
             cursor,
-            "SELECT expert_capability FROM expert_able_work"
+            "SELECT able_work_id FROM expert_able_work"
             " WHERE user_id = %s ORDER BY expert_able_work_id",
             user_id,
         )
         profile["domain_ids"] = select_column(
-            cursor, "SELECT field_id FROM domain WHERE user_id = %s ORDER BY domain_id", user_id
+            cursor,
+            "SELECT field_id FROM expert_domain WHERE user_id = %s ORDER BY expert_domain_id",
+            user_id,
         )
         profile["collaboration"] = load_collaboration(cursor, user_id)
         profile["portfolios"] = load_portfolios(cursor, user_id)
@@ -85,14 +85,17 @@ def select_column(cursor, sql: str, *params) -> list:
 def load_collaboration(cursor, user_id: int) -> dict | None:
     """협업 조건 + 희망 보상. 아직 안 썼으면 None."""
     cursor.execute(
-        "SELECT meeting_type, face_to_area, available_time FROM collaboration WHERE user_id = %s",
+        "SELECT meeting_type, face_to_area, available_time FROM expert_collab_condition"
+        " WHERE user_id = %s",
         (user_id,),
     )
     collaboration = cursor.fetchone()
     if collaboration is None:
         return None
     collaboration["rewards"] = select_column(
-        cursor, "SELECT reward_type FROM reward WHERE user_id = %s ORDER BY reward_id", user_id
+        cursor,
+        "SELECT reward_type FROM expert_reward WHERE user_id = %s ORDER BY expert_reward_id",
+        user_id,
     )
     return collaboration
 

@@ -58,14 +58,14 @@ def save_intro(body: IntroRequest, user_id: int = Depends(get_current_user_id)) 
         check_fields_exist(cursor, domain_ids)
         cursor.execute("UPDATE expert SET introduce = %s WHERE user_id = %s", (introduce, user_id))
         # 목록은 '지우고 다시 넣기'로 바꿉니다. 고른 순서대로 남아요.
-        cursor.execute("DELETE FROM domain WHERE user_id = %s", (user_id,))
+        cursor.execute("DELETE FROM expert_domain WHERE user_id = %s", (user_id,))
         cursor.executemany(
-            "INSERT INTO domain (user_id, field_id) VALUES (%s, %s)",
+            "INSERT INTO expert_domain (user_id, field_id) VALUES (%s, %s)",
             [(user_id, field_id) for field_id in domain_ids],
         )
         cursor.execute("DELETE FROM expert_able_work WHERE user_id = %s", (user_id,))
         cursor.executemany(
-            "INSERT INTO expert_able_work (user_id, expert_capability) VALUES (%s, %s)",
+            "INSERT INTO expert_able_work (user_id, able_work_id) VALUES (%s, %s)",
             [(user_id, able_work_id) for able_work_id in able_work_ids],
         )
     return load_profile(user_id)
@@ -90,20 +90,20 @@ def save_collaboration(
         raise bad_request("'상의 후 결정'은 다른 보상과 함께 고를 수 없어요")
 
     with transaction() as cursor:
-        # user_id가 PK라서, 이미 있으면 같은 줄을 UPDATE 합니다.
+        # user_id가 PK라서, 이미 있으면(ON CONFLICT) 같은 줄을 새 값(EXCLUDED)으로 바꿉니다.
         cursor.execute(
             """
-            INSERT INTO collaboration (user_id, meeting_type, face_to_area, available_time)
+            INSERT INTO expert_collab_condition (user_id, meeting_type, face_to_area, available_time)
             VALUES (%s, %s, %s, %s)
-            ON DUPLICATE KEY UPDATE meeting_type = VALUES(meeting_type),
-                                    face_to_area = VALUES(face_to_area),
-                                    available_time = VALUES(available_time)
+            ON CONFLICT (user_id) DO UPDATE SET meeting_type = EXCLUDED.meeting_type,
+                                                face_to_area = EXCLUDED.face_to_area,
+                                                available_time = EXCLUDED.available_time
             """,
             (user_id, body.meeting_type, area, body.available_time),
         )
-        cursor.execute("DELETE FROM reward WHERE user_id = %s", (user_id,))
+        cursor.execute("DELETE FROM expert_reward WHERE user_id = %s", (user_id,))
         cursor.executemany(
-            "INSERT INTO reward (user_id, reward_type) VALUES (%s, %s)",
+            "INSERT INTO expert_reward (user_id, reward_type) VALUES (%s, %s)",
             [(user_id, reward) for reward in rewards],
         )
     return load_profile(user_id)
