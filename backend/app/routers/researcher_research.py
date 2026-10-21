@@ -78,10 +78,11 @@ def add_research(body: ResearchRequest, user_id: int = Depends(get_current_user_
         check_codes_exist(cursor, children)
         columns = ["user_id", *values]
         cursor.execute(
-            f"INSERT INTO research ({', '.join(columns)}) VALUES ({', '.join(['%s'] * len(columns))})",
+            f"INSERT INTO research ({', '.join(columns)}) VALUES ({', '.join(['%s'] * len(columns))})"
+            " RETURNING research_id",  # 방금 만든 연구 번호를 바로 돌려받습니다.
             (user_id, *values.values()),
         )
-        insert_children(cursor, cursor.lastrowid, children)  # lastrowid = 방금 만든 연구 번호
+        insert_children(cursor, cursor.fetchone()["research_id"], children)
         fix_primary(cursor, user_id)
     return load_researches(user_id)
 

@@ -16,7 +16,7 @@ FRONTEND_URL = os.getenv("NEXT_PUBLIC_APP_URL", "http://localhost:3000")
 CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
 
 
-# MySQL (docker-compose로 띄운 DB)
+# PostgreSQL (docker-compose로 띄운 DB)
 DB_HOST = os.getenv("DB_HOST", "127.0.0.1")
 DB_PORT = int(os.getenv("DB_PORT", "5433"))
 DB_NAME = os.environ["DB_NAME"]
