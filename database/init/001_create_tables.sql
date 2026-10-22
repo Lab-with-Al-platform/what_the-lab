@@ -4,6 +4,7 @@
 -- 0) updated_at 자동 갱신 함수
 --    PostgreSQL에는 MySQL의 ON UPDATE CURRENT_TIMESTAMP가 없어서, 트리거로 같은 일을 합니다.
 --    값이 실제로 바뀐 줄만 시간을 바꿉니다. (같은 값으로 UPDATE하면 그대로)
+--    호출자의 검색 경로 대신 PostgreSQL 기본 함수만 찾아 사용합니다.
 CREATE FUNCTION set_updated_at() RETURNS trigger AS $$
 BEGIN
   IF NEW IS DISTINCT FROM OLD THEN
@@ -11,7 +12,7 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SET search_path = pg_catalog;
 
 -- 1) 회원: 디스코드로 로그인한 모든 사람
 --    user는 PostgreSQL 예약어라서 users로 씁니다.
