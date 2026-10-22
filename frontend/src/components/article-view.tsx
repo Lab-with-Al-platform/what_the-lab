@@ -85,6 +85,9 @@ function ReadableText({ text, breakOnColon = false }: { text: string; breakOnCol
 
 interface ArticleViewProps {
   article: InsightArticle;
+  hideCover?: boolean;
+  /** 관리자 미리보기에서는 같은 본문만 재사용하고 주변 탐색 영역은 제외합니다. */
+  contentOnly?: boolean;
 }
 
 function HighlightIcon({ index }: { index: number }) {
@@ -103,7 +106,7 @@ function HighlightIcon({ index }: { index: number }) {
   );
 }
 
-export function ArticleView({ article }: ArticleViewProps) {
+export function ArticleView({ article, hideCover = false, contentOnly = false }: ArticleViewProps) {
   const related = relatedInsights(article);
   const companion = article.companionSlug ? getInsight(article.companionSlug) : undefined;
   const sectionName = article.kind === "case" ? "AI 연구 협업 사례" : "AI 트렌드";
@@ -111,8 +114,8 @@ export function ArticleView({ article }: ArticleViewProps) {
   const expertQuery = encodeURIComponent(article.technologies[0]?.title ?? article.topicLabel);
 
   return (
-    <PageContainer className="py-4 md:py-5">
-      <nav aria-label="경로" className="truncate text-[11px] text-muted">
+    <PageContainer className={contentOnly ? "article-content-preview" : "py-4 md:py-5"}>
+      {!contentOnly ? <nav aria-label="경로" className="truncate text-[11px] text-muted">
         <Link href="/" className="hover:text-ink">
           홈
         </Link>
@@ -122,17 +125,17 @@ export function ArticleView({ article }: ArticleViewProps) {
         </Link>
         <span className="mx-1.5">›</span>
         <span className="text-ink">{article.title}</span>
-      </nav>
+      </nav> : null}
 
-      <div className="article-layout mt-5">
-        <ArticleToc
+      <div className={contentOnly ? "" : "article-layout mt-5"}>
+        {!contentOnly ? <ArticleToc
           placement="sidebar"
           items={article.sections.map((section) => ({ id: section.id, label: section.toc }))}
-        />
+        /> : null}
 
         <article className="-mx-5 min-w-0 bg-card px-5 py-1 sm:mx-0 sm:rounded-card sm:border sm:border-line sm:p-5 sm:shadow-card md:p-6">
-          <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_280px] xl:gap-6">
-            <figure className="xl:col-start-2 xl:row-start-1">
+          <div className={hideCover ? "" : "xl:grid xl:grid-cols-[minmax(0,1fr)_280px] xl:gap-6"}>
+            {!hideCover ? <figure className="xl:col-start-2 xl:row-start-1">
               <CoverArt
                 theme={article.cover}
                 src={article.coverSrc}
@@ -149,7 +152,7 @@ export function ArticleView({ article }: ArticleViewProps) {
                   }
                 />
               </figcaption>
-            </figure>
+            </figure> : null}
             <div className="mt-4 xl:col-start-1 xl:row-start-1 xl:mt-0">
               <p className="text-[11px] font-semibold text-brand">
                 {kindLabel(article.kind)}
@@ -175,7 +178,7 @@ export function ArticleView({ article }: ArticleViewProps) {
           {/* 설명 길이와 상관없이 키워드와 날짜 사이에 같은 간격을 둡니다. */}
           <ul
             className="mt-8 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-line pt-4 text-[11px] text-faint xl:max-w-[calc(100%-var(--header-figure-offset))] xl:border-t-0 xl:pt-0"
-            style={{ ["--header-figure-offset" as string]: `${HEADER_FIGURE_WIDTH + HEADER_FIGURE_GAP}px` }}
+            style={{ ["--header-figure-offset" as string]: `${hideCover ? 0 : HEADER_FIGURE_WIDTH + HEADER_FIGURE_GAP}px` }}
           >
             {article.institution ? <li>{article.institution}</li> : null}
             <li>{article.publishedOn}</li>
@@ -245,7 +248,8 @@ export function ArticleView({ article }: ArticleViewProps) {
                   </ArticleParagraph>
                 ))}
                 <ArticleGlossary terms={(article.glossary ?? []).filter((term) => section.termIds?.includes(term.id))} />
-                {section.chips ? (
+                {/* 빈 배열도 JavaScript에서는 참입니다. 실제 항목이 있을 때만 그림·캡션을 표시합니다. */}
+                {section.chips?.length ? (
                   <figure className="mt-5">
                     <ul className="grid grid-cols-4 gap-2 md:gap-3">
                       {section.chips.map((chip, chipIndex) => (
@@ -265,7 +269,7 @@ export function ArticleView({ article }: ArticleViewProps) {
                     <figcaption className="mt-3 text-center text-[11px] text-muted">이해를 돕는 사진입니다. 논문의 원본 그림이 아닙니다.</figcaption>
                   </figure>
                 ) : null}
-                {section.steps ? (
+                {section.steps?.length ? (
                   <ol className="mt-5 grid gap-3 md:grid-cols-4">
                     {section.steps.map((step, stepIndex) => (
                       <li key={step.title} className="relative rounded-card border border-line bg-white p-4 shadow-card">
@@ -282,7 +286,7 @@ export function ArticleView({ article }: ArticleViewProps) {
           </div>
         </article>
 
-        <aside className="mt-8 space-y-4 xl:mt-0">
+        {!contentOnly ? <aside className="mt-8 space-y-4 xl:mt-0">
           <section className="rounded-card border border-line bg-card p-5 shadow-card">
             <h2 className="border-b border-line pb-3 text-sm font-semibold">연구 정보</h2>
             <dl className="text-[12px]">
@@ -350,10 +354,10 @@ export function ArticleView({ article }: ArticleViewProps) {
             </section>
           ) : null}
           </div>
-        </aside>
+        </aside> : null}
       </div>
 
-      {related.length > 0 ? (
+      {!contentOnly && related.length > 0 ? (
         <section className="mt-12">
           <h2 className="text-lg font-bold">이어서 볼 글</h2>
           <div className="mt-4 grid gap-4 md:grid-cols-3">

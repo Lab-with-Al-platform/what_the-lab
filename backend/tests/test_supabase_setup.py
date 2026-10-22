@@ -11,20 +11,29 @@ from sqlalchemy.engine import make_url
 from app.supabase_setup import validate_project
 
 
-@pytest.mark.parametrize("url", [
-    "postgresql://postgres:password@db.example-ref.supabase.co/postgres",
-    "postgresql://postgres.example-ref:password@aws-0-test.pooler.supabase.com/postgres",
-])
+@pytest.mark.parametrize(
+    "url",
+    [
+        "postgresql://postgres:password@db.example-ref.supabase.co/postgres",
+        "postgresql://postgres.example-ref:password@aws-0-test.pooler.supabase.com/postgres",
+    ],
+)
 def test_apply_requires_exact_supabase_project(url):
     validate_project(make_url(url), "example-ref")
 
 
-@pytest.mark.parametrize("url,ref", [
-    ("postgresql://postgres:password@db.other-ref.supabase.co/postgres", "example-ref"),
-    ("postgresql://postgres.other-ref:password@aws-0-test.pooler.supabase.com/postgres", "example-ref"),
-    ("postgresql://admin:password@localhost:5433/labbridge", "example-ref"),
-    ("postgresql://admin:password@invalid.example/postgres", ""),
-])
+@pytest.mark.parametrize(
+    "url,ref",
+    [
+        ("postgresql://postgres:password@db.other-ref.supabase.co/postgres", "example-ref"),
+        (
+            "postgresql://postgres.other-ref:password@aws-0-test.pooler.supabase.com/postgres",
+            "example-ref",
+        ),
+        ("postgresql://admin:password@localhost:5433/labbridge", "example-ref"),
+        ("postgresql://admin:password@invalid.example/postgres", ""),
+    ],
+)
 def test_wrong_or_unconfirmed_target_is_rejected(url, ref):
     with pytest.raises(ValueError):
         validate_project(make_url(url), ref)
@@ -33,7 +42,8 @@ def test_wrong_or_unconfirmed_target_is_rejected(url, ref):
 def test_shared_member_migration_sql_protects_all_tables():
     backend = Path(__file__).resolve().parents[1]
     config = Config(str(backend / "alembic.ini"), output_buffer=StringIO())
-    command.upgrade(config, "head", sql=True)
+    # 회원 초기 구조의 검증은 해당 이력에 고정합니다. 후속 설정 표와 섞지 않습니다.
+    command.upgrade(config, "20261021_02", sql=True)
     sql = config.output_buffer.getvalue()
     assert "CREATE TABLE users" in sql
     assert "CREATE TABLE research" in sql

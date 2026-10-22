@@ -44,6 +44,7 @@ SCORE_MAXIMUMS = {
     "input_data": 1,
     "limitations": 1,
 }
+MAX_IMPORT_ITEMS = 50
 
 
 class StrictModel(BaseModel):
@@ -108,7 +109,14 @@ class Score(StrictModel):
         return self
 
 
+class GlossaryTerm(StrictModel):
+    label: Annotated[str, Field(min_length=1, max_length=100)]
+    definition: ShortText
+
+
 class Draft(StrictModel):
+    # 같은 논문도 '연구 사례'와 '쉬운 기술 해설'은 서로 다른 원고입니다.
+    kind: Literal["case", "trend"] = "case"
     source: SourceInput
     title: Annotated[str, Field(min_length=1, max_length=180)]
     slug: Annotated[str, Field(pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$", max_length=100)]
@@ -119,6 +127,10 @@ class Draft(StrictModel):
     scores: Annotated[list[Score], Field(max_length=7)] = Field(default_factory=list)
     keyword_ids: Annotated[list[str], Field(max_length=5)] = Field(default_factory=list)
     image_policy: Literal["no_image", "rights_checked"] = "no_image"
+    glossary: Annotated[list[GlossaryTerm], Field(max_length=10)] = Field(default_factory=list)
+    classification_tags: Annotated[
+        list[Annotated[str, Field(min_length=1, max_length=64)]], Field(max_length=10)
+    ] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def reject_duplicates(self) -> Self:
@@ -137,14 +149,30 @@ class RevisionInput(StrictModel):
     reason: ShortText
 
 
+class CandidateImportInput(StrictModel):
+    # 기본은 미리 보기입니다. 저장은 관리자가 명시적으로 false를 보낼 때만 합니다.
+    dry_run: bool = Field(default=True, strict=True)
+    drafts: Annotated[list[Draft], Field(min_length=1, max_length=MAX_IMPORT_ITEMS)]
+
+
 class VersionInput(StrictModel):
     expected_version: Annotated[int, Field(strict=True, ge=1)]
     reason: ShortText
 
 
+class ReadingChecks(StrictModel):
+    clear_question: bool = Field(default=False, strict=True)
+    input_output: bool = Field(default=False, strict=True)
+    plain_language: bool = Field(default=False, strict=True)
+    concrete_example: bool = Field(default=False, strict=True)
+    limitations: bool = Field(default=False, strict=True)
+    source_separation: bool = Field(default=False, strict=True)
+
+
 class ApprovalInput(VersionInput):
     editorial_checked: Literal[True]
     rights_checked: Literal[True]
+    reading_checks: ReadingChecks = Field(default_factory=ReadingChecks)
     scheduled_for: datetime | None = None
 
     @field_validator("scheduled_for")
