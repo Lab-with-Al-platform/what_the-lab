@@ -33,7 +33,7 @@ def test_wrong_or_unconfirmed_target_is_rejected(url, ref):
 def test_shared_member_migration_sql_protects_all_tables():
     backend = Path(__file__).resolve().parents[1]
     config = Config(str(backend / "alembic.ini"), output_buffer=StringIO())
-    command.upgrade(config, "head", sql=True)
+    command.upgrade(config, "20261021_02", sql=True)  # 이 migration까지만 (뒤에 추가된 표는 아래 테스트에서 따로 확인)
     sql = config.output_buffer.getvalue()
     assert "CREATE TABLE users" in sql
     assert "CREATE TABLE research" in sql
@@ -50,3 +50,22 @@ def test_shared_member_migration_sql_protects_all_tables():
     assert "20261021_02" in sql
     frozen = backend / "migrations" / "sql" / "20261021_02"
     assert len(list(frozen.glob("*.sql"))) == 6
+
+
+def test_collaboration_request_migration_sql_is_protected():
+    """협업 요청 표도 같은 보안 규칙(RLS, 브라우저 역할 차단)을 따르고, Docker용 init SQL과 내용이 같아야 해요."""
+    backend = Path(__file__).resolve().parents[1]
+    config = Config(str(backend / "alembic.ini"), output_buffer=StringIO())
+    command.upgrade(config, "20261021_02:20261022_03", sql=True)  # 02 다음 변경분만 SQL로 뽑아 봅니다.
+    sql = config.output_buffer.getvalue()
+    assert "CREATE TABLE collaboration_request" in sql
+    assert sql.count("ENABLE ROW LEVEL SECURITY") == 1
+    assert "FROM anon" in sql
+    assert "FROM authenticated" in sql
+    assert "FROM service_role" in sql
+    assert "자동 덮어쓰기를 중단" in sql
+    assert "DELETE FROM" not in sql
+    assert "DROP TABLE" not in sql
+    frozen = backend / "migrations" / "sql" / "20261022_03" / "001_create_collaboration_request.sql"
+    docker = backend.parent / "database" / "init" / "007_create_collaboration_request.sql"
+    assert frozen.read_text(encoding="utf-8") == docker.read_text(encoding="utf-8")
