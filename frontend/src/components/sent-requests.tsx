@@ -9,7 +9,7 @@ import {
   photoOrDefault,
   REJECT_REASON_LABELS,
   SentRequest,
-  shortDate,
+  shortPeriod,
 } from "@/lib/collab-requests";
 import { formatDate, MEETING_LABELS, Research } from "@/lib/my-research";
 import type { AbleWorkOption, FieldCategory } from "@/components/my-research-modal";
@@ -278,7 +278,7 @@ function SentCard({
           <dt className="text-xs text-faint">희망 기간</dt>
           <dd>{formatPeriod(request.start_date, request.end_date)}</dd>
           <dt className="text-xs text-faint">메시지</dt>
-          <dd className="whitespace-pre-line">{request.message}</dd>
+          <dd className="whitespace-pre-line">{request.message || "메시지를 적지 않았어요"}</dd>
         </dl>
       )}
 
@@ -306,7 +306,7 @@ function statusLine(request: SentRequest): string {
     case "pending":
       return `${sent} 보냄 · ${formatDate(request.expires_at)}까지 답이 없으면 만료 (${daysLeft(request.expires_at)}일 남음)`;
     case "accepted":
-      return `${formatDate(request.responded_at ?? request.created_at)} 수락 · 희망 기간 ${shortDate(request.start_date)} ~ ${shortDate(request.end_date)}`;
+      return `${formatDate(request.responded_at ?? request.created_at)} 수락 · 희망 기간 ${shortPeriod(request.start_date, request.end_date)}`;
     case "expired":
       return `${sent} 보냄 · ${formatDate(request.expires_at)} 만료 (7일 동안 답이 없었어요)`;
     case "rejected": {

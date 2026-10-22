@@ -18,9 +18,9 @@ export type RejectReason = "schedule" | "field_mismatch" | "data_terms" | "other
 type RequestBase = {
   request_id: number;
   status: RequestStatus;
-  start_date: string; // 희망 시작일 YYYY-MM-DD
-  end_date: string; // 희망 종료일 YYYY-MM-DD
-  message: string; // 연구자가 쓴 메시지
+  start_date: string | null; // 희망 시작일 YYYY-MM-DD (비워서 보낼 수 있어요)
+  end_date: string | null; // 희망 종료일 YYYY-MM-DD (비워서 보낼 수 있어요)
+  message: string | null; // 연구자가 쓴 메시지 (비워서 보낼 수 있어요)
   created_at: string; // 보낸 때 (ISO)
   expires_at: string; // 답이 없으면 만료되는 때 (보낸 때 + 7일)
   responded_at: string | null; // 전문가가 수락·거절한 때
@@ -85,12 +85,25 @@ export function dotDate(date: string): string {
   return date.slice(0, 10).replaceAll("-", ".");
 }
 
-/** 희망 기간 → "2026.10.13 ~ 2026.12.31 · 약 2.5개월" */
-export function formatPeriod(start: string, end: string): string {
+
+
+/** 희망 기간 → "2026.10.13 ~ 2026.12.31 · 약 2.5개월". 비어 있으면 "기간 미정" */
+export function formatPeriod(start: string | null, end: string | null): string {
+  if (!start || !end) {
+    if (start) return `${dotDate(start)}부터 · 종료일 미정`;
+    if (end) return `${dotDate(end)}까지 · 시작일 미정`;
+    return "기간 미정";
+  }
   const days = (Date.parse(end) - Date.parse(start)) / 86_400_000;
   const months = Math.round((days / 30) * 2) / 2; // 0.5개월 단위로 반올림
   const length = months >= 1 ? `약 ${months}개월` : `약 ${Math.max(1, Math.round(days / 7))}주`;
   return `${dotDate(start)} ~ ${dotDate(end)} · ${length}`;
+}
+
+/** 짧은 희망 기간 → "10.13 ~ 12.31". 비어 있으면 "미정" */
+export function shortPeriod(start: string | null, end: string | null): string {
+  if (!start && !end) return "미정";
+  return `${start ? shortDate(start) : "미정"} ~ ${end ? shortDate(end) : "미정"}`;
 }
 
 /** 만료까지 남은 날 (오늘 기준, 0이면 오늘 만료) */

@@ -230,8 +230,10 @@ function RequestDetail({
 
       <Section>
         <p className="text-xs font-semibold text-faint">{researcher.nickname} 님의 메시지</p>
-        <p className="mt-2 whitespace-pre-line rounded-button bg-page px-4 py-3 text-sm leading-relaxed">{request.message}</p>
+        <p className="mt-2 whitespace-pre-line rounded-button bg-page px-4 py-3 text-sm leading-relaxed">{request.message || "메시지를 적지 않았어요"}</p>
       </Section>
+
+      
 
       <Section title="요청 내용">
         <InfoGrid>
