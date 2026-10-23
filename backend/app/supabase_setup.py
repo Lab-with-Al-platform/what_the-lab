@@ -16,7 +16,7 @@ from app.database_config import get_database_url
 from app.insights.database import build_engine
 
 ROOT = Path(__file__).resolve().parents[2]
-REVISION = "20261021_02"
+REVISION = "20261021_03"
 INSIGHT_TABLES = ("sources", "candidates", "revisions", "review_events", "publications")
 
 
@@ -80,13 +80,30 @@ def verify_members(connection: Connection) -> dict:
     return {"seed_counts": counts, "protected_public_tables": 24, "api_role_access": accessible}
 
 
+def verify_updated_at(connection: Connection) -> dict:
+    """호출자가 검색 순서를 바꾸어도 트리거의 검색 경로는 고정되어야 합니다."""
+    settings = connection.execute(text("""
+        SELECT proconfig FROM pg_proc
+        WHERE oid = to_regprocedure('public.set_updated_at()')
+    """)).scalar_one_or_none()
+    if not settings or "search_path=pg_catalog" not in settings:
+        raise ValueError("수정 시각 함수의 검색 경로 보호가 없습니다. 변경을 확정하지 않습니다.")
+    return {"updated_at_search_path": "pg_catalog"}
+
+
 def apply_members(connection: Connection, *, rehearse: bool) -> dict:
     """같은 트랜잭션에서 확인 → 기록 → 추가 적용 → 검증합니다."""
     connection.execute(text("SELECT pg_advisory_xact_lock(20261021, 2)"))
     before = inspect_database(connection)
     if before["versions"] == [REVISION]:
-        return {"already_applied": True, **verify_members(connection)}
-    if before != {"public_tables": ["insight_alembic_version"], "versions": ["20261016_01"]}:
+        return {
+            "already_applied": True,
+            **verify_members(connection), **verify_updated_at(connection),
+        }
+    if before["versions"] == ["20261021_02"]:
+        # 이미 회원 표를 적용한 팀 DB는 초기화하지 않고 후속 보안 설정만 적용합니다.
+        verify_members(connection)
+    elif before != {"public_tables": ["insight_alembic_version"], "versions": ["20261016_01"]}:
         raise ValueError("기존 회원 구조 또는 이력이 다릅니다. 자동 적용을 중단합니다.")
     snapshot = read_insights(connection)
     checkpoint_dir = ROOT / "tmp" / "db-checkpoints"
@@ -98,7 +115,7 @@ def apply_members(connection: Connection, *, rehearse: bool) -> dict:
     config = Config(str(ROOT / "backend" / "alembic.ini"))
     config.attributes["connection"] = connection
     command.upgrade(config, REVISION)
-    result = verify_members(connection)
+    result = {**verify_members(connection), **verify_updated_at(connection)}
     if read_insights(connection) != snapshot:
         raise ValueError("인사이트 자료 보존 검사가 실패했습니다. 변경을 확정하지 않습니다.")
     return {

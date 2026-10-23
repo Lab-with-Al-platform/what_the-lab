@@ -49,6 +49,7 @@ export function SiteHeader() {
   const [me, setMe] = useState<Me | null>(null);
   const [meLoading, setMeLoading] = useState(true);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [canManageInsights, setCanManageInsights] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -59,6 +60,9 @@ export function SiteHeader() {
       setMenuOpen(false);
       setSearchOpen(false);
       setProfileOpen(false);
+      if (profileRef.current?.contains(document.activeElement)) {
+        profileRef.current.querySelector("button")?.focus();
+      }
     }
 
     window.addEventListener("keydown", closeOnEscape);
@@ -69,10 +73,20 @@ export function SiteHeader() {
   // 헤더는 페이지를 옮겨도 그대로 남아 있어서, 주소가 바뀔 때마다 다시 불러옵니다.
   // (가입을 끝내고 홈으로 왔을 때 새로고침 없이 닉네임·사진이 보이게)
   useEffect(() => {
+    let active = true;
+    setCanManageInsights(false);
     requestApi<Me>("/auth/me")
-      .then(setMe)
-      .catch(() => setMe(null))
-      .finally(() => setMeLoading(false));
+      .then(async (user) => {
+        if (!active) return;
+        setMe(user);
+        // 일반 관리자와 인사이트 허용 목록을 서버에서 함께 판단합니다.
+        const access = await requestApi<{ can_manage_insights: boolean }>("/admin/insights/access")
+          .catch(() => null);
+        if (active) setCanManageInsights(access?.can_manage_insights === true);
+      })
+      .catch(() => { if (active) setMe(null); })
+      .finally(() => { if (active) setMeLoading(false); });
+    return () => { active = false; };
   }, [pathname]);
 
   // 드롭다운이 열려 있을 때, 프로필 영역 바깥을 누르면 닫기
@@ -145,7 +159,7 @@ export function SiteHeader() {
             >
               디스코드로 로그인
             </Link>
-          ) : me.signup_step !== "done" ? (
+          ) : me.signup_step !== "done" && !canManageInsights ? (
             <Link
               href="/signup"
               className="hidden h-11 items-center rounded-button bg-ink px-4 text-sm font-semibold text-white hover:bg-brand-hover sm:inline-flex"
@@ -153,20 +167,23 @@ export function SiteHeader() {
               가입 이어하기
             </Link>
           ) : (
-            <div ref={profileRef} className="relative hidden sm:block">
+            <div ref={profileRef} className="relative">
               <button
                 type="button"
                 className="inline-flex h-11 items-center gap-2 rounded-button px-2 text-sm font-semibold text-ink hover:bg-page"
                 aria-expanded={profileOpen}
+                aria-label="계정 메뉴"
+                aria-controls="account-navigation"
                 onClick={() => setProfileOpen((open) => !open)}
               >
                 <img src={profileImageOf(me)} alt="" className="h-8 w-8 rounded-full object-cover" />
-                <span>{me.nickname}</span>
+                <span className="hidden sm:inline">{me.nickname}</span>
               </button>
 
               {profileOpen ? (
-                <div className="absolute right-0 top-full mt-2 w-44 rounded-button border border-line bg-white py-2 shadow-lg">
-                  {(me.user_role === "expert" ? EXPERT_MENU : RESEARCHER_MENU).map((item) => (
+                <nav id="account-navigation" aria-label="계정 메뉴" className="absolute right-0 top-full mt-2 w-52 rounded-button border border-line bg-white py-2 shadow-card">
+                  {(me.signup_step !== "done" ? [{ href: "/signup", label: "가입 이어하기" }]
+                    : me.user_role === "expert" ? EXPERT_MENU : RESEARCHER_MENU).map((item) => (
                     <Link
                       key={item.href}
                       href={item.href}
@@ -177,6 +194,12 @@ export function SiteHeader() {
                     </Link>
                   ))}
 
+                  {canManageInsights ? (
+                    <Link href="/admin/insights" className="flex min-h-11 items-center px-4 text-sm font-semibold text-brand hover:bg-brand-soft" onClick={() => setProfileOpen(false)}>
+                      인사이트 관리자
+                    </Link>
+                  ) : null}
+
                   <div className="my-2 border-t border-line" />
                   <button
                     type="button"
@@ -185,7 +208,7 @@ export function SiteHeader() {
                   >
                     로그아웃
                   </button>
-                </div>
+                </nav>
               ) : null}
             </div>
           )}
@@ -261,6 +284,11 @@ export function SiteHeader() {
                     {item.label}
                   </Link>
                 ))}
+                {canManageInsights ? (
+                  <Link href="/admin/insights" className="flex min-h-11 items-center rounded-button px-3 text-sm font-semibold text-brand hover:bg-brand-soft" onClick={() => setMenuOpen(false)}>
+                    인사이트 관리자
+                  </Link>
+                ) : null}
                 <button
                   type="button"
                   className="flex min-h-11 w-full items-center rounded-button px-3 text-sm font-medium hover:bg-page"

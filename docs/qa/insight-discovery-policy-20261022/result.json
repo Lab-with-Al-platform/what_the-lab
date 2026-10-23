@@ -1,0 +1,11 @@
+{
+  "passed": [
+    "three_profiles_default_stages_and_existing_one_item_cap",
+    "1440_768_390_policy_controls_no_overflow",
+    "lowering_storage_cap_safely_clamps_expansion_target",
+    "fixed_period_can_be_saved_without_automatic_expansion",
+    "type_caps_and_version_conflict_preserve_policy_input",
+    "policy_limits_save_reload_without_collection_requests"
+  ],
+  "errors": []
+}

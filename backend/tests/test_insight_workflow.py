@@ -14,7 +14,7 @@ from app import user_store
 from app.config import JWT_SECRET
 from app.insights.database import SCHEMA, Base, build_engine, get_session
 from app.insights.models import Publication, utc_now
-from app.insights.schemas import SCORE_MAXIMUMS, normalize_doi
+from app.insights.schemas import SCORE_MAXIMUMS, ReadingChecks, normalize_doi
 from app.main import app
 from app.security import create_access_token
 
@@ -154,11 +154,47 @@ def approval_body(candidate: dict, **extra) -> dict:
         "reason": "원문과 독자 유용성을 검토함",
         "editorial_checked": True,
         "rights_checked": True,
+        "reading_checks": {name: True for name in ReadingChecks.model_fields},
         **extra,
     }
 
 
+def prepare_article(client: TestClient, candidate: dict) -> dict:
+    path = f"{ADMIN_PATH}/{candidate['id']}"
+    detail = client.get(path).json()
+    if not detail.get("article"):
+        response = client.post(
+            f"{path}/article-draft",
+            headers=ORIGIN,
+            json={"expected_version": candidate["version"], "reason": "가상 테스트용 원고 작성"},
+        )
+        assert response.status_code == 200, response.text
+        detail = client.get(path).json()
+        article = detail["article"]
+        article["glossary"] = [
+            {"id": "test-term", "label": "가상 용어", "definition": "실제 연구가 아닌 테스트 풀이"}
+        ]
+        article["sections"][0]["paragraphs"] += [
+            {"kind": kind, "text": f"가상 테스트용 {kind}"}
+            for kind in ("interpretation", "application", "caution")
+        ]
+        response = client.post(
+            f"{path}/article-revisions",
+            headers=ORIGIN,
+            json={
+                "expected_version": detail["version"],
+                "reason": "가상 독자용 본문 보완",
+                "article": article,
+                "draft": detail["review_draft"],
+            },
+        )
+        assert response.status_code == 200, response.text
+        candidate = submit(client, response.json())
+    return candidate
+
+
 def approve(client: TestClient, candidate: dict) -> dict:
+    candidate = prepare_article(client, candidate)
     response = client.post(
         f"{ADMIN_PATH}/{candidate['id']}/approve", headers=ORIGIN, json=approval_body(candidate)
     )
@@ -307,7 +343,8 @@ def test_legacy_cookie_requires_discord_login_again(client):
     user = login(client)
     old_token = jwt.encode(
         {"sub": str(user["user_id"]), "exp": (utc_now() + timedelta(days=1)).timestamp()},
-        JWT_SECRET, algorithm="HS256",
+        JWT_SECRET,
+        algorithm="HS256",
     )
     client.cookies.clear()
     client.cookies.set("access_token", old_token, domain=client.base_url.host, path="/")
@@ -322,7 +359,8 @@ def test_discord_callback_reuses_same_member_for_all_features(client, monkeypatc
     from app.routers import auth
 
     monkeypatch.setattr(
-        auth, "fetch_discord_user",
+        auth,
+        "fetch_discord_user",
         lambda _code: {"id": ADMIN_ID, "username": "가상 테스트 회원"},
     )
     user_ids = []
@@ -354,21 +392,27 @@ def test_revision_invalidates_approval_and_keeps_old_snapshot(client):
     approved = approve(client, submit(client, create(client)))
     new_draft = make_draft()
     new_draft["title"] = "관리자가 수정한 테스트 제목"
-    revised = client.post(
-        f"{ADMIN_PATH}/{approved['id']}/revisions",
+    old_detail = client.get(f"{ADMIN_PATH}/{approved['id']}").json()
+    article = old_detail["article"]
+    article["title"] = new_draft["title"]
+    response = client.post(
+        f"{ADMIN_PATH}/{approved['id']}/article-revisions",
         headers=ORIGIN,
         json={
             "expected_version": approved["version"],
             "draft": new_draft,
+            "article": article,
             "reason": "근거 검토 후 제목 수정",
         },
-    ).json()
+    )
+    assert response.status_code == 200, response.text
+    revised = client.get(f"{ADMIN_PATH}/{approved['id']}").json()
     assert revised["status"] == "draft"
     assert revised["approved_revision"] is None
     assert publish(client, approved).status_code == 409
     assert publish(client, revised).status_code == 409
     detail = client.get(f"{ADMIN_PATH}/{approved['id']}").json()
-    assert len(detail["revisions"]) == 2
+    assert len(detail["revisions"]) == 4
     assert detail["revisions"][0]["content"]["title"] == make_draft()["title"]
     assert detail["events"][-1]["action"] == "revised"
 
@@ -436,7 +480,7 @@ def test_approval_blocks_incomplete_evidence(client, problem):
 
 def test_future_schedule_and_naive_timezone(client):
     login(client)
-    candidate = submit(client, create(client))
+    candidate = prepare_article(client, submit(client, create(client)))
     path = f"{ADMIN_PATH}/{candidate['id']}/approve"
     assert (
         client.post(
@@ -535,7 +579,7 @@ def test_postgres_ddl_contains_private_schema_and_unique_constraints():
 
 
 def test_restart_keeps_publication(tmp_path):
-    from app.insights import service
+    from app.insights import editorial, service
     from app.insights.schemas import ApprovalInput, Draft
 
     url = f"sqlite:///{tmp_path / 'restart.db'}"
@@ -543,6 +587,15 @@ def test_restart_keeps_publication(tmp_path):
     Base.metadata.create_all(engine)
     with Session(engine) as session, session.begin():
         candidate = service.create_candidate(session, Draft.model_validate(make_draft()), ADMIN_ID)
+        article = editorial.notes_to_article(Draft.model_validate(make_draft()))
+        article["glossary"] = [{"id": "test", "label": "가상", "definition": "테스트"}]
+        article["sections"][0]["paragraphs"] += [
+            {"kind": kind, "text": "테스트"}
+            for kind in ("interpretation", "application", "caution")
+        ]
+        editorial.start_article_draft(
+            session, candidate.id, candidate.version, ADMIN_ID, "테스트", article
+        )
         service.submit_candidate(session, candidate.id, candidate.version, ADMIN_ID, "테스트")
         service.approve_candidate(
             session,
