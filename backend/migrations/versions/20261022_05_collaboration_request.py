@@ -1,14 +1,14 @@
 """협업 요청(연구회원 → AI 전문가) 테이블을 공통 Supabase에 추가합니다.
 
-SQL 본문은 backend/migrations/sql/20261022_03/ 에 동결해 두었습니다. (Docker용 database/init/007 과 같은 내용)
+SQL 본문은 backend/migrations/sql/20261022_05/ 에 동결해 두었습니다. (Docker용 database/init/007 과 같은 내용)
 """
 
 from pathlib import Path
 
 from alembic import op
 
-revision = "20261022_03"
-down_revision = "20261021_02"
+revision = "20261022_05"
+down_revision = "20261022_04"
 branch_labels = None
 depends_on = None
 
@@ -19,7 +19,7 @@ API_ROLES = ("anon", "authenticated", "service_role")  # Supabase가 브라우�
 
 def upgrade() -> None:
     # 같은 DB에 동시에 적용하지 않도록 트랜잭션이 끝날 때까지 잠급니다.
-    op.execute("SELECT pg_advisory_xact_lock(20261022, 3)")
+    op.execute("SELECT pg_advisory_xact_lock(20261022, 5)")
     op.execute("SET LOCAL search_path TO public, pg_catalog")
     # 이미 있으면 덮어쓰지 않고 멈춥니다.
     op.execute(f"""

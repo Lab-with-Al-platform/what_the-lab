@@ -1,7 +1,6 @@
 -- 협업 요청(연구회원 → AI 전문가)에 필요한 테이블입니다. (PostgreSQL) 001, 004, 006 다음에 실행됩니다.
 -- 화면: 요청관리 (연구회원은 보낸 요청, AI 전문가는 받은 요청)
--- 같은 내용이 Supabase용 backend/migrations/sql/20261022_03/ 에도 있습니다. 둘을 함께 고칩니다.
-
+-- 같은 내용이 Supabase용 backend/migrations/sql/20261022_05/ 에도 있습니다. 둘을 함께 고칩니다.
 -- 1) 협업 요청: research 1 : N, expert 1 : N
 --    보낸 연구회원은 research.user_id 로 알 수 있어서 따로 저장하지 않습니다.
 CREATE TABLE collaboration_request (
