@@ -67,7 +67,8 @@ def test_shared_member_migration_sql_protects_all_tables():
 def test_search_path_revision_only_alters_existing_function():
     backend = Path(__file__).resolve().parents[1]
     config = Config(str(backend / "alembic.ini"), output_buffer=StringIO())
-    command.upgrade(config, "20261021_02:head", sql=True)
+    # head는 이후 표 생성까지 포함하므로, 함수 설정 변경만 이 범위에서 검사합니다.
+    command.upgrade(config, "20261021_02:20261021_03", sql=True)
     sql = config.output_buffer.getvalue()
     assert "ALTER FUNCTION public.set_updated_at() SET search_path = pg_catalog" in sql
     assert "20261021_03" in sql
