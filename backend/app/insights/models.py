@@ -108,3 +108,19 @@ class Publication(Base):
     slug: Mapped[str] = mapped_column(String(100), unique=True)
     snapshot: Mapped[dict] = mapped_column(JSON)
     published_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+
+class CollectionSetting(Base):
+    """팀 공통 설정만 보관합니다. 이 테이블 자체는 수집 작업을 실행하지 않습니다."""
+
+    __tablename__ = "collection_settings"
+    __table_args__ = (
+        CheckConstraint("version >= 1", name="ck_collection_settings_version"),
+        {"schema": SCHEMA},
+    )
+
+    id: Mapped[str] = mapped_column(String(30), primary_key=True)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    content: Mapped[dict] = mapped_column(JSON)
+    updated_by: Mapped[str] = mapped_column(String(32))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)

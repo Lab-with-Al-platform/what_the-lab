@@ -51,7 +51,9 @@ def current_draft(session: Session, candidate: Candidate) -> Draft:
     )
     if revision is None:
         raise HTTPException(409, "본문 버전이 일치하지 않습니다.")
-    return Draft.model_validate(revision.content)
+    if revision.content.get("format") == "legacy_article_v1":
+        raise HTTPException(409, "이관한 기존 글은 게시 목록에서 읽기 전용으로 확인하세요.")
+    return Draft.model_validate(revision.content.get("draft", revision.content))
 
 
 def add_event(session: Session, candidate: Candidate, actor: str, action: str, reason: str) -> None:
@@ -75,10 +77,15 @@ def create_candidate(session: Session, draft: Draft, actor: str) -> Candidate:
         source = Source(**draft.source.model_dump(mode="json"))
         session.add(source)
         flush_changes(session)
-    existing = session.scalar(select(Candidate).where(Candidate.source_id == source.id))
+    existing = session.scalar(
+        select(Candidate).where(
+            Candidate.source_id == source.id,
+            Candidate.kind == draft.kind,
+        )
+    )
     if existing is not None:
         raise HTTPException(409, "같은 출처의 후보가 이미 있습니다.")
-    candidate = Candidate(source_id=source.id)
+    candidate = Candidate(source_id=source.id, kind=draft.kind)
     session.add(candidate)
     flush_changes(session)
     session.add(
@@ -106,6 +113,15 @@ def revise_candidate(
     if candidate.status == "published":
         raise HTTPException(409, "게시 후 정정은 별도 정정 절차에서 처리해야 합니다.")
     previous = current_draft(session, candidate)
+    revision = session.scalar(
+        select(Revision).where(
+            Revision.candidate_id == candidate.id, Revision.number == candidate.current_revision
+        )
+    )
+    if revision.content.get("format") in {"article_review_v1", "article_draft_v1"}:
+        raise HTTPException(409, "전체 원고 수정 API로 저장해야 기존 본문이 보존됩니다.")
+    if draft.kind != candidate.kind:
+        raise HTTPException(409, "원고 유형은 바꿀 수 없습니다. 다른 유형은 새 후보로 등록하세요.")
     if draft.source.doi != previous.source.doi or draft.source.url != previous.source.url:
         raise HTTPException(409, "출처 식별자는 바꿀 수 없습니다. 별도 후보로 등록해 주세요.")
     candidate.current_revision += 1
@@ -161,6 +177,11 @@ def approved_keyword_labels(keyword_ids: list[str]) -> list[dict[str, str]]:
 
 
 def validate_evidence(draft: Draft) -> int:
+    if draft.kind == "trend":
+        raise HTTPException(
+            422,
+            "트렌드는 수집·수정·검토 대기까지 지원합니다. 전용 게시 검증 기준 연결 전에는 승인·게시할 수 없습니다.",
+        )
     if not draft.source.bibliography_checked:
         raise HTTPException(422, "서지와 출처를 확인해야 합니다.")
     if {claim.field for claim in draft.claims} != REQUIRED_CLAIMS:
@@ -198,6 +219,16 @@ def approve_candidate(
         raise HTTPException(409, "검토 대기 중인 최신 본문만 승인할 수 있습니다.")
     draft = current_draft(session, candidate)
     validate_evidence(draft)
+    from app.insights.editorial import READING_LABELS, validate_editorial
+
+    validate_editorial(session, candidate)
+    if not all(request.reading_checks.model_dump().values()):
+        missing = [
+            label
+            for key, label in READING_LABELS.items()
+            if not getattr(request.reading_checks, key)
+        ]
+        raise HTTPException(422, "독자 검수를 직접 확인해 주세요: " + "; ".join(missing))
     if request.scheduled_for is not None and request.scheduled_for <= utc_now():
         raise HTTPException(422, "예약 시각은 현재보다 나중이어야 합니다.")
     candidate.status = "approved"
@@ -206,7 +237,7 @@ def approve_candidate(
     candidate.approved_at = utc_now()
     candidate.scheduled_for = request.scheduled_for
     candidate.version += 1
-    add_event(session, candidate, actor, "approved", request.reason)
+    add_event(session, candidate, actor, "approved", request.reason + " | 독자 검수 6항목 확인")
     flush_changes(session)
     return candidate
 
@@ -227,9 +258,10 @@ def publish_candidate(
     candidate = get_candidate(session, candidate_id)
     existing = session.scalar(select(Publication).where(Publication.candidate_id == candidate.id))
     if existing is not None:
-        if existing.idempotency_key != key:
+        if existing.idempotency_key == key:
+            return existing
+        if existing.revision >= candidate.current_revision:
             raise HTTPException(409, "이미 다른 게시 명령으로 발행되었습니다.")
-        return existing
     if candidate.version != version:
         raise HTTPException(409, "최신 후보 버전으로 다시 요청해 주세요.")
     if candidate.status != "approved" or candidate.approved_by is None:
@@ -241,12 +273,43 @@ def publish_candidate(
     draft = current_draft(session, candidate)
     # 예약 후 기술 승인 상태가 바뀌었을 수 있어 발행 직전에 다시 확인합니다.
     total = validate_evidence(draft)
+    from app.insights.editorial import validate_editorial
+
+    editorial_article = validate_editorial(session, candidate)
+    if existing is not None:
+        revision = session.scalar(
+            select(Revision).where(
+                Revision.candidate_id == candidate.id, Revision.number == candidate.current_revision
+            )
+        )
+        if revision.content.get("format") != "article_review_v1":
+            raise HTTPException(
+                409, "정식 수정 초안으로 작성한 원고만 공개본을 교체할 수 있습니다."
+            )
+        # 수정 중에는 건드리지 않았던 공개 스냅샷을 재승인·명시적 게시 때만 교체합니다.
+        article = revision.content["article"]
+        existing.snapshot = {
+            "kind": article["kind"],
+            "slug": article["slug"],
+            "title": article["title"],
+            "summary": article["summary"],
+            "article": article,
+            "origin": "reviewed_correction",
+        }
+        existing.revision = candidate.current_revision
+        existing.idempotency_key = key
+        candidate.status = "published"
+        candidate.version += 1
+        add_event(session, candidate, actor, "correction_published", reason)
+        flush_changes(session)
+        return existing
     public_content = {
-        "kind": "case",
+        "kind": draft.kind,
         "case_type": draft.case_type,
         "title": draft.title,
         "slug": draft.slug,
         "summary": draft.summary,
+        "glossary": [term.model_dump() for term in draft.glossary],
         "research_field": draft.research_field,
         "sections": [
             {
@@ -269,6 +332,9 @@ def publish_candidate(
         "score_total": total,
         # ID 기반 전문가 검색은 아직 없어 잘못된 skill=CAP...를 전달하지 않습니다.
         "expert_search_url": "/experts",
+        # 새 게시에서도 근거 메모만 내보내지 않고 승인된 전체 본문을 보존합니다.
+        "article": {**editorial_article, "publishedOn": utc_now().strftime("%Y.%m.%d")},
+        "origin": "reviewed_article",
     }
     publication = Publication(
         candidate_id=candidate.id,

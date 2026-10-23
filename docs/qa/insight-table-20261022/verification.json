@@ -1,0 +1,21 @@
+{
+  "passed": 13,
+  "checks": [
+    "six_column_table_and_compact_filters_1440",
+    "six_column_table_and_compact_filters_768",
+    "six_column_table_and_compact_filters_390",
+    "sidebar_scope_and_published_only_options_keep_private_search",
+    "body_only_correct_layout_1440_inside_1440",
+    "body_only_correct_layout_390_inside_1440",
+    "body_only_correct_layout_1440_inside_768",
+    "body_only_correct_layout_390_inside_768",
+    "body_only_correct_layout_1440_inside_390",
+    "body_only_correct_layout_390_inside_390",
+    "scaled_preview_can_scroll_to_last_paragraph",
+    "live_unsaved_edits_preserved_across_modes",
+    "public_article_layout_unchanged"
+  ],
+  "page_errors": [],
+  "mutations": [],
+  "scope": "isolated SQLite API, real frontend; no Supabase writes"
+}

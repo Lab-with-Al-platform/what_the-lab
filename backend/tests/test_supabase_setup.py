@@ -13,20 +13,29 @@ from app import supabase_setup
 from app.supabase_setup import validate_project, verify_updated_at
 
 
-@pytest.mark.parametrize("url", [
-    "postgresql://postgres:password@db.example-ref.supabase.co/postgres",
-    "postgresql://postgres.example-ref:password@aws-0-test.pooler.supabase.com/postgres",
-])
+@pytest.mark.parametrize(
+    "url",
+    [
+        "postgresql://postgres:password@db.example-ref.supabase.co/postgres",
+        "postgresql://postgres.example-ref:password@aws-0-test.pooler.supabase.com/postgres",
+    ],
+)
 def test_apply_requires_exact_supabase_project(url):
     validate_project(make_url(url), "example-ref")
 
 
-@pytest.mark.parametrize("url,ref", [
-    ("postgresql://postgres:password@db.other-ref.supabase.co/postgres", "example-ref"),
-    ("postgresql://postgres.other-ref:password@aws-0-test.pooler.supabase.com/postgres", "example-ref"),
-    ("postgresql://admin:password@localhost:5433/labbridge", "example-ref"),
-    ("postgresql://admin:password@invalid.example/postgres", ""),
-])
+@pytest.mark.parametrize(
+    "url,ref",
+    [
+        ("postgresql://postgres:password@db.other-ref.supabase.co/postgres", "example-ref"),
+        (
+            "postgresql://postgres.other-ref:password@aws-0-test.pooler.supabase.com/postgres",
+            "example-ref",
+        ),
+        ("postgresql://admin:password@localhost:5433/labbridge", "example-ref"),
+        ("postgresql://admin:password@invalid.example/postgres", ""),
+    ],
+)
 def test_wrong_or_unconfirmed_target_is_rejected(url, ref):
     with pytest.raises(ValueError):
         validate_project(make_url(url), ref)
@@ -35,7 +44,8 @@ def test_wrong_or_unconfirmed_target_is_rejected(url, ref):
 def test_shared_member_migration_sql_protects_all_tables():
     backend = Path(__file__).resolve().parents[1]
     config = Config(str(backend / "alembic.ini"), output_buffer=StringIO())
-    command.upgrade(config, "head", sql=True)
+    # 회원 초기 구조의 검증은 해당 이력에 고정합니다. 후속 설정 표와 섞지 않습니다.
+    command.upgrade(config, "20261021_02", sql=True)
     sql = config.output_buffer.getvalue()
     assert "CREATE TABLE users" in sql
     assert "CREATE TABLE research" in sql
@@ -57,7 +67,8 @@ def test_shared_member_migration_sql_protects_all_tables():
 def test_search_path_revision_only_alters_existing_function():
     backend = Path(__file__).resolve().parents[1]
     config = Config(str(backend / "alembic.ini"), output_buffer=StringIO())
-    command.upgrade(config, "20261021_02:head", sql=True)
+    # head는 이후 표 생성까지 포함하므로, 함수 설정 변경만 이 범위에서 검사합니다.
+    command.upgrade(config, "20261021_02:20261021_03", sql=True)
     sql = config.output_buffer.getvalue()
     assert "ALTER FUNCTION public.set_updated_at() SET search_path = pg_catalog" in sql
     assert "20261021_03" in sql

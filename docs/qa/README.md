@@ -27,6 +27,12 @@
 | ai-cases-20261010 | 연구사례 콘텐츠 화면 | [측정 결과](ai-cases-20261010/verification.json) |
 | ai-trend-co-scientist-20261010 | Co-Scientist·MatterGen·AlphaEvolve 화면 | [측정 결과](ai-trend-co-scientist-20261010/verification.json) |
 
+## 인사이트 관리자 후속 검증 — 2026-10-22
+
+- [후보 부족 시 기간 확장 정책](insight-discovery-policy-20261022/README.md): 성격별 탐색 순서·상한, 기준 후보 수와 저장 수 분리, 개발 DB 설정 보존·반응형 검증
+- [출처 확장·용도 복수 분류](insight-sources-20261022/README.md): 추천 출처 11곳, 협업사례·AI 트렌드 선택, 기존 설정 보존과 개발 DB 저장 검증
+- [수집 메모·게시용 원고 분리](insight-editorial-20261022/README.md): 6개 비공개 후보 보강, 독자 검수 6항목, 기존 공개본 31개 보존과 반응형 편집 화면 검증
+
 새 검증 기록에는 확인일, 코드·브랜치 기준, 수행한 검증, 미검증 범위와 캡처를 함께 남깁니다. 기존 증거는 덮어쓰지 않습니다.
 
 [전체 문서 안내](../README.md) · [디자인 검수 기준](../design/DESIGN_QA_CHECKLIST.md)

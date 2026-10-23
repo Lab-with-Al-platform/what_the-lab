@@ -10,7 +10,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 from sqlalchemy.schema import CreateSchema, DropSchema
 
-from app.insights import service
+from app.insights import editorial, service
 from app.insights.database import SCHEMA, Base, build_engine
 from app.insights.models import Publication
 from app.insights.schemas import ApprovalInput, Draft
@@ -35,6 +35,15 @@ def test_two_postgres_workers_publish_once():
         with Session(translated) as session, session.begin():
             candidate = service.create_candidate(
                 session, Draft.model_validate(make_draft()), ADMIN_ID
+            )
+            article = editorial.notes_to_article(Draft.model_validate(make_draft()))
+            article["glossary"] = [{"id": "test", "label": "가상", "definition": "검증 전용"}]
+            article["sections"][0]["paragraphs"] += [
+                {"kind": kind, "text": "가상 검증 전용"}
+                for kind in ("interpretation", "application", "caution")
+            ]
+            editorial.start_article_draft(
+                session, candidate.id, candidate.version, ADMIN_ID, "검증 전용", article
             )
             service.submit_candidate(
                 session, candidate.id, candidate.version, ADMIN_ID, "동시성 검토"
