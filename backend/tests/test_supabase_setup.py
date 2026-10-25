@@ -155,3 +155,23 @@ def test_setup_rejects_unprotected_previous_revision(monkeypatch):
     with pytest.raises(ValueError, match="보호 실패"):
         supabase_setup.apply_members(connection, rehearse=False)
     upgrade.assert_not_called()
+
+
+
+def test_collaboration_request_migration_sql_is_protected():
+    """협업 요청 표도 같은 보안 규칙(RLS, 브라우저 역할 차단)을 따르고, Docker용 init SQL과 내용이 같아야 해요."""
+    backend = Path(__file__).resolve().parents[1]
+    config = Config(str(backend / "alembic.ini"), output_buffer=StringIO())
+    command.upgrade(config, "20261022_04:20261022_05", sql=True)  # 04 다음 변경분만 SQL로 뽑아 봅니다.
+    sql = config.output_buffer.getvalue()
+    assert "CREATE TABLE collaboration_request" in sql
+    assert sql.count("ENABLE ROW LEVEL SECURITY") == 1
+    assert "FROM anon" in sql
+    assert "FROM authenticated" in sql
+    assert "FROM service_role" in sql
+    assert "자동 덮어쓰기를 중단" in sql
+    assert "DELETE FROM" not in sql
+    assert "DROP TABLE" not in sql
+    frozen = backend / "migrations" / "sql" / "20261022_05" / "001_create_collaboration_request.sql"
+    docker = backend.parent / "database" / "init" / "007_create_collaboration_request.sql"
+    assert frozen.read_text(encoding="utf-8") == docker.read_text(encoding="utf-8")

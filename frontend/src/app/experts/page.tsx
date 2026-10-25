@@ -1,17 +1,11 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
-import { ExpertBrowser } from "@/components/expert-browser";
-import { PageContainer } from "@/components/page-container";
-import { expertDomains, expertTasks, listExperts } from "@/lib/experts";
+import { ExpertSearch } from "@/components/expert-search";
 
 export const metadata: Metadata = {
   title: "AI 전문가 찾기",
 };
 
+// 공개한 전문가를 DB에서 찾아 보여 줘요. (검색·필터는 화면 안에서 API로 다시 불러와요)
 export default function ExpertsPage() {
-  return (
-    <Suspense fallback={<PageContainer className="py-16 text-sm text-muted">전문가 목록을 준비하는 중입니다.</PageContainer>}>
-      <ExpertBrowser experts={listExperts()} tasks={expertTasks()} domains={expertDomains()} />
-    </Suspense>
-  );
+  return <ExpertSearch />;
 }

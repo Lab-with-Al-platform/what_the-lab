@@ -4,10 +4,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import CORS_ORIGINS
 from app.routers import (
     auth,
+    collab_requests,
     expert,
     expert_history,
     expert_portfolio,
     expert_profile,
+    experts,
     insights,
     researcher,
     researcher_research,
@@ -43,5 +45,8 @@ app.include_router(expert.router)
 app.include_router(expert_profile.router)
 app.include_router(expert_portfolio.router)
 app.include_router(expert_history.router)
+app.include_router(experts.router)
 app.include_router(taxonomy.router)
 app.include_router(researcher_research.router)
+app.include_router(collab_requests.researcher_router)
+app.include_router(collab_requests.expert_router)

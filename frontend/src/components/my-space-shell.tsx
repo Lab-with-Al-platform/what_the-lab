@@ -7,13 +7,13 @@ import type { ReactNode } from "react";
 // 왼쪽 "내 공간" 메뉴. 회원 유형마다 다릅니다. (주소는 헤더 드롭다운과 같게 맞춤)
 const MENUS = {
   researcher: [
-    { href: "/my-research", label: "내 연구" },
-    { href: "/requests", label: "보낸 요청" },
+    { href: "/requests", label: "요청관리" },
     { href: "/workspace", label: "협업 공간" },
+    { href: "/my-research", label: "내 연구" },
     { href: "/settings/profile", label: "프로필 설정" },
   ],
   expert: [
-    { href: "/requests", label: "받은 요청" },
+    { href: "/requests", label: "요청관리" },
     { href: "/workspace", label: "내 협업" },
     { href: "/my-career", label: "내 이력" },
     { href: "/settings/profile", label: "프로필 설정" },
