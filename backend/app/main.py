@@ -15,6 +15,7 @@ from app.routers import (
     researcher_research,
     taxonomy,
     verification,
+    notifications,
 )
 
 app = FastAPI(title="LabBridge API")
@@ -50,3 +51,4 @@ app.include_router(taxonomy.router)
 app.include_router(researcher_research.router)
 app.include_router(collab_requests.researcher_router)
 app.include_router(collab_requests.expert_router)
+app.include_router(notifications.router)

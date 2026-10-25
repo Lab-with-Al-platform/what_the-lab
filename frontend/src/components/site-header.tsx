@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { NotificationBell } from "@/components/notification-bell";
 import { PageContainer } from "@/components/page-container";
 import { requestApi } from "@/lib/api";
 
@@ -151,6 +152,8 @@ export function SiteHeader() {
             <span className="sr-only">인사이트 검색 열기</span>
             <SearchIcon />
           </button>
+
+          {me && me.signup_step === "done" ? <NotificationBell pathname={pathname} /> : null}
 
           {meLoading ? null : !me ? (
             <Link

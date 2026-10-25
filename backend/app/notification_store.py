@@ -1,0 +1,167 @@
+"""알림 저장·읽기 (사이트 안 알림 종). 디스코드 DM은 이 표를 보고 따로 보냅니다.
+
+문구는 저장하지 않고, 알림 종류(type)와 관련 협업 요청으로 읽을 때 만듭니다.
+"""
+
+from fastapi import HTTPException
+
+from app.db import get_connection
+
+RECENT_DAYS = 30  # 최근 며칠 알림만 보여 줄까 (지우지는 않아요)
+LIST_LIMIT = 50  # 한 번에 보여 줄 최대 개수
+
+# 받는 사람이 누구인지에 따라 나눈 알림 종류
+TO_EXPERT = {"request_received", "request_canceled"}  # 연구회원이 한 일 → 전문가에게
+TO_RESEARCHER = {"request_accepted", "request_rejected"}  # 전문가가 한 일 → 연구회원에게
+TO_BOTH = {"request_expired", "collab_started"}  # 둘 다에게 (서로가 상대방)
+
+# 거절 사유 (프론트 REJECT_REASON_LABELS와 같은 문구)
+REJECT_LABELS = {
+    "schedule": "일정이 맞지 않아요",
+    "field_mismatch": "맡길 일이 제 분야와 달라요",
+    "data_terms": "데이터 공유 조건을 지키기 어려워요",
+    "other": "기타",
+}
+
+# 협업 요청 1건에서 받는 사람(user_id)·일으킨 사람(actor_id)을 뽑는 SELECT
+TO_EXPERT_SQL = """
+    SELECT cr.expert_id, %(type)s, r.user_id, cr.request_id
+    FROM collaboration_request cr JOIN research r ON r.research_id = cr.research_id
+    WHERE cr.request_id = ANY(%(ids)s)
+"""
+TO_RESEARCHER_SQL = """
+    SELECT r.user_id, %(type)s, cr.expert_id, cr.request_id
+    FROM collaboration_request cr JOIN research r ON r.research_id = cr.research_id
+    WHERE cr.request_id = ANY(%(ids)s)
+"""
+
+# 같은 사람·같은 종류·같은 요청 알림이 이미 있으면 새 알림처럼 다시 띄웁니다.
+# (예: 만료된 요청을 다시 보내면 '요청 도착' 알림이 안 읽음으로 맨 위에 다시 와요)
+UPSERT_SQL = """
+    INSERT INTO notification (user_id, type, actor_id, request_id)
+    {source}
+    ON CONFLICT (user_id, type, request_id) WHERE request_id IS NOT NULL
+    DO UPDATE SET actor_id = EXCLUDED.actor_id, created_at = now(), read_at = NULL,
+        discord_status = 'pending', discord_attempts = 0,
+        discord_sent_at = NULL, discord_error = NULL
+"""
+
+
+def notify_requests(cursor, type_: str, request_ids: list[int]) -> None:
+    """협업 요청 여러 건에 대해 알림을 한 번에 저장합니다. 요청을 바꾼 같은 트랜잭션 안에서 부릅니다.
+
+    type_: 알림 종류 (TO_EXPERT / TO_RESEARCHER / TO_BOTH 중 하나)
+    request_ids: 알림을 만들 협업 요청 번호들 (비어 있으면 아무것도 안 함)
+    """
+    if not request_ids:
+        return
+    if type_ in TO_EXPERT:
+        source = TO_EXPERT_SQL
+    elif type_ in TO_RESEARCHER:
+        source = TO_RESEARCHER_SQL
+    elif type_ in TO_BOTH:
+        source = f"{TO_EXPERT_SQL} UNION ALL {TO_RESEARCHER_SQL}"
+    else:
+        raise ValueError(f"모르는 알림 종류: {type_}")
+    cursor.execute(UPSERT_SQL.format(source=source), {"type": type_, "ids": request_ids})
+
+
+# ---------- 읽기 ----------
+def build_message(row: dict, user_id: int) -> tuple[str, str]:
+    """알림 한 줄 → (제목, 작은 설명). 받는 사람이 전문가인지 연구회원인지에 따라 문구가 달라요.
+
+    row: type, actor_nickname, research_title, reject_reason, expert_id 를 담은 dict
+    """
+    actor = row["actor_nickname"] or "탈퇴한 회원"
+    title = row["research_title"] or "삭제된 연구"
+    to_expert = row["expert_id"] == user_id
+    kind = row["type"]
+    if kind == "request_received":
+        # 아직 답을 기다리는 요청일 때만 기한 안내를 붙여요. (이미 수락·거절했으면 연구 제목만)
+        waiting = row.get("request_status") == "pending"
+        detail = f"{title} · 7일 안에 답해 주세요" if waiting else title
+        return f"{actor} 님이 협업을 요청했어요", detail    
+    if kind == "request_accepted":
+        return f"{actor} 님이 협업 요청을 수락했어요", title
+    if kind == "request_rejected":
+        reason = REJECT_LABELS.get(row["reject_reason"], title)
+        return f"{actor} 님이 협업 요청을 거절했어요", reason
+    if kind == "request_canceled":
+        return f"{actor} 님이 보낸 요청을 취소했어요", title
+    if kind == "request_expired":
+        if to_expert:
+            return f"{actor} 님의 요청이 답이 없어 만료됐어요", title
+        return f"{actor} 님에게 보낸 요청이 답이 없어 만료됐어요", title
+    if kind == "collab_started":
+        return f"{actor} 님과 협업을 시작했어요", title
+    return "새 알림이 있어요", title
+
+
+def load_notifications(user_id: int) -> list[dict]:
+    """내 알림 목록 (최근 30일, 최신순 50개)."""
+    with get_connection() as conn, conn.cursor() as cursor:
+        cursor.execute(
+            """
+            SELECT n.notification_id, n.type, n.read_at, n.created_at,
+                   a.nickname AS actor_nickname, r.title AS research_title,
+                   cr.reject_reason, cr.expert_id, cr.status AS request_status
+            FROM notification n
+            LEFT JOIN users a ON a.user_id = n.actor_id
+            LEFT JOIN collaboration_request cr ON cr.request_id = n.request_id
+            LEFT JOIN research r ON r.research_id = cr.research_id
+            WHERE n.user_id = %s AND n.created_at >= now() - make_interval(days => %s)
+            ORDER BY n.created_at DESC, n.notification_id DESC
+            LIMIT %s
+            """,
+            (user_id, RECENT_DAYS, LIST_LIMIT),
+        )
+        rows = cursor.fetchall()
+
+    items = []
+    for row in rows:
+        title, detail = build_message(row, user_id)
+        items.append(
+            {
+                "notification_id": row["notification_id"],
+                "type": row["type"],
+                "title": title,
+                "detail": detail,
+                "link": "/requests",  # 지금은 모두 요청관리. 협업공간이 생기면 collab_started는 그쪽으로
+                "read": row["read_at"] is not None,
+                "created_at": row["created_at"],
+            }
+        )
+    return items
+
+
+def count_unread(user_id: int) -> int:
+    """안 읽은 알림 수 (헤더 종 숫자). 목록과 같은 30일 기준."""
+    with get_connection() as conn, conn.cursor() as cursor:
+        cursor.execute(
+            "SELECT count(*) AS count FROM notification"
+            " WHERE user_id = %s AND read_at IS NULL"
+            " AND created_at >= now() - make_interval(days => %s)",
+            (user_id, RECENT_DAYS),
+        )
+        return cursor.fetchone()["count"]
+
+
+def mark_read(user_id: int, notification_id: int) -> None:
+    """알림 하나를 읽음으로. 내 알림이 아니거나 없으면 404."""
+    with get_connection() as conn, conn.cursor() as cursor:
+        cursor.execute(
+            "UPDATE notification SET read_at = COALESCE(read_at, now())"
+            " WHERE notification_id = %s AND user_id = %s",
+            (notification_id, user_id),
+        )
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="알림을 찾을 수 없어요")
+
+
+def mark_all_read(user_id: int) -> None:
+    """내 안 읽은 알림을 모두 읽음으로."""
+    with get_connection() as conn, conn.cursor() as cursor:
+        cursor.execute(
+            "UPDATE notification SET read_at = now() WHERE user_id = %s AND read_at IS NULL",
+            (user_id,),
+        )

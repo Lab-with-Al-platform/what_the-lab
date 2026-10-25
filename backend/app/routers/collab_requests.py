@@ -11,6 +11,7 @@ from pydantic import BaseModel
 
 from app.db import transaction
 from app.form_rules import bad_request, optional_text, required_text
+from app.notification_store import notify_requests
 from app.request_store import (
     expire_old_requests,
     load_received_requests,
@@ -95,9 +96,10 @@ def send_request(body: SendRequest, user_id: int = Depends(get_current_user_id))
         cursor.execute(
             "INSERT INTO collaboration_request"
             " (research_id, expert_id, start_date, end_date, message)"
-            " VALUES (%s, %s, %s, %s, %s)",
+            " VALUES (%s, %s, %s, %s, %s) RETURNING request_id",
             (research_id, body.expert_id, body.start_date, body.end_date, message),
         )
+        notify_requests(cursor, "request_received", [cursor.fetchone()["request_id"]])
     return load_sent_requests(user_id)
 
 
@@ -110,6 +112,7 @@ def cancel_request(request_id: int, user_id: int = Depends(get_current_user_id))
         request = find_sent(cursor, user_id, request_id)
         check_status(request, "pending")
         set_status(cursor, request_id, "canceled")
+        notify_requests(cursor, "request_canceled", [request_id])
     return load_sent_requests(user_id)
 
 
@@ -121,6 +124,7 @@ def decline_request(request_id: int, user_id: int = Depends(get_current_user_id)
         request = find_sent(cursor, user_id, request_id)
         check_status(request, "accepted")
         set_status(cursor, request_id, "canceled")
+        notify_requests(cursor, "request_canceled", [request_id])
     return load_sent_requests(user_id)
 
 
@@ -140,6 +144,7 @@ def resend_request(request_id: int, user_id: int = Depends(get_current_user_id))
             " WHERE request_id = %s",
             (request_id,),
         )
+        notify_requests(cursor, "request_received", [request_id])  # 전문가에게 다시 '요청 도착'
     return load_sent_requests(user_id)
 
 
@@ -156,11 +161,16 @@ def start_collaboration(request_id: int, user_id: int = Depends(get_current_user
             " WHERE request_id = %s",
             (request_id,),
         )
+        notify_requests(cursor, "collab_started", [request_id])
         cursor.execute(
             "UPDATE collaboration_request SET status = 'canceled'"
-            " WHERE research_id = %s AND request_id <> %s AND status IN ('pending', 'accepted')",
+            " WHERE research_id = %s AND request_id <> %s AND status IN ('pending', 'accepted')"
+            " RETURNING request_id",
             (request["research_id"], request_id),
         )
+        # 자동으로 취소된 다른 전문가들에게도 알려요.
+        canceled_ids = [row["request_id"] for row in cursor.fetchall()]
+        notify_requests(cursor, "request_canceled", canceled_ids)
     return load_sent_requests(user_id)
 
 
@@ -186,6 +196,7 @@ def accept_request(
             " responded_at = now() WHERE request_id = %s",
             (reply, request_id),
         )
+        notify_requests(cursor, "request_accepted", [request_id])
     return load_received_requests(user_id)
 
 
@@ -205,6 +216,7 @@ def reject_request(
             " reject_text = %s, responded_at = now() WHERE request_id = %s",
             (body.reason, text, request_id),
         )
+        notify_requests(cursor, "request_rejected", [request_id])
     return load_received_requests(user_id)
 
 
