@@ -1,6 +1,6 @@
 """협업 요청: 연구회원(보내기·취소·시작)과 AI 전문가(수락·거절).
 
-요청은 연구회원의 '지정한 연구'로 보냅니다. 요청 표에는 연구 번호만 저장하고 연구 내용은 research 표에서 읽어요.
+요청은 연구회원이 고른 '등록한 연구'로 보냅니다. 요청 표에는 연구 번호만 저장하고 연구 내용은 research 표에서 읽어요.
 저장 API는 모두 처리가 끝난 최신 목록 전체를 돌려줍니다. 화면은 받은 값으로 그대로 다시 그려요.
 """
 
@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from app.db import transaction
-from app.form_rules import bad_request, optional_text
+from app.form_rules import bad_request, optional_text, required_text
 from app.request_store import (
     expire_old_requests,
     load_received_requests,
@@ -39,10 +39,10 @@ BLOCKING = {
 
 class SendRequest(BaseModel):
     expert_id: int  # 받을 AI 전문가 (users.user_id)
-    start_date: date | None = None  # 희망 시작일 (비워도 됨)
-    end_date: date | None = None  # 희망 종료일 (비워도 됨)
-    message: str = ""  # 300자, 비워도 됨
-
+    research_id: int  # 어떤 연구로 요청하나 (내가 등록한 연구)
+    start_date: date  # 희망 시작일
+    end_date: date  # 희망 종료일
+    message: str  # 300자
 
 class AcceptRequest(BaseModel):
     message: str = ""  # 수락하며 남기는 한마디 (선택, 200자)
@@ -62,23 +62,25 @@ def list_sent(user_id: int = Depends(get_current_user_id)) -> list[dict]:
 
 @researcher_router.post("")
 def send_request(body: SendRequest, user_id: int = Depends(get_current_user_id)) -> list[dict]:
-    """지정한 연구로 AI 전문가에게 협업을 요청합니다."""
+    
+    """고른 연구로 AI 전문가에게 협업을 요청합니다. (전문가 찾기·상세의 [협업 요청])"""
     require_researcher(user_id)
-    if body.start_date and body.end_date and body.end_date < body.start_date:
+    if body.end_date < body.start_date:
         raise bad_request("희망 종료일은 시작일보다 빠를 수 없어요")
-    message = optional_text(body.message, MAX_MESSAGE, "메시지")
+    message = required_text(body.message, MAX_MESSAGE, "메시지")
 
     with transaction() as cursor:
         expire_old_requests(cursor)
         cursor.execute(
-            "SELECT research_id FROM research"
-            " WHERE user_id = %s AND is_primary = TRUE AND status = 'registered'",
-            (user_id,),
+            "SELECT status FROM research WHERE research_id = %s AND user_id = %s",
+            (body.research_id, user_id),
         )
         research = cursor.fetchone()
         if research is None:
-            raise bad_request("요청을 보내려면 먼저 내 연구를 등록하고 지정해 주세요")
-        research_id = research["research_id"]
+            raise HTTPException(status_code=404, detail="연구를 찾을 수 없어요")
+        if research["status"] != "registered":
+            raise bad_request("임시 저장한 연구로는 요청할 수 없어요. 먼저 등록해 주세요")
+        research_id = body.research_id
         check_not_started(cursor, research_id)
 
         cursor.execute(
