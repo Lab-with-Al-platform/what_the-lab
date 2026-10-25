@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from app import user_store
-from app.db import get_connection , transaction
+from app.db import get_connection, transaction
 from app.security import get_current_user_id
 
 router = APIRouter(prefix="/api/v1/expert", tags=["expert"])

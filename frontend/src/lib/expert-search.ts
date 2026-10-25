@@ -1,5 +1,5 @@
 // AI 전문가 찾기·협업 요청 창에서 쓰는 타입과 계산. 백엔드 응답(snake_case) 모양 그대로예요.
-import type { CareerProfile } from "@/lib/my-career";
+import type { AbleWorkOption, CareerProfile, FieldCategory } from "@/lib/my-career";
 
 /** 목록 카드 한 장 (GET /experts) */
 export type ExpertCardData = {
@@ -19,11 +19,24 @@ export type ExpertSearchResult = {
   matched: { able_work_ids: string[]; field_ids: string[] }; // 검색어와 같은 뜻으로 함께 찾은 분류
 };
 
-/** 공개 프로필 (GET /experts/{id}). 협업 요청 창의 '전문가의 협업 조건'에 써요. */
+/** 이 서비스에서 진행한 연구 한 건 (협업을 시작한 요청) */
+export type ExpertCollaboration = {
+  start_date: string; // 희망 시작일 YYYY-MM-DD
+  end_date: string; // 희망 종료일 YYYY-MM-DD
+  ongoing: boolean; // 종료일이 아직 안 지났으면 true (진행 중)
+  title: string; // 연구 제목
+  partner_nickname: string; // 함께한 연구회원 닉네임
+  category_ids: string[]; // 연구 분야 대분류 ID (F01~F10)
+  able_work_ids: string[]; // 연구에서 맡긴 일 UG ID
+};
+
+/** 공개 프로필 (GET /experts/{id}). 전문가 상세와 협업 요청 창에서 써요. */
 export type ExpertPublicProfile = Omit<CareerProfile, "is_public"> & {
   user_id: number;
+  affiliation: string | null; // 소속 (선택)
   engaged: boolean;
   engaged_until: string | null;
+  collaborations: ExpertCollaboration[];
 };
 
 /** 분류 ID → 화면 이름 (맡길 일·분야 칩과 태그에 씀) */
@@ -33,6 +46,41 @@ export type Names = {
   categoryOf: Map<string, string>; // FIELD ID → 대분류 ID
   categories: Map<string, string>; // 대분류 ID → 이름
 };
+
+/** 보기 목록 두 개(맡길 일·분야)로 이름표를 만들어요. */
+export function buildNames(ableWorks: AbleWorkOption[], categories: FieldCategory[]): Names {
+  const fields = new Map<string, string>();
+  const categoryOf = new Map<string, string>();
+  for (const category of categories) {
+    for (const field of category.fields) {
+      fields.set(field.field_id, field.name);
+      categoryOf.set(field.field_id, category.field_category_id);
+    }
+  }
+  return {
+    works: new Map(ableWorks.map((item) => [item.able_work_id, item.name])),
+    fields,
+    categoryOf,
+    categories: new Map(categories.map((item) => [item.field_category_id, item.name])),
+  };
+}
+
+/** 협업 기간 → "2026.06 ~ 07" / "2025.12 ~ 2026.02" / "2026.10 ~ 진행 중" */
+export function periodLabel(item: Pick<ExpertCollaboration, "start_date" | "end_date" | "ongoing">): string {
+  const start = item.start_date.slice(0, 7).replace("-", ".");
+  if (item.ongoing) return `${start} ~ 진행 중`;
+  const end = item.end_date.slice(0, 7).replace("-", ".");
+  return end.slice(0, 4) === start.slice(0, 4) ? `${start} ~ ${end.slice(5)}` : `${start} ~ ${end}`;
+}
+
+/** 마친 연구를 분야(대분류)별로 셉니다. 많은 분야부터. 예: [{id:"F02", count:2}, {id:"F09", count:1}] */
+export function countByCategory(items: ExpertCollaboration[]): { id: string; count: number }[] {
+  const counts = new Map<string, number>();
+  for (const item of items) {
+    for (const id of item.category_ids) counts.set(id, (counts.get(id) ?? 0) + 1);
+  }
+  return [...counts].map(([id, count]) => ({ id, count })).sort((a, b) => b.count - a.count);
+}
 
 /** 세부 분야 ID 목록 → 겹치지 않는 대분류 이름 목록. 예: [FIELD001, FIELD002] → ["생명과학"] */
 export function categoryNames(fieldIds: string[], names: Names): string[] {
