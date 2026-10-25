@@ -165,3 +165,14 @@ def mark_all_read(user_id: int) -> None:
             "UPDATE notification SET read_at = now() WHERE user_id = %s AND read_at IS NULL",
             (user_id,),
         )
+
+# ---------- 알림 설정 (notification_setting) ----------
+def mark_discord_joined(user_id: int) -> None:
+    """LabBridge 서버에 참가했다고 기록해요. 줄이 없으면 만들고, DM 막힘 표시는 지워요."""
+    with get_connection() as conn, conn.cursor() as cursor:
+        cursor.execute(
+            "INSERT INTO notification_setting (user_id, discord_joined_at) VALUES (%s, now())"
+            " ON CONFLICT (user_id) DO UPDATE"
+            " SET discord_joined_at = now(), discord_blocked_at = NULL",
+            (user_id,),
+        )        

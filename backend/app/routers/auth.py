@@ -9,6 +9,8 @@ from fastapi.responses import RedirectResponse, Response
 
 from app import user_store
 from app.config import DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, DISCORD_REDIRECT_URI, FRONTEND_URL
+from app.discord_bot import join_guild
+from app.notification_store import mark_discord_joined
 from app.security import (
     create_access_token,
     ensure_active_user,
@@ -46,7 +48,7 @@ def discord_login(access_token: str | None = Cookie(default=None)) -> RedirectRe
         "client_id": DISCORD_CLIENT_ID,
         "redirect_uri": DISCORD_REDIRECT_URI,
         "response_type": "code",
-        "scope": "identify",
+        "scope": "identify guilds.join",  # guilds.join = LabBridge 서버에 넣어도 된다는 허락 (알림 DM용)
         "state": state,
     }
     response = RedirectResponse(f"{DISCORD_AUTHORIZE_URL}?{urlencode(params)}")
@@ -75,6 +77,9 @@ def discord_callback(
         user = user_store.create_user(discord_user)  # 처음 온 사람 = 가입
 
     ensure_active_user(user)
+    if discord_user.get("access_token"):
+        connect_discord(user["user_id"], discord_user["id"], discord_user["access_token"])
+    
     next_path = next_path_for(user)
     response = RedirectResponse(f"{FRONTEND_URL}{next_path}")
     response.set_cookie(
@@ -87,6 +92,14 @@ def discord_callback(
     response.delete_cookie(STATE_COOKIE)
     return response
 
+def connect_discord(user_id: int, discord_id: str, discord_token: str) -> None:
+    """LabBridge 디스코드 서버에 넣어서 봇이 DM을 보낼 수 있게 해요. 실패해도 로그인은 그대로 진행돼요."""
+    try:
+        joined = join_guild(discord_id, discord_token)
+    except httpx.HTTPError:
+        joined = False  # 디스코드가 잠깐 안 될 때: 다음 로그인 때 다시 시도
+    if joined:
+        mark_discord_joined(user_id)
 
 @router.get("/me")
 def me(user: Annotated[dict, Depends(get_current_user)]) -> dict:
@@ -108,7 +121,10 @@ def next_path_for(user: dict) -> str:
     return NEXT_PATH_BY_STEP.get(user["signup_step"], "/signup")
 
 def fetch_discord_user(code: str) -> dict:
-    """일회용 code → 디스코드 토큰 → 사용자 정보."""
+    """일회용 code → 디스코드 토큰 → 사용자 정보.
+
+    서버 참가에 쓰도록 디스코드 토큰을 "access_token"에 함께 담아 돌려줘요. (DB에는 저장하지 않아요)
+    """
     token_response = httpx.post(
         DISCORD_TOKEN_URL,
         data={"grant_type": "authorization_code", "code": code, "redirect_uri": DISCORD_REDIRECT_URI},
@@ -119,4 +135,4 @@ def fetch_discord_user(code: str) -> dict:
 
     me_response = httpx.get(DISCORD_ME_URL, headers={"Authorization": f"Bearer {discord_token}"})
     me_response.raise_for_status()
-    return me_response.json()
+    return {**me_response.json(), "access_token": discord_token}
