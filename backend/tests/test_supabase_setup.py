@@ -175,3 +175,23 @@ def test_collaboration_request_migration_sql_is_protected():
     frozen = backend / "migrations" / "sql" / "20261022_05" / "001_create_collaboration_request.sql"
     docker = backend.parent / "database" / "init" / "007_create_collaboration_request.sql"
     assert frozen.read_text(encoding="utf-8") == docker.read_text(encoding="utf-8")
+
+def test_notification_migration_sql_is_protected():
+    """알림 표 2개도 같은 보안 규칙(RLS, 브라우저 역할 차단)을 따르고 init SQL과 같아야 해요."""
+    backend = Path(__file__).resolve().parents[1]
+    config = Config(str(backend / "alembic.ini"), output_buffer=StringIO())
+    # 05 다음 변경분만 SQL로 뽑아 봅니다. (DB에 접속하지 않아요)
+    command.upgrade(config, "20261022_05:20261025_06", sql=True)
+    sql = config.output_buffer.getvalue()
+    assert "CREATE TABLE notification (" in sql
+    assert "CREATE TABLE notification_setting (" in sql
+    assert sql.count("ENABLE ROW LEVEL SECURITY") == 2
+    assert "REVOKE ALL ON SEQUENCE public.notification_notification_id_seq FROM anon" in sql
+    assert "REVOKE ALL ON TABLE public.notification_setting FROM authenticated" in sql
+    assert "FROM service_role" in sql
+    assert "자동 덮어쓰기를 중단" in sql
+    assert "DELETE FROM" not in sql
+    assert "DROP TABLE" not in sql
+    frozen = backend / "migrations" / "sql" / "20261025_06" / "001_create_notification.sql"
+    docker = backend.parent / "database" / "init" / "008_create_notification.sql"
+    assert frozen.read_text(encoding="utf-8") == docker.read_text(encoding="utf-8")
