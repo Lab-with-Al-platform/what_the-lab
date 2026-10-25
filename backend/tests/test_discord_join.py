@@ -47,3 +47,10 @@ def test_login_asks_for_server_join_permission():
         response = client.get("/api/v1/auth/discord/login", follow_redirects=False)
     assert response.status_code == 307
     assert "scope=identify+guilds.join" in response.headers["location"]
+
+
+
+def test_connect_needs_login():
+    with TestClient(app) as client:
+        response = client.get("/api/v1/auth/discord/connect", follow_redirects=False)
+    assert response.status_code == 401

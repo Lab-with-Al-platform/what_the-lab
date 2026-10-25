@@ -23,8 +23,8 @@ def get_profile(user_id: int = Depends(get_current_user_id)) -> dict:
     with get_connection() as conn, conn.cursor() as cursor:
         cursor.execute(
             """
-            SELECT institution_name, institution_source, department, position, is_verified
-            FROM researcher_profile
+            SELECT institution_name, institution_source, department, position, is_verified,
+            verified_at FROM researcher_profile
             WHERE user_id = %s
             """,
             (user_id,),
@@ -50,6 +50,20 @@ def save_profile(body: ProfileRequest, user_id: int = Depends(get_current_user_i
         )
         cursor.execute("UPDATE users SET signup_step = 'done' WHERE user_id = %s", (user_id,))
     return {"next": "/signup/researcher/done"}
+
+@router.put("/profile")
+def update_profile(body: ProfileRequest, user_id: int = Depends(get_current_user_id)) -> dict:
+    """프로필 설정에서 학과·직위만 고쳐요. (가입 단계는 건드리지 않아요)"""
+    department = clean_department(body.department)
+    position = clean_position(body.position)
+    with get_connection() as conn, conn.cursor() as cursor:
+        cursor.execute(
+            "UPDATE researcher_profile SET department = %s, position = %s WHERE user_id = %s",
+            (department, position, user_id),
+        )
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="소속 인증을 먼저 해 주세요")
+    return get_profile(user_id)
 
 
 def is_ready_to_finish(cursor, user_id: int) -> bool:

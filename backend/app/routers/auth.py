@@ -32,6 +32,8 @@ DISCORD_TOKEN_URL = "https://discord.com/api/oauth2/token"
 DISCORD_ME_URL = "https://discord.com/api/users/@me"
 TOKEN_COOKIE = "access_token"
 STATE_COOKIE = "oauth_state"
+NEXT_COOKIE = "oauth_next"  # [디스코드 알림 연결]로 왔는지 표시 (값: "settings")
+SETTINGS_PATH = "/settings/profile"
 TOKEN_MAX_AGE = 7 * 24 * 60 * 60  # 7일(초)
 
 
@@ -43,6 +45,23 @@ def discord_login(access_token: str | None = Cookie(default=None)) -> RedirectRe
         ensure_active_user(user)
         return RedirectResponse(f"{FRONTEND_URL}{next_path_for(user)}")
 
+    return discord_authorize()
+
+
+@router.get("/discord/connect")
+def discord_connect(user: Annotated[dict, Depends(get_current_user)]) -> RedirectResponse:
+    """[디스코드 알림 연결] 이미 로그인했어도 디스코드 승인 화면을 다시 거쳐 LabBridge 서버에 참가해요.
+
+    끝나면 프로필 설정으로 돌아와요.
+    """
+    ensure_active_user(user)
+    response = discord_authorize()
+    response.set_cookie(NEXT_COOKIE, "settings", max_age=600, httponly=True, samesite="lax")
+    return response
+
+
+def discord_authorize() -> RedirectResponse:
+    """디스코드 승인 화면으로 보내요. state: 다른 사이트가 끼어들지 못하게 하는 1회용 확인값."""
     state = secrets.token_urlsafe(16)
     params = {
         "client_id": DISCORD_CLIENT_ID,
@@ -62,6 +81,7 @@ def discord_callback(
     state: str | None = None,
     error: str | None = None,
     oauth_state: str | None = Cookie(default=None),
+    oauth_next: str | None = Cookie(default=None),
 ) -> RedirectResponse:
     """② 디스코드가 돌려보내는 곳. 회원을 찾거나 만들고, JWT를 쿠키에 담아 프론트로 보냅니다."""
     if error or not code or state is None or state != oauth_state:
@@ -77,10 +97,13 @@ def discord_callback(
         user = user_store.create_user(discord_user)  # 처음 온 사람 = 가입
 
     ensure_active_user(user)
+    joined = False
     if discord_user.get("access_token"):
-        connect_discord(user["user_id"], discord_user["id"], discord_user["access_token"])
-    
-    next_path = next_path_for(user)
+        joined = connect_discord(user["user_id"], discord_user["id"], discord_user["access_token"])
+    if oauth_next == "settings":  # [디스코드 알림 연결]로 왔으면 결과와 함께 설정 화면으로
+        next_path = f"{SETTINGS_PATH}?discord={'connected' if joined else 'failed'}"
+    else:
+        next_path = next_path_for(user)
     response = RedirectResponse(f"{FRONTEND_URL}{next_path}")
     response.set_cookie(
         TOKEN_COOKIE,
@@ -90,16 +113,23 @@ def discord_callback(
         samesite="lax",
     )
     response.delete_cookie(STATE_COOKIE)
+    response.delete_cookie(NEXT_COOKIE)
     return response
 
-def connect_discord(user_id: int, discord_id: str, discord_token: str) -> None:
-    """LabBridge 디스코드 서버에 넣어서 봇이 DM을 보낼 수 있게 해요. 실패해도 로그인은 그대로 진행돼요."""
+
+def connect_discord(user_id: int, discord_id: str, discord_token: str) -> bool:
+    """LabBridge 디스코드 서버에 넣어서 봇이 DM을 보낼 수 있게 해요. 들어갔으면 True.
+
+    실패해도 로그인은 그대로 진행돼요.
+    """
     try:
         joined = join_guild(discord_id, discord_token)
     except httpx.HTTPError:
         joined = False  # 디스코드가 잠깐 안 될 때: 다음 로그인 때 다시 시도
     if joined:
         mark_discord_joined(user_id)
+    return joined
+
 
 @router.get("/me")
 def me(user: Annotated[dict, Depends(get_current_user)]) -> dict:

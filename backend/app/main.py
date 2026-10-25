@@ -23,6 +23,7 @@ from app.routers import (
     taxonomy,
     verification,
     notifications,
+    profile_photo,
 )
 
 @asynccontextmanager
@@ -76,3 +77,4 @@ app.include_router(researcher_research.router)
 app.include_router(collab_requests.researcher_router)
 app.include_router(collab_requests.expert_router)
 app.include_router(notifications.router)
+app.include_router(profile_photo.router)

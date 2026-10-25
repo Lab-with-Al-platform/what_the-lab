@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ReactNode, useEffect, useState } from "react";
-import { ApiError, requestApi } from "@/lib/api";
+import { ApiError, apiAsset, requestApi } from "@/lib/api";
 import {
   AbleWorkOption,
   CAREER_LABELS,
@@ -307,7 +307,7 @@ function IntroCard({ profile, workName, fieldName, onEdit }: { profile: CareerPr
     <section className="rounded-card border border-line bg-card p-5 shadow-card sm:p-6">
       <div className="flex items-center gap-4">
         {/* eslint-disable-next-line @next/next/no-img-element -- 헤더와 같은 방식(서비스 업로드 사진 또는 기본 사진) */}
-        <img src={profile.user_photo ?? "/profile-images/default-expert.png"} alt="" className="h-16 w-16 shrink-0 rounded-full bg-page object-cover" />
+        <img src={profile.user_photo ? apiAsset(profile.user_photo) : "/profile-images/default-expert.png"} alt="" className="h-16 w-16 shrink-0 rounded-full bg-page object-cover" />
         <div className="min-w-0">
           <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-lg font-bold">
             {profile.nickname}

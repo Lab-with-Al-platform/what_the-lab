@@ -175,4 +175,46 @@ def mark_discord_joined(user_id: int) -> None:
             " ON CONFLICT (user_id) DO UPDATE"
             " SET discord_joined_at = now(), discord_blocked_at = NULL",
             (user_id,),
+        )
+
+
+
+def load_setting(user_id: int) -> dict:
+    """내 알림 설정. 줄이 없으면 기본값(모두 켜짐, 연결 안 됨)이에요."""
+    with get_connection() as conn, conn.cursor() as cursor:
+        cursor.execute(
+            "SELECT discord_dm, notify_request, notify_workspace, discord_joined_at,"
+            " discord_blocked_at FROM notification_setting WHERE user_id = %s",
+            (user_id,),
+        )
+        row = cursor.fetchone()
+    return row or {
+        "discord_dm": True,
+        "notify_request": True,
+        "notify_workspace": True,
+        "discord_joined_at": None,
+        "discord_blocked_at": None,
+    }
+
+
+def save_setting(user_id: int, discord_dm: bool, notify_request: bool, notify_workspace: bool):
+    """켜기/끄기 3개를 저장해요. 줄이 없으면 만들어요. (참가·막힘 기록은 건드리지 않아요)"""
+    with get_connection() as conn, conn.cursor() as cursor:
+        cursor.execute(
+            "INSERT INTO notification_setting (user_id, discord_dm, notify_request, notify_workspace)"
+            " VALUES (%s, %s, %s, %s)"
+            " ON CONFLICT (user_id) DO UPDATE SET discord_dm = EXCLUDED.discord_dm,"
+            " notify_request = EXCLUDED.notify_request,"
+            " notify_workspace = EXCLUDED.notify_workspace",
+            (user_id, discord_dm, notify_request, notify_workspace),
+        )
+
+
+def set_dm_blocked(user_id: int, blocked: bool) -> None:
+    """DM이 막혔으면 시각을 남기고, 다시 받을 수 있으면 지워요."""
+    with get_connection() as conn, conn.cursor() as cursor:
+        cursor.execute(
+            "UPDATE notification_setting"
+            " SET discord_blocked_at = CASE WHEN %s THEN now() ELSE NULL END WHERE user_id = %s",
+            (blocked, user_id),
         )        

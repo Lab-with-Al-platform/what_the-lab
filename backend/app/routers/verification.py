@@ -111,6 +111,83 @@ def save_institution_name(body: InstitutionNameRequest, user_id: int = Depends(g
 
     return {"institution_name": name, "next": "/signup/researcher/info"}
 
+# ---------- 프로필 설정 > [기관 바꾸기] (이미 가입한 연구회원의 재인증) ----------
+# 가입 때와 같은 인증번호 방식이지만, 가입 단계(signup_step)는 건드리지 않아요.
+# 인증을 다 마치기 전까지는 지금 기관이 그대로 유지돼요.
+_pending_changes: dict[int, dict] = {}  # {user_id: {"code", "institution_name", "source", "expires_at", "confirmed"}}
+
+
+@router.post("/change/send")
+def send_change_code(body: SendCodeRequest, user_id: int = Depends(get_current_user_id)) -> dict:
+    """① 새 기관 이메일로 인증번호 보내기 (다시 보내기도 같은 주소)"""
+    require_done_researcher(user_id)
+    institution_name, source = decide_institution(body.email)
+    code = f"{secrets.randbelow(1_000_000):06d}"
+    _pending_changes[user_id] = {
+        "code": code,
+        "institution_name": institution_name,
+        "source": source,
+        "expires_at": time.time() + CODE_VALID_SECONDS,
+        "confirmed": False,
+    }
+    # TODO: 메일 발송이 생기면 여기서 code를 메일로 보냅니다.
+    response = {"institution_name": institution_name, "expires_in": CODE_VALID_SECONDS}
+    if APP_ENV == "development":
+        response["dev_code"] = code
+    return response
+
+
+@router.post("/change/confirm")
+def confirm_change_code(body: ConfirmCodeRequest, user_id: int = Depends(get_current_user_id)) -> dict:
+    """② 인증번호 확인. 목록에 있는 기관이면 바로 바꾸고, 목록에 없으면 기관명 입력(③)으로 넘어가요."""
+    pending = _pending_changes.get(user_id)
+    if pending is None or time.time() > pending["expires_at"]:
+        raise HTTPException(status_code=400, detail="인증 시간이 지났어요. 다시 보내 주세요")
+    if not secrets.compare_digest(body.code, pending["code"]):
+        raise HTTPException(status_code=400, detail="인증번호가 맞지 않아요")
+    if pending["institution_name"] is None:  # 목록에 없는 학교·연구기관: 이름을 받아야 해요
+        pending["confirmed"] = True
+        pending["expires_at"] = time.time() + CODE_VALID_SECONDS  # 이름 입력할 시간을 다시 5분
+        return {"institution_name": None, "needs_name": True}
+    apply_institution_change(user_id, pending["institution_name"], pending["source"])
+    del _pending_changes[user_id]
+    return {"institution_name": pending["institution_name"], "needs_name": False}
+
+
+@router.post("/change/name")
+def save_change_name(body: InstitutionNameRequest, user_id: int = Depends(get_current_user_id)) -> dict:
+    """③ (목록에 없던 기관만) 인증을 마친 뒤 기관명을 입력하면 그때 바꿔요."""
+    pending = _pending_changes.get(user_id)
+    if pending is None or not pending["confirmed"] or time.time() > pending["expires_at"]:
+        raise HTTPException(status_code=400, detail="인증을 다시 해 주세요")
+    name = body.institution_name.strip()
+    if not name:
+        raise HTTPException(status_code=400, detail="학교·기관 이름을 입력해 주세요")
+    if len(name) > MAX_NAME_LENGTH:
+        raise HTTPException(status_code=400, detail=f"기관 이름은 {MAX_NAME_LENGTH}자 이내로 입력해 주세요")
+    apply_institution_change(user_id, name, pending["source"])
+    del _pending_changes[user_id]
+    return {"institution_name": name, "needs_name": False}
+
+
+def require_done_researcher(user_id: int) -> None:
+    """가입을 마친 연구회원만 기관을 바꿀 수 있어요."""
+    user = user_store.find_by_id(user_id)
+    if user is None:
+        raise HTTPException(status_code=401, detail="로그인이 필요합니다")
+    if user["user_role"] != "researcher" or user["signup_step"] != "done":
+        raise HTTPException(status_code=409, detail="가입을 마친 연구회원만 바꿀 수 있어요")
+
+
+def apply_institution_change(user_id: int, institution_name: str, source: str) -> None:
+    """새 기관으로 바꾸고 인증 시각을 새로 남겨요. 학과·직위와 가입 단계는 그대로예요."""
+    with get_connection() as conn, conn.cursor() as cursor:
+        cursor.execute(
+            "UPDATE researcher_profile SET institution_name = %s, institution_source = %s,"
+            " is_verified = TRUE, verified_at = now() WHERE user_id = %s",
+            (institution_name, source, user_id),
+        )
+
 
 def decide_institution(email: str) -> tuple[str | None, str]:
     """(기관명, 출처). 목록에 있으면 (이름, 'list'), 목록에 없는 학교 도메인이면 (None, 'manual')."""

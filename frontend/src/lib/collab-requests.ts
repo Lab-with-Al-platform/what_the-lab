@@ -1,4 +1,5 @@
 // 협업 요청(연구자 → AI 전문가) 화면에서 쓰는 타입·문구·계산. 백엔드 응답(snake_case) 모양 그대로예요.
+import { apiAsset } from "@/lib/api";
 import type { Research } from "@/lib/my-research";
 
 /**
@@ -113,5 +114,5 @@ export function daysLeft(expiresAt: string): number {
 
 /** 프로필 사진이 없으면 회원 유형별 기본 그림 */
 export function photoOrDefault(photo: string | null, role: "researcher" | "expert"): string {
-  return photo ?? `/profile-images/default-${role}.png`;
+  return photo ? apiAsset(photo) : `/profile-images/default-${role}.png`;
 }

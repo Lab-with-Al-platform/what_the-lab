@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { NotificationRows } from "@/components/notification-list";
@@ -116,7 +117,12 @@ export function NotificationBell({ pathname }: { pathname: string }) {
           <div className="max-h-[min(420px,calc(100dvh-180px))] overflow-y-auto">
             {list ? <NotificationRows items={list.items} onOpen={openItem} /> : <p className="px-5 py-8 text-center text-sm text-faint">불러오는 중…</p>}
           </div>
-          <p className="border-t border-line px-5 py-3 text-[13px] text-muted">최근 30일 알림만 보여요</p>
+          <div className="flex items-center justify-between border-t border-line px-5 py-3 text-[13px]">
+            <span className="text-muted">최근 30일 알림만 보여요</span>
+            <Link href="/settings/profile#noti" onClick={() => setOpen(false)} className="font-semibold text-brand">
+              알림 설정
+            </Link>
+          </div>        
         </div>
       )}
     </div>
