@@ -15,12 +15,22 @@ CHILD_TABLES = {
 
 
 def load_researches(user_id: int) -> list[dict]:
-    """내 연구 목록 (최근 작성 순). 화면의 Research 타입과 같은 모양이에요."""
+    """내 연구 목록 (최근 작성 순). 화면의 Research 타입과 같은 모양이에요.
+
+    open_request_count: 답 기다리는·수락된 요청 수 (있으면 수정·삭제 잠금)
+    started_count: 협업을 시작한 수 (있으면 삭제 잠금)
+    """
     with get_connection() as conn, conn.cursor() as cursor:
         cursor.execute(
             """
             SELECT research_id, status, is_primary, title, description, data_status, share_policy,
-                   share_condition, task_unsure, meeting_type, face_to_area, created_at, updated_at
+                   share_condition, task_unsure, meeting_type, face_to_area, created_at, updated_at,
+                   (SELECT count(*) FROM collaboration_request cr
+                    WHERE cr.research_id = research.research_id
+                      AND cr.status IN ('pending', 'accepted')) AS open_request_count,
+                   (SELECT count(*) FROM collaboration_request cr
+                    WHERE cr.research_id = research.research_id
+                      AND cr.status = 'started') AS started_count
             FROM research
             WHERE user_id = %s
             ORDER BY created_at DESC, research_id DESC

@@ -30,10 +30,12 @@ export type Research = {
   face_to_area: string | null;
   created_at: string; // ISO 날짜
   updated_at: string;
+  open_request_count: number; // 답 기다리는·수락된 요청 수 (있으면 수정·삭제 잠금)
+  started_count: number; // 협업을 시작한 수 (있으면 삭제 잠금)
 };
 
-/** 저장할 때 보내는 값 (번호·지정·날짜는 서버가 정해요) */
-export type ResearchInput = Omit<Research, "research_id" | "is_primary" | "created_at" | "updated_at">;
+/** 저장할 때 보내는 값 (번호·지정·날짜·요청 수는 서버가 정해요) */
+export type ResearchInput = Omit<Research, "research_id" | "is_primary" | "created_at" | "updated_at" | "open_request_count" | "started_count">;
 
 export const LIMITS = {
   title: 60,

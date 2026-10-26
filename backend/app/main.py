@@ -5,10 +5,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import CORS_ORIGINS
-
 from app.discord_bot import bot_ready
 from app.notification_sender import run_forever, wake_up
-
+from app.request_store import expire_forever
 from app.routers import (
     auth,
     collab_requests,
@@ -18,20 +17,27 @@ from app.routers import (
     expert_profile,
     experts,
     insights,
+    notifications,
+    profile_photo,
     researcher,
     researcher_research,
     taxonomy,
     verification,
-    notifications,
-    profile_photo,
 )
+
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
-    """서버가 켜질 때 디스코드 알림 보내기를 시작하고, 꺼질 때 멈춰요. 봇 설정이 없으면 시작하지 않아요."""
-    task = asyncio.create_task(run_forever()) if bot_ready() else None
+    """서버가 켜질 때 백그라운드 작업을 시작하고, 꺼질 때 멈춰요.
+
+    - 협업 요청 만료 처리: 1분마다 (항상)
+    - 디스코드 알림 보내기: 봇 설정이 있을 때만
+    """
+    tasks = [asyncio.create_task(expire_forever())]
+    if bot_ready():
+        tasks.append(asyncio.create_task(run_forever()))
     yield
-    if task:
+    for task in tasks:
         task.cancel()
 
 

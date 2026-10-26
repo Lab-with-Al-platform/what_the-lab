@@ -195,9 +195,16 @@ function ResearchCard({ research, showRadio, fieldName, workName, onPick, onEdit
               이 연구로 전문가 찾기
             </Link>
           )}
-          <button type="button" onClick={onEdit} className="h-9 rounded-button border border-line px-4 text-[13px] font-semibold text-muted hover:bg-page hover:text-ink">
-            {draft ? "이어서 작성" : "수정"}
-          </button>
+          {research.open_request_count > 0 ? (
+            // 진행 중인 요청이 있으면 수정이 잠겨요. 상세에서 요청을 정리한 뒤 수정할 수 있어요.
+            <Link href={`/my-research/${research.research_id}`} className="inline-flex h-9 items-center rounded-button border border-line px-4 text-[13px] font-semibold text-faint hover:bg-page">
+              🔒 요청 {research.open_request_count}건 진행 중
+            </Link>
+          ) : (
+            <button type="button" onClick={onEdit} className="h-9 rounded-button border border-line px-4 text-[13px] font-semibold text-muted hover:bg-page hover:text-ink">
+              {draft ? "이어서 작성" : "수정"}
+            </button>
+          )}
         </div>
       </div>
     </li>

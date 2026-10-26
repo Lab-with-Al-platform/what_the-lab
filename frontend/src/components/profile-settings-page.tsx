@@ -332,6 +332,7 @@ function NotificationSection() {
             </p>
           </div>
           <a href={connectHref} className="inline-flex h-10 items-center gap-2 rounded-button bg-[#5865f2] px-4 text-[13px] font-semibold text-white">
+            <DiscordIcon />
             디스코드 알림 연결
           </a>
         </div>

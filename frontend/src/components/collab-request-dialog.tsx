@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { INPUT_CLASS, Modal } from "@/components/modal";
 import { ApiError, requestApi } from "@/lib/api";
-import { formatPeriod, type SentRequest } from "@/lib/collab-requests";
-import { categoryNames, dayAfter, MESSAGE_LIMIT, monthDay, today, type ExpertPublicProfile, type Names } from "@/lib/expert-search";
+import { deadlineText, earliestStart, effectivePeriod, formatPeriod, RULES, secondTryBlock, todayDate, type SentRequest } from "@/lib/collab-requests";
+import { categoryNames, dayAfter, MESSAGE_LIMIT, monthDay, type ExpertPublicProfile, type Names } from "@/lib/expert-search";
 import { MEETING_LABELS, REWARD_LABELS as EXPERT_REWARD_LABELS, TIME_LABELS } from "@/lib/my-career";
 import { DATA_STATUS_LABELS, DATA_TYPE_LABELS, SHARE_LABELS, type Research } from "@/lib/my-research";
 
@@ -21,17 +21,19 @@ export function CollabRequestDialog({ expert, role, names, onClose }: Props) {
   const [step, setStep] = useState<1 | 2 | "done">(1);
   const [profile, setProfile] = useState<ExpertPublicProfile | null>(null);
   const [researches, setResearches] = useState<Research[] | null>(null);
-  const [startedIds, setStartedIds] = useState<Set<number>>(new Set()); // 이미 협업을 시작한 연구 (새 요청 불가)
+  const [sent, setSent] = useState<SentRequest[]>([]); // 내가 보낸 요청 전체 (연구별로 더 보낼 수 있는지 계산)
   const [loadError, setLoadError] = useState("");
 
   const [researchId, setResearchId] = useState<number | null>(null);
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
   const [message, setMessage] = useState("");
+  const [urgent, setUrgent] = useState(false); // 급해요: 내일부터 시작, 수락하면 바로 협업 시작
   const [agreed, setAgreed] = useState(false);
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState("");
   const [sentToOther, setSentToOther] = useState(false); // 지정한 연구가 아닌 연구로 보냈는지 (요청관리 안내용)
+  const [deadline, setDeadline] = useState(""); // 보낸 요청의 전문가 답 기한 (보낸 뒤 안내)
 
   useEffect(() => {
     if (role !== "researcher") return;
@@ -40,16 +42,19 @@ export function CollabRequestDialog({ expert, role, names, onClose }: Props) {
       requestApi<Research[]>("/researcher/researches"),
       requestApi<SentRequest[]>("/researcher/requests"),
     ])
-      .then(([expertProfile, list, sent]) => {
+      .then(([expertProfile, list, sentList]) => {
         const registered = list.filter((item) => item.status === "registered");
-        const started = new Set(sent.filter((item) => item.status === "started").map((item) => item.research_id));
-        const open = registered.filter((item) => !started.has(item.research_id));
+        const open = registered.filter((item) => !researchBlock(item.research_id, sentList, expert.user_id));
         setProfile(expertProfile);
         setResearches(registered);
-        setStartedIds(started);
-        // 지정한 연구를 먼저 골라 두고(협업 중인 연구는 빼고), 협업 중인 전문가는 끝난 다음 날부터 시작하도록 채워 둬요.
+        setSent(sentList);
+        // 지정한 연구를 먼저 골라 두고(보낼 수 없는 연구는 빼고), 협업 중인 전문가는 끝난 다음 날부터 시작하도록 채워 둬요.
         setResearchId((open.find((item) => item.is_primary) ?? open[0])?.research_id ?? null);
-        if (expertProfile.engaged_until) setStart(dayAfter(expertProfile.engaged_until));
+        if (expertProfile.engaged_until) {
+          const next = dayAfter(expertProfile.engaged_until);
+          const first = earliestStart(false);
+          setStart(next > first ? next : first);
+        }
       })
       .catch((caught) => setLoadError(caught instanceof ApiError ? caught.message : "잠시 후 다시 시도해 주세요"));
   }, [expert.user_id, role]);
@@ -73,7 +78,10 @@ export function CollabRequestDialog({ expert, role, names, onClose }: Props) {
   if (step === "done") {
     return (
       <Modal title={`${expert.nickname} 님에게 요청을 보냈어요`} onClose={onClose} footer={<FooterButtons onClose={onClose} label="확인" primary />}>
-        <p className="text-sm text-muted">7일 안에 답이 없으면 요청은 만료돼요.</p>
+        <p className="text-sm text-muted">
+          <b className="text-ink">{deadline}</b>까지 답이 없으면 요청은 만료돼요.
+          {urgent && " 급한 요청이라 수락하는 순간 바로 협업이 시작돼요."}
+        </p>
         <p className="mt-1 text-sm text-muted">
           보낸 요청은{" "}
           <Link href="/requests" className="font-semibold text-brand">
@@ -102,8 +110,19 @@ export function CollabRequestDialog({ expert, role, names, onClose }: Props) {
   }
 
   const research = researches.find((item) => item.research_id === researchId) ?? null;
-  const periodOk = Boolean(start && end && end >= start);
+  const minStart = earliestStart(urgent);
+  const periodOk = Boolean(start && end && start >= minStart && end >= start);
+  const urgentTaken = research ? sent.some((item) => item.research_id === research.research_id && item.is_urgent && (item.status === "pending" || item.status === "accepted")) : false;
   const ready = Boolean(research) && periodOk && message.trim() !== "";
+
+  /** [급해요]를 켜고 끄면 고를 수 있는 시작일이 바뀌어요. 범위를 벗어난 날짜는 지워요. */
+  function toggleUrgent(next: boolean) {
+    setUrgent(next);
+    if (start && start < earliestStart(next)) {
+      setStart("");
+      setEnd("");
+    }
+  }
 
   async function send() {
     if (!research) return;
@@ -112,8 +131,11 @@ export function CollabRequestDialog({ expert, role, names, onClose }: Props) {
     try {
       await requestApi("/researcher/requests", {
         method: "POST",
-        body: JSON.stringify({ expert_id: expert.user_id, research_id: research.research_id, start_date: start, end_date: end, message: message.trim() }),
+        body: JSON.stringify({ expert_id: expert.user_id, research_id: research.research_id, start_date: start, end_date: end, message: message.trim(), is_urgent: urgent }),
       });
+      const latest = await requestApi<SentRequest[]>("/researcher/requests");
+      const mine = latest.find((item) => item.research_id === research.research_id && item.expert.user_id === expert.user_id && item.status === "pending");
+      setDeadline(mine ? deadlineText(mine.expires_at) : "기한 안");
       setSentToOther(!research.is_primary);
       setStep("done");
     } catch (caught) {
@@ -153,15 +175,15 @@ export function CollabRequestDialog({ expert, role, names, onClose }: Props) {
           <ul className="mt-2 space-y-2">
             {researches.map((item) => {
               const on = item.research_id === researchId;
-              const started = startedIds.has(item.research_id);
+              const blocked = researchBlock(item.research_id, sent, expert.user_id);
               return (
                 <li key={item.research_id}>
-                  <label className={`flex gap-3 rounded-card border p-3 ${started ? "cursor-not-allowed border-line bg-page opacity-60" : on ? "cursor-pointer border-brand bg-brand-soft" : "cursor-pointer border-line"}`}>
-                    <input type="radio" name="request-research" checked={on} disabled={started} onChange={() => setResearchId(item.research_id)} className="mt-1 accent-brand" />
+                  <label className={`flex gap-3 rounded-card border p-3 ${blocked ? "cursor-not-allowed border-line bg-page opacity-60" : on ? "cursor-pointer border-brand bg-brand-soft" : "cursor-pointer border-line"}`}>
+                    <input type="radio" name="request-research" checked={on} disabled={Boolean(blocked)} onChange={() => setResearchId(item.research_id)} className="mt-1 accent-brand" />
                     <span className="min-w-0">
                       <span className="block text-sm font-semibold">
                         {item.title}
-                        {started && <span className="ml-2 text-xs font-normal text-muted">협업 진행 중이라 새 요청을 보낼 수 없어요</span>}
+                        {blocked && <span className="mt-0.5 block text-xs font-normal text-muted">{blocked}</span>}
                       </span>
                       <span className="mt-1.5 flex flex-wrap gap-1.5">
                         {[...categoryNames(item.field_ids, names), ...item.able_work_ids.map((id) => names.works.get(id) ?? id)].map((tag) => (
@@ -182,16 +204,32 @@ export function CollabRequestDialog({ expert, role, names, onClose }: Props) {
         </Link>
 
         <FieldLabel text="희망 기간" />
+        <label className={`mt-2 flex items-start gap-3 rounded-button border p-3 ${urgentTaken ? "cursor-not-allowed border-line bg-page opacity-60" : urgent ? "cursor-pointer border-danger/40 bg-danger-soft" : "cursor-pointer border-line"}`}>
+          <input type="checkbox" checked={urgent} disabled={urgentTaken} onChange={(event) => toggleUrgent(event.target.checked)} className="mt-0.5 h-4 w-4 accent-danger" />
+          <span>
+            <span className="block text-sm font-semibold">🔥 빨리 시작해야 해요 (급해요)</span>
+            <span className="mt-0.5 block text-xs leading-5 text-muted">
+              {urgentTaken
+                ? "이 연구로 보낸 급한 요청이 이미 있어요. 급한 요청은 한 명에게만 보낼 수 있어요."
+                : "내일부터 시작할 수 있어요. 전문가는 시작일 전날 밤까지 답해야 하고, 수락하면 바로 협업이 시작돼요. 일정 조정은 할 수 없어요."}
+            </span>
+          </span>
+        </label>
         <div className="mt-2 flex flex-wrap items-center gap-2">
           <div className="min-w-[140px] flex-1">
-            <input type="date" aria-label="희망 시작일" value={start} min={today()} onChange={(event) => setStart(event.target.value)} className={INPUT_CLASS} />
+            <input type="date" aria-label="희망 시작일" value={start} min={minStart} onChange={(event) => setStart(event.target.value)} className={INPUT_CLASS} />
           </div>
           <span className="text-muted">~</span>
           <div className="min-w-[140px] flex-1">
-            <input type="date" aria-label="희망 종료일" value={end} min={start || today()} onChange={(event) => setEnd(event.target.value)} className={INPUT_CLASS} />
+            <input type="date" aria-label="희망 종료일" value={end} min={start || minStart} onChange={(event) => setEnd(event.target.value)} className={INPUT_CLASS} />
           </div>
-          {periodOk && <span className="text-xs text-muted">{formatPeriod(start, end).split(" · ")[1]}</span>}
+          {start && end && end >= start && <span className="text-xs text-muted">{formatPeriod(start, end).split(" · ")[1]}</span>}
         </div>
+        <p className="mt-1 text-xs text-faint">
+          시작일은 {urgent ? "내일" : `오늘부터 ${RULES.normalLeadDays}일 뒤`}({monthDay(minStart)})부터 고를 수 있어요.
+          {!urgent && " 전문가가 수락하면서 시작일을 앞뒤 7일 안에서 조정할 수 있어요."}
+        </p>
+        {start && start < minStart && <p className="mt-1 text-xs text-danger">시작일은 {monthDay(minStart)}부터 고를 수 있어요.</p>}
         {start && end && end < start && <p className="mt-1 text-xs text-danger">종료일은 시작일보다 빠를 수 없어요.</p>}
         {profile.engaged && (
           <p className="mt-2 rounded-button bg-page px-3 py-2 text-xs text-muted">
@@ -241,6 +279,7 @@ export function CollabRequestDialog({ expert, role, names, onClose }: Props) {
       <Summary title="내가 입력한 것">
         <Row label="연구" value={research?.title ?? ""} />
         <Row label="희망 기간" value={formatPeriod(start, end)} />
+        {urgent && <Row label="급한 요청" value="전문가가 수락하면 바로 협업이 시작돼요" />}
         <Row label="메시지" value={message.trim()} />
       </Summary>
       {research && (
@@ -322,4 +361,18 @@ function FooterButtons({ onClose, label = "닫기", primary = false }: { onClose
       </button>
     </div>
   );
+}
+
+/**
+ * 이 연구로 이 전문가에게 요청을 보낼 수 없는 이유. 보낼 수 있으면 null.
+ * (진행 중 협업 3개, 답 기다리는 요청 3개, 같은 전문가에게 두 번까지)
+ */
+function researchBlock(researchId: number, sent: SentRequest[], expertId: number): string | null {
+  const mine = sent.filter((item) => item.research_id === researchId);
+  const today = todayDate();
+  const active = mine.filter((item) => item.status === "started" && effectivePeriod(item).end >= today).length;
+  if (active >= RULES.maxActive) return "진행 중인 협업이 3개라 새 요청을 보낼 수 없어요";
+  const open = mine.filter((item) => item.status === "pending" || item.status === "accepted").length;
+  if (open >= RULES.maxOpen) return "답 기다리는 요청이 3개라 새 요청을 보낼 수 없어요";
+  return secondTryBlock(mine.filter((item) => item.expert.user_id === expertId));
 }

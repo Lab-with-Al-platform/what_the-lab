@@ -64,9 +64,9 @@ def expand_query(query: str) -> tuple[list[str], list[str]]:
 
 # 참여 중 = 협업을 시작했고(started) 희망 종료일이 아직 안 지났거나 정하지 않은 요청이 있음
 ENGAGED_SQL = """
-    SELECT expert_id, MAX(end_date) AS engaged_until
+    SELECT expert_id, MAX(COALESCE(accepted_end_date, end_date)) AS engaged_until
     FROM collaboration_request
-    WHERE status = 'started' AND (end_date IS NULL OR end_date >= CURRENT_DATE)
+    WHERE status = 'started' AND COALESCE(accepted_end_date, end_date) >= CURRENT_DATE
     GROUP BY expert_id
 """
 
@@ -178,14 +178,16 @@ def load_collaborations(user_id: int) -> list[dict]:
     with get_connection() as conn, conn.cursor() as cursor:
         cursor.execute(
             """
-            SELECT cr.research_id, cr.start_date, cr.end_date, r.title,
+            SELECT cr.research_id,
+                   COALESCE(cr.accepted_start_date, cr.start_date) AS start_date,
+                   COALESCE(cr.accepted_end_date, cr.end_date) AS end_date, r.title,
                    u.nickname AS partner_nickname,
-                   (cr.end_date >= CURRENT_DATE) AS ongoing
+                   (COALESCE(cr.accepted_end_date, cr.end_date) >= CURRENT_DATE) AS ongoing
             FROM collaboration_request cr
             JOIN research r ON r.research_id = cr.research_id
             JOIN users u ON u.user_id = r.user_id
             WHERE cr.expert_id = %s AND cr.status = 'started'
-            ORDER BY cr.start_date DESC, cr.request_id DESC
+            ORDER BY 2 DESC, cr.request_id DESC
             """,
             (user_id,),
         )

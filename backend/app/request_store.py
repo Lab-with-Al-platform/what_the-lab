@@ -3,17 +3,22 @@
 요청에는 연구 번호(research_id)만 저장되어 있고, 연구 내용은 research 표에서 함께 읽어 옵니다.
 """
 
+import asyncio
+import logging
+
 from fastapi import HTTPException
 
-from app.db import get_connection
-from app.research_store import CHILD_TABLES, load_child
+from app.db import get_connection, transaction
 from app.notification_store import notify_requests
+from app.research_store import CHILD_TABLES, load_child
 
 # 두 화면이 함께 쓰는 요청 칸
 REQUEST_COLUMNS = """
     cr.request_id, cr.research_id, cr.status, cr.start_date, cr.end_date, cr.message,
     cr.reply_message, cr.reject_reason, cr.reject_text,
-    cr.expires_at, cr.responded_at, cr.started_at, cr.created_at
+    cr.expires_at, cr.responded_at, cr.started_at, cr.created_at,
+    cr.is_urgent, cr.accepted_start_date, cr.accepted_end_date, cr.select_expires_at,
+    cr.cancel_reason, cr.cancel_text
 """
 # 받은 요청 화면에 보여 줄 연구 칸 (research 표)
 RESEARCH_COLUMNS = (
@@ -26,23 +31,48 @@ RESEARCH_COLUMNS = (
     "share_policy",
     "share_condition",
 )
+EXPIRE_EVERY_SECONDS = 60
+log = logging.getLogger(__name__)
 RESEARCHER_COLUMNS = ("nickname", "user_photo", "institution_name", "department", "is_verified")
 
 
 def expire_old_requests(cursor) -> None:
-    """7일 동안 답이 없던 요청을 만료로 바꾸고, 양쪽에 만료 알림을 남깁니다.
+    """기한이 지난 요청을 만료로 바꾸고, 양쪽에 만료 알림을 남깁니다.
 
-    목록을 읽거나 상태를 바꾸기 전에 부릅니다.
+    - 답 기다리는 요청: 전문가 답 기한(expires_at)이 지남
+    - 수락된 요청: 연구자 선택 기한(select_expires_at)이 지남
+    목록을 읽거나 상태를 바꾸기 전에 부르고, 서버가 1분마다 한 번씩도 불러요(expire_forever).
     """
     cursor.execute(
         "UPDATE collaboration_request SET status = 'expired'"
-        " WHERE status = 'pending' AND expires_at <= now() RETURNING request_id"
+        " WHERE (status = 'pending' AND expires_at <= now())"
+        " OR (status = 'accepted' AND select_expires_at <= now()) RETURNING request_id"
     )
     notify_requests(cursor, "request_expired", [row["request_id"] for row in cursor.fetchall()])
 
 
+def expire_now() -> None:
+    """만료 처리만 한 번 (백그라운드에서 불러요)."""
+    with transaction() as cursor:
+        expire_old_requests(cursor)
+
+
+async def expire_forever() -> None:
+    """서버가 켜져 있는 동안 1분마다 만료 처리. 아무도 화면을 열지 않아도 기한이 지나면 만료·알림이 가요."""
+    while True:
+        try:
+            await asyncio.to_thread(expire_now)
+        except Exception:  # 한 번 실패해도 다음 차례에 다시 돌아요
+            log.exception("협업 요청 만료 처리 실패")
+        await asyncio.sleep(EXPIRE_EVERY_SECONDS)
+
+
 def load_sent_requests(user_id: int) -> list[dict]:
-    """연구회원이 보낸 요청 (최근 순). 취소한 요청은 화면에서 사라지므로 빼고 돌려줍니다."""
+    """연구회원이 보낸 요청 (최근 순). 내가 취소·거절한 요청도 함께 돌려줘요.
+
+    화면에서는 내가 닫은 요청(cancel_reason이 withdrawn·declined)은 숨기고,
+    '한 번 더 보낼 수 있는지' 계산에만 써요.
+    """
     with get_connection() as conn, conn.cursor() as cursor:
         expire_old_requests(cursor)
         cursor.execute(
@@ -51,7 +81,7 @@ def load_sent_requests(user_id: int) -> list[dict]:
             FROM collaboration_request cr
             JOIN research r ON r.research_id = cr.research_id
             JOIN users u ON u.user_id = cr.expert_id
-            WHERE r.user_id = %s AND cr.status <> 'canceled'
+            WHERE r.user_id = %s
             ORDER BY cr.created_at DESC, cr.request_id DESC
             """,
             (user_id,),
@@ -76,13 +106,19 @@ def load_received_requests(user_id: int) -> list[dict]:
             SELECT {REQUEST_COLUMNS},
                    u.nickname, u.user_photo, p.institution_name, p.department, p.is_verified,
                    r.title, r.description, r.task_unsure, r.meeting_type, r.face_to_area,
-                   r.data_status, r.share_policy, r.share_condition
+                   r.data_status, r.share_policy, r.share_condition,
+                   (SELECT count(*) FROM collaboration_request o
+                    WHERE o.expert_id = cr.expert_id AND o.status = 'started'
+                      AND o.start_date IS NOT NULL
+                      AND COALESCE(o.accepted_start_date, o.start_date) <= cr.end_date
+                      AND COALESCE(o.accepted_end_date, o.end_date) >= cr.start_date
+                   ) AS overlap_count
             FROM collaboration_request cr
             JOIN research r ON r.research_id = cr.research_id
             JOIN users u ON u.user_id = r.user_id
             JOIN researcher_profile p ON p.user_id = r.user_id
             WHERE cr.expert_id = %s
-            ORDER BY cr.created_at DESC, cr.request_id DESC
+            ORDER BY (cr.status = 'pending' AND cr.is_urgent) DESC, cr.created_at DESC, cr.request_id DESC
             """,
             (user_id,),
         )
