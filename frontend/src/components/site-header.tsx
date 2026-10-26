@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { NotificationBell } from "@/components/notification-bell";
 import { PageContainer } from "@/components/page-container";
-import { requestApi } from "@/lib/api";
+import { apiAsset, requestApi } from "@/lib/api";
+import { ME_CHANGED_EVENT } from "@/lib/profile-settings";
 
 const NAV_ITEMS = [
   { href: "/", label: "홈" },
@@ -50,6 +52,7 @@ export function SiteHeader() {
   const [meLoading, setMeLoading] = useState(true);
   const [profileOpen, setProfileOpen] = useState(false);
   const [canManageInsights, setCanManageInsights] = useState(false);
+  const [meVersion, setMeVersion] = useState(0); // 프로필 설정에서 사진을 바꾸면 1씩 올라가요 → 내 정보를 다시 불러와요
   const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -87,7 +90,14 @@ export function SiteHeader() {
       .catch(() => { if (active) setMe(null); })
       .finally(() => { if (active) setMeLoading(false); });
     return () => { active = false; };
-  }, [pathname]);
+  }, [pathname, meVersion]);
+
+  // 프로필 설정에서 사진을 바꿨다는 신호를 받으면 내 정보를 다시 불러와요.
+  useEffect(() => {
+    const reload = () => setMeVersion((version) => version + 1);
+    window.addEventListener(ME_CHANGED_EVENT, reload);
+    return () => window.removeEventListener(ME_CHANGED_EVENT, reload);
+  }, []);
 
   // 드롭다운이 열려 있을 때, 프로필 영역 바깥을 누르면 닫기
   useEffect(() => {
@@ -151,6 +161,8 @@ export function SiteHeader() {
             <span className="sr-only">인사이트 검색 열기</span>
             <SearchIcon />
           </button>
+
+          {me && me.signup_step === "done" ? <NotificationBell pathname={pathname} /> : null}
 
           {meLoading ? null : !me ? (
             <Link
@@ -324,7 +336,7 @@ function MenuIcon() {
 }
 
 function profileImageOf(me: Me): string {
-  if (me.user_photo) return me.user_photo;
+  if (me.user_photo) return apiAsset(me.user_photo);
   return me.user_role === "expert"
     ? "/profile-images/default-expert.png"
     : "/profile-images/default-researcher.png";

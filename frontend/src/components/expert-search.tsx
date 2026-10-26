@@ -7,7 +7,7 @@ import { PageContainer } from "@/components/page-container";
 import { Avatar } from "@/components/request-parts";
 import { ApiError, requestApi } from "@/lib/api";
 import { photoOrDefault } from "@/lib/collab-requests";
-import { categoryNames, engagedLabel, headAndRest, type ExpertCardData, type ExpertSearchResult, type Names } from "@/lib/expert-search";
+import { buildNames, categoryNames, engagedLabel, headAndRest, type ExpertCardData, type ExpertSearchResult, type Names } from "@/lib/expert-search";
 import type { AbleWorkOption, FieldCategory } from "@/lib/my-career";
 import { DATA_STATUS_LABELS, type Research } from "@/lib/my-research";
 
@@ -53,22 +53,7 @@ export function ExpertSearch() {
       .catch(() => setRole(null)); // 로그인 안 함: 목록은 그대로 볼 수 있어요
   }, []);
 
-  const names = useMemo<Names>(() => {
-    const fieldNames = new Map<string, string>();
-    const categoryOf = new Map<string, string>();
-    for (const category of categories) {
-      for (const field of category.fields) {
-        fieldNames.set(field.field_id, field.name);
-        categoryOf.set(field.field_id, category.field_category_id);
-      }
-    }
-    return {
-      works: new Map(ableWorks.map((item) => [item.able_work_id, item.name])),
-      fields: fieldNames,
-      categoryOf,
-      categories: new Map(categories.map((item) => [item.field_category_id, item.name])),
-    };
-  }, [ableWorks, categories]);
+  const names = useMemo<Names>(() => buildNames(ableWorks, categories), [ableWorks, categories]);
 
   const search = useCallback(
     async (offset: number) => {
@@ -383,9 +368,9 @@ function ExpertCard({ expert, names, onRequest }: { expert: ExpertCardData; name
         {rest > 0 && <li className="rounded-full bg-page px-2.5 py-1 text-xs text-muted">+{rest}</li>}
       </ul>
       <div className="mt-auto grid grid-cols-2 gap-2 pt-4">
-        <button type="button" disabled title="전문가 상세 화면은 다음 단계에서 연결돼요" className="h-11 cursor-not-allowed rounded-button border border-line bg-page text-sm font-semibold text-faint">
+        <Link href={`/experts/${expert.user_id}`} className="inline-flex h-11 items-center justify-center rounded-button border border-line text-sm font-semibold hover:bg-page">
           프로필 보기
-        </button>
+        </Link>
         <button type="button" onClick={onRequest} className="h-11 rounded-button bg-brand text-sm font-semibold text-white hover:bg-brand-hover">
           협업 요청
         </button>

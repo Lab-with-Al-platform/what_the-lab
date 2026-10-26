@@ -1,29 +1,12 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { ExpertDetail } from "@/components/expert-detail";
-import { EXPERTS, getExpert, relatedExperts } from "@/lib/experts";
+import { ExpertProfileView } from "@/components/expert-profile-view";
 
-interface PageProps {
-  params: Promise<{ slug: string }>;
-}
+export const metadata: Metadata = { title: "AI 전문가" };
 
-export function generateStaticParams(): { slug: string }[] {
-  return EXPERTS.map((expert) => ({ slug: expert.slug }));
-}
+type PageProps = { params: Promise<{ slug: string }> };
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const expert = getExpert(slug);
-  return { title: expert ? `${expert.name} · AI 전문가` : "AI 전문가" };
-}
-
+// /experts/{전문가 번호}. 공개한 전문가의 프로필을 DB에서 불러와 보여 줘요.
 export default async function ExpertDetailPage({ params }: PageProps) {
   const { slug } = await params;
-  const expert = getExpert(slug);
-
-  if (!expert) {
-    notFound();
-  }
-
-  return <ExpertDetail expert={expert} related={relatedExperts(expert)} />;
+  return <ExpertProfileView expertId={slug} />;
 }

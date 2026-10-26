@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException, Query
 
 from app.db import get_connection
 from app.expert_profile_store import load_profile
-from app.expert_search_store import load_engagement, search_experts
+from app.expert_search_store import load_collaborations, load_engagement, search_experts
 
 router = APIRouter(prefix="/api/v1/experts", tags=["experts"])
 
@@ -35,12 +35,19 @@ def get_expert(user_id: int) -> dict:
     """공개 프로필 하나. 비공개·정지·없는 전문가는 똑같이 404."""
     with get_connection() as conn, conn.cursor() as cursor:
         cursor.execute(
-            "SELECT 1 FROM expert e JOIN users u ON u.user_id = e.user_id"
+            "SELECT e.affiliation FROM expert e JOIN users u ON u.user_id = e.user_id"
             " WHERE e.user_id = %s AND e.is_public = TRUE AND u.status = 'active'",
             (user_id,),
         )
-        if cursor.fetchone() is None:
+        expert = cursor.fetchone()
+        if expert is None:
             raise HTTPException(status_code=404, detail="공개된 전문가를 찾을 수 없어요")
     profile = load_profile(user_id)
     profile.pop("is_public", None)
-    return {"user_id": user_id, **profile, **load_engagement(user_id)}
+    return {
+        "user_id": user_id,
+        **profile,
+        "affiliation": expert["affiliation"],  # 소속 (선택 입력)
+        **load_engagement(user_id),
+        "collaborations": load_collaborations(user_id),  # 이 서비스에서 진행한 연구
+    }

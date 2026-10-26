@@ -7,6 +7,7 @@ from fastapi import HTTPException
 
 from app.db import get_connection
 from app.research_store import CHILD_TABLES, load_child
+from app.notification_store import notify_requests
 
 # 두 화면이 함께 쓰는 요청 칸
 REQUEST_COLUMNS = """
@@ -29,11 +30,15 @@ RESEARCHER_COLUMNS = ("nickname", "user_photo", "institution_name", "department"
 
 
 def expire_old_requests(cursor) -> None:
-    """7일 동안 답이 없던 요청을 만료로 바꿉니다. 목록을 읽거나 상태를 바꾸기 전에 부릅니다."""
+    """7일 동안 답이 없던 요청을 만료로 바꾸고, 양쪽에 만료 알림을 남깁니다.
+
+    목록을 읽거나 상태를 바꾸기 전에 부릅니다.
+    """
     cursor.execute(
         "UPDATE collaboration_request SET status = 'expired'"
-        " WHERE status = 'pending' AND expires_at <= now()"
+        " WHERE status = 'pending' AND expires_at <= now() RETURNING request_id"
     )
+    notify_requests(cursor, "request_expired", [row["request_id"] for row in cursor.fetchall()])
 
 
 def load_sent_requests(user_id: int) -> list[dict]:

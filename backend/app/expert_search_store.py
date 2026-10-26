@@ -168,3 +168,50 @@ def load_engagement(user_id: int) -> dict:
         )
         row = cursor.fetchone()
     return {"engaged": row is not None, "engaged_until": row["engaged_until"] if row else None}
+
+def load_collaborations(user_id: int) -> list[dict]:
+    """이 서비스에서 진행한 연구 (협업을 시작한 요청). 최근에 시작한 것부터.
+
+    title: 연구 제목 / partner_nickname: 함께한 연구회원 닉네임
+    ongoing: 희망 종료일이 아직 안 지났으면 True (진행 중)
+    """
+    with get_connection() as conn, conn.cursor() as cursor:
+        cursor.execute(
+            """
+            SELECT cr.research_id, cr.start_date, cr.end_date, r.title,
+                   u.nickname AS partner_nickname,
+                   (cr.end_date >= CURRENT_DATE) AS ongoing
+            FROM collaboration_request cr
+            JOIN research r ON r.research_id = cr.research_id
+            JOIN users u ON u.user_id = r.user_id
+            WHERE cr.expert_id = %s AND cr.status = 'started'
+            ORDER BY cr.start_date DESC, cr.request_id DESC
+            """,
+            (user_id,),
+        )
+        rows = cursor.fetchall()
+        ids = [row["research_id"] for row in rows]
+        categories: dict[int, list[str]] = {}
+        works: dict[int, list[str]] = {}
+        if ids:
+            cursor.execute(
+                "SELECT DISTINCT d.research_id, f.field_category_id FROM research_domain d"
+                " JOIN research_field f ON f.field_id = d.field_id WHERE d.research_id = ANY(%s)"
+                " ORDER BY f.field_category_id",
+                (ids,),
+            )
+            for row in cursor.fetchall():
+                categories.setdefault(row["research_id"], []).append(row["field_category_id"])
+            cursor.execute(
+                "SELECT research_id, able_work_id FROM research_able_work"
+                " WHERE research_id = ANY(%s) ORDER BY research_able_work_id",
+                (ids,),
+            )
+            for row in cursor.fetchall():
+                works.setdefault(row["research_id"], []).append(row["able_work_id"])
+
+    for row in rows:
+        research_id = row.pop("research_id")
+        row["category_ids"] = categories.get(research_id, [])
+        row["able_work_ids"] = works.get(research_id, [])
+    return rows

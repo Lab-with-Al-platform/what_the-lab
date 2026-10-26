@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from app import user_store
-from app.db import get_connection , transaction
+from app.db import get_connection, transaction
 from app.security import get_current_user_id
 
 router = APIRouter(prefix="/api/v1/expert", tags=["expert"])
@@ -61,6 +61,41 @@ def signup_expert(body: ExpertSignupRequest, user_id: int = Depends(get_current_
             (user_id,),
         )
     return {"next": "/signup/expert/done"}
+
+class ExpertBasicRequest(BaseModel):
+    current_job: str  # 지금 하는 일 코드
+    ai_career: str  # AI 관련 경력 코드
+    affiliation: str | None = None  # 소속 (선택)
+
+
+@router.get("/basic")
+def get_basic(user_id: int = Depends(get_current_user_id)) -> dict:
+    """프로필 설정 > 가입 정보. 가입 때 고른 지금 하는 일·AI 경력·소속."""
+    with get_connection() as conn, conn.cursor() as cursor:
+        cursor.execute(
+            "SELECT current_job, ai_career, affiliation FROM expert WHERE user_id = %s", (user_id,)
+        )
+        basic = cursor.fetchone()
+    if basic is None:
+        raise HTTPException(status_code=404, detail="AI 전문가 회원만 쓸 수 있어요")
+    return basic
+
+
+@router.put("/basic")
+def update_basic(body: ExpertBasicRequest, user_id: int = Depends(get_current_user_id)) -> dict:
+    """가입 정보 고치기. 가입 때와 같은 규칙으로 확인해요."""
+    check_code(body.current_job, JOB_CODES, "지금 하는 일")
+    check_code(body.ai_career, CAREER_CODES, "AI 관련 경력")
+    affiliation = clean_affiliation(body.affiliation)
+    with get_connection() as conn, conn.cursor() as cursor:
+        cursor.execute(
+            "UPDATE expert SET current_job = %s, ai_career = %s, affiliation = %s WHERE user_id = %s",
+            (body.current_job, body.ai_career, affiliation, user_id),
+        )
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="AI 전문가 회원만 쓸 수 있어요")
+    return get_basic(user_id)
+
 
 
 def reject_if_not_new(user_id: int) -> None:
