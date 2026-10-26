@@ -161,18 +161,37 @@ def submit_candidate(
     return candidate
 
 
+TAXONOMY_DIR = Path(__file__).resolve().parents[3] / "taxonomy/v4.0"
+APPROVED_STATUSES = {"active", "verified"}
+
+
+def approved_capabilities() -> list[dict[str, str]]:
+    """분류체계에서 운영 승인된 CAP만 읽습니다. 선택 목록과 승인 검사가 같은 기준을 씁니다."""
+    capabilities = json.loads((TAXONOMY_DIR / "capabilities.json").read_text(encoding="utf-8"))
+    categories = json.loads((TAXONOMY_DIR / "categories.json").read_text(encoding="utf-8"))
+    category_labels = {item["id"]: item["label_ko"] for item in categories}
+    return [
+        {
+            "id": item["id"],
+            "label": item["label_ko"],
+            "category_id": item["category_id"],
+            "category_label": category_labels.get(item["category_id"], ""),
+        }
+        for item in sorted(capabilities, key=lambda item: item["sort_order"])
+        if item.get("status") in APPROVED_STATUSES
+    ]
+
+
 def approved_keyword_labels(keyword_ids: list[str]) -> list[dict[str, str]]:
     if not keyword_ids:
         return []
-    registry_path = Path(__file__).resolve().parents[3] / "taxonomy/v4.0/capabilities.json"
-    registry = json.loads(registry_path.read_text(encoding="utf-8"))
-    by_id = {item["id"]: item for item in registry}
+    by_id = {item["id"]: item for item in approved_capabilities()}
     result = []
     for keyword_id in keyword_ids:
         item = by_id.get(keyword_id)
-        if item is None or item.get("status") not in {"active", "verified"}:
+        if item is None:
             raise HTTPException(422, "운영 승인된 기술 ID만 검색에 연결할 수 있습니다.")
-        result.append({"id": keyword_id, "label": item["label_ko"]})
+        result.append({"id": keyword_id, "label": item["label"]})
     return result
 
 

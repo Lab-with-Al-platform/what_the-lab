@@ -6,6 +6,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
+from app.analytics.store import record_registration_completed
 from app.db import transaction
 from app.form_rules import bad_request, optional_text, required_text, unique_list
 from app.research_store import CHILD_TABLES, load_researches, require_researcher
@@ -47,6 +48,8 @@ class ResearchRequest(BaseModel):
     rewards: list[str] = []  # 선택
     meeting_type: str | None = None  # 선택
     face_to_area: str | None = None
+    # 등록 창의 작성 시도 번호. 연구 표에는 넣지 않고, 수집이 켜진 경우의 완료 기록에만 씁니다.
+    writing_attempt_id: str | None = None
 
 
 @router.get("")
@@ -82,8 +85,12 @@ def add_research(body: ResearchRequest, user_id: int = Depends(get_current_user_
             " RETURNING research_id",  # 방금 만든 연구 번호를 바로 돌려받습니다.
             (user_id, *values.values()),
         )
-        insert_children(cursor, cursor.fetchone()["research_id"], children)
+        new_id = cursor.fetchone()["research_id"]
+        insert_children(cursor, new_id, children)
         fix_primary(cursor, user_id)
+    # 수집 기록은 저장이 끝난 뒤에 남깁니다. 표가 없어도 연구 등록은 유지됩니다.
+    if values["status"] == "registered":
+        record_registration_completed(body.writing_attempt_id, new_id, "create")
     return load_researches(user_id)
 
 
@@ -97,7 +104,8 @@ def update_research(
 
     with transaction() as cursor:
         current = find_research(cursor, user_id, research_id)
-        if current["status"] == "registered" and values["status"] == "draft":
+        previous_status = current["status"]
+        if previous_status == "registered" and values["status"] == "draft":
             raise bad_request("등록한 연구는 임시 저장으로 되돌릴 수 없어요")
         check_codes_exist(cursor, children)
         assignments = ", ".join(f"{column} = %s" for column in values)
@@ -109,6 +117,9 @@ def update_research(
             cursor.execute(f"DELETE FROM {table} WHERE research_id = %s", (research_id,))
         insert_children(cursor, research_id, children)
         fix_primary(cursor, user_id)
+    # 임시 저장에서 처음 등록으로 바뀐 경우만 완료로 셉니다. 이미 등록된 연구의 수정은 제외합니다.
+    if previous_status != "registered" and values["status"] == "registered":
+        record_registration_completed(body.writing_attempt_id, research_id, "resume")
     return load_researches(user_id)
 
 

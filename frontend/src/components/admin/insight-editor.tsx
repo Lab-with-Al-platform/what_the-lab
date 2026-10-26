@@ -2,6 +2,7 @@
 
 import { cloneElement, useId, type ReactElement } from "react";
 import { ADMIN_FIELD } from "./admin-ui";
+import { InsightKeywordPicker } from "./insight-keyword-picker";
 import {
   CLAIM_LABELS, TREND_CLAIM_LABELS, SCORE_LABELS, safeSourceUrl, type Claim, type Draft, type Score,
 } from "@/lib/admin-insights";
@@ -99,8 +100,8 @@ export function InsightEvidenceEditor({ draft, existing, onChange }: { draft: Dr
     </section>}
     <section className="space-y-4 border-t border-line pt-6">
       <h3 className="text-lg font-semibold">키워드와 이미지</h3>
-      <Field label="기술 키워드 ID · 한 줄에 하나, 최대 5개"><textarea className={ADMIN_INPUT} rows={3} value={draft.keyword_ids.join("\n")} onChange={(e) => onChange({ ...draft, keyword_ids: e.target.value.split("\n") })} /></Field>
-      <p className="text-xs leading-5 text-muted">키워드를 비워 두면 일반 전문가 탐색으로 연결합니다. 입력한 CAP ID가 운영 승인 상태인지 서버가 다시 확인하며 임의로 승인하지 않습니다.</p>
+      <InsightKeywordPicker value={draft.keyword_ids} onChange={(keyword_ids) => onChange({ ...draft, keyword_ids })} />
+      <p className="text-xs leading-5 text-muted">키워드를 비워 두면 일반 전문가 탐색으로 연결합니다. 고른 CAP ID가 운영 승인 상태인지 승인할 때 서버가 다시 확인합니다.</p>
       <Field label="이미지 정책"><select className={ADMIN_INPUT} value={draft.image_policy} onChange={(e) => onChange({ ...draft, image_policy: e.target.value as Draft["image_policy"] })}>
         <option value="no_image">이미지 사용 안 함</option><option value="rights_checked">이미지 권리 확인 완료</option>
       </select></Field>

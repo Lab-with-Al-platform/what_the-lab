@@ -30,6 +30,7 @@
 - [첫 백엔드 실행·검증 안내](ai-case-automation/FOUNDATION_RUNBOOK.md): 구현 범위, 테스트 실행, 개발용 Supabase 연결 전 확인 사항
 - [Phase 0 확인 결과](ai-case-automation/PHASE_0_FINDINGS.md): 실제 코드·자료·분류체계와 미확인 항목
 - [편집·정기 게시 운영 기준서](ai-case-automation/INSIGHT_EDITORIAL_OPERATING_STANDARD.md): 근거와 연구자 유용성, 후보·편성·승인·보류
+- [클라우드 수집·PR 검토·AWS 반입 기준안](ai-case-automation/INSIGHT_CLOUD_PR_INGESTION_STANDARD.md): 수집 AI와 DB 권한 분리, 데이터 PR·미승인 반입·관리자 승인, 단계별 검증. AWS 구성·자동 실행은 별도 팀 검토
 - [통합 Codex 실행 지시서](ai-case-automation/WHAT_THE_LAB_AI_CASE_AND_TREND_AUTOMATION_CODEX_SPEC.md): 실제 저장소 확인부터 연구사례 자동화·AI 트렌드 확장까지
 - [분할 개발 명세와 근거 자료](ai-case-automation/README.md): 요구사항·데이터·수집·근거·키워드·API·관리자·테스트
 

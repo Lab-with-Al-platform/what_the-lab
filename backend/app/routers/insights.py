@@ -20,6 +20,8 @@ from app.insights.schemas import (
     RevisionInput,
     VersionInput,
 )
+from app.routers.insight_views import admin_router as view_admin_router
+from app.routers.insight_views import router as view_router
 from app.routers.insight_workspace import router as workspace_router
 
 router = APIRouter(prefix="/api/v1", tags=["insights"], dependencies=[Depends(require_enabled)])
@@ -33,6 +35,12 @@ Admin = Annotated[str, Depends(require_admin)]
 def admin_access(actor: Admin) -> dict[str, bool]:
     """메뉴 표시도 서버 권한을 재사용합니다. 화면의 역할 이름을 신뢰하지 않습니다."""
     return {"can_manage_insights": True}
+
+
+@admin_router.get("/keywords")
+def approved_keywords(actor: Admin) -> dict[str, list[dict[str, str]]]:
+    """편집 화면의 기술 ID 선택 목록. 승인 검사와 같은 분류체계 파일을 읽습니다."""
+    return {"items": service.approved_capabilities()}
 
 
 def candidate_summary(candidate: Candidate) -> dict:
@@ -328,4 +336,6 @@ def article(slug: str, session: DB) -> dict:
 
 
 admin_router.include_router(workspace_router)
+admin_router.include_router(view_admin_router)
+router.include_router(view_router)
 router.include_router(admin_router)

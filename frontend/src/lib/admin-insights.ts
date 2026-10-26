@@ -163,3 +163,53 @@ export function scheduleToIso(value: string): string | null {
   }
   return date.toISOString();
 }
+
+// 후보 묶음 가져오기: 서버의 POST /admin/insights/candidates/import 와 같은 형식입니다.
+export const IMPORT_PATH = "/admin/insights/candidates/import";
+export const MAX_IMPORT_ITEMS = 50;
+export const IMPORT_ACTION_LABELS = {
+  would_create: "새로 생성", created: "생성됨",
+  existing_preserved: "기존 후보 유지", duplicate_in_batch: "묶음 안 중복",
+} as const;
+export type ImportAction = keyof typeof IMPORT_ACTION_LABELS;
+export type ImportItem = { index: number; action: ImportAction; candidate_id: string | null; duplicate_of: number | null;
+  // 새로 만들 후보에서 남길 기술 ID(승인된 CAP)와 버릴 ID입니다.
+  keyword_ids?: string[]; dropped_keyword_ids?: string[] };
+export type ImportResult = { dry_run: boolean; created: number; would_create: number;
+  existing_preserved: number; duplicate_in_batch: number; items: ImportItem[] };
+
+/**
+ * 붙여넣은 JSON에서 후보 목록만 꺼냅니다. {"drafts": [...]} 와 [...] 둘 다 받습니다.
+ * 파일에 적힌 dry_run 값은 쓰지 않습니다. 저장 여부는 화면의 버튼으로만 정합니다.
+ * 항목 안의 세부 검사는 서버가 합니다.
+ */
+export function parseImportBatch(text: string): { drafts: Draft[] } | { error: string } {
+  let value: unknown;
+  try { value = JSON.parse(text); } catch { return { error: "JSON 형식이 아닙니다. 괄호와 쉼표를 확인해 주세요." }; }
+  const drafts = Array.isArray(value) ? value
+    : value && typeof value === "object" && Array.isArray((value as { drafts?: unknown }).drafts) ? (value as { drafts: unknown[] }).drafts
+      : null;
+  if (!drafts) return { error: "후보 목록(drafts 배열)을 찾지 못했습니다." };
+  if (drafts.length === 0) return { error: "가져올 후보가 없습니다." };
+  if (drafts.length > MAX_IMPORT_ITEMS) return { error: `한 번에 최대 ${MAX_IMPORT_ITEMS}건까지 가져올 수 있습니다.` };
+  if (drafts.some((item) => !item || typeof item !== "object" || Array.isArray(item))) {
+    return { error: "후보 항목은 모두 객체({ ... })여야 합니다." };
+  }
+  return { drafts: drafts as Draft[] };
+}
+
+// 기술 ID 선택: 서버가 분류체계 v4.0에서 운영 승인된 CAP만 내려줍니다.
+export const KEYWORDS_PATH = "/admin/insights/keywords";
+export const MAX_KEYWORDS = 5;
+export type ApprovedKeyword = { id: string; label: string; category_id: string; category_label: string };
+
+/** 선택 목록을 대분류(C01 데이터 준비·품질 등)별로 묶습니다. 서버가 준 순서를 유지합니다. */
+export function groupKeywords(items: ApprovedKeyword[]): { id: string; label: string; items: ApprovedKeyword[] }[] {
+  const groups: { id: string; label: string; items: ApprovedKeyword[] }[] = [];
+  for (const item of items) {
+    let group = groups.find((value) => value.id === item.category_id);
+    if (!group) { group = { id: item.category_id, label: item.category_label, items: [] }; groups.push(group); }
+    group.items.push(item);
+  }
+  return groups;
+}

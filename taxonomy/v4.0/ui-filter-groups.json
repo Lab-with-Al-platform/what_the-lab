@@ -4,7 +4,7 @@
     "label_ko": "데이터 준비·품질",
     "helper": "데이터 준비·품질과 관련된 작업을 선택하세요",
     "sort_order": 1,
-    "status": "pending_review",
+    "status": "active",
     "selection_semantics": "OR_ANY",
     "visible_in_filter": true,
     "show_default": true
@@ -14,7 +14,7 @@
     "label_ko": "통계·연구설계",
     "helper": "통계·연구설계과 관련된 작업을 선택하세요",
     "sort_order": 2,
-    "status": "pending_review",
+    "status": "active",
     "selection_semantics": "OR_ANY",
     "visible_in_filter": true,
     "show_default": true
@@ -24,7 +24,7 @@
     "label_ko": "예측·일반 머신러닝",
     "helper": "예측·일반 머신러닝과 관련된 작업을 선택하세요",
     "sort_order": 3,
-    "status": "pending_review",
+    "status": "active",
     "selection_semantics": "OR_ANY",
     "visible_in_filter": true,
     "show_default": true
@@ -34,7 +34,7 @@
     "label_ko": "이미지·영상 분석",
     "helper": "이미지·영상 분석과 관련된 작업을 선택하세요",
     "sort_order": 4,
-    "status": "pending_review",
+    "status": "active",
     "selection_semantics": "OR_ANY",
     "visible_in_filter": true,
     "show_default": true
@@ -44,7 +44,7 @@
     "label_ko": "텍스트·문서 분석",
     "helper": "텍스트·문서 분석과 관련된 작업을 선택하세요",
     "sort_order": 5,
-    "status": "pending_review",
+    "status": "active",
     "selection_semantics": "OR_ANY",
     "visible_in_filter": true,
     "show_default": true
@@ -54,7 +54,7 @@
     "label_ko": "음성·멀티모달",
     "helper": "음성·멀티모달과 관련된 작업을 선택하세요",
     "sort_order": 6,
-    "status": "pending_review",
+    "status": "active",
     "selection_semantics": "OR_ANY",
     "visible_in_filter": true,
     "show_default": true
@@ -64,7 +64,7 @@
     "label_ko": "시계열·공간·그래프",
     "helper": "시계열·공간·그래프과 관련된 작업을 선택하세요",
     "sort_order": 7,
-    "status": "pending_review",
+    "status": "active",
     "selection_semantics": "OR_ANY",
     "visible_in_filter": true,
     "show_default": true
@@ -74,7 +74,7 @@
     "label_ko": "생성형 AI·지식 활용",
     "helper": "생성형 AI·지식 활용과 관련된 작업을 선택하세요",
     "sort_order": 8,
-    "status": "pending_review",
+    "status": "active",
     "selection_semantics": "OR_ANY",
     "visible_in_filter": true,
     "show_default": false
@@ -84,7 +84,7 @@
     "label_ko": "최적화·제어·로봇",
     "helper": "최적화·제어·로봇과 관련된 작업을 선택하세요",
     "sort_order": 9,
-    "status": "pending_review",
+    "status": "active",
     "selection_semantics": "OR_ANY",
     "visible_in_filter": true,
     "show_default": false
@@ -94,7 +94,7 @@
     "label_ko": "과학 계산·특화 분석",
     "helper": "과학 계산·특화 분석과 관련된 작업을 선택하세요",
     "sort_order": 10,
-    "status": "pending_review",
+    "status": "active",
     "selection_semantics": "OR_ANY",
     "visible_in_filter": true,
     "show_default": false
@@ -104,7 +104,7 @@
     "label_ko": "모델 개발·검증·운영",
     "helper": "모델 개발·검증·운영과 관련된 작업을 선택하세요",
     "sort_order": 11,
-    "status": "pending_review",
+    "status": "active",
     "selection_semantics": "OR_ANY",
     "visible_in_filter": true,
     "show_default": false

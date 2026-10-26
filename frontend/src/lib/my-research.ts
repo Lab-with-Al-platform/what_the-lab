@@ -33,7 +33,9 @@ export type Research = {
 };
 
 /** 저장할 때 보내는 값 (번호·지정·날짜는 서버가 정해요) */
-export type ResearchInput = Omit<Research, "research_id" | "is_primary" | "created_at" | "updated_at">;
+export type ResearchInput = Omit<Research, "research_id" | "is_primary" | "created_at" | "updated_at"> & {
+  writing_attempt_id?: string; // 등록 창의 작성 시도. 연구 표에는 저장하지 않아요.
+};
 
 export const LIMITS = {
   title: 60,
@@ -83,18 +85,37 @@ export const MEETING_LABELS: Record<MeetingType, string> = {
   offline_ok: "대면도 가능",
 };
 
-/** 등록(임시 저장 아님)에 필요한 단계별 조건. 비어 있으면 그 단계에서 [다음]이 막혀요. */
-export function stepReady(step: number, input: ResearchInput): boolean {
-  if (step === 1) return input.title.trim() !== "" && input.field_ids.length > 0 && input.description.trim() !== "";
+/** 등록(임시 저장 아님)에 필요한 단계별 조건. 막힌 이유를 코드로 돌려주고, 없으면 통과예요. */
+export function stepBlocker(step: number, input: ResearchInput): string | null {
+  if (step === 1) {
+    if (input.title.trim() === "") return "title_required";
+    if (input.field_ids.length === 0) return "field_required";
+    if (input.description.trim() === "") return "description_required";
+    return null;
+  }
   if (step === 2) {
-    const conditionOk = input.share_policy !== "conditional" || (input.share_condition ?? "").trim() !== "";
-    return input.data_types.length > 0 && input.data_status !== null && input.share_policy !== null && conditionOk;
+    if (input.data_types.length === 0) return "data_type_required";
+    if (input.data_status === null) return "data_status_required";
+    if (input.share_policy === null) return "share_required";
+    if (input.share_policy === "conditional" && (input.share_condition ?? "").trim() === "") {
+      return "share_condition_required";
+    }
+    return null;
   }
   if (step === 3) {
-    const areaOk = input.meeting_type !== "offline_ok" || (input.face_to_area ?? "").trim() !== "";
-    return (input.able_work_ids.length > 0 || input.task_unsure) && input.outputs.length > 0 && areaOk;
+    if (!(input.able_work_ids.length > 0 || input.task_unsure)) return "work_required";
+    if (input.outputs.length === 0) return "output_required";
+    if (input.meeting_type === "offline_ok" && (input.face_to_area ?? "").trim() === "") {
+      return "area_required";
+    }
+    return null;
   }
-  return true;
+  return null;
+}
+
+/** 그 단계에서 [다음]으로 넘어갈 수 있는지. */
+export function stepReady(step: number, input: ResearchInput): boolean {
+  return stepBlocker(step, input) === null;
 }
 
 /** 빈 입력값 (새 연구 작성) */

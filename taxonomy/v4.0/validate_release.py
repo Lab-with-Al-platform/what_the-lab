@@ -16,6 +16,7 @@ for x in a:
  if x['relation'] in ('PREFERRED','EXACT') and x.get('auto_match')=='yes':
   k=(x['axis'],unicodedata.normalize('NFKC',x['term']).casefold().strip());index[k].add(x['term_id'])
 assert not [k for k,v in index.items() if len(v)>1]
-assert all(x.get('status')=='pending_review' for x in c+f),'Approval state changed; review signed approvals and adjust validator intentionally.'
+# 2026-10-23 팀 합의로 전체 운영 승인. 승인 기록(검토자·날짜)이 없는 active 항목은 허용하지 않습니다.
+assert all(x.get('status')=='active' and x.get('reviewer') and x.get('approved_at') for x in c+f),'Approval state changed; review signed approvals and adjust validator intentionally.'
 print(f'PASS: structural refs | CAP={len(c)} FIELD={len(f)} aliases={len(a)} UI groups={len(u)}')
 print('NOT VERIFIED: semantics, research standard crosswalk, real search quality, authorization, DB/API integration')

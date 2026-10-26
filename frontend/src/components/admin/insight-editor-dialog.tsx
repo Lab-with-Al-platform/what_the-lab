@@ -165,7 +165,7 @@ export function InsightEditorDialog({ item, onClose, onChanged }: {
     <div className="flex h-full min-h-0 flex-col">
       <header className="flex shrink-0 items-center justify-between gap-3 border-b border-line px-4 py-3 sm:px-6">
         <div className="min-w-0"><h2 id="insight-editor-title" className="truncate text-lg font-bold">{item ? "원고 편집·미리보기" : "후보 직접 등록"}</h2><p className="mt-1 text-xs text-muted">{detail ? `${STATUS_LABELS[detail.status]} · 판본 ${detail.current_revision}` : "비공개 초안"} · {busy || (dirty ? "저장하지 않은 수정 있음" : "저장된 내용")}</p></div>
-        <button ref={closeButton} className={BUTTON} disabled={!!busy} onClick={close}>닫기</button>
+        <div className="flex items-center gap-2">{detail?.publication_id ? <a className={BUTTON} href={`/admin/insights/statistics/${detail.publication_id}?from=published`} onClick={(event) => { if (dirty && !window.confirm("저장하지 않은 수정을 버리고 통계로 이동할까요?")) event.preventDefault(); }}>통계 보기</a> : null}<button ref={closeButton} className={BUTTON} disabled={!!busy} onClick={close}>닫기</button></div>
       </header>
       <div className="flex shrink-0 gap-2 border-b border-line p-2 lg:hidden">{[["editor", "편집"], ["preview", "미리보기"]].map(([key, label]) => <button key={key} className={`${BUTTON} flex-1 ${mobilePanel === key ? "bg-brand-soft text-brand" : ""}`} aria-pressed={mobilePanel === key} onClick={() => setMobilePanel(key)}>{label}</button>)}</div>
       <div className="grid min-h-0 flex-1 lg:grid-cols-2">
