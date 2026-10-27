@@ -1,0 +1,767 @@
+﻿path,bytes,sha256,kind,inspection
+.env.example,2479,d8d15f5df641ce7db33cd63d384bd4e3705c34750d419ba7650b1892c5b84c9a,text,53 lines fully decoded
+.gitattributes,92,e8dc2b533fa8935d47ab70fdba1aef96869c4959b479bbd7bb069f87503f177b,text,7 lines fully decoded
+.github/pull_request_template.md,1726,58f9207f437d268dd2e2e2cdfaafd92c18134b1e4654d761e237875ca7f4bf5b,text,50 lines fully decoded
+.gitignore,801,bde00218602c596effc2050507ca36c236c4d643dbfe8e006ae45fb2d110147e,text,66 lines fully decoded
+AGENTS.md,3838,63f0f241539cc78ac8548a2731ae46cf19d58f9a26badea8401f94f542194bc2,text,66 lines fully decoded
+README.md,4092,fee5e46325ec58dfb1a947df1a63a6d0d69b1d8a285a2d15c5f37a91a93f410d,text,86 lines fully decoded
+ai/README.md,718,41083ac82fe4fdcde9d8112bce855bf3b587d7d8fa849def94fc76be53427987,text,15 lines fully decoded
+backend/README.md,9503,7f2dd168cabb235118c150e42ba439d93bfa8aaafaddfbf0c9b1279663e84bb6,text,154 lines fully decoded
+backend/alembic.ini,160,e3ac808acd823d13c96d6a02ad5632fe70c0617166002a3b090ca2f0478d68cc,text,5 lines fully decoded
+backend/app/__init__.py,0,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,text,0 lines fully decoded; AST valid (0 functions)
+backend/app/config.py,1440,4de947e7634d4e809b0059abf87390aa224c257feebc14af19116f4053ce64ac,text,31 lines fully decoded; AST valid (0 functions)
+backend/app/database_config.py,1966,43536c7a2da88887ec66c48e2c73167daccf387145710d29424c93349ef1a93f,text,42 lines fully decoded; AST valid (1 functions)
+backend/app/db.py,1194,3d10670757ecdecc98f1a722a0c591135b694ed24c6f340507af1576699c4401,text,32 lines fully decoded; AST valid (2 functions)
+backend/app/discord_bot.py,2864,5acde76a5cb550792f9f82b72d7b6404e5f1794190992620ca81ebc69ee0f5f5,text,74 lines fully decoded; AST valid (4 functions)
+backend/app/expert_profile_store.py,5038,cf328e1339fd1136a9470cc3eff74de59661036f58a5112e5799058334aa227d,text,128 lines fully decoded; AST valid (6 functions)
+backend/app/expert_search_store.py,9645,a3d37a7949fffa07f7ba8d2e757aba7e68a301a38bb6a54ca1b6645ae8a8eb93,text,217 lines fully decoded; AST valid (7 functions)
+backend/app/form_rules.py,2431,f45cbd351f59ccb8bfc1195ec18c48e1e4a1cd95429846acf12e4c9369b8d4da,text,58 lines fully decoded; AST valid (7 functions)
+backend/app/insight_catalog_setup.py,6341,4f48e0d9aab2abc323a2380128c8e024134f4191da5cb90a00b71eba8f572c9f,text,142 lines fully decoded; AST valid (2 functions)
+backend/app/insight_discovery_setup.py,6156,34fa1026ac2b5920f93c97f63ba902e416c11f380d2ccc0e27fa1fba693ee73d,text,142 lines fully decoded; AST valid (2 functions)
+backend/app/insight_editorial_setup.py,7184,f9ce87c7cb41c3d97e8b5201d42db6b3fd800aa3ff75b64164e4fa28a1680e8e,text,156 lines fully decoded; AST valid (3 functions)
+backend/app/insight_source_setup.py,5527,04c812b5f03cee97937d1d6a8595d647a8fcccc3c3441682ed45e045bab5a055,text,130 lines fully decoded; AST valid (2 functions)
+backend/app/insight_workspace_setup.py,4320,bc2682ba6c6f72a9492c0667789aa48c14fa0ae81d4ac5ed4da78f130d93e23d,text,94 lines fully decoded; AST valid (1 functions)
+backend/app/insights/__init__.py,81,051ab51d6e9a7db53a43939b395e283be2ee786f2b0da4a65dd930314df5a01a,text,1 lines fully decoded; AST valid (0 functions)
+backend/app/insights/auth.py,1564,386ef74b0d5fca95dfb47bca0ab03ca73293794c37d723d2b5743743e4780734,text,41 lines fully decoded; AST valid (3 functions)
+backend/app/insights/catalog_import.py,4015,234ffe76a33054316468d3006095e4aeac4855ac4c029958f50fe6d5c561d64c,text,97 lines fully decoded; AST valid (2 functions)
+backend/app/insights/collection_oct22.py,20506,6d55e0651397ce240cd584c9aa4229822475495b7961975fcb6ea7155039ab39,text,247 lines fully decoded; AST valid (1 functions)
+backend/app/insights/collection_policy.py,1944,30df9d68cb268d487abaa63f652c6c18a934ead934b4e8f9e5b4224f3589f90f,text,48 lines fully decoded; AST valid (2 functions)
+backend/app/insights/collection_sources.py,3293,a5bcfc7df8ddc3af77a83ce81380a2a698ce3715d4e337ab2dbbf3472202801e,text,94 lines fully decoded; AST valid (4 functions)
+backend/app/insights/corrections.py,7650,41a9c769ef389a5a539a9ddee8254d87ec2c5580968ae88f2c261112ab7873c5,text,191 lines fully decoded; AST valid (3 functions)
+backend/app/insights/database.py,2189,6418be2cb6310ed5ddebfcb1dadbf62d46cdafb64cc58055e0030e00148ca1ea,text,58 lines fully decoded; AST valid (4 functions)
+backend/app/insights/editorial.py,6923,4c253bb0a56e810ae815ecbaf0d6dc8a173841a24b795c5e1ddd6f79c2a175a2,text,176 lines fully decoded; AST valid (6 functions)
+backend/app/insights/editorial_oct22.py,42082,ea8b05a51b370b51c138dbf8a01079dd323bd2b21af4b44bed9080a3b636164f,text,248 lines fully decoded; AST valid (2 functions)
+backend/app/insights/importing.py,5758,41fc157053425cabe2fa2cb6c4e78fd6110dc1659fb1a3b85b860a38454d1d25,text,128 lines fully decoded; AST valid (4 functions)
+backend/app/insights/models.py,4961,9f127e569f081f8e2f7f25f1bcd171dfb3aa6ec24567d4bc288708909a3024fe,text,126 lines fully decoded; AST valid (2 functions)
+backend/app/insights/schemas.py,6387,cf426bc1b64b9a3c511d5abcffd440afd2eea7c7c71fd54793c14a00a8cbee1a,text,187 lines fully decoded; AST valid (6 functions)
+backend/app/insights/service.py,14602,ae5a6d1a2e01eee4cd27b7adc240c449bb8c182645aeb2886b48c7e84d344d24,text,351 lines fully decoded; AST valid (12 functions)
+backend/app/insights/workspace_schemas.py,8360,86b88c0e4e2364bdc345e7ccf5ce0ed8628af8bef78ebae5c6a265a439e83ce8,text,215 lines fully decoded; AST valid (5 functions)
+backend/app/institution_store.py,2184,57ddf58447819e8c463ac273baf1ea57e4961804f80c053162353efcad1d0d6a,text,48 lines fully decoded; AST valid (5 functions)
+backend/app/main.py,2482,6c5311777de27135e77c6c12ad608b2bc228fd9a3abb890754c3e8ebfda5a87f,text,80 lines fully decoded; AST valid (3 functions)
+backend/app/notification_sender.py,6185,a70d802c904a32418a97ec5885ac772a5f69d3aa3216b773546160a7ef7007ce,text,142 lines fully decoded; AST valid (6 functions)
+backend/app/notification_store.py,9842,ddbb98f55ed8448399cf18c8f80ea52da1ba06ff938e6bd243db0f659fc04de1,text,220 lines fully decoded; AST valid (10 functions)
+backend/app/request_store.py,4792,f0958b386be7bff8d40d75906dca0303aaffdefe6749267d9a7b60bc83779a4c,text,120 lines fully decoded; AST valid (4 functions)
+backend/app/research_store.py,3041,10cc77b8b17313a1bff0cf74fd8385f983c6ac62c1a00a24e00eb7af6e3b6259,text,70 lines fully decoded; AST valid (3 functions)
+backend/app/routers/__init__.py,0,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,text,0 lines fully decoded; AST valid (0 functions)
+backend/app/routers/auth.py,6559,cf43cbe917055a2443e87a48538e583e4e30235fba5c9ded849dc0974567b7e5,text,168 lines fully decoded; AST valid (9 functions)
+backend/app/routers/collab_requests.py,12829,d54f53d6c93214e97c79b081b9d5ddf36121cc9d5818175ff353c23891d732b5,text,290 lines fully decoded; AST valid (16 functions)
+backend/app/routers/expert.py,6294,8ec58ea9af30d6885dc30ace59750d440e45c7f3038cdb3cbc28970808674a5f,text,139 lines fully decoded; AST valid (9 functions)
+backend/app/routers/expert_history.py,6582,35d720e38ca421566997c05bcf0e113145ab65bf04efb8ccfd1316846300637a,text,174 lines fully decoded; AST valid (16 functions)
+backend/app/routers/expert_portfolio.py,8744,f4f9a039c2023abf79a101a8dbd3a3199eaa0ff18af84e19f5c069099a253b9d,text,192 lines fully decoded; AST valid (11 functions)
+backend/app/routers/expert_profile.py,6146,9e1777d91a47bf2e017b34dadad04011a82f932386db209a415b92e2f5c46ab2,text,137 lines fully decoded; AST valid (5 functions)
+backend/app/routers/experts.py,2212,7692ff972c56587c55cecc3ec61078241ca1b10fa3a85bd1af8865c2487cc3ca,text,53 lines fully decoded; AST valid (3 functions)
+backend/app/routers/insight_workspace.py,10188,a0338ffaaa0e339934f1aabc4385d59fc229f541a7225561d5e6fea3782afe34,text,256 lines fully decoded; AST valid (8 functions)
+backend/app/routers/insights.py,11756,27217077d04c86af676cc67d240fc32acb7ea7415a2e6c93590b85a953f1c05f,text,331 lines fully decoded; AST valid (15 functions)
+backend/app/routers/notifications.py,4333,22aca20010ed192e901082adcad77a1b464788bda3fa641c31171b23bdc1f84e,text,110 lines fully decoded; AST valid (8 functions)
+backend/app/routers/profile_photo.py,4134,21c0ff587c9edb1d116312373926a111d1d3f91acdcdf6d91cedd63340940111,text,92 lines fully decoded; AST valid (7 functions)
+backend/app/routers/researcher.py,4177,58bbf2c72670ced4674ee12b04a79488306d55ff93df64ed00fd40957103bffd,text,95 lines fully decoded; AST valid (6 functions)
+backend/app/routers/researcher_research.py,12410,a127c018eec18bd70abd314002a114622feea9fdc49c9d9d791f628ad833259b,text,292 lines fully decoded; AST valid (12 functions)
+backend/app/routers/taxonomy.py,1491,383a18a2c4317eb2e5c47cc6aef245aa0f291a94a54d3942295594faa187c1c4,text,37 lines fully decoded; AST valid (1 functions)
+backend/app/routers/verification.py,11826,be7dce15c819dcabf73df89527422e125eb56eb1553eb5c8c9f7fb7185e82090,text,233 lines fully decoded; AST valid (12 functions)
+backend/app/security.py,2310,09cc95720a6684e1401879ee44672a9f7c7a497552106a52c2e87ce88960386f,text,58 lines fully decoded; AST valid (5 functions)
+backend/app/supabase_setup.py,7958,27edcd62510ed3fd9880240cb7534a47d3128fa93101e5ca0edbf4c21823af74,text,161 lines fully decoded; AST valid (7 functions)
+backend/app/upload_store.py,1442,f3b26ee0924c6f2249893245e4a569205391974d6beb7b703cc2d2535fd96f86,text,42 lines fully decoded; AST valid (4 functions)
+backend/app/user_store.py,1657,5d433a25c365b450cfd71fd7169fd9c8db0dd795058145d06baf96fef4d0cedf,text,34 lines fully decoded; AST valid (3 functions)
+backend/migrations/env.py,2223,af2a2f24b29d2dfb65d3defe13ec30b8acc4e85df556364ef056e04515fd242a,text,61 lines fully decoded; AST valid (2 functions)
+backend/migrations/sql/20261021_02/001_create_tables.sql,6217,77ad129c86068c09253240fdbd9928213e5a4a3b7ef196d07d5e866db73a2fc4,text,102 lines fully decoded
+backend/migrations/sql/20261021_02/002_seed_institutions.sql,29163,e09f01b6a36975d66f7a7c58136eec5e96696ab7db1c2621b223766235762fe0,text,273 lines fully decoded
+backend/migrations/sql/20261021_02/003_seed_able_work.sql,1049,0eb424cc8d77f4c39e83a60093a25032532a519f6a427388288f7dd827ed35aa,text,13 lines fully decoded
+backend/migrations/sql/20261021_02/004_create_expert_profile_tables.sql,7955,0df65598f3737e7925d7554a851bd292746ff0300ca1c794c696d6d469f59b8a,text,137 lines fully decoded
+backend/migrations/sql/20261021_02/005_seed_research_field.sql,7531,909be8d51615126bf7fd95d325a5a633874be6a9d84c25c2374b4a31156c2211,text,98 lines fully decoded
+backend/migrations/sql/20261021_02/006_create_research_tables.sql,4946,eaad97dfa761030daafe34654835f92ca66dc2ba149f8cb3289d916781efe093,text,77 lines fully decoded
+backend/migrations/sql/20261022_05/001_create_collaboration_request.sql,3511,e6dd1bd32d5228936e95e59c1e458b95ec3abdce0cf894df0c99aa87d15d6e61,text,40 lines fully decoded
+backend/migrations/sql/20261025_06/001_create_notification.sql,4941,eaec0588f9916ba83247f68bf4a4de89812f2dcef9e1584516b717cf286ddddd,text,60 lines fully decoded
+backend/migrations/versions/20261016_01_insight_foundation.py,4934,284f5e277b786962c756f22a08868c42a5d17ba99328732b479df716c41f81ae,text,117 lines fully decoded; AST valid (2 functions)
+backend/migrations/versions/20261021_02_shared_members.py,4793,99a489fa5ae55964e49c3718190ad816399d60e19a0d4a7a44dbcb3fe7b30672,text,102 lines fully decoded; AST valid (2 functions)
+backend/migrations/versions/20261021_03_updated_at_search_path.py,820,c2d27dac22e724c251bfe4597e9804808934e8bd4eff80a36d71527d9ee9685b,text,19 lines fully decoded; AST valid (2 functions)
+backend/migrations/versions/20261022_04_collection_settings.py,1478,50fb0678f4871eccb24dedb41daf899ab71a8bae9bb8daf24847677de849be22,text,35 lines fully decoded; AST valid (2 functions)
+backend/migrations/versions/20261022_05_collaboration_request.py,2280,11e718aa327fccc41a92da0566f73389a424f8bd7baec197dc3f0b1b46d2a9f0,text,51 lines fully decoded; AST valid (2 functions)
+backend/migrations/versions/20261025_06_notification.py,2683,3ebcfa2a96ef7a0fd79568ea911b37666db9328cb0d0b12170fee45989efc409,text,61 lines fully decoded; AST valid (2 functions)
+backend/pyproject.toml,573,78aa8ba6cc99dfefba5a1b0475a9a0fd2474e5759e3498d6f9c37ef497a10d98,text,31 lines fully decoded
+backend/scripts/__init__.py,64,4b1acfad8c6a9276b99915b180adce39405f4415f8cbf763f26a05ef5b097bc7,text,1 lines fully decoded; AST valid (0 functions)
+backend/scripts/verify_supabase_integration.py,4110,c5da63d14e18c54b7be73362f274eda2c3a40a6af558bf7897149b8c9fcadd28,text,86 lines fully decoded; AST valid (2 functions)
+backend/tests/__init__.py,67,d0697d397b29a7348b5ea269ef6d38a1b605b73056dad47abd1b078174f9fdb7,text,1 lines fully decoded; AST valid (0 functions)
+backend/tests/conftest.py,796,3a089da4c3847ec12133eb9882ed247b462fefb2f75fbf822761fb47feffa5a0,text,20 lines fully decoded; AST valid (0 functions)
+backend/tests/test_database_config.py,4321,f3d11512bbeeba250d46530c8329907c4bfeef0cd85751ce5f8ee522b814cd4d,text,111 lines fully decoded; AST valid (9 functions)
+backend/tests/test_discord_dm.py,2926,be6ae8006ca729552a12c4d4714f5d64156b3d89912e93c159419ae30f0c2346,text,79 lines fully decoded; AST valid (8 functions)
+backend/tests/test_discord_join.py,2180,c90b6fe0690664025fe59a3edb2c00426696480d2a562fbe36d70645de328db1,text,56 lines fully decoded; AST valid (7 functions)
+backend/tests/test_insight_admin_ui_api.py,3378,b5d6056846214ab6e71cfc5ff169b075593980241dd873f69f65ff35e54548d2,text,73 lines fully decoded; AST valid (4 functions)
+backend/tests/test_insight_catalog.py,6199,442ede2ef50c5cf083c3e16e229ddee3564c355de6959898eaf69e61a4a826ea,text,140 lines fully decoded; AST valid (6 functions)
+backend/tests/test_insight_discovery_policy.py,5572,7b00e3f5a2882bae32a5beb7be36b0b2a62b782fa30753e9816ae56958c29f7c,text,136 lines fully decoded; AST valid (7 functions)
+backend/tests/test_insight_editorial.py,6306,afb4adaaf3fd1813ff5df4754deb6d736eaa96b91890339f9e5540f745395f36,text,145 lines fully decoded; AST valid (6 functions)
+backend/tests/test_insight_import.py,8728,d6478e0411c05e3c912adbd20ea76c33511a7689f8ae8ea9179f20a9dddbd3ec,text,216 lines fully decoded; AST valid (15 functions)
+backend/tests/test_insight_migration.py,969,665d02e25d92f8bdc86eacd65176bb416118fbec5aa530b56090e472d1bd863b,text,22 lines fully decoded; AST valid (1 functions)
+backend/tests/test_insight_postgres.py,3558,ca87ea765618c466e2c0046b365ae449e5943ee7677886261d59899132224e46,text,82 lines fully decoded; AST valid (2 functions)
+backend/tests/test_insight_sources.py,6055,116d1b09d9ed984de6af517664944bd63e465b7df06841f53439a2f7b25f5af2,text,135 lines fully decoded; AST valid (8 functions)
+backend/tests/test_insight_workflow.py,23205,dde98d92321f5088c7a5974a6c6fe314adfa92da8bf11c8a6c3e8bbec3af1694,text,620 lines fully decoded; AST valid (39 functions)
+backend/tests/test_insight_workspace.py,12156,3c22c7fc073c5a816d14538332b459565ebb6f72b3bf5d9981cfc629e50601f0,text,296 lines fully decoded; AST valid (10 functions)
+backend/tests/test_notification_messages.py,1844,cb0c2f9523a079e7d155b4ad7f7a6cfb47f522609c1a8bbff5070e201a9adbd4,text,44 lines fully decoded; AST valid (5 functions)
+backend/tests/test_supabase_setup.py,9166,8b0d383298007cfcf0f274b9af2c5dd772e56fb8c9f11c0d3d4d241eb9b15d27,text,197 lines fully decoded; AST valid (12 functions)
+backend/uv.lock,255588,950a741a0661d9667be2bb70d59b251e675fe40cc56297f48ad677d6817e7724,text,1207 lines fully decoded
+data/README.md,653,ca877d51497be5f48924a80917d295cccda64af075cd557f4be085e837a73cd1,text,18 lines fully decoded
+database/README.md,3902,a4e2808709e3d33c2f7cc0214550a3104b292e161028af7a2ef1baf714fabb25,text,44 lines fully decoded
+database/init/001_create_tables.sql,6339,ccddffe8cce215e281d73d7172d11fade20f38a72b011c82591727e37b73b49a,text,103 lines fully decoded
+database/init/002_seed_institutions.sql,29163,e09f01b6a36975d66f7a7c58136eec5e96696ab7db1c2621b223766235762fe0,text,273 lines fully decoded
+database/init/003_seed_able_work.sql,1049,0eb424cc8d77f4c39e83a60093a25032532a519f6a427388288f7dd827ed35aa,text,13 lines fully decoded
+database/init/004_create_expert_profile_tables.sql,7955,0df65598f3737e7925d7554a851bd292746ff0300ca1c794c696d6d469f59b8a,text,137 lines fully decoded
+database/init/005_seed_research_field.sql,7531,909be8d51615126bf7fd95d325a5a633874be6a9d84c25c2374b4a31156c2211,text,98 lines fully decoded
+database/init/006_create_research_tables.sql,4946,eaad97dfa761030daafe34654835f92ca66dc2ba149f8cb3289d916781efe093,text,77 lines fully decoded
+database/init/007_create_collaboration_request.sql,3511,e6dd1bd32d5228936e95e59c1e458b95ec3abdce0cf894df0c99aa87d15d6e61,text,40 lines fully decoded
+database/init/008_create_notification.sql,4941,eaec0588f9916ba83247f68bf4a4de89812f2dcef9e1584516b717cf286ddddd,text,60 lines fully decoded
+database/seed/build_able_work_seed.py,1706,eded4dcb4fcf4079aeb1969c98e181575c2dd851237990402f8adc8b203e1374,text,44 lines fully decoded; AST valid (3 functions)
+database/seed/build_institution_seed.py,9085,9c959b77f62f327afa7a8713ac0aff7dbb0ab8d590dd5a6575e807e475254827,text,203 lines fully decoded; AST valid (14 functions)
+database/seed/build_research_field_seed.py,2511,038ca7dc28f975a5f32d4a4130aab1c925ba3b35bcd49374c20cac21331d43ea,text,60 lines fully decoded; AST valid (3 functions)
+design/AI 연구 플랫폼 랩브리지 랜딩페이지.png,1832569,f8cccfacce1ada38547e7f89d4aa0dd9e48efd03d231d0c7cbec1589df0a2221,image,1536x1024; RGB; full pixel decode
+design/AI 전문가 리스트.png,1431810,7c3bc946ac2ff6444e0251d4cf22ab53afd5196cfb0856529b82ff7d2d27a4e9,image,2880x8987; RGBA; full pixel decode
+design/AI 전문가 상세.png,1500009,05ef2659ed3364198d1b6908630199253c4a32c1550e81c02e41182e5ce517e2,image,3487x4995; RGBA; full pixel decode
+design/LabBridge 암세포 분석 연구 페이지.png,1837455,817641e0b6d6da2ce86622e155f532857bb7e8221c21167d98f594a4ab4c348b,image,1536x1024; RGB; full pixel decode
+design/README.md,908,c67b0b595073a631cf9d9fc48aee22c987839a48241d0d7612cae7edaaced0a8,text,18 lines fully decoded
+design/labbridge-ui-v3/case-detail-desktop-top.png,561293,e323409a7ed9a831620c3c5f185ba3630520ca24c8d5e3f7392665e22d449bf8,image,1408x1200; RGB; full pixel decode
+design/labbridge-ui-v3/case-detail-mobile-top.png,308374,36709cc8acbd5fb10f4f381228b70b1c88bb08b629314ba873f20ba2572d12b6,image,390x1600; RGB; full pixel decode
+design/labbridge-ui-v3/labbridge-ui-v3.html,593306,e838b8a90ef68acd575d2d60fedc3b2df62b2141d61102c777582e8233362c35,text,3403 lines fully decoded
+design/labbridge-ui-v3/prepare-preview.cjs,834,c1b729e23e7bd203c0456fd32e7b3c1e42d761d1fc299866a8f4f0935eab9aff,text,16 lines fully decoded
+design/labbridge-ui-v3/screens/case-detail-desktop.png,757449,906c676e51099f8ff70bd52cab8d6ac9c87348d2d445a52a51b00d5275ddc247,image,1408x3271; RGB; full pixel decode
+design/labbridge-ui-v3/screens/case-detail-mobile.png,566241,f1aff27058614c319141e32240393c5f6dcdd533c5f9d62a9326cbaf7121942c,image,390x5208; RGB; full pixel decode
+design/labbridge-ui-v3/screens/cases-desktop.png,1569014,a8324e8d496e0f6b75aa63a1a97448a8602ff583ec0846b014ff6f4b067a8f70,image,1408x2203; RGB; full pixel decode
+design/labbridge-ui-v3/screens/cases-mobile.png,1154788,0f5599ee245058634bf60c1bcd3ccbc49a725b45940518f0eb096c13657ac069,image,390x4223; RGB; full pixel decode
+design/labbridge-ui-v3/screens/detail-desktop.png,186824,dc12a117b71e09a9b7e6504c740eb31afd3320aca82457237deb792a0edb3061,image,1408x1581; RGB; full pixel decode
+design/labbridge-ui-v3/screens/detail-mobile.png,133488,eb9c6c5842271964a091625599b0e27e8ff23f7216e8f9e961edd60fa275dd17,image,390x1851; RGB; full pixel decode
+design/labbridge-ui-v3/screens/experts-desktop.png,202043,4ce4476ac786341992ebb0a770fdeffa6974777d18230740782e471b9c14ad4a,image,1408x1751; RGB; full pixel decode
+design/labbridge-ui-v3/screens/experts-mobile.png,242285,c501b1d970a022322bd0baac44ea9507a6f680021ac9684cd2f9ac4f9cef1919,image,390x3759; RGB; full pixel decode
+design/labbridge-ui-v3/screens/sample img.png,2907935,5339df8afba4a6ac4a6c11002e244cbadedd8e0379d02e0e83e6d5afd29e597a,image,1536x1024; RGB; full pixel decode
+design/labbridge-ui-v3/screens/trend-detail-desktop.png,509103,8ffbbddcb661c2615834edd2ba20513baad918e401d176379f3b9c00957b53df,image,1408x2943; RGB; full pixel decode
+design/labbridge-ui-v3/screens/trend-detail-mobile.png,440766,23152cde0ec40821404548adc73586fbefe96bb59f9cd51db2702a9ffb429176,image,390x4825; RGB; full pixel decode
+design/labbridge-ui-v3/screens/trends-desktop.png,1249644,e77571b2eeeafab6b4e9840b53213241f251e59d7fb76392849549b5b82d4434,image,1408x2026; RGB; full pixel decode
+design/labbridge-ui-v3/screens/trends-mobile.png,1053028,26f0134b6bd23367ef1faaa296f98f251d568a23573dc0df7991b03c9a3ae49c,image,390x3941; RGB; full pixel decode
+design/labbridge-ui-v3/trend-detail-desktop-top.png,329069,abf9dc7a63473e81d1bc4097f928ec2fb341fe68f2ca0b4383e476c730456b58,image,1408x1200; RGB; full pixel decode
+design/labbridge-ui-v3/trend-detail-mobile-top.png,229389,e93d955c918f08e40f57de9600d9aa1f3aa8af1b9163e54414cf207635180180,image,390x1600; RGB; full pixel decode
+design/labbridge-ui-v3/verification.json,3257,7cb90a3155677b781abf4c5427a69bbb2d75b79bd6ec09b543fb7d730770d21d,text,164 lines fully decoded; valid JSON
+design/labbridge-ui-v3/verify-details.cjs,5394,fd953a0a177719c2f9d8069e87f97129a97e0a4f3ef4a47c3ae26cce807a4362,text,86 lines fully decoded
+design/labbridge-ui-v3/시안-안내.md,2041,108e74617f57d746f4672a5a08ed46f97f0fc6ddb60cf78a62b61e385c026151,text,36 lines fully decoded
+design/인사이트_시안/assets/insight.css,17692,db51b0116e6a6e42bee4df8d2967748b9a02b14c84247ca02d80f019ab2cdb8a,text,335 lines fully decoded
+design/인사이트_시안/case-list-row.html,25359,360f56c89ef0c129fbc91ac7d1b95f113a791a1f8ad38dcd89fc478b9c911000,text,359 lines fully decoded
+design/인사이트_시안/case-list.html,25206,511c2f0b54f27877ece7d90e74ac01c5a87acc0f769987f87a4004b743cbf885,text,358 lines fully decoded
+design/인사이트_시안/png/case-list-row_desktop.png,583583,ae6a5dc1db05b88c4ba1ed0f96d2f81094eff7d11dca64d839dce1a15bcfe35e,image,1440x3133; RGB; full pixel decode
+design/인사이트_시안/png/case-list-row_mobile.png,363907,5300b0150c47e92ba24af1fc8b97d7313c3193165700d9a02d1ad57a1a2e61df,image,390x4801; RGB; full pixel decode
+design/인사이트_시안/png/case-list_desktop.png,558060,e74f34122f9e744dfc05b7811bbbf0007eb2718fa693456718d11068225b70f7,image,1440x2864; RGB; full pixel decode
+design/인사이트_시안/png/case-list_mobile.png,374145,6eedaa9481f86341927aa7c5c5e4f336763cce438bb2f5ca64ba1cd514095008,image,390x5222; RGB; full pixel decode
+design/인사이트_시안/png/trend-list-row_desktop.png,489343,5cc0341c96692ff0ca377445b2513ff94a5791ec50dd1be2e906387edbdbd459,image,1440x3072; RGB; full pixel decode
+design/인사이트_시안/png/trend-list-row_mobile.png,300905,3a6de4bfd373d8621ce709016e8d978abce7a5f18cdb5c59898f7166f1e46c46,image,390x4640; RGB; full pixel decode
+design/인사이트_시안/png/trend-list_desktop.png,465493,3b55dec117b84629562c06f4bbea8c3032f7e1fedeca42c75125d285f5f5da57,image,1440x2788; RGB; full pixel decode
+design/인사이트_시안/png/trend-list_mobile.png,312477,7e4344054be5b32465bdca4cb288349f37c43b5bb9dd6d0c14f446bb1731bee7,image,390x5075; RGB; full pixel decode
+design/인사이트_시안/trend-list-row.html,21756,b28823d2fa249991ca315248056f14e04294ffc7a05f10ec61d2d73dfbf4bb98,text,327 lines fully decoded
+design/인사이트_시안/trend-list.html,21605,cfef096c4f782638ff05d157d575b0a8af4b3339cfb02139abbde1352431b2dd,text,326 lines fully decoded
+docker-compose.yml,1216,66aab4122f8bb914e1fa946ab41bc41003bf73b9adc89448dad0736ead86fdbe,text,28 lines fully decoded
+docs/README.md,4483,9b76aec1e3136c579eef5a7cd5bced188916d553d84507e8c45d88befbbbce15,text,50 lines fully decoded
+docs/ai-case-automation/01-product-requirements.md,4851,424e1c58b5fb4356deeccaaa17410b806920fd73b7d895061d7e1289bbe8c6aa,text,66 lines fully decoded
+docs/ai-case-automation/02-architecture-data.md,7683,bd4ce1b8a74d2de4ad82be84c2423babd0efa9270585528a12bbf44fa0a9856f,text,119 lines fully decoded
+docs/ai-case-automation/03-collection-ingestion.md,4608,30d6520d0e25ab009c5ed5e44c3242ec0fca813dcd9de0d5f319ceda0e12db60,text,72 lines fully decoded
+docs/ai-case-automation/04-ai-evidence-keywords.md,6245,5148958109a1b0744ae432ce4f526e2cdc9bd522f22b3d47f3c15893cbb538e0,text,83 lines fully decoded
+docs/ai-case-automation/05-api-state-machine.md,5053,7e9720e57ea58b1be70c231bacdd64a304161d8b74531c1bc5caedba5848ab24,text,87 lines fully decoded
+docs/ai-case-automation/06-admin-ui-content.md,5157,e9a0e1c1549eabeb449a04bea95120bb5c433b6207c4bc38851f7a8bc92d7d60,text,71 lines fully decoded
+docs/ai-case-automation/07-cursor-execution.md,7192,3892039b4262ad6b671382e4c179b4dbf038a063ccd3b38f60fb7e8e657a4f97,text,84 lines fully decoded
+docs/ai-case-automation/08-test-ops-launch.md,5289,f584023548925dc111fc0375c544dab4f09036a4429dedf96f4fbc6f54392234,text,80 lines fully decoded
+docs/ai-case-automation/09-decisions-and-traceability.md,7655,b836b127f0dac658a56f0c06191b0224376fb735bb5238cb5a93aae97af1c68b,text,79 lines fully decoded
+docs/ai-case-automation/FOUNDATION_RUNBOOK.md,21754,294a93e3074b7ed10c8d296d5a282266bbb1565b4d70df1fdc425449578965e1,text,201 lines fully decoded
+docs/ai-case-automation/INSIGHT_EDITORIAL_OPERATING_STANDARD.md,33887,4f58832ac3d6741a9ad9a30e437949e2d0c2218f96a4c04727efdb13817c0a09,text,362 lines fully decoded
+docs/ai-case-automation/PHASE_0_FINDINGS.md,10028,413a545f8e0c47d8f6923665dfa3087339bed99ccaba47f6aeb077c5448beccd,text,83 lines fully decoded
+docs/ai-case-automation/README.md,3918,acc9e8dfb94d46ec0d7b48e5d776cc56eb848f6a317f6826d5aa7a0ca769f5bf,text,40 lines fully decoded
+docs/ai-case-automation/WHAT_THE_LAB_AI_CASE_AND_TREND_AUTOMATION_CODEX_SPEC.md,48888,9f5e3ea6e7a80881751725223e3d861956b24217dba7c14e3f5c04b4e3b90c47,text,1111 lines fully decoded
+docs/ai-case-automation/WHAT_THE_LAB_AI_RESEARCH_CASE_KEYWORD_GUIDE_v1.md,16536,e58c6d10ad4178a9e01e0be7de1ab9fa88ed62ad0ac3351e991e878fe25353a3,text,440 lines fully decoded
+docs/ai-case-automation/WHAT_THE_LAB_AI연구사례_상세자료집.pdf,1464905,25cb042fb7c2c717ed2ba3edbdd097053cecc7ad000a7ff688568579561eaf07,pdf,33 pages; 54721 text characters; all pages extracted/rendered
+docs/ai-case-automation/WHAT_THE_LAB_Keyword_Master_결정안.pdf,510902,f42b922a3c651f2afef29b41a0456bfe635ebd880d987b54dec6d1be4ec8d26e,pdf,5 pages; 8227 text characters; all pages extracted/rendered
+docs/archive/DOCUMENT_REORGANIZATION_2026-10-16.md,4070,372cc903548b8d2d301f2b9e92c5cf47768c35867649792e059dc5760fed36c2,text,47 lines fully decoded
+docs/archive/README.md,1080,7f2a951964978de470faaf5c2653dcd85f765f9c2bb1542cb9847212c902616a,text,20 lines fully decoded
+docs/archive/design/ADDENDUM_MERGE_MAP.md,2329,c7f78ce5eccadbc14524835ec9aebf92bd5e8aee9f0fa39bab715febcafe7e41,text,19 lines fully decoded
+docs/archive/design/STYLE_GUIDE_ADDENDUM.md,11284,12a492ab7db65fc39f7acf31c5d3aa4a58752c53d4f09f1e05bacbd00b52f342,text,175 lines fully decoded
+docs/design/CURSOR_UI_REVISION_GUIDE.md,35318,7c288348d3b6882a622c7a3e214fa4b1fa9b0aa7a83a55a35057c2e159ff0627,text,1906 lines fully decoded
+docs/design/DESIGN_QA_CHECKLIST.md,5087,10975c939c3294e2e272a73ba10e2ac53afb35fcfd8a645b7a77f669115327d1,text,92 lines fully decoded
+docs/design/DOC_AUDIT_REPORT.md,8960,b4c76b48d2e6f2802378f4ded796a80cc002d850852ceb61cb0d35301dae6c1b,text,77 lines fully decoded
+docs/design/README.md,1199,f698c4c759afe3624032e47cc4090604a9d34804871d3eabc02330758fabe99b,text,17 lines fully decoded
+docs/design/SCREEN_DESIGN_SPECS.md,22289,dcdc471da76fd7f6a3517b8991322a42313e44cc15d9e62c4ddc8ad6ba45f507,text,200 lines fully decoded
+docs/design/STYLE_GUIDE.md,42458,8acd5a7404d47a3bb24256ae55308d277745cb3decbd7d9f1ec09b56776e30cd,text,455 lines fully decoded
+docs/development/CODING_STYLE.md,12710,085d7b18088a1a4199f0ce3cd1295d17f1c664b2d5820188c3ea2db5bb994f2b,text,189 lines fully decoded
+docs/development/INSIGHT_CHAT_HANDOFF.md,3342,712afa7e31144dfa0c08019e073c892eb3d0cf2a0b55cf4bfc6bff8973d37500,text,39 lines fully decoded
+docs/development/MY_SPACE_GUIDE.md,23869,9c5f3af3bacb93bcda3cf76bd3824accd678aa16f942c208522a52a3333431d7,text,448 lines fully decoded
+docs/development/POSTGRESQL_MIGRATION.md,12637,e3f76c88f107b844ee4781ab9df104436a79fd27b8f1c60e8dc9e60387dab348,text,256 lines fully decoded
+docs/development/README.md,796,af95de8a7dcab32c0454d5ead8453b0a17cfde5e9d967698f52619b1e13366c1,text,16 lines fully decoded
+docs/development/SETUP_NOTIFICATION_PROFILE.md,9022,2c621ece487a9db53115ced8a5b37d603bc3b3d08987edb7b46e49dc2b4ba30b,text,168 lines fully decoded
+docs/development/SHARED_DATABASE_GUIDE.md,9672,85edcff1da2b88150664023823d6cfe6f638eaf5e2ff8addf9ae91913f5c9928,text,84 lines fully decoded
+docs/development/SIGNUP_LOGIN_GUIDE.md,24469,44b15fbd1d392813cb241dca60835d2d31064c4ee1b6ce20d8a7ec0899351c9d,text,463 lines fully decoded
+docs/development/SUPABASE_TEAM_ONBOARDING.md,9537,e8d72e35151bd65d514be3e6f83a4d068211336976d50c8009f9729dd541557f,text,123 lines fully decoded
+docs/development/TEAM_WORKFLOW.md,4788,eb781ddcab7e4da6d6413446bed4473a49a6314c34e1561188e021b191ec3e82,text,118 lines fully decoded
+docs/planning/README.md,991,2b2391e8b2de671d3437b457e681d4e605489bc4d0a36f10cea8238c92293b09,text,14 lines fully decoded
+docs/planning/research_ai_collaboration_MVP_roadmap.pdf,26933,546ec41941ca4cd8fb1146b2bcb76404ec23476c50a4d984737141911c41e103,pdf,11 pages; 4536 text characters; all pages extracted/rendered
+docs/planning/research_ai_collaboration_platform_planning.md,23046,b91366ef8ca82b55a5db07904c466b8e6004e4b4b9db4be916598c14e2f08759,text,1108 lines fully decoded
+docs/planning/research_ai_collaboration_screen_handoff.md,18258,eaa8692edf9a1d6f29f05bbefc467d49856bae6f801198b5768feb569c8c75ce,text,708 lines fully decoded
+docs/planning/user_persona_scenarios.md,10751,0ff8a20f452ab8adb9a145c0004ff648dbcd01915fbd8158fd3c634b7de206b1,text,139 lines fully decoded
+docs/product/01_PRODUCT_STORY.pdf,3010657,7f3618731cd1f1eb7c5f912de67bb2844ba9f43ddfb9ad760c44f24540368abf,pdf,24 pages; 0 text characters; all pages extracted/rendered
+docs/product/02_SCREEN_GUIDE.md,35514,501209026afeaa18ce379429d1e99afe8b3fbc7d633a9587fb9502434ebba881,text,708 lines fully decoded
+docs/product/03_DECISION_LOG.md,34445,a15f3489586048e16b20b5a82b69cac089e4bd751e902528d8007407a5ccdfab,text,469 lines fully decoded
+docs/product/MVP_SCOPE.md,6815,a5be572e77e10292d56ab2a8c04d0f51da1e35b30ae62b66ec1d4ee65ade71d2,text,107 lines fully decoded
+docs/product/README.md,953,7e0875594e9ead3a50e8e60a8f620dd2522c6ca3f5947edca973cd8eb74ee31f,text,16 lines fully decoded
+docs/qa/INSIGHT_CANDIDATE_IMPORT_2026-10-22.md,7789,d2d5a16d182b82fd29181227253c1a8ac3f540534d1e1c772e170e6e72745977,text,127 lines fully decoded
+docs/qa/INSIGHT_READING_EXPERIENCE_2026-10-17.md,8186,2263dee28b9bb243b8d28b064b66959e6aabc69178ee9deb8cdc2e5cebc8c0b2,text,85 lines fully decoded
+docs/qa/INSIGHT_SUPABASE_MIGRATION_2026-10-16.md,9153,2388942d7afe5afb78bf307b3c05116729d14466b6220fa3004d717782eee893,text,97 lines fully decoded
+docs/qa/POSTGRES_ACCOUNT_INTEGRATION_2026-10-21.md,11934,c32e2b459a563a3045c364d8aeede97cefdb0e7646db271731207d0f6cc65372,text,84 lines fully decoded
+docs/qa/PR10_MERGE_RESOLUTION_2026-10-17.md,4844,80753ee1adce3ccedee10cb620b50d9b17cf110a2f64d02d15cb3ab8517a3e72,text,57 lines fully decoded
+docs/qa/PR_INSIGHT_WORKSPACE_2026-10-22.md,9723,3bd1b20024beae71caf251edf168465d3e7e755f74578b37ab37c3dfb184b5fd,text,93 lines fully decoded
+docs/qa/README.md,3702,15780777f1122314f7fb737db29439f163b3fa6e518abd1ca6b4a5ee106341bc,text,38 lines fully decoded
+docs/qa/SET_UPDATED_AT_SEARCH_PATH_2026-10-21.md,6225,6c5a307ee19c4af36caa92b64c5c172d4fb4c9c0ad78fe8ddaa6cb93342f14b0,text,84 lines fully decoded
+docs/qa/ai-cases-20261010/cases-1440.jpg,166874,24a62caeb7fe7bf7c85d8428df4e27129fd1a563e842c7854bef4a65a3bace19,image,1440x1000; RGB; full pixel decode
+docs/qa/ai-cases-20261010/cases-390.jpg,49341,59dff4a3f2544834a2f3d85dc5aef72b34bb8ee8b08e015b7cb1024fb6a7ec73,image,390x844; RGB; full pixel decode
+docs/qa/ai-cases-20261010/cases-768.jpg,96753,690627abc91b1478d5a47d3f5cbcb0bedb366681e2218b95d0a2c97e1c83f338,image,768x1000; RGB; full pixel decode
+docs/qa/ai-cases-20261010/concrete-1440.jpg,152302,0888570670eccb381ba08522dde3c0a4ecd98d655bd4d5ebb6a44864905ed624,image,1440x1000; RGB; full pixel decode
+docs/qa/ai-cases-20261010/concrete-390.jpg,54316,8bf18b4f954bedcb7320321705f41d9a30088f25d3de699ff2c856e792a80a7a,image,390x844; RGB; full pixel decode
+docs/qa/ai-cases-20261010/concrete-768.jpg,103483,9691716e66f368323e3a586d2c44766ac11c2b8b5d30f6c94adf9ef64421c587,image,768x1000; RGB; full pixel decode
+docs/qa/ai-cases-20261010/dental-1440.jpg,154592,5c543b80c182690e97157bafc5e38f2462a00f305aea3aa4b6a984c747c8fbe7,image,1440x1000; RGB; full pixel decode
+docs/qa/ai-cases-20261010/dental-390.jpg,56788,f6f5a9b54ab21a09ab59774eca41913d08c75828de27262c20c1cbd531998471,image,390x844; RGB; full pixel decode
+docs/qa/ai-cases-20261010/dental-768.jpg,97734,becddb47df62c767e974bf2260d815658de9cd195443d0b48d81f7ac9ce36976,image,768x1000; RGB; full pixel decode
+docs/qa/ai-cases-20261010/lettuce-1440.jpg,161018,e9beb6d380753ff8ee56db01dd423def04e08cd8a96fcb0cdf986f78605100d8,image,1440x1000; RGB; full pixel decode
+docs/qa/ai-cases-20261010/lettuce-390.jpg,61584,ae4edc3bec0b15bb3b2d46021fd78bad9b2557f5e08b98ea0d43d1ac67fad813,image,390x844; RGB; full pixel decode
+docs/qa/ai-cases-20261010/lettuce-768.jpg,111301,0a702fec499fcd81d3b1620aad51799b2d226bc4d9344206c793ea41bcc3ae6c,image,768x1000; RGB; full pixel decode
+docs/qa/ai-cases-20261010/verification.json,3236,9b986382f594f2c150b785f117c87446a3b63737c10caafa80260f014d357139,text,124 lines fully decoded; valid JSON
+docs/qa/ai-trend-co-scientist-20261010/alphaevolve-1440.jpg,155993,1f566791e997a5a89f170020f0c9b715e1211a530032d2ccc09f1fbee6e2bc83,image,1440x1000; RGB; full pixel decode
+docs/qa/ai-trend-co-scientist-20261010/alphaevolve-390.jpg,61537,893a42a8a1f7d5e9de759c56cf6ad305b96e9d89a97ccbdefd0f551500017eff,image,390x844; RGB; full pixel decode
+docs/qa/ai-trend-co-scientist-20261010/alphaevolve-768.jpg,116871,5d52e00961a7809d227524443b1019ca58b96e16221731b581253225450f4264,image,768x1000; RGB; full pixel decode
+docs/qa/ai-trend-co-scientist-20261010/co-scientist-1440.jpg,153867,c166162057d1608042f24b1956cecd61ab9bd949ada042b1172bf2cdeef2267e,image,1440x1000; RGB; full pixel decode
+docs/qa/ai-trend-co-scientist-20261010/co-scientist-390.jpg,62978,01e45de43c212c863d550968da6f5aff23a346e52db6ba51d0244c94319986c9,image,390x844; RGB; full pixel decode
+docs/qa/ai-trend-co-scientist-20261010/co-scientist-768.jpg,114532,16ad3fdfa0833bf52e41486ae5e27292b9f819d9833ac1e11f2460264b904170,image,768x1000; RGB; full pixel decode
+docs/qa/ai-trend-co-scientist-20261010/mattergen-1440.jpg,153994,15aee677ae08d47b4d658a70f5cb6b134af4b61a09e3b742464ebfb8628cce89,image,1440x1000; RGB; full pixel decode
+docs/qa/ai-trend-co-scientist-20261010/mattergen-390.jpg,63824,eb599deced129608816ed502ff3fd54a23302f58705846d4c3595950ff6ce5d2,image,390x844; RGB; full pixel decode
+docs/qa/ai-trend-co-scientist-20261010/mattergen-768.jpg,114826,a4f00804082e3e7eb69232aaffaa73a9984a028010d01ad33245b5a1b8383b89,image,768x1000; RGB; full pixel decode
+docs/qa/ai-trend-co-scientist-20261010/trends-1440.jpg,164943,00dc9d7f64ecbfc8c7a16d4cfb1535f10ec9c64b3cd4c94f67048a41cbd165f8,image,1440x1000; RGB; full pixel decode
+docs/qa/ai-trend-co-scientist-20261010/trends-390.jpg,51221,04d633b3c58778f67422dccc95a09caed13aea336cc11b79a5d58b7a587fff45,image,390x844; RGB; full pixel decode
+docs/qa/ai-trend-co-scientist-20261010/trends-768.jpg,103278,63c9cbfe5e64c583552796fb3f3f3be6a56b3df8384f2057113aa2569692531b,image,768x1000; RGB; full pixel decode
+docs/qa/ai-trend-co-scientist-20261010/verification.json,3989,caafa96103cf1225028f2616f2f6ee478df67c6a668072dc4fd3a72f4e07e61e,text,139 lines fully decoded; valid JSON
+docs/qa/hero-frame-20261009/README.md,5029,077a6cce9fd2ebe3cfa91713b84d409657287f98c0f30f658c8bbb960938c067,text,54 lines fully decoded
+docs/qa/hero-frame-20261009/cases-1440.jpg,411535,c428eabb522b49f75f2a2cdacdeb82ba36f0366f377d36a2b4d8b59f11c2d0ef,image,1424x2415; RGB; full pixel decode
+docs/qa/hero-frame-20261009/cases-2880.jpg,462947,86816894dd39861b9f8b561978f167c0760a47a16e2306194e6c8e53f8366dd5,image,2864x2430; RGB; full pixel decode
+docs/qa/hero-frame-20261009/cases-390.jpg,291117,91664305ddf13b657e077b511e2ddbb6374ffcc0594210518594b9dcec7e6196,image,374x4422; RGB; full pixel decode
+docs/qa/hero-frame-20261009/cases-768.jpg,294669,103fa159e1c66ab6ed4410a33a1f7adc6002ff75903107ca0950c0db3b6d0b21,image,752x2700; RGB; full pixel decode
+docs/qa/hero-frame-20261009/home-1440.jpg,228604,662aa8a8fcbfa7ca86edc0080a9446e4ad5974f3ba4906570f8b81413fa05179,image,1424x1306; RGB; full pixel decode
+docs/qa/hero-frame-20261009/home-2880.jpg,257030,9b3c529f156f266e52d810196cc3c730bef97d60c4bc376f6ec95eb3dfad979e,image,2864x1306; RGB; full pixel decode
+docs/qa/hero-frame-20261009/home-390.jpg,172667,c406e1deb8f6759037caaa596a4ccd2e6f108fd776da24b2500c9866364b46da,image,374x2874; RGB; full pixel decode
+docs/qa/hero-frame-20261009/home-768.jpg,202637,f5503a0007c753f1d05b289a848bedd27f951aa0ff7843f45c58a5704f545d0a,image,752x2352; RGB; full pixel decode
+docs/qa/hero-frame-20261009/trends-1440.jpg,373900,be259beb210704659132c6f41e77a6eba832545468ac7851d051a8e92e7da5a6,image,1424x2098; RGB; full pixel decode
+docs/qa/hero-frame-20261009/trends-2880.jpg,419352,4457fd636139dccbbca8977a4576542479f0d66d9c33d4ab0dda73544144b417,image,2864x2113; RGB; full pixel decode
+docs/qa/hero-frame-20261009/trends-390.jpg,267833,3dae83446fb4a0b37f6f07ae1cde46220fb80bc6bc0a7d8be054ee656cbd126f,image,374x3930; RGB; full pixel decode
+docs/qa/hero-frame-20261009/trends-768.jpg,268113,530d4ed97e406c1b8d6d572816296307b016e26dfb28090b0673dfc6f2955ae1,image,752x2400; RGB; full pixel decode
+docs/qa/home-cards-20261016/README.md,7491,8fe34116b4605585a4adae5845c83056f79186d4ff904a06430eb755beb50741,text,101 lines fully decoded
+docs/qa/home-cards-20261016/cards-desktop.jpg,47780,90b56190386e199601e1161c16ee803588acf4458a4459d12ba5ed21d0d6e3a4,image,1377x255; RGB; full pixel decode
+docs/qa/home-cards-20261016/home-1440.jpg,166865,359c6095cdafa515e6dd1eb7440f7da12ac6bdbc4706bed3ca151cd6eb6e2176,image,1425x891; RGB; full pixel decode
+docs/qa/home-cards-20261016/home-2880.jpg,219908,88ae2f3e3fbf4370d26a3799aee71190836280b4e5e6569e38de4c1aa0432cb9,image,2248x1194; RGB; full pixel decode
+docs/qa/home-cards-20261016/home-390.jpg,38200,0127e594a98cbba6d07c874d2404dee5130a85473b5a66a78ae40b1a852572a4,image,375x812; RGB; full pixel decode
+docs/qa/home-cards-20261016/home-768.jpg,75223,1ae30d65c2d4ca66c6a46ababbbd7670440ebdd53d651bbe5f19049872ba2ce2,image,753x1004; RGB; full pixel decode
+docs/qa/home-cards-20261016/home-focus-1440.jpg,169958,85701c868941cbea316c22fec0441df3fc0f25382fd14f0e1c78f3257734f076,image,1425x891; RGB; full pixel decode
+docs/qa/home-cards-20261016/home-hover-1440.jpg,149957,5562dbc638f656bb692ef27f94e88a654f983860b8e70931047014f012c7500d,image,1425x891; RGB; full pixel decode
+docs/qa/image-optimization-20261020/README.md,10047,d3e420fe349ab52fe0487498d58f094fee7c145cce839045f379a699b87abebf,text,92 lines fully decoded
+docs/qa/image-optimization-20261020/after-1792455274505/article-1440.png,319438,d7a88934ed99786fa41cf072a4f05ad5aad593180290088440ed4709c5e6eb3e,image,1440x900; RGB; full pixel decode
+docs/qa/image-optimization-20261020/after-1792455274505/article-390.png,204507,0b93c9f71c54a9d6210e4bc10c79de8cad10b975fafe784aad1308af04c411d8,image,390x844; RGB; full pixel decode
+docs/qa/image-optimization-20261020/after-1792455274505/article-768.png,474517,3de4394106c489d4872df23ad0cd51b41ddb5297948ad900349e4736c2d7fd06,image,768x1024; RGB; full pixel decode
+docs/qa/image-optimization-20261020/after-1792455274505/article-toc-390.png,70003,50719e3b4092f86723392c6680fe5036c393053ae1c20d0260dfee7b38790f9f,image,390x844; RGB; full pixel decode
+docs/qa/image-optimization-20261020/after-1792455274505/cases-1440.png,624013,ef604482aef5651888f07c2161fd672c8671634464477cb394f340b438e092c6,image,1440x900; RGB; full pixel decode
+docs/qa/image-optimization-20261020/after-1792455274505/cases-2880.png,1078691,dafed6628b11a8fd764f14a42c487ee54169d524d466c037b987ada41cc7323b,image,2880x1080; RGB; full pixel decode
+docs/qa/image-optimization-20261020/after-1792455274505/cases-390.png,161163,904f7b6356fe6b836e92dfd10ef26de1ec6f7fde121f4560bdf51c89ab65b022,image,390x844; RGB; full pixel decode
+docs/qa/image-optimization-20261020/after-1792455274505/cases-768.png,510169,ce27a4188cc68782328aeaa077b9ce781f147ebd42f42f4269f4be3f51ca1e54,image,768x1024; RGB; full pixel decode
+docs/qa/image-optimization-20261020/after-1792455274505/home-1440.png,878412,80d546279b75e6bc34deb738bb99567c91e2c92f483857cedcd595e170b6e4f4,image,1440x900; RGB; full pixel decode
+docs/qa/image-optimization-20261020/after-1792455274505/home-2880.png,992982,51884c047ffb741a05afb320be3b9012265881f8e961ae20b506d207abcd2543,image,2880x1080; RGB; full pixel decode
+docs/qa/image-optimization-20261020/after-1792455274505/home-390.png,148835,b7ea7f36a317f70465d90d27ab248b96eeba575196e61d9109c9e931fc097d4f,image,390x844; RGB; full pixel decode
+docs/qa/image-optimization-20261020/after-1792455274505/home-768.png,384274,141a76e5854fb92d49a55aca5543240bbe850756e4e395fa6986d4eaac0a078a,image,768x1024; RGB; full pixel decode
+docs/qa/image-optimization-20261020/after-1792455274505/trends-1440.png,589499,dd2036c2806e8bb57b1623b2db16cde7edc9e840054186e7e8b37bd072cc392c,image,1440x900; RGB; full pixel decode
+docs/qa/image-optimization-20261020/after-1792455274505/trends-390.png,163835,e1e1b98fc010c8f1d38956eb23fbe445c946e4e92ca35cc3c0a6f04ee8da7bd0,image,390x844; RGB; full pixel decode
+docs/qa/image-optimization-20261020/after-1792455274505/trends-768.png,496030,58f802544e5cf4a9851ed655cdb33c617ba30b48a8ffe3d97a6e40a2931fb9b4,image,768x1024; RGB; full pixel decode
+docs/qa/image-optimization-20261020/after.json,101478,668c87880850c7ab57a1e3f22166294a55d948fdd39b4d98ec9f9a65df2de960,text,3155 lines fully decoded; valid JSON
+docs/qa/image-optimization-20261020/before-1792454911063/article-1440.png,336824,c36532e5498971dd82b9f8dcba864918ffa9cbab83cef0cb7018c3b0b2270b5f,image,1440x900; RGB; full pixel decode
+docs/qa/image-optimization-20261020/before-1792454911063/article-390.png,226262,c1e47889177ee0413ed33851ed97f1e28ed34b5018e35d9bd86652572bb03259,image,390x844; RGB; full pixel decode
+docs/qa/image-optimization-20261020/before-1792454911063/article-768.png,544995,c128410aedd0051dc639a14f38659423b9836007d8274aa542b3eb6d47347c37,image,768x1024; RGB; full pixel decode
+docs/qa/image-optimization-20261020/before-1792454911063/cases-1440.png,658233,1dd8aa26e786b53ebeb564f801ac369175a91d7ae21173a3ed37cc7ac0c0c91d,image,1440x900; RGB; full pixel decode
+docs/qa/image-optimization-20261020/before-1792454911063/cases-2880.png,1122028,74dac9cc0f95a6afce44cd34e5147226273856b375f4cc09a459895407f9aee0,image,2880x1080; RGB; full pixel decode
+docs/qa/image-optimization-20261020/before-1792454911063/cases-390.png,168745,58a30dd92ed4c6dda10ba4f5e5dd04ad48b21f27560bd9f9ddfcfe2da3f9af17,image,390x844; RGB; full pixel decode
+docs/qa/image-optimization-20261020/before-1792454911063/cases-768.png,531223,f733578e7ca26a64d54acb35cab42ae6b421d63afad7592628cd7e6d02f4eca9,image,768x1024; RGB; full pixel decode
+docs/qa/image-optimization-20261020/before-1792454911063/home-1440.png,917370,67cfa9991c87a67b1f5650b7e4e6c34872f8dc0b2169b71cadfc013918304e70,image,1440x900; RGB; full pixel decode
+docs/qa/image-optimization-20261020/before-1792454911063/home-2880.png,1061855,091bb105fcc4bd87ba53fa2f9a07c47e161613ac053d0dda642157173b57965c,image,2880x1080; RGB; full pixel decode
+docs/qa/image-optimization-20261020/before-1792454911063/home-390.png,148835,b7ea7f36a317f70465d90d27ab248b96eeba575196e61d9109c9e931fc097d4f,image,390x844; RGB; full pixel decode
+docs/qa/image-optimization-20261020/before-1792454911063/home-768.png,384274,141a76e5854fb92d49a55aca5543240bbe850756e4e395fa6986d4eaac0a078a,image,768x1024; RGB; full pixel decode
+docs/qa/image-optimization-20261020/before-1792454911063/trends-1440.png,630819,dae5f6860e24355b9aaff31ff9e29707bf0cace09137f0a9249b77237c96c4e4,image,1440x900; RGB; full pixel decode
+docs/qa/image-optimization-20261020/before-1792454911063/trends-390.png,171490,22ec43e37d6adf965aea979acff670c16d57c7ff7df57ca49d3182b63483bb0f,image,390x844; RGB; full pixel decode
+docs/qa/image-optimization-20261020/before-1792454911063/trends-768.png,525090,5fc366ac07dbc4dcd96bb8ce2bb723cd04d075e10953d47c2d4dfd3143915193,image,768x1024; RGB; full pixel decode
+docs/qa/image-optimization-20261020/before.json,87772,1f8c8d5a9ffffd3fcddcae0940c56dfd5ffc61d5fb799fd1edc1c5c4a7e62cfc,text,3141 lines fully decoded; valid JSON
+docs/qa/image-optimization-20261020/variants.json,12808,cc73cdb07b7610dc62fc00a109b3f92832b6ae0ee9c36f25bcb8d54dd358826f,text,450 lines fully decoded; valid JSON
+docs/qa/image-optimization-20261020/verify-images.cjs,10499,c4816116089c131da6557d9cfa8da07f9ba8bb9ea026016eabd4ce9b661dc502,text,170 lines fully decoded
+docs/qa/image-optimization-20261020/verify-variants.cjs,3182,4a2cefddbff79981937ca4422e6325422001a21e99e4eadb8e7386b09af77442,text,57 lines fully decoded
+docs/qa/insight-admin-20261022/README.md,11116,5b1706f9904f605085b1dbe37acc5b7e385e9e4013a5553e448da77f8120b174,text,112 lines fully decoded
+docs/qa/insight-admin-20261022/account-menu-390.png,51213,beee6b1d9ed7d186ed08bf0a1d35d7369287fbbafcd3609eefe98a38eba2e44d,image,390x844; RGB; full pixel decode
+docs/qa/insight-admin-20261022/approval-confirm-1440.png,127144,4f89da83d7f2f1641b8dcab26d0622a621eb0b1ff1a872f7bf0e9e7d3b259ae4,image,1440x900; RGB; full pixel decode
+docs/qa/insight-admin-20261022/approval-confirm-390.png,64641,23a14c2f7fdc8be44400a120ed669df44cc57299de4a7016121bf0b29b66e69b,image,390x844; RGB; full pixel decode
+docs/qa/insight-admin-20261022/editor-1440.png,108936,961fa2bf8dc929583f7151a4a821c5ef895227b7ca6cf8438460cd7306c13be0,image,1440x900; RGB; full pixel decode
+docs/qa/insight-admin-20261022/editor-390.png,50728,227c09eda7901b73dd94a0307666b530b5d6381706019f805f9f4b1e0f047783,image,390x844; RGB; full pixel decode
+docs/qa/insight-admin-20261022/editor-768.png,73229,49ec4ff3e1d98fa2edf8d1c99c4ded2034ccc180ec7999649beba7571ac543ae,image,768x1024; RGB; full pixel decode
+docs/qa/insight-admin-20261022/history-published-1440.png,100352,6c4011204ec61c66be1b3c373b852daa5af8869763b6b8ba892db3a250fa2aea,image,1440x900; RGB; full pixel decode
+docs/qa/insight-admin-20261022/login-required-1440.png,69029,7b49900134285c850c407675f96c068b60cb7825acd9ea6d804b5dde8b430fc1,image,1440x900; RGB; full pixel decode
+docs/qa/insight-admin-20261022/member-denied-1440.png,77337,e0c5f1b92a2cb220551c549ac428c7f77a2089ad665a1a2b532b49ea9e290aba,image,1440x900; RGB; full pixel decode
+docs/qa/insight-admin-20261022/selected-editor-390.png,55204,d3661f9e522005ef3497e04505c3de6e71d2f719f747cec9588f5822d3997ebd,image,390x844; RGB; full pixel decode
+docs/qa/insight-admin-20261022/verification.json,786,7816a6b8b96bcb3efbe57a51e1935bf6524396b3895c1d7aa0396ea565e0ce24,text,22 lines fully decoded; valid JSON
+docs/qa/insight-catalog-20261022/README.md,10172,e19de0567f074b14ca9500032a05d3b3d747fba1d068a3bf3750ab32af28811b,text,88 lines fully decoded
+docs/qa/insight-catalog-20261022/published-1440.png,123214,73a2dce6a1f916b2add96128acd42af0fedd16139bb5ec179ba0a3c3ebcf1a14,image,1440x900; RGB; full pixel decode
+docs/qa/insight-catalog-20261022/published-390.png,56265,5d74643194ba626c04ec1413e8c240d38d3cf8871e12b517db1b6cc37938d3a6,image,390x844; RGB; full pixel decode
+docs/qa/insight-catalog-20261022/published-768.png,73651,1fad06b466b17606e477b1e700906b1484904124c1c3140a37542e66acd9a3af,image,768x1024; RGB; full pixel decode
+docs/qa/insight-catalog-20261022/trend-editor-390.png,59556,0092721ef1aec6d0f7d6b5e79e31528e7d8ca052b2ab1ded23e0de774a0d6170,image,390x844; RGB; full pixel decode
+docs/qa/insight-catalog-20261022/verification.json,690,36c55eafe096dc20781efe0ec636210d8340d31f59989c9b725440d284a2d2d8,text,17 lines fully decoded; valid JSON
+docs/qa/insight-compact-preview-20261022/README.md,5191,7dff9fa91fef08a5537c5a2ab422d806b2f7ae60e9bc5205e612ede877f5ec89,text,37 lines fully decoded
+docs/qa/insight-compact-preview-20261022/list-1440.png,91455,c169ddf62a9ddaa8d759f85a15744c94cc696e785580505fb122ef020f9697db,image,1440x900; RGB; full pixel decode
+docs/qa/insight-compact-preview-20261022/list-390.png,63742,c417a9175c5ed433b7949889c7b44d800839f362d1e4b79ac19b8989d8355f51,image,390x844; RGB; full pixel decode
+docs/qa/insight-compact-preview-20261022/list-768.png,78212,cbcde7d74fd1a86a9513214e50bb73f3fbea2f2a42cbafebcebd8ee2b6b74446,image,768x1024; RGB; full pixel decode
+docs/qa/insight-compact-preview-20261022/preview-mobile-1440.png,252288,1e7f7a3fe79e0ae14c2a17ff3f43dc0e377cb009d4deb5b675acd84d2a0fee2a,image,1440x900; RGB; full pixel decode
+docs/qa/insight-compact-preview-20261022/preview-mobile-390.png,178565,aadae91aa51869751fa9b595da50fe47ea5e0173dfb255f94e3f6db7c8903fd2,image,390x844; RGB; full pixel decode
+docs/qa/insight-compact-preview-20261022/preview-mobile-768.png,222273,1d4e0496299f9f4dd0dba9879cb7a08f704e37de3e44f62ffb53cc91d03b608f,image,768x1024; RGB; full pixel decode
+docs/qa/insight-compact-preview-20261022/preview-web-1440.png,255570,f086413e0479fc27c67b46f7b8c5e672ad2a9ce5a3e8d351d6b9c2dff955bc80,image,1440x900; RGB; full pixel decode
+docs/qa/insight-compact-preview-20261022/preview-web-390.png,120315,f46b6e2ac31e2cda926ce73069ff08f4990c528b101371acf499173c83b871ed,image,390x844; RGB; full pixel decode
+docs/qa/insight-compact-preview-20261022/preview-web-768.png,223702,c51a641ec85d9fb17a7ce367653a31fbed2d7c21486c7587b1d76a56756009a7,image,768x1024; RGB; full pixel decode
+docs/qa/insight-compact-preview-20261022/regression/candidate-editor-390.png,62528,3f35087ff82790ac1adf60dcb1cff6a303f207eb8f8b42716b823acae8e8741a,image,390x844; RGB; full pixel decode
+docs/qa/insight-compact-preview-20261022/regression/candidate-editor-768.png,89426,bb9978eef30c42dcaf8238624cc26be57b00c09c2fd46c04b76ddb769bc97c55,image,768x1024; RGB; full pixel decode
+docs/qa/insight-compact-preview-20261022/regression/candidate-modal-1440.png,191796,b746ba2ba59806c449a601f6805c4d75d7a82c66adfcfbd11ec57b0383605358,image,1440x900; RGB; full pixel decode
+docs/qa/insight-compact-preview-20261022/regression/candidate-preview-390.png,86783,69e30018d2897c56c714f1d8401ff4a154ddc2209e8025dc505d9b75614fb198,image,390x844; RGB; full pixel decode
+docs/qa/insight-compact-preview-20261022/regression/candidate-preview-768.png,127775,bd695084cd987c9d89d0f554e810884cb893a1e7a0a48bc6c5bcd13df61fb066,image,768x1024; RGB; full pixel decode
+docs/qa/insight-compact-preview-20261022/regression/correction-modal-1440.png,266725,ff274999fc493abb8f73b71dabb3eaac028462ec7d6d06211c7988bbda8eb804,image,1440x900; RGB; full pixel decode
+docs/qa/insight-compact-preview-20261022/regression/list-1440.png,91455,c169ddf62a9ddaa8d759f85a15744c94cc696e785580505fb122ef020f9697db,image,1440x900; RGB; full pixel decode
+docs/qa/insight-compact-preview-20261022/regression/list-390.png,63742,c417a9175c5ed433b7949889c7b44d800839f362d1e4b79ac19b8989d8355f51,image,390x844; RGB; full pixel decode
+docs/qa/insight-compact-preview-20261022/regression/list-768.png,78212,cbcde7d74fd1a86a9513214e50bb73f3fbea2f2a42cbafebcebd8ee2b6b74446,image,768x1024; RGB; full pixel decode
+docs/qa/insight-compact-preview-20261022/regression/settings-1440.png,103500,79b794b126fca978158a5155605c7bede7c7aaa4ad55ebaacc81caa76343c11b,image,1440x900; RGB; full pixel decode
+docs/qa/insight-compact-preview-20261022/regression/settings-390.png,47697,df9781054648ea132a7b7dd494ac9ee0f328e631df599b086031e39db5cdfe08,image,390x844; RGB; full pixel decode
+docs/qa/insight-compact-preview-20261022/regression/settings-768.png,77623,25b065c6ad2f2e7c83f4893383f7b9aa91f6e6b2f7594c4de7b2543eb8bd287d,image,768x1024; RGB; full pixel decode
+docs/qa/insight-compact-preview-20261022/regression/verification.json,1281,9aa2c8257afa092c7c0fc2fedf3e5bde40036e4b93febf8441bcde85072c03c2,text,31 lines fully decoded; valid JSON
+docs/qa/insight-compact-preview-20261022/verification.json,791,79f43f249a8912d2a8f50be68ba5e51a218599d8910621bde44fb23be0448b59,text,21 lines fully decoded; valid JSON
+docs/qa/insight-covers-20261019/README.md,13688,e49ea6026ab43cd2fe6aa1c56441e89811f100ca7581308186f28bdb6f0ed331,text,106 lines fully decoded
+docs/qa/insight-covers-20261019/ancient-inscription-1440.png,371663,00306bbfcd79c59e41db5410c82e79b7099c0b016301bbf6b0a83d10d2a92ca8,image,1440x900; RGB; full pixel decode
+docs/qa/insight-covers-20261019/ancient-inscription-390.png,249714,ae1d561b141dfce09d542db09c1c000a10ed085621bfe43ad589ef211f06d29e,image,390x844; RGB; full pixel decode
+docs/qa/insight-covers-20261019/ancient-inscription-768.png,678553,e58fbb41a0d7d304610e209f3c99364d3a9bdaea182b68426b2ac7b456da7db6,image,768x1024; RGB; full pixel decode
+docs/qa/insight-covers-20261019/assets.json,35853,7781da03992dda36d81678960e42a91d75fdc2fd9e15ace494357e033e3fdb71,text,224 lines fully decoded; valid JSON
+docs/qa/insight-covers-20261019/battery-life-1440.png,324894,2c7137896306ba5af6662d81c7f90f5f6d46ebebf1ef9d23feadad55d79f8d8e,image,1440x900; RGB; full pixel decode
+docs/qa/insight-covers-20261019/battery-life-390.png,198921,c009b3985a24a5206a0f5be94a09a267fa7025cf63bab87c8ae3aec8e1c900ae,image,390x844; RGB; full pixel decode
+docs/qa/insight-covers-20261019/battery-life-768.png,472473,0aedb8d16a94df44891c455a9f2276f7447c6e17a38d45396b3cac52191ddd12,image,768x1024; RGB; full pixel decode
+docs/qa/insight-covers-20261019/battery-life-glossary-390.png,71457,d28d55a64ef73d053939cd0144bc98e15f1c74cc67859ed6a0ac4d482dfd89ec,image,390x844; RGB; full pixel decode
+docs/qa/insight-covers-20261019/battery-life-roles-390.png,77127,de2d794b7d1e9965e8e1733fa7e9360ac1e97fb9c368e5dbe7743104a16e0e01,image,390x844; RGB; full pixel decode
+docs/qa/insight-covers-20261019/cases-list-1440.png,1968811,5a39f52357f019fbc51ac53608dd971f16e919721ad3f0c7a2aae1587ee1a618,image,1440x2105; RGB; full pixel decode
+docs/qa/insight-covers-20261019/cases-list-390.png,1143182,ae4d312edf6380478ad623e2d3d8e0d9034accd61275e69f8b1913f623f04a8b,image,390x4189; RGB; full pixel decode
+docs/qa/insight-covers-20261019/cases-list-768.png,1206776,9f4c9993690a53da681a8799913098a129fc4cb2829a515d748bfaf6d90c3dca,image,768x2415; RGB; full pixel decode
+docs/qa/insight-covers-20261019/cases-page2-1440.png,1822325,6e79cef4a76a5b2cba5e38ded1f263ccf6f07189e09da70387c4a82aa9abd9c2,image,1440x2105; RGB; full pixel decode
+docs/qa/insight-covers-20261019/cases-page3-1440.png,1769088,ad5896de29aee724ad3d472dacc78417a2de75dd071d5ef07a552c9ca5205206,image,1440x2105; RGB; full pixel decode
+docs/qa/insight-covers-20261019/content-audit.json,15783,036437e182e8ef6dc617fdc99364951bfd7f5bb03ebdf6db5b4990a1d1d3b3fd,text,316 lines fully decoded; valid JSON
+docs/qa/insight-covers-20261019/fluid-simulation-1440.png,346154,4537aef63db47407f27acc0200028aa0f55d4c2632443bbf6fbf79e621812cd1,image,1440x900; RGB; full pixel decode
+docs/qa/insight-covers-20261019/fluid-simulation-390.png,211306,415736af45cdb204cb18e76db85d38c559aac17b9440b5603827ba0865abfac8,image,390x844; RGB; full pixel decode
+docs/qa/insight-covers-20261019/fluid-simulation-768.png,543260,6344920d67d54113072dcf9aeeb2ead5a2e09a12626a7f2c05aada32d6a3badc,image,768x1024; RGB; full pixel decode
+docs/qa/insight-covers-20261019/food-image-quality-1440.png,365146,750480da90ea1e1a2ec4b57f2600f66b3097af6e36066684a60fc79e858e562b,image,1440x900; RGB; full pixel decode
+docs/qa/insight-covers-20261019/food-image-quality-390.png,234683,80302e508d4c7107ecaf122468b679309950bfd7d5b8d0934808394fa5843340,image,390x844; RGB; full pixel decode
+docs/qa/insight-covers-20261019/food-image-quality-768.png,587649,998d01ddc613aaca74264317bd59f8e4ad6ae9ae8479a003098cda6945d95715,image,768x1024; RGB; full pixel decode
+docs/qa/insight-covers-20261019/mattergen-material-design-1440.png,314820,5979d5da6c3214889178baa105c7ed80fdd59140d8a885f5ec2358fd3e0f6f81,image,1440x900; RGB; full pixel decode
+docs/qa/insight-covers-20261019/mattergen-material-design-390.png,185434,31e6797d204488821e3dec61a96ba10c939e16867d98c9f628ba2f57b862ef47,image,390x844; RGB; full pixel decode
+docs/qa/insight-covers-20261019/mattergen-material-design-768.png,459050,241a4762b8021fa7e356a17b8969f0b04090fa0d5b1baa2365228b53d1529792,image,768x1024; RGB; full pixel decode
+docs/qa/insight-covers-20261019/measurements.json,15428,76a0b459b66fe5bdfe7d8bfc17aeb6f84423f17d216032ee196a8e19ae9a68bc,text,782 lines fully decoded; valid JSON
+docs/qa/insight-covers-20261019/private-data-ai-1440.png,307743,76b7e03c4fea54f3ec94696754b23936e8148dfb2c2aa8b94afd11a04ee88d60,image,1440x900; RGB; full pixel decode
+docs/qa/insight-covers-20261019/private-data-ai-390.png,178092,7f1a67418fde7d10e076b2d5f49ab822657aab944104be5a5939657eae914cec,image,390x844; RGB; full pixel decode
+docs/qa/insight-covers-20261019/private-data-ai-768.png,431520,d5e34717b4251a0cb81808f98eccac8fcab48fb78bbec53304d7704ffdb2cd5b,image,768x1024; RGB; full pixel decode
+docs/qa/insight-covers-20261019/trends-list-1440.png,1809905,53af7cf5712b2f1df98bf56dfc4eed117c78dff62b52a682e9d0881e3061d276,image,1440x2105; RGB; full pixel decode
+docs/qa/insight-covers-20261019/trends-list-390.png,1017523,eb40f125cfe91a99f4b9b99eb825a2a04f44fbb58bee3dd0f1bd4258a14b2425,image,390x4026; RGB; full pixel decode
+docs/qa/insight-covers-20261019/trends-list-768.png,1087702,05df6f7da6b61004cf4da4c1fb9f0d1d93b70d403184d580e83fcf68a9ed2621,image,768x2383; RGB; full pixel decode
+docs/qa/insight-covers-20261019/trends-page2-1440.png,1636772,d0d08478c0f3f8fa9c1f06d7a41a1d448cb16cc9c3ae275de844fe632bc827ec,image,1440x2105; RGB; full pixel decode
+docs/qa/insight-covers-20261019/trends-page3-1440.png,1002152,fd222e9cc55b8cba878ea1501a755c260c23db13ab900763d044149d045eecdc,image,1440x1618; RGB; full pixel decode
+docs/qa/insight-covers-20261019/verify-covers.cjs,9585,d69f1990c010bb0d5c7f3448cd746182a1949c0b470230dcc59ac81e056427c7,text,158 lines fully decoded
+docs/qa/insight-depth-20261019/README.md,7022,b210bd8d244b5e9fd5757a2c87f6ceb6f9d6c3625b714056c574e8e3a2faeddc,text,56 lines fully decoded
+docs/qa/insight-depth-20261019/before.json,15783,036437e182e8ef6dc617fdc99364951bfd7f5bb03ebdf6db5b4990a1d1d3b3fd,text,316 lines fully decoded; valid JSON
+docs/qa/insight-depth-20261019/content-audit.json,15930,83c43c2beb412fe3215d34d68e79e5b090206a2fbfe7af36baa0ca1e1eb6db79,text,316 lines fully decoded; valid JSON
+docs/qa/insight-depth-20261019/growth.json,4093,966aef60203de5ade84d154bceee502d08649c0e186872542e66e1a3a86bece6,text,219 lines fully decoded; valid JSON
+docs/qa/insight-depth-20261019/measurements.json,20090,4bb7ebc6e5668536dbefd9689c1e162b18b95895ec274985428dcba90e17cdd1,text,1002 lines fully decoded; valid JSON
+docs/qa/insight-depth-20261019/screens-1792401464547/battery-life-glossary-390.png,66510,29dee8319cc5b509f23e4475c1f599aa7beb70f1555767b82890947c41ca8d71,image,390x844; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/battery-life-roles-390.png,78296,71758f3d2c51535ce9a67aeaffad642a972254b4ec23d32a537da4177a8eb557,image,390x844; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/cases-list-1440.png,1968811,5a39f52357f019fbc51ac53608dd971f16e919721ad3f0c7a2aae1587ee1a618,image,1440x2105; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/cases-list-390.png,1143041,45309e2f3ffc88607470fac598e9e98f3779bd727a046e4fa8c67b34599a8d4a,image,390x4189; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/cases-list-768.png,1206776,9f4c9993690a53da681a8799913098a129fc4cb2829a515d748bfaf6d90c3dca,image,768x2415; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/cases-page2-1440.png,1822325,6e79cef4a76a5b2cba5e38ded1f263ccf6f07189e09da70387c4a82aa9abd9c2,image,1440x2105; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/cases-page3-1440.png,1768798,537d344016e5a1bb827f781504de50d7d5354297b1a28e1436fcc5f291ac2fa6,image,1440x2105; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/concrete-crack-segmentation-method-1440.png,215688,f10a2fd4d41f0365dc7584171c17c39a4e23344463a1b3eb61958dabbbef940e,image,1440x900; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/concrete-crack-segmentation-method-390.png,82347,32459d9ba651698eba345dd2743241970b200bc947c95332b5c61baff1a1824f,image,390x844; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/concrete-crack-segmentation-method-768.png,125071,9fc0684b833b4c12dd2087b024c6e1d439b58f67eb05d5f67ceade60385ba151,image,768x1024; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/concrete-crack-segmentation-pilot-1440.png,232999,574dcd0153a04595f6a6d54a6eb259889fb6826cb7fd0b2d6a8c46154169cbda,image,1440x900; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/concrete-crack-segmentation-pilot-390.png,79413,2b74520eaf8c1b701facd78a937aa06dd12fcab5a0c0677a1558546f0bcd802f,image,390x844; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/concrete-crack-segmentation-pilot-768.png,126912,3f527f38e28ef70e17718485767b31d732086ca2b975f7f499b8ded10dc0cd70,image,768x1024; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/few-shot-vision-method-1440.png,195433,f0b0811407d03f192ffbc1ef9279b73fcfb93d80e1bcd3dd121efd23a0e7e6bf,image,1440x900; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/few-shot-vision-method-390.png,86273,6adbcb91da121c8c8cfb8b2dd56bb9c2068c812572211b6ded5a7803d37c2718,image,390x844; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/few-shot-vision-method-768.png,130581,2033107f8165603b3cf9382289073bb682792dfd4a6e46931ddab8d100ef5a8e,image,768x1024; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/few-shot-vision-pilot-1440.png,212234,7ae835995f169812aab2ab599b52fd60102f0eaee3fc807d75246e47204a5051,image,1440x900; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/few-shot-vision-pilot-390.png,78957,2ec985c60177c47340127036c7ebfdc72f9da180ff8a2973455c3b44f0ae674e,image,390x844; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/few-shot-vision-pilot-768.png,130466,0a61acfa332147d13da8ee265c23fccb92fbd438024bb00772886400ed1e09ea,image,768x1024; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/graph-neural-nets-method-1440.png,203943,e516d75560c24244348785e53094be6dadd3726dc0a90a76967be97f86ade859,image,1440x900; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/graph-neural-nets-method-390.png,80146,482ccce353306e83b129973b07aaa38b888fcdc6525bf73406f21e8ec835332e,image,390x844; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/graph-neural-nets-method-768.png,125251,4bde0397b58c4c66a252a9dbd82cb17884b1c8a543e4481c019d26a4d2b5c4f8,image,768x1024; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/graph-neural-nets-pilot-1440.png,204079,4e71f124a79a4792f078b1b4b79aa989c7c6a6c32edceed9fe3ba26749d81428,image,1440x900; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/graph-neural-nets-pilot-390.png,81277,1c61c80edacbae650c45472e33db311a0542044b98df9071dd44a1832a886db5,image,390x844; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/graph-neural-nets-pilot-768.png,130939,bd08a4279f5f8a97533ed901d47f5749ccb53f03a291e705e0f9a818827a3f13,image,768x1024; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/lettuce-biomass-estimation-method-1440.png,216882,dfd07bc4254d78946953c85b733b667b65fa227c369409e9a8846281695e27c1,image,1440x900; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/lettuce-biomass-estimation-method-390.png,88435,1dc5af8159c556abc81fd93a769739e428bbd6a94e761378eadc3c01719f85ad,image,390x844; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/lettuce-biomass-estimation-method-768.png,135484,54b428a5222a0c1b6a56a48f4eb8fd8183b67a0bcbf4ab812cc40439132407a3,image,768x1024; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/lettuce-biomass-estimation-pilot-1440.png,233095,5b9b7990f6500856ad7816aaac23dfa6617b98add91626623441603c79ffe8f1,image,1440x900; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/lettuce-biomass-estimation-pilot-390.png,79550,6be4cf1f063a098577c9bbf55e31eddfe5eb65c9f170fe29b503bf912d5857b6,image,390x844; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/lettuce-biomass-estimation-pilot-768.png,134002,bfcc800162c2fa2df0534dc681e5fb70eefe90237cd9cbf93d05c271d34245d3,image,768x1024; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/trends-list-1440.png,1809905,53af7cf5712b2f1df98bf56dfc4eed117c78dff62b52a682e9d0881e3061d276,image,1440x2105; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/trends-list-390.png,1017523,eb40f125cfe91a99f4b9b99eb825a2a04f44fbb58bee3dd0f1bd4258a14b2425,image,390x4026; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/trends-list-768.png,1087702,05df6f7da6b61004cf4da4c1fb9f0d1d93b70d403184d580e83fcf68a9ed2621,image,768x2383; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/trends-page2-1440.png,1636772,d0d08478c0f3f8fa9c1f06d7a41a1d448cb16cc9c3ae275de844fe632bc827ec,image,1440x2105; RGB; full pixel decode
+docs/qa/insight-depth-20261019/screens-1792401464547/trends-page3-1440.png,1002152,fd222e9cc55b8cba878ea1501a755c260c23db13ab900763d044149d045eecdc,image,1440x1618; RGB; full pixel decode
+docs/qa/insight-depth-20261019/verify-depth.cjs,11657,dfcb3b075acddc8da921efcabb1980c992765603cfa44a1048c2ddc6814e52d8,text,191 lines fully decoded
+docs/qa/insight-discovery-policy-20261022/README.md,5896,ab10fa3c7f020b6baa466fa2f2d49c037aec50d8676a277ca9e3b709947bec26,text,63 lines fully decoded
+docs/qa/insight-discovery-policy-20261022/policy-1440.png,88476,46af3c4abc5e45b035e3a9b65824ec6969d5033e5511026164a627674d21b761,image,1084x774; RGB; full pixel decode
+docs/qa/insight-discovery-policy-20261022/policy-390.png,87953,171bfeff60411c2eb22bd5cd72bfa4a59f9ef04c3f6e843304b7a058c1128211,image,308x1316; RGB; full pixel decode
+docs/qa/insight-discovery-policy-20261022/policy-768.png,91017,a786fb209461156858c613dc7c4fa4d5b8ab0eef26b754d3087eafd09dcbca68,image,646x1116; RGB; full pixel decode
+docs/qa/insight-discovery-policy-20261022/result.json,388,a0ad7f5a1646ae67c634a8b9b9a46734dd37a377e44896ecf4c6554ef25fd0b1,text,11 lines fully decoded; valid JSON
+docs/qa/insight-discovery-policy-20261022/settings-1440.png,110545,d0a7065a0f04ae7683d25b4e8fd4f60a0056467750694d1432dd33259ddc48d0,image,1440x900; RGB; full pixel decode
+docs/qa/insight-discovery-policy-20261022/settings-390.png,50261,95fa58e41a2bcb331c378e0660c6eab7a7014c31195e7e184b598734b86b293e,image,390x844; RGB; full pixel decode
+docs/qa/insight-discovery-policy-20261022/settings-768.png,82519,62f82b2b7b8d1fc287678b0952c4262f991676a4f8827cef97630c27804f8dde,image,768x1024; RGB; full pixel decode
+docs/qa/insight-editorial-20261022/README.md,7336,357c923a604a6b57e0d1ea73e7d456aa40cc606847ef9cce352a9bc4d1909bf5,text,92 lines fully decoded
+docs/qa/insight-editorial-20261022/preview-1440.png,194007,c469182d5798baf6961ead297cd33d20dfaf2990b00686fcbbb4c29ce77a45c9,image,1440x900; RGB; full pixel decode
+docs/qa/insight-editorial-20261022/preview-390.png,89301,b33f9b89ff284aac1d00b8c26e088465bfd4b9e1257602b1d5da01f12ed0e767,image,390x844; RGB; full pixel decode
+docs/qa/insight-editorial-20261022/preview-768.png,132006,43c3d7a1f015b550455e205394b76b0082f04555461c6562d16e06198fdbe817,image,768x1024; RGB; full pixel decode
+docs/qa/insight-editorial-20261022/result.json,446,7f652f329faaea528fb2ec2c64a09a3eec44c297dabd725e243e4e3beb472ea5,text,12 lines fully decoded; valid JSON
+docs/qa/insight-enrichment-20261016/README.md,7167,2eed43a0f8ff6454a2675d03eca57101c94aacca4feb0338876cb5cd282db07a,text,69 lines fully decoded
+docs/qa/insight-enrichment-20261016/case-1440.jpg,122355,fdedba03832dc8120b1c5f1d8fe0a525278b2c1640d0dda46f6097d184f0ae8f,image,1425x891; RGB; full pixel decode
+docs/qa/insight-enrichment-20261016/case-390.jpg,52165,08194e7b3fe5fc9fbbe90d0139566e014590a2f72c43f5418aebcf3e378b28de,image,375x812; RGB; full pixel decode
+docs/qa/insight-enrichment-20261016/case-768.jpg,90217,1c736808db0b27a37dcadaac068e9485304cdc73ab3accfc92927031ee92054e,image,753x1004; RGB; full pixel decode
+docs/qa/insight-enrichment-20261016/case-mobile-body.jpg,46230,bb05a3f4d87d7a81d7fbe84feec78d726773e79c2db26e1bfacaf4abb946c12e,image,375x812; RGB; full pixel decode
+docs/qa/insight-enrichment-20261016/trend-1440.jpg,120189,2fd4913975d51ace78395c689bd625d2126494d7df87a0f575dae9cd29e99cc3,image,1425x891; RGB; full pixel decode
+docs/qa/insight-enrichment-20261016/trend-390.jpg,54316,73fce28246837cb299c2ad7c7b9e801be443ef68fa22e4a0a0eee5aa8b692fe1,image,375x812; RGB; full pixel decode
+docs/qa/insight-enrichment-20261016/trend-768.jpg,102493,5af89c6afc2d5bbe903f07229ea91286756ea8eb74e7c0b36a963d076f3a944d,image,753x1004; RGB; full pixel decode
+docs/qa/insight-enrichment-20261016/trend-mobile-body.jpg,50592,e122c30bf62fbf710f689af0a4f122a82f22a492787a99637e21df331664e4ef,image,375x812; RGB; full pixel decode
+docs/qa/insight-expansion-20261019/README.md,11560,ee70e8496859467fe988d6f5b802fcbb271a9d10407e075e2f05acbdf708f036,text,98 lines fully decoded
+docs/qa/insight-expansion-20261019/battery-life-1440.png,289754,cb48335824c2b90f68172b1dc68f9f605ea0ff95acaa082d34465a0f03796ec7,image,1440x900; RGB; full pixel decode
+docs/qa/insight-expansion-20261019/battery-life-390.png,163255,ff56de770936742117e98f9197223cc950e1c5d3940fd8b882902da366b8f4c4,image,390x844; RGB; full pixel decode
+docs/qa/insight-expansion-20261019/battery-life-768.png,391196,e0297c83c05cd98c6724ca527923304296f951c2e51d24d070174981a207dffa,image,768x1024; RGB; full pixel decode
+docs/qa/insight-expansion-20261019/battery-life-glossary-390.png,71457,d28d55a64ef73d053939cd0144bc98e15f1c74cc67859ed6a0ac4d482dfd89ec,image,390x844; RGB; full pixel decode
+docs/qa/insight-expansion-20261019/battery-life-roles-390.png,77187,92be9aa3449f67f2d247effaf75a7259a6af80f21760bb44bf51f89ecb9d2f78,image,390x844; RGB; full pixel decode
+docs/qa/insight-expansion-20261019/cancer-cell-classification-1440.png,358920,ee8195eee17c51c21973a03c3e3acc95c36f1077aee6625342dd24fe59dbda4a,image,1440x900; RGB; full pixel decode
+docs/qa/insight-expansion-20261019/cancer-cell-classification-390.png,250055,6188adabe306892289fcac0f1bc28b107f7df0408c4e5a16a3bd0702242f26ef,image,390x844; RGB; full pixel decode
+docs/qa/insight-expansion-20261019/cancer-cell-classification-768.png,632331,894e4828f7e73ae9cf1a181bbcf47e8dccf3843b3bf3e69445c7e5885b3f488c,image,768x1024; RGB; full pixel decode
+docs/qa/insight-expansion-20261019/few-shot-vision-1440.png,377953,cfd37b1edbbc6c9d82d653b78f0ef88be48cd13e524536c8188322c940c2e4c3,image,1440x900; RGB; full pixel decode
+docs/qa/insight-expansion-20261019/few-shot-vision-390.png,243309,d547efd9bc707804f55c89c73221f4c9ba953e00a6e50bc70cc9e616c4faff45,image,390x844; RGB; full pixel decode
+docs/qa/insight-expansion-20261019/few-shot-vision-768.png,590823,f8df879334e02602e6e78c8397021c1b5f28e3d3307500b64f13458848e7b575,image,768x1024; RGB; full pixel decode
+docs/qa/insight-expansion-20261019/measurements.json,14940,9b43ea60dba547ce1cb5bf52238bd2ffc21331b15c00714bd7ff985bd1d73f5f,text,752 lines fully decoded; valid JSON
+docs/qa/insight-expansion-20261019/private-data-ai-1440.png,251130,0a7e71f481949543eb510e235d9d4fbea2e41a068cbbdebbf5cf83177583ade9,image,1440x900; RGB; full pixel decode
+docs/qa/insight-expansion-20261019/private-data-ai-390.png,109256,8d3cf5a3ad6cb49241b6e67d4964c4372565169a13b8f7dca87ccafbb20b46fe,image,390x844; RGB; full pixel decode
+docs/qa/insight-expansion-20261019/private-data-ai-768.png,232614,c0451597f75fd82c51e5933eddf0e18e1ab825b38136a16ef54b758dfb7da8e7,image,768x1024; RGB; full pixel decode
+docs/qa/insight-expansion-20261019/verify-reading.cjs,5148,d54044b690157ff84c47576da9568e6f317cff20a30742665f745367ac83cf2e,text,93 lines fully decoded
+docs/qa/insight-pagination-20261022/README.md,2081,a29e2930bddc5b898dfa841aeba0c6e7e556f800ea5233265dc3071adf968187,text,20 lines fully decoded
+docs/qa/insight-pagination-20261022/pagination-1440.png,97574,c9eee4be64b63fd89b7c9a16ec762f9fc5570ca943d3f62a0369841f98360c24,image,1440x900; RGB; full pixel decode
+docs/qa/insight-pagination-20261022/pagination-390.png,55947,70faad8ac2292a3869d280eeb3927b7139f33f3eb3ce40356955d5c2fcddc478,image,390x844; RGB; full pixel decode
+docs/qa/insight-pagination-20261022/pagination-768.png,82807,383629f4c51b00bcb5e51be06a82045d14f4f99fbfe5c53b0235c9a276dbeb0b,image,768x1024; RGB; full pixel decode
+docs/qa/insight-pagination-20261022/pagination-touch-390.png,56682,75598fc56f02698b4540501c68decf134dbec1da6b3debfff25fe2d860f7a6b2,image,390x844; RGB; full pixel decode
+docs/qa/insight-pagination-20261022/verification.json,521,4f4c2a2d7a051512ed1c3b8bb8a3c3680e18c0f63b4a85cd7b13842f505ceaba,text,17 lines fully decoded; valid JSON
+docs/qa/insight-reading-20261017/README.md,1240,ab5e712da233c0e575795b1743eb53bb4df470bf1d668b2915936cb53d7f6466,text,17 lines fully decoded
+docs/qa/insight-reading-20261017/case-1440-top.png,119977,368471cca7d2785e62e9477d0e943e742a167ed96f5df4479310499e962a537f,image,1425x891; RGB; full pixel decode
+docs/qa/insight-reading-20261017/case-390-collaboration.png,52547,2cab8304fc470c01a3088ed72460de765f2984989ca989e53d1995caa36ab2e3,image,375x812; RGB; full pixel decode
+docs/qa/insight-reading-20261017/case-390-glossary-open.png,43094,ef5c92d57851d8bd51db12952a4e2b95e129913f6dacac83dc402556f7a118da,image,375x812; RGB; full pixel decode
+docs/qa/insight-reading-20261017/case-390-top.png,56847,fcf6495c8d496f7427525774e06c7267d0059d87ae516105cbbc3196fe385815,image,375x812; RGB; full pixel decode
+docs/qa/insight-reading-20261017/case-768-top.png,105216,e6b5c79f0aabc1e991b0a41445ad36895a8a0337f80c493d211008a8e6b5b357,image,753x1004; RGB; full pixel decode
+docs/qa/insight-reading-20261017/measurements.json,8151,bf56f45be9589e77f934f40498a70912ffb9ba8af8b9f52d8cb89324701ce2c9,text,305 lines fully decoded; valid JSON
+docs/qa/insight-reading-20261017/trend-1440-reading-notes.png,126005,1be58a1c3a0d40a2e8135af957ed59d64791783efb5a6989b2baa6b72e41417c,image,1425x891; RGB; full pixel decode
+docs/qa/insight-reading-20261017/trend-1440-top.png,117632,e46eea8894c9185e708d4ac6135d431e7563a5ff67aa7aba01db6317c1812be7,image,1425x891; RGB; full pixel decode
+docs/qa/insight-reading-20261017/trend-390-glossary-open.png,41299,0809a996801d74abe457c6bea583869633b1b5a889998578709b7602e917a3cd,image,375x812; RGB; full pixel decode
+docs/qa/insight-reading-20261017/trend-390-top.png,51324,db01bdc12759e16731b19c410627f64d87df34e078f47b5b1bab5acb2c178407,image,375x812; RGB; full pixel decode
+docs/qa/insight-reading-20261017/trend-768-top.png,101057,9b0069491937b8d182936b3dabfbcb48fc2691056dd09a6d91307e68850f7f42,image,753x1004; RGB; full pixel decode
+docs/qa/insight-sources-20261022/README.md,5432,4e00deff4698968e6fb82decf2a897fc23b760ce6d7f076c9f691840c2dde7c4,text,65 lines fully decoded
+docs/qa/insight-sources-20261022/purposes-1440.png,94606,b2a851cf6359681c87a02a90eb31579199f4f7b92d3e1a0e10634d061ad025f0,image,1440x900; RGB; full pixel decode
+docs/qa/insight-sources-20261022/purposes-390.png,46958,0a9b9b7b426904f6ff35a50fa88c57b98e3d660fe82bcdd7ea481e5e7c21a26e,image,390x844; RGB; full pixel decode
+docs/qa/insight-sources-20261022/purposes-768.png,57873,2c00dbc2b069363edb046501e384a1190a8a01e53b1c8393baf55d6757f76441,image,768x1024; RGB; full pixel decode
+docs/qa/insight-sources-20261022/result.json,418,ab2778aa9439a8bfafe67248d1139c63ce3b17cfdad73c905657962452ec64fd,text,11 lines fully decoded; valid JSON
+docs/qa/insight-sources-20261022/settings-1440.png,85256,706674f11d01d586b8a6cd9565b5496ffe0b73fd93b9b2fd83bf1df9988b6cd4,image,1440x900; RGB; full pixel decode
+docs/qa/insight-sources-20261022/settings-390.png,47573,9498e11c18189a7406a3a9d7eec6be491e19be0ffb7313c7189a92d71ec35d52,image,390x844; RGB; full pixel decode
+docs/qa/insight-sources-20261022/settings-768.png,80378,8b5d8c3486b306fa590a47d82d146edbd9949c74d916742c21c0876690c170a3,image,768x1024; RGB; full pixel decode
+docs/qa/insight-table-20261022/README.md,6580,7c510b7bdea3ff0a83afeb4e21557d5fd727f69a713ed09df62cf1f00e334ca0,text,46 lines fully decoded
+docs/qa/insight-table-20261022/filters-1440.png,126157,1015c3ab282632843a36b5adea1a4b724bbf852bceccf5be1b96eb4af0075547,image,1440x900; RGB; full pixel decode
+docs/qa/insight-table-20261022/filters-390.png,63268,6744390990e544dab1490f71b062ea446bb98347912603d75dc5bd87aa7e9bf8,image,390x844; RGB; full pixel decode
+docs/qa/insight-table-20261022/filters-768.png,102906,5c00be54cf9f5b8d3183271bcc1b58a16a5bb80555c8169a6fb8971285029c9f,image,768x1024; RGB; full pixel decode
+docs/qa/insight-table-20261022/list-1440.png,120420,d7848758c96884920611d52bb7cb7f2fe72ecc4ba24bf0eea4491e5a055ea532,image,1440x900; RGB; full pixel decode
+docs/qa/insight-table-20261022/list-390.png,68547,32204c65cfe2270b0673d37d18f07d413bac843d93f55cdb3b21813d74e1f8a4,image,390x844; RGB; full pixel decode
+docs/qa/insight-table-20261022/list-768.png,97561,b389d5bbbcb5ede14246226e8140b942c3cc8d83b0878d373ed4469493478015,image,768x1024; RGB; full pixel decode
+docs/qa/insight-table-20261022/preview-mobile-1440.png,252076,1c419cd86f37128ac013fc30aa78de3fbaa936ce1c25710b19c807bf9d5ba54b,image,1440x900; RGB; full pixel decode
+docs/qa/insight-table-20261022/preview-mobile-390.png,179568,bf1a29bdc35797e064b4e34bf8316a4f4a1c646e7be98880fcc19dbfa17e8587,image,390x844; RGB; full pixel decode
+docs/qa/insight-table-20261022/preview-mobile-768.png,228912,e9ec04bdc568ef074749d58aa40a41c56ff55611175b87aa39e3e404ffd3d3e5,image,768x1024; RGB; full pixel decode
+docs/qa/insight-table-20261022/preview-web-1440.png,257102,36d44c46519313b131e0fdb922f46231d58d31fc218bd448cd3e300f86a5658b,image,1440x900; RGB; full pixel decode
+docs/qa/insight-table-20261022/preview-web-390.png,121973,584ed76ed7230173d3b9ae11598cf48b896800e0846d57ddc13397d70347ef44,image,390x844; RGB; full pixel decode
+docs/qa/insight-table-20261022/preview-web-768.png,234298,8fff90b43ca374c377e159e832568635bea96c93214ae75578be64c6aa0bc2c5,image,768x1024; RGB; full pixel decode
+docs/qa/insight-table-20261022/regression/candidate-editor-390.png,64614,480802dd75a870779d74512a379425e172c6ebc4d3a7c3a88b218b609b6fce3a,image,390x844; RGB; full pixel decode
+docs/qa/insight-table-20261022/regression/candidate-editor-768.png,96322,e9f31e80d00224f46a77e1623cd3627f2640515ae8bd05d5f778b9c182822b97,image,768x1024; RGB; full pixel decode
+docs/qa/insight-table-20261022/regression/candidate-modal-1440.png,194316,15f0dddcc1cbd8be36535d36f6dc906e14f72b615877cb07b814752498e19287,image,1440x900; RGB; full pixel decode
+docs/qa/insight-table-20261022/regression/candidate-preview-390.png,87616,def3b832944dc91c6e94ea6f7041065f53899c146ef2332ba3198dc6a684c107,image,390x844; RGB; full pixel decode
+docs/qa/insight-table-20261022/regression/candidate-preview-768.png,137966,64705c01f8a5d7445d353cb6a4085378bdb031576f9fba98aba91f108065a23e,image,768x1024; RGB; full pixel decode
+docs/qa/insight-table-20261022/regression/correction-modal-1440.png,269269,41798323cbe527cee2ee4d9af2ceb8d59c1693ff2b5df809c3890679c7079549,image,1440x900; RGB; full pixel decode
+docs/qa/insight-table-20261022/regression/list-1440.png,118160,750ff44f3faff973d339f6b0c6c73dedae37ab154c106d61be1931bf24f68302,image,1440x900; RGB; full pixel decode
+docs/qa/insight-table-20261022/regression/list-390.png,68518,7e4ca861513aec6bfc2fcc38d2521c1793668a3a6f00264716e836d5fbfe8907,image,390x844; RGB; full pixel decode
+docs/qa/insight-table-20261022/regression/list-768.png,97531,eb254c3e28c57c244ce47e3e185ca42233c90d4afb1d4748d929a27e7cec9bb0,image,768x1024; RGB; full pixel decode
+docs/qa/insight-table-20261022/regression/settings-1440.png,97656,c68b88e3c98db8103d9e5f095c648cda2979aa10bd7edcb9316caae7e4c417eb,image,1440x900; RGB; full pixel decode
+docs/qa/insight-table-20261022/regression/settings-390.png,47359,0e0f4daeef5796d0e0d2121badc03147a4a6e0bfa4a6dde985386be4c1404e15,image,390x844; RGB; full pixel decode
+docs/qa/insight-table-20261022/regression/settings-768.png,76772,1ea1bd6e4c2f96aab1dc80d5d8449d9e9c9d8ce53413dbff7f8d6883225f1b2e,image,768x1024; RGB; full pixel decode
+docs/qa/insight-table-20261022/regression/verification.json,1281,9aa2c8257afa092c7c0fc2fedf3e5bde40036e4b93febf8441bcde85072c03c2,text,31 lines fully decoded; valid JSON
+docs/qa/insight-table-20261022/verification.json,784,c98b0e00d3928f4600083749a4108da64b0a679286085cf1c3e3321f58371fd6,text,21 lines fully decoded; valid JSON
+docs/qa/insight-workspace-20261022/README.md,10862,ff60a2fb604ad877efe5bd5bfbd058597bf6a8402e13e769f2f1890f8077638a,text,68 lines fully decoded
+docs/qa/insight-workspace-20261022/candidate-editor-390.png,63665,9e56a5292efa73d050216f76327793044a1b7b916fc09f0c696a2eb1744d42a3,image,390x844; RGB; full pixel decode
+docs/qa/insight-workspace-20261022/candidate-editor-768.png,88573,fd00b461fc8a81f826cc47e565e13457b429921d3d9383b3b054e6b34dfadc00,image,768x1024; RGB; full pixel decode
+docs/qa/insight-workspace-20261022/candidate-modal-1440.png,168084,b9d13a80c9de7f4d6e3424480f2a4f7c68f322c3c21b766f97db59e1844c67e9,image,1440x900; RGB; full pixel decode
+docs/qa/insight-workspace-20261022/candidate-preview-390.png,74909,4569d2f0064e477d8f35453eb1cfba05224fd46103c94e2f6d9de2adfa8cf6e7,image,390x844; RGB; full pixel decode
+docs/qa/insight-workspace-20261022/candidate-preview-768.png,109688,9be2d2d10fab87c6142c4584624e061781d8934f2bf90eba0f9f7c773551d4b6,image,768x1024; RGB; full pixel decode
+docs/qa/insight-workspace-20261022/correction-modal-1440.png,486411,35e363373c6f868e774db9e972bb2090777e21ca54875ab7a4ebcd21dcc7578c,image,1440x900; RGB; full pixel decode
+docs/qa/insight-workspace-20261022/list-1440.png,123556,cc20dcdc3dc868bb304ce2403a7c8d2aaf50ccf335ca4ef4205359a8de79c44b,image,1440x900; RGB; full pixel decode
+docs/qa/insight-workspace-20261022/list-390.png,47239,23b0ebc4d8feee621e4d5c22b8d8ca2f442bcbd40e5f938c1b7679548554039a,image,390x844; RGB; full pixel decode
+docs/qa/insight-workspace-20261022/list-768.png,90813,cc84295ca7c4943072fa45255c38825cc58259e457922ff3214ce066024c4ee9,image,768x1024; RGB; full pixel decode
+docs/qa/insight-workspace-20261022/settings-1440.png,100601,8a9e5b3e56116121835c8dd5d65d8651c098635ecfbc82d036fa8a48078a79db,image,1440x900; RGB; full pixel decode
+docs/qa/insight-workspace-20261022/settings-390.png,46120,b467ef77423ede308d2c21a3f42ced6333c9b894af72cca93a21359389a9c719,image,390x844; RGB; full pixel decode
+docs/qa/insight-workspace-20261022/settings-768.png,78283,d565162a23846b1786c51488e9fb4471a15ceb93db0d22c58ecb79581681cbac,image,768x1024; RGB; full pixel decode
+docs/qa/insight-workspace-20261022/verification.json,1281,9aa2c8257afa092c7c0fc2fedf3e5bde40036e4b93febf8441bcde85072c03c2,text,31 lines fully decoded; valid JSON
+docs/qa/list-editorial-20261009/README.md,3712,a129056dc0f4b8e212dd583bcfb75a1df381a035406b81f2968fe06299c99f81,text,43 lines fully decoded
+docs/qa/list-editorial-20261009/editorial-cases-1440.jpg,434334,fd6303cdc0fca33ec4460fda20d40806028a09acc63b51d8f49dc9cf53259423,image,1440x2518; RGB; full pixel decode
+docs/qa/list-editorial-20261009/editorial-cases-390.jpg,291970,64c5dc8907cc60cf3e8c17f862f5170fce90d2154dddc14c733cfa3ad32e1731,image,374x4508; RGB; full pixel decode
+docs/qa/list-editorial-20261009/editorial-cases-768.jpg,302327,1a3d97ae993e0dd2ff1b8af1977f5e969e189285c5bd81a4e16b1c2dfa3c4234,image,752x2806; RGB; full pixel decode
+docs/qa/list-editorial-20261009/editorial-trends-1440.jpg,438008,5343dcd2003be5c8cbc9a679dba722c163dafabaf9599e68873b641f7eff247a,image,1424x2513; RGB; full pixel decode
+docs/qa/list-editorial-20261009/editorial-trends-390.jpg,287439,b98f8a379a190990dc26fc68c84fcd0caa88feeb2a50bdd2780544c6afdb2a50,image,374x4348; RGB; full pixel decode
+docs/qa/list-editorial-20261009/editorial-trends-768.jpg,300777,3fd003d362ace3b5b09aefcb3c687228eed52fca54086ade70937e9a413e9084,image,752x2806; RGB; full pixel decode
+docs/qa/list-editorial-header-20261009/README.md,3288,9502179759c5a921f46f8e2a88a0ec231eedf39a8d4413d7ab8eb76bf5005f72,text,37 lines fully decoded
+docs/qa/list-editorial-header-20261009/cases-1440.jpg,411563,659b1413d6cc8a424f7e9366653ffcfbef3e8fc5b4aa9aa6fa503eb7729426b5,image,1424x2415; RGB; full pixel decode
+docs/qa/list-editorial-header-20261009/cases-390.jpg,293067,a8b877e5928b820ac19278b929c25592b08bc77acdb73890652e3beaf520b742,image,374x4422; RGB; full pixel decode
+docs/qa/list-editorial-header-20261009/cases-768.jpg,294369,6ba279f39436ecb156cb53e94576b864fdd978746c520f1ae4a2d829c7d92fe9,image,752x2700; RGB; full pixel decode
+docs/qa/list-editorial-header-20261009/cases-header-1440.jpg,107741,e8184800f98c0ed315b3238c73f0f7594301302ce1b4413cc48d6b6bcc448bf5,image,1440x851; RGB; full pixel decode
+docs/qa/list-editorial-header-20261009/trends-1440.jpg,373370,13b372370b80ed5c91aa35382fde106b50e6cffb26cd77fe8a5983c3b3cfda72,image,1424x2098; RGB; full pixel decode
+docs/qa/list-editorial-header-20261009/trends-390.jpg,267581,7d934e4e3412d593908892e81498ed37a714e8334833f56f685993d53d01b351,image,374x3930; RGB; full pixel decode
+docs/qa/list-editorial-header-20261009/trends-768.jpg,267930,957eab81026f298c817224a63f2f7533ab03327e6c6cd51bffe4b73776fd8a04,image,752x2400; RGB; full pixel decode
+docs/research/README.md,1684,e6c3ec620b71d7427e77f3a35edeb211e639f9b6ca211e15caa2a07bfb4bb5f6,text,22 lines fully decoded
+docs/research/insight_content_strategy_guide.md,6577,205d7783c36696ddca0f06d5bbac995b518aa8055df01ddd9ae9c07c65a98bb0,text,78 lines fully decoded
+docs/research/research_platform_market_analysis.md,14903,4ef58a91bfb0e899f679fc94155829249c9093c411904c39e8e8cbdfcc363454,text,174 lines fully decoded
+docs/research/연구자 커뮤니티 · AI 개발자 매칭 플랫폼 시장조사.md,30833,a234c104bec2d1ca389b940adc2018623af13295e6b10dfa990cfeb697c236a0,text,371 lines fully decoded
+docs/research/연구자 커뮤니티 · AI 개발자 매칭 플랫폼 시장조사_클로드.pdf,735927,14b326a52b431002c7f1ebd665a1cd627c8bae04879024b5e91b3cf468c75d7f,pdf,5 pages; 4347 text characters; all pages extracted/rendered
+docs/research/연구자_커뮤니티_및_AI매칭플랫폼_시장분석보고서_안티그래피티.pdf,501428,79d2bde98b627c1a0cc36c93ba365b56914fa38b93162750ad8fca4c25297d42,pdf,4 pages; 3752 text characters; all pages extracted/rendered
+docs/research/유저_페르소나_시나리오_가이드북.pdf,809610,03ae61c2c371443207881ccbf8833c78e1030dd5c8e0c9f35abf50cfcd890473,pdf,3 pages; 3402 text characters; all pages extracted/rendered
+docs/research/인사이트_콘텐츠_전략_및_번역가이드.pdf,381822,b6ac85f1a6142465f21ec81d02083fc6bffa8e59e48320f8de25f5baaa5e3548,pdf,3 pages; 3298 text characters; all pages extracted/rendered
+frontend/.gitignore,23,0e2810bf3f1fc7a01a63a1f940d3be5983cbe54cdfebe12a6c635dcf0e7d7dea,text,3 lines fully decoded
+frontend/README.md,1498,8afd9225995929254fb16137e31f7aac5a204da76ca91be4e917c5f59fcbbb50,text,37 lines fully decoded
+frontend/eslint.config.mjs,393,3de4ba23ff1f687685651cad622700613998de80daa30ac4d82c47776a04019d,text,16 lines fully decoded
+frontend/next-env.d.ts,262,85ae5aee75f011967cf2d25cbc342f62d69314e9d925f7f4aa3456fc2cffcca6,text,6 lines fully decoded
+frontend/next.config.ts,104,ab4c61f6ee100ae43610a18512f1ebcec842bb2405431e1009266173f21cf772,text,5 lines fully decoded
+frontend/package-lock.json,218312,7a08f92834b096aa0af72702f2f32efd06a4641a906810e77fac7b4a4d4ebe24,text,6376 lines fully decoded; valid JSON
+frontend/package.json,614,fff254f494ed8b134231876999594b7cd0d73576d28f33f8291a4fff41466bda,text,27 lines fully decoded; valid JSON
+frontend/postcss.config.mjs,94,dfac7ac2d86d326a0e5adb024e7943c181393ed17a5fcb8f0315b24c7da6ddde,text,7 lines fully decoded
+frontend/public/generated/ai-trends-card-v1.png,1911014,dd7ead26053ec3a2e17e820d8bd0488cee1092607bc142db9625e9a96412a825,image,1816x866; RGB; full pixel decode
+frontend/public/generated/case-battery-cycling-v1.png,1868968,61617fab6ac1147c1165d2816ce9d5e07e70e1546a8dbcf44655721e3be0729b,image,1672x941; RGB; full pixel decode
+frontend/public/generated/case-concrete-crack-v1.png,2463682,d4ee815945764c2e6ee93680b9a9a937accbece3cbc9dc90f8e9c414ab184b4f,image,1672x941; RGB; full pixel decode
+frontend/public/generated/case-fluid-channel-v1.png,2383006,8c5ae77d862fc1fde3a97bea02628ef109947b04be465ce6b43541d6a0ed9803,image,1672x941; RGB; full pixel decode
+frontend/public/generated/case-inscription-restoration-v1.png,3202984,3231008c91220253751e73da52f7bd24c75d41142f74b70ce8d214e7b7bc214a,image,1672x941; RGB; full pixel decode
+frontend/public/generated/case-lettuce-biomass-v1.png,2205512,11980d811c6ee8f7e1dbf5964a76e03e4ea1f9cc01479115720b00e902c32f21,image,1672x941; RGB; full pixel decode
+frontend/public/generated/case-multimodal-research-v1.png,2115156,e27c032ae8f37146edea767f9a19e1a5936f797b8bbd0f9e2fe5093e833b32b2,image,1672x941; RGB; full pixel decode
+frontend/public/generated/case-orca-acoustics-v1.png,2095954,fce3b9c4adb0ea9240a36dfc9cb737af72521a1f800e48641f9892df6464e200,image,1672x941; RGB; full pixel decode
+frontend/public/generated/case-periodontal-xray-v1.png,1997453,e597ac3eb4e5fb5100b8b2cd538d7346a4f4dc136cdc7b325f4118a0dafc2055,image,1672x941; RGB; full pixel decode
+frontend/public/generated/case-protein-design-v1.png,1870709,822904f449b04e7317b224713a83fa2fb92fff4c11660d2d41fe84b7e1e47cd5,image,1672x941; RGB; full pixel decode
+frontend/public/generated/find-experts-card-v1.png,1715377,897c02df7b3d2671e0fbf77cfb08c983d5dd6280701bb70e61a80ece2b8ea3b2,image,1774x887; RGB; full pixel decode
+frontend/public/generated/labbridge-hero-v1.png,1973516,59987d185144c7be6a363b726d8148ed84e2ddc0b54011ca75db1517a7606c27,image,1983x793; RGB; full pixel decode
+frontend/public/generated/research-cases-card-v1.png,1811030,03c3f3d74b3883277ca26c58fd64fe1f39e8ac693005f62fd7dc94b60cb1bc76,image,1774x887; RGB; full pixel decode
+frontend/public/generated/trend-alphaevolve-v1.png,2196347,8fa5f0cd35339812b6e235af85efab2f59c33616dca245a7a7f42c27617aab87,image,1672x941; RGB; full pixel decode
+frontend/public/generated/trend-co-scientist-v1.png,2103938,90bb0dd730485be149333486170ca28b57881fd738709c4e1961b3e14e4514bd,image,1672x941; RGB; full pixel decode
+frontend/public/generated/trend-experiment-search-v1.png,1827838,4aed67654a9fdaa60bf1703578bbc9e9a0ac744dce0d2ffe9bd946c0d49a43fa,image,1672x941; RGB; full pixel decode
+frontend/public/generated/trend-graph-messages-v1.png,1724125,182d9429e04ce6b49bbe382421e9c7c70d10a908826126b21f2bd041537f618f,image,1672x941; RGB; full pixel decode
+frontend/public/generated/trend-literature-review-v1.png,2233437,e18e61eb37ffdb82ed8ae8d96d0b6be3d63d0da7a6eb5cf69872b4facfa618ee,image,1672x941; RGB; full pixel decode
+frontend/public/generated/trend-mattergen-inverse-design-v1.png,1871258,c99e686c7b7f69499df45003d9db9c9410ab1b606f94ea445b6c216637ab6712,image,1672x941; RGB; full pixel decode
+frontend/public/generated/trend-mattergen-v1.png,2158294,092560a6652405659e74725d8da0f743678988ca063a0e4c5141bb8de95f9518,image,1672x941; RGB; full pixel decode
+frontend/public/generated/trend-medical-review-v1.png,1851801,861b6c038a9c9a88dcbf1863dc4ec83e0bdb8810068031dd9e9fece184086350,image,1672x941; RGB; full pixel decode
+frontend/public/generated/trend-molecule-denoising-v1.png,1782767,d058acfa28d47f664793056ed866cb07f5e39287f65793ae9fb904b25e03b610,image,1672x941; RGB; full pixel decode
+frontend/public/generated/trend-orchard-vision-v1.png,2271568,bfbd7161634d53c7d0983dd719c9b9e49263ef16ae425bbd92a2a48d53acdf88,image,1672x941; RGB; full pixel decode
+frontend/public/generated/trend-private-data-boundary-v1.png,1824665,95568378befb1b6600c1c87f5e9886b694538faf44c55a5d395be413eb358ddb,image,1672x941; RGB; full pixel decode
+frontend/public/generated/trend-reproducibility-records-v1.png,1786296,ae53ee341eb7f487df90ba6b3f387f27f467f4008567d7c1412cd6c1d5551b32,image,1672x941; RGB; full pixel decode
+frontend/public/generated/trend-sensor-logging-v1.png,2262564,933461a6a053ad666646bd2f5c0ae6ae9cac06dd2af1c1948537f00f17e8ed16,image,1672x941; RGB; full pixel decode
+frontend/public/generated/trend-surrogate-comparison-v1.png,2090355,dc76cb0cc714d5e549f235d4a2289afa9acb6485789b0a1f74abeba4d2eca9f9,image,1672x941; RGB; full pixel decode
+frontend/public/generated/trend-vision-prompts-v1.png,1998774,3b1db0aaf2dffe34c7bbd78085b44a97e3fffc32726b9f39c5ba3fee8108c8e5,image,1672x941; RGB; full pixel decode
+frontend/public/photos/brain-network.jpg,91760,8360ac340509f43d1a7d2dc438705dc3f6ae88cd418737a8a34cb604f519af20,image,512x512; RGB; full pixel decode
+frontend/public/photos/brain.jpg,162961,b214bf9f6e21226a799685d6bfaef305a8eb0a0e9e65e6b67faecf9c7df7c39d,image,1600x900; RGB; full pixel decode
+frontend/public/photos/cells-render.jpg,82446,4f0dbd1e19c7a7232a210caae71ff748aa1f9b6f9007c922dd5839c808574045,image,512x512; RGB; full pixel decode
+frontend/public/photos/cells.jpg,375323,fb81b15b7c24f819ebefcc4a7d0b48b2786400e39a54b41e3632dfafe716dca4,image,1600x2400; RGB; full pixel decode
+frontend/public/photos/chart.jpg,159318,fbb2dbb5b9f2bf132bc6ad4b8d240ecdf0b13e765b6be29d5f72eb0a276e4f1b,image,1400x933; RGB; full pixel decode
+frontend/public/photos/climate.jpg,213606,063a6f0bcb1081ea4a1080edd521f8b8ab01b7fb2cfaf3d4ce0103dcd5bdc472,image,1600x1063; RGB; full pixel decode
+frontend/public/photos/earth.jpg,200049,548f75cfef5b2f05862b5d035cd574ba61ddf068d791e5ce5b2d5cfd134a7a1d,image,1600x1065; RGB; full pixel decode
+frontend/public/photos/histology.jpg,115420,13fc6a80d1ed29c9d381e7249ea8c267b4e082e7ac97dbd0d1d4c0587daadf88,image,512x512; RGB; full pixel decode
+frontend/public/photos/lab-team.jpg,58158,c883624d1ff5a490e1d43c3cd93186221243fd1ba2e89d122bb74d082a547f69,image,512x512; RGB; full pixel decode
+frontend/public/photos/lab.jpg,689308,da5fdfe302ce48008220b70605fd0b350b4b23ea812a63e79b410d72207ad1fa,image,1800x2700; RGB; full pixel decode
+frontend/public/photos/molecule.jpg,197590,b494b0459fb6b821c0a83fc908bc2652e674721debebfbe03537c265114af480,image,1600x1004; RGB; full pixel decode
+frontend/public/photos/papers.jpg,202481,158b80f456f2303e61f81a7f6ea2823924b0e8d1233b88402a2228cfa26cd091,image,1400x933; RGB; full pixel decode
+frontend/public/photos/people.jpg,118231,b966bef6411ead2a3453517a8cc9394c45fbad225511446cd54bd9689b70c7b0,image,1400x933; RGB; full pixel decode
+frontend/public/photos/petri.jpg,302018,79f5eafe3bd768df14f868976c85ab75525c4143af22af9445787d1f8da86a23,image,1600x1067; RGB; full pixel decode
+frontend/public/photos/pexel-cells.jpg,159453,50967199a1d4768299b9c96458869d34af17cab4af3ac8b4cb60d81c0dc3c555,image,1600x900; RGB; full pixel decode
+frontend/public/photos/pexel-lab2.jpg,177507,7e7dbd1bf53d28796a4cacd7f8079836eb539f1eee40a738f5b73fd388556b54,image,1600x2240; RGB; full pixel decode
+frontend/public/photos/pexel-scope.jpg,194337,50216ab4d7f339e0ac648df7c5b209b282f9614ac02bf4b306bb311337d5a251,image,1600x1068; RGB; full pixel decode
+frontend/public/photos/protein-render.jpg,64764,164e5e1f84da2d2dcdb2c70df0e475e20e7dc67d27f0b4be103fac1f47039e4d,image,512x512; RGB; full pixel decode
+frontend/public/photos/protein.jpg,275722,1962f8f5863e42c5150527d1b0f162181c6236293dd9a4ac6ec7fd283f54bbfd,image,1600x1067; RGB; full pixel decode
+frontend/public/photos/scope.jpg,216323,c9cde8ab5c5ce0afa31056f76e8364da4caabc1da5634586ae464dbcb058b1e8,image,1600x1600; RGB; full pixel decode
+frontend/public/photos/solar.jpg,246563,fc1429c493f6c80c814d5b1d038fdad9d907723c0301aa2f6540c53e200ae4a4,image,1400x932; RGB; full pixel decode
+frontend/public/photos/tissue.jpg,282461,a3b80ce73f4d91cd7f7218e1f5b305303f0ab15cd53a17916646a9a4f1591656,image,1600x1067; RGB; full pixel decode
+frontend/public/photos/turbines-sunset.jpg,47639,119d89d347cbc9ab136317630f6d7e48af032faffa36e8f7a9c2eb5dddc8eac5,image,512x512; RGB; full pixel decode
+frontend/public/photos/turbines.jpg,253441,be8210f78c605abac1e0f82ffbfc6a18942d376c989569b1b672008aadac2bc4,image,1600x1067; RGB; full pixel decode
+frontend/public/photos/waves.jpg,225006,302a6edacd566622b7d7e417092e8fe5012b1cfece0891c33ce666c0f952aa8b,image,1400x933; RGB; full pixel decode
+frontend/public/photos/xray.jpg,157550,f3ede0e19827cf7c8a916f850c7694afc967563d5ad59f7a93aa06908b394d2c,image,1400x933; RGB; full pixel decode
+frontend/public/profile-images/default-expert.png,1392050,b760e361c2cc189a636d608e78b8b788f02463741ea90c0ea838e579f51aeb02,image,1254x1254; RGB; full pixel decode
+frontend/public/profile-images/default-researcher.png,1444781,610a2915235fa9a1d0d5dda4f59b177cc32d7767591c9adc6e8fa482df3f221f,image,1254x1254; RGB; full pixel decode
+frontend/scripts/export-insights.cjs,1144,70ef7f63957161ea6e9f12b1cf1c4fa5ec4a56f582e5192922918cb84815e3a7,text,25 lines fully decoded
+frontend/src/app/admin/insights/layout.tsx,230,a170880430c5bebd022914eb30e2cdad1741a7bbc100490640a97684c253560f,text,7 lines fully decoded
+frontend/src/app/admin/insights/page.tsx,318,9cd439a831ae4553843b39b271a1ffe5ce4e0fa7cb74940e4ef8c2fc6d6cc0fb,text,11 lines fully decoded
+frontend/src/app/admin/insights/preview/page.tsx,2886,54ed2b874526e335e6ddc5db03b6cb97a65bc60da5602d054464743065fb4ace,text,48 lines fully decoded
+frontend/src/app/admin/insights/preview/preview.css,770,0c2eddbb96cf8a8827a6a16494c87c8cf713eb12375ae94f1a2cba08bf28d770,text,35 lines fully decoded
+frontend/src/app/cases/[slug]/page.tsx,961,b8ab97a0d46119883d53053bc9636c24df59254cd2aed7b40c91ba74edb36e7d,text,30 lines fully decoded
+frontend/src/app/cases/page.tsx,1553,a978713f6816f1dc764e975260227efd4d28ea37a656a332ff8e9ae8a2d86530,text,31 lines fully decoded
+frontend/src/app/experts/[slug]/page.tsx,484,072856920bde76e05bb2b2f0a5f9fe5acc7d0bb4f5091da0010868a3a4c0c768,text,12 lines fully decoded
+frontend/src/app/experts/page.tsx,359,2c20b3b4fd7f93a8dbf27b84bc59adbb8589f76106298f2ff34538b583ab9abe,text,11 lines fully decoded
+frontend/src/app/globals.css,10687,02ae6974ab8a1efc2248a09dd001913b3cfac5ae354c89996452692c7f753e24,text,377 lines fully decoded
+frontend/src/app/layout.tsx,1166,690c150258ce4d270dfe705829fd6797f5830d2a8ef0826fbd47577ba35bf560,text,36 lines fully decoded
+frontend/src/app/login/page.tsx,3169,7c63506c99ff3b284d3894cd23c90aa99014e03759b07a09a4d6c4f12a387b2d,text,78 lines fully decoded
+frontend/src/app/my-career/page.tsx,362,ef888b85625e785b4d271aad92f53b16349745475a8da2503828345b6263efea,text,13 lines fully decoded
+frontend/src/app/my-research/[id]/page.tsx,478,5e367f14de9f220b58216276df9af2089e2a9fd85db1090e5b4780e1248ed386,text,15 lines fully decoded
+frontend/src/app/my-research/page.tsx,267,f08efdd0e1a803ccda93ff1f33511f65eb0e3d5e7eeaf510f9001e84392ca0c1,text,10 lines fully decoded
+frontend/src/app/not-found.tsx,494,2157a4336e5d6ff4a36585994d5af9e10c858cadaaac3d98d6a6fbc8bbc82aae,text,13 lines fully decoded
+frontend/src/app/page.tsx,240,7448300fa34a27c563ea0be97f5d80bc9d57ddf0709dea1d737293bfda0fe062,text,10 lines fully decoded
+frontend/src/app/requests/page.tsx,278,8e1b52e896003f5b1dc1823a7b203afce7706a05586d3e8c078296473a9e06df,text,6 lines fully decoded
+frontend/src/app/search/page.tsx,1937,ee5a748e0bca8b265425e3208417180f34db2edf6ae82e323b04f09bb0fd5b0b,text,54 lines fully decoded
+frontend/src/app/settings/profile/page.tsx,365,dd43ce8cc224c10f599f8afeb596dcc0f096c66798a5d7ffe728c8355cb3e705,text,9 lines fully decoded
+frontend/src/app/signup/continue/page.tsx,3262,063d7ca671b8e5709df94948878332bb40e30c38d2956072b0a2d46a123af1db,text,86 lines fully decoded
+frontend/src/app/signup/expert/done/page.tsx,2625,9784a4efb7d1fd03c2bd79e86a993f8488418535075c4ad674acf4e6dc8a68aa,text,57 lines fully decoded
+frontend/src/app/signup/expert/page.tsx,343,9babed765bcf43904bf180ab46fe1d08a867a2a4ce774069fe691f5c607361e8,text,12 lines fully decoded
+frontend/src/app/signup/page.tsx,324,1aaad8ad7c94c62a13762bbf6408f9095c4c6ffb3d72e051ee60dd95dd477513,text,12 lines fully decoded
+frontend/src/app/signup/researcher/done/page.tsx,339,91e931e097e4945960c29ebab9667f6eba484a378d9489f576fb53204b8fa119,text,12 lines fully decoded
+frontend/src/app/signup/researcher/info/page.tsx,388,f56467ed3eb44326448b3fe77a6139539a820b3c0d90209736abe0fadc72c53a,text,14 lines fully decoded
+frontend/src/app/signup/researcher/page.tsx,396,1578bb3e428e72a6a5dcb13d513407629ed79c19859d04a703cc704654d36d61,text,14 lines fully decoded
+frontend/src/app/trends/[slug]/page.tsx,968,36488e221810ed1bf05ac5c9fbf308ed0d0b913531a3be497724fabb6915dbf2,text,30 lines fully decoded
+frontend/src/app/trends/page.tsx,1543,0f0398774f53fd5546cf560f11f6af4b01a9dec48680ed26d311d34bb7fcbe85,text,31 lines fully decoded
+frontend/src/components/admin/admin-ui.ts,673,4a3ac7d99320257312e6008638ec22a826a945facefad8ff238842f34010fd78,text,4 lines fully decoded
+frontend/src/components/admin/insight-article-editor.tsx,5287,7182ad83a85c788659d03db4e8d5de4bce699c02eccb1f4a3f8d401ed794a279,text,44 lines fully decoded
+frontend/src/components/admin/insight-collection-settings.tsx,11179,6111eaa15e265bfebfa440da8cdf35fd7602b6694b95cff48376e3b900c7bdc7,text,98 lines fully decoded
+frontend/src/components/admin/insight-confirm-dialog.tsx,3211,1aabf0507a1210e7cbf692aae1ecea1beb6add5f8100d8c7156adedae36ee21d,text,42 lines fully decoded
+frontend/src/components/admin/insight-discovery-policy.tsx,4877,5f33cac94d2891230aa04cc8d319121ccf125ac03f38bb523c74157e7a337056,text,30 lines fully decoded
+frontend/src/components/admin/insight-editor-dialog.tsx,17961,59b1fcc4b9e0c64efbba72c5b38b22104aca6e1018b613547f8d07d66916c8fc,text,199 lines fully decoded
+frontend/src/components/admin/insight-editor.tsx,12248,6714cc806c4750633a09140a8f213593687a56f0360480591878b0c05d67dbfa,text,110 lines fully decoded
+frontend/src/components/admin/insight-live-preview.tsx,3971,6e2822727bf20b7ee064780377c829a27684dd26f3bcacabb5e6d03efef23563,text,67 lines fully decoded
+frontend/src/components/admin/insight-review.tsx,8937,374a96417944a9a832d5010d9a473cb7aa156fbe414dea6df4faabf03ce6a209,text,73 lines fully decoded
+frontend/src/components/admin/insight-workspace-table.tsx,3077,327407daf47b2df99e27b2fd2114a227599f559a2f7f38ed45e80e10162a65f1,text,28 lines fully decoded
+frontend/src/components/admin/insight-workspace.module.css,6337,448685931e9cf04c05d4a004ec749c9f6cfebc56cd6160dfccc34e3247f3db2e,text,93 lines fully decoded
+frontend/src/components/admin/insight-workspace.tsx,11696,0f73cfdb5e36079ff71e017aedd64ad5646968dbd1e879f890ea943777268d6d,text,112 lines fully decoded
+frontend/src/components/article-editorial.tsx,2239,aa5e7ddd53f7d8c8b028fc3eb455f65e7a548e5f5d6956d0f7f011e669af7c74,text,50 lines fully decoded
+frontend/src/components/article-toc.tsx,4043,d4cb18878d6bcd03bf5abd67e30de38eeacfc02624a915526f9d690e1f792f38,text,119 lines fully decoded
+frontend/src/components/article-view.tsx,18078,f9680a7bad34059212c94cc4dfe1f454262900d5a601ca92956818b0d2979f52,text,372 lines fully decoded
+frontend/src/components/collab-request-dialog.tsx,15536,3b9e717223a4d38cb36cc05b9768c97585104299406ba4f3b36e25261ec59a93,text,325 lines fully decoded
+frontend/src/components/cover-art.tsx,2475,2c6ec7ddea578be015ad754643e32d5e0a3b2374d6a1abc5dcfa684351cbfaff,text,60 lines fully decoded
+frontend/src/components/expert-browser.tsx,9056,a910eb6e9bf282c7d138fa3e70debe8fce9b098bf3f5fededbef6a07ae26b569,text,215 lines fully decoded
+frontend/src/components/expert-card.tsx,2945,3e193e7e0f613c917c2c5683e49fb25f0aec062b061032b5b8fbdbf5e54f2e8b,text,67 lines fully decoded
+frontend/src/components/expert-detail.tsx,14663,2b9b1c01b2f72bc415502f194c8dd7f549890c87bc1f6f37b89d31d7f9192b86,text,304 lines fully decoded
+frontend/src/components/expert-profile-view.tsx,24981,417b313b5953d18e40df4a6df2a4fd62c349c8423f07fcb3c208d426f8d94fad,text,538 lines fully decoded
+frontend/src/components/expert-request-dialog.tsx,6867,776b982c0f50296d778c08c3a7f2e29d258f8b89a92a3239e59fc4c7b48b91ef,text,145 lines fully decoded
+frontend/src/components/expert-search.tsx,17994,10f83ac0eb40c289ad8e7241bf65a51117fe69b2cd68e4889ba501404d92b0fa,text,380 lines fully decoded
+frontend/src/components/expert-signup-form.tsx,7287,c7e49633da822a535a7119b0a163820d91ace0c508e7477af72dd816ae17f4ca,text,176 lines fully decoded
+frontend/src/components/expert-welcome-title.tsx,664,2c33afeba99b57b3782532893d7b202bf6ef012ad416a14f92033213c413cd59,text,17 lines fully decoded
+frontend/src/components/home-page.tsx,9609,a42fb774b2d328654e1b06b1aba9b51a2f74e7c93659b8a83edb929c034c210b,text,207 lines fully decoded
+frontend/src/components/insight-browser.tsx,11336,79a485f0ba62b7b80278dda60bd1c2e353d6b54594fbbddc5596b735379b4617,text,254 lines fully decoded
+frontend/src/components/insight-card.tsx,4248,a6cb69dc17646c26dcf4c7aecde2ca6c543b4305d47e03e74114c0e90f1a4b89,text,78 lines fully decoded
+frontend/src/components/interview-panel.tsx,3346,82a1389f946bb1654e59b1b40a4ac0b88e1fcc12d8e2414e42cdf873c65ccf9b,text,74 lines fully decoded
+frontend/src/components/keyword-tag.tsx,375,cc6c8454032a0c30cb641da7f400887eecd19ea6879356b3058a75edd963d650,text,10 lines fully decoded
+frontend/src/components/kind-badge.tsx,476,decadacf32daadc2585c259b2674e0a5adc06b70107be20db21121bf4f2f3a57,text,12 lines fully decoded
+frontend/src/components/modal.tsx,6884,c7befe700083106e0f0f829f330a08fc0061a22e26e2ba54d253baad334d3b37,text,184 lines fully decoded
+frontend/src/components/my-career-collaboration-modal.tsx,4621,99b71658cc75519b2bf38bffe309c3c5143725c49a17390f54846db76a08fb25,text,116 lines fully decoded
+frontend/src/components/my-career-history-modal.tsx,9113,828e5e3c235d03f0be5b28ea28dfd9b09d5f8d7a9bf44aa1e869d5760ade0761,text,203 lines fully decoded
+frontend/src/components/my-career-intro-modal.tsx,6325,420deb84688f1aedc4ab79175f622b36d8cc9533ab2b879fc2f510e9bd758beb,text,144 lines fully decoded
+frontend/src/components/my-career-portfolio-modal.tsx,9931,8185520aff224e59218598b7231a0349fc09e75dabf13a4a57b0d25bbd84ca5f,text,212 lines fully decoded
+frontend/src/components/my-career-profile.tsx,22824,64efcb89513b48a59ed5ed8ac8e391c45917dfc3857d5ee8bfa0340618559de5,text,473 lines fully decoded
+frontend/src/components/my-research-detail.tsx,13770,29bb64abb1cf2fdf960aeea8cca7a29c07155ac16c392ab4e877d77e435a7611,text,294 lines fully decoded
+frontend/src/components/my-research-list.tsx,10535,1a930678b96a1e6090da426d36e07b44ffdb1cadcadc7d4627f4972ea05db00d,text,236 lines fully decoded
+frontend/src/components/my-research-modal.tsx,23016,fb1e08c2ec72461f8b0e503ae2435ede1a62500479411ca665f55f4d7dd097ba,text,503 lines fully decoded
+frontend/src/components/my-space-shell.tsx,2401,5e71e2c23a7b6f4ba29d3e1b4f3f9bdc216009ce8e3a9070995cc70d06f8940b,text,63 lines fully decoded
+frontend/src/components/notification-bell.tsx,5773,c26a418ac557400919fd8a07e17b4200bffdc2858742dd16a04bea979cfa0132,text,139 lines fully decoded
+frontend/src/components/notification-list.tsx,2144,0a8cd78287c7c8b4fd8b0f689a83243e305111cc53b239714fb3b53952d61793,text,51 lines fully decoded
+frontend/src/components/page-container.tsx,437,241aa3f1b1fb3ef3636e07bea2c996d588854f0361a83d1f1773f9fe1226dc43,text,14 lines fully decoded
+frontend/src/components/profile-settings-page.tsx,21924,0879614992612ff414444b89de47970031e9bf24c65c131b8454aaac93344bef,text,489 lines fully decoded
+frontend/src/components/received-requests.tsx,20243,6afa0c28b3079c6bc1cfa675305b891c75f6e34fae5754ab63b2811b7bcdeae4,text,481 lines fully decoded
+frontend/src/components/request-parts.tsx,2490,876426175f541cf1ecc81f94fc39c71d6feef628db5bd12f2b5976e504ed5959,text,59 lines fully decoded
+frontend/src/components/requests-page.tsx,1757,e6e2b7c91b578fde6aa7f4a18cd44a76f523e6a1b162435762a2f7a7720b1cd3,text,39 lines fully decoded
+frontend/src/components/researcher-info-form.tsx,6065,ce1abb9def5c774c915a4958f4632593bbcac0c85805ddf487df04fe9dc00926,text,137 lines fully decoded
+frontend/src/components/researcher-signup-done.tsx,3025,34f2cc3ab328be832e0b65c3c7501568cec7214ba7d79f9136bf63670e931b7a,text,63 lines fully decoded
+frontend/src/components/researcher-verify-form.tsx,13557,f560e1853b3b4d930d3c0e16187725e300e4595e05b18eb528fe4d18f1fc6556,text,342 lines fully decoded
+frontend/src/components/sent-requests.tsx,21479,efd1663f401689a928ad9c8625779f8e4aa97680d1492c5ac75de96fe67d2619,text,480 lines fully decoded
+frontend/src/components/settings-institution-modal.tsx,10248,39ff47e99dfe41461ea59b5715c18a82dae8395e6d7a378f2a7feac8e8d11442,text,232 lines fully decoded
+frontend/src/components/settings-photo-modal.tsx,4520,9c20f16964b22eacb1113a365f3953490c9b6f2e6057b93cb239007c14c6fb17,text,101 lines fully decoded
+frontend/src/components/signup-role-form.tsx,3763,49aa2e2dc691248f56db8b4127dc14b33498ed6ef4be9e8582d78d29a3a580a5,text,106 lines fully decoded
+frontend/src/components/signup-steps.tsx,1165,876a7c7dfd8a38b7e5c7f9951cc7274b41ed674bbf83a11401600ae25af7e34b,text,30 lines fully decoded
+frontend/src/components/site-footer.tsx,1006,204534b5c33269adf3e2fe3094d947c59e2221280f774114495f7b35ee81130f,text,26 lines fully decoded
+frontend/src/components/site-header.tsx,13864,81c896500848ede3184bbe284e970eb8ba397ffce879a4c2f2c667d238f97cf4,text,343 lines fully decoded
+frontend/src/lib/admin-insights.ts,11141,13a100286622836a8d7adf64a093f8cbf13c6a51d15cf203d53ae135be0eee7a,text,165 lines fully decoded
+frontend/src/lib/api.ts,1718,67693238979ba26e00a0f1e5459179cf143edb8b03884989ef92101af78cadf2,text,35 lines fully decoded
+frontend/src/lib/collab-requests.ts,4569,b2004f7f43f4cfb2f15c1a04d7ce631db9d9278b39867bca25244bd2caaabbed,text,118 lines fully decoded
+frontend/src/lib/email-domain.ts,1461,865f892fb6f7caf8d33478d5e377281c84e62b54a17a40af8fe64f9bb9aff470,text,37 lines fully decoded
+frontend/src/lib/expert-search.ts,5519,48cc61d15550262f059e930188cbb4a71e3fd51296d27f13c25162a60f9df044,text,125 lines fully decoded
+frontend/src/lib/experts.ts,11385,59a2f051ed255af81e2f26f0d6bb7b3b5f4aab75ee4d01bf24579d74a439db65,text,301 lines fully decoded
+frontend/src/lib/insight-case-details.ts,137733,c58662789506f80b7ae0966609621157538776b0a5812fbaeb4947133f3d1dfe,text,841 lines fully decoded
+frontend/src/lib/insight-covers.ts,4129,0471ea7f4dbb51c7c0ada36131e93dbaca51981e9a843283bb03d465b7a465c3,text,40 lines fully decoded
+frontend/src/lib/insight-enrichment.ts,5769,6b4370884a2198eda45121d8184bb2cf9f74ed2a76a6846d92ec6abe9e486213,text,110 lines fully decoded
+frontend/src/lib/insight-trend-details.ts,114198,92acef60cd77322afaf0765a8a9b04015de46ec6d2f4036f0caa0468cfd8fd88,text,707 lines fully decoded
+frontend/src/lib/insights.ts,122515,943e0c4c3af58231fcad4525cbf128c29c2bfb3d901e09fe4981c6be351afdaf,text,1959 lines fully decoded
+frontend/src/lib/my-career.ts,4633,0cd20be6f0e008ebd14ddd17f2bc2bdcfaf5e84bcfb662d3795a459b3a4f0761,text,156 lines fully decoded
+frontend/src/lib/my-research.ts,5076,7177971cb913d2a993595f16c303404ea3d0d2823fe43b6bdeb6efebe5e16d07,text,144 lines fully decoded
+frontend/src/lib/notifications.ts,2390,68d68134ab9822f040eca13254bd894aeff7f72409281aba258c6ccab2cbba44,text,54 lines fully decoded
+frontend/src/lib/profile-settings.ts,2047,7e4164fdbc50ed42ebb3a7bcdd25352c3764e154e6b4be1425877d7bdd7f0f79,text,58 lines fully decoded
+frontend/src/lib/taxonomy-options.ts,6935,8046df65f4f8ac390f100a605187f771744a6727794a2e2c2d7a760e53952ebd,text,83 lines fully decoded
+frontend/tests/insight-admin.test.cjs,7003,b6b1f9a86327f34d07a14058c61657fba8670c4ad7a6b760c198d3edd40f36ea,text,127 lines fully decoded
+frontend/tests/insight-preview.test.cjs,4253,6f3ec0fa0e3022dbb879a75f86dc4c548e4fdacdc0667c241f3ca44e78ca839e,text,73 lines fully decoded
+frontend/tests/insight-reading.test.cjs,18687,fe4eb6e7dcf0518cd3ef0e83b4ee650c736807ff2ab039263afd33e65e7a3fb8,text,336 lines fully decoded
+frontend/tsconfig.json,566,e756e7a5c72c69a2f08d40682ab5294bf555ffa4085f634261da2a49615bab06,text,21 lines fully decoded; valid JSON
+infra/README.md,906,cb0a5f1978b0765e4d811b08d06b5c3f6fed35d7c028b4d09e644e07d6d1cf40,text,26 lines fully decoded
+output/pdf/WHAT_THE_LAB_팀공유_에이전트_기능제안_v1.pdf,157677,8d68d10e891e23596b79c5c22eb18bcb4d4f344f50f1b38d049898f184a18361,pdf,4 pages; 4014 text characters; all pages extracted/rendered
+taxonomy/WHAT_THE_LAB_C_Stage4_6_Mock_Expert_Search/README.md,7871,5dce5f32e2afc3c77ffaa079feee9abf110e2f1858c2812e630116d864feffe8,text,133 lines fully decoded
+taxonomy/WHAT_THE_LAB_C_Stage4_6_Mock_Expert_Search/frontend/src/app/expert-search-demo/page.tsx,227,9a61ce59151bddc3717f7c9a685f5ee21e23dec5bd94cc81e932c5077114f966,text,4 lines fully decoded
+taxonomy/WHAT_THE_LAB_C_Stage4_6_Mock_Expert_Search/frontend/src/components/mock-expert-search-demo.tsx,3720,bb9f70bece3f8969c63fc02c56f3497582add3fc188587451bd194cdc9893444,text,50 lines fully decoded
+taxonomy/WHAT_THE_LAB_C_Stage4_6_Mock_Expert_Search/frontend/src/lib/mock-expert-search.ts,2925,bbf8e8d613847552bf98e0dc846aaaabad9d32f14666a6fce766fe1edc73ac28,text,47 lines fully decoded
+taxonomy/WHAT_THE_LAB_C_Stage4_6_Mock_Expert_Search/stage 4-6 가이드.html,7069,f4bb4e286d8615178198a5ca4913d0e643b9fd8b9b70c54bd9160376c6abec67,text,1 lines fully decoded
+taxonomy/WHAT_THE_LAB_C_Stage4_6_Mock_Expert_Search/taxonomy/mock-experts-v1/data/capabilities.snapshot.json,50079,d49a4e3f20b170f1c40526605957f3efaded11602ba1ef6e18202411fa00dd07,text,1362 lines fully decoded; valid JSON
+taxonomy/WHAT_THE_LAB_C_Stage4_6_Mock_Expert_Search/taxonomy/mock-experts-v1/data/experts.mock.json,13497,854e7b55c2b8301641ed842fa6ee41928e4de248b9c218a121de2d33189c4fcd,text,582 lines fully decoded; valid JSON
+taxonomy/WHAT_THE_LAB_C_Stage4_6_Mock_Expert_Search/taxonomy/mock-experts-v1/data/research-fields.snapshot.json,52610,7ceafe7275182326f284b0a0d7ce241c7120137dcf3ae5eb3024d66a14e2a5a1,text,1413 lines fully decoded; valid JSON
+taxonomy/WHAT_THE_LAB_C_Stage4_6_Mock_Expert_Search/taxonomy/mock-experts-v1/data/search-aliases.snapshot.json,160099,aba4e7eac1da490e0b2a9e3629ec61adeee28fcd140f6cd39f2390a2298b609e,text,6322 lines fully decoded; valid JSON
+taxonomy/WHAT_THE_LAB_C_Stage4_6_Mock_Expert_Search/taxonomy/mock-experts-v1/mock-experts-review.csv,5056,d67372f22b6e8dce4f1a603294d6519ad909161aa501ba5d07c240082d19e915,text,21 lines fully decoded
+taxonomy/WHAT_THE_LAB_C_Stage4_6_Mock_Expert_Search/taxonomy/mock-experts-v1/tests/test_mock_data.py,1340,771997f778c2f1b3054d31a4939b2a6dff0e446e72b55c39f706e852b8a5dfa9,text,21 lines fully decoded; AST valid (1 functions)
+taxonomy/WHAT_THE_LAB_C_Stage4_6_Mock_Expert_Search/코드_이해_가이드.html,7069,f4bb4e286d8615178198a5ca4913d0e643b9fd8b9b70c54bd9160376c6abec67,text,1 lines fully decoded
+taxonomy/WHAT_THE_LAB_C_Taxonomy_ERD_Guide.html,27870,62ce48be79174b73a34244b5f4f2978939d4cfb466cb58fba99fbacc7fa7b40c,text,47 lines fully decoded
+taxonomy/v3.0/README.md,3863,be609542d76708808944da9eae321e256840d0e4f461d8768c9b745ea0db136d,text,50 lines fully decoded
+taxonomy/v3.0/WHAT_THE_LAB_Taxonomy_Integration_README.md,18794,bcf85cb8da25ced1158e684ad136a44c5b9205271f79de65f3203e6041810dcf,text,354 lines fully decoded
+taxonomy/v3.0/WHAT_THE_LAB_Taxonomy_v3.xlsx,111717,0fa620309beb9cbcc01f6d4bfdf3305be0b09e248c1e3a845307786064c44e9c,xlsx,19 sheets; 9301 nonempty cells including formulas read
+taxonomy/v3.0/capabilities.json,50080,25c6ecd77129f968b95235da476df2100412841bccb0208751e20bb1b367a2a9,text,1362 lines fully decoded; valid JSON
+taxonomy/v3.0/categories.json,4216,bbe94350acfff0385eb5a83640be717e60248736905a85365fdfd380bbd53bb2,text,170 lines fully decoded; valid JSON
+taxonomy/v3.0/golden-test-cases.json,6552,91810d7894ca61580ff751fd7e5a036e5b5d47be57070183b0ef44b6e116272f,text,266 lines fully decoded; valid JSON
+taxonomy/v3.0/migration-v2-review.json,25902,fcead1c144c08c34a70c9bd602fabb6e22a68981d451d08f3956b468e4c48d6f,text,762 lines fully decoded; valid JSON
+taxonomy/v3.0/nextjs_example.ts,922,a1920723a19291de392c7c6fc5785c0510f98b6a23977674473cf46571b655de,text,16 lines fully decoded
+taxonomy/v3.0/postgres_schema.sql,2844,656854f85463bcfb95a8bbe442e17c4f8ecc73c530b6a5a2e906da2268a29f54,text,15 lines fully decoded
+taxonomy/v3.0/related-search-terms.json,17200,5668e5e2521aee4b3d3a6ddc70215b8641d346d003c7e3b06eac1660e7ed8c23,text,714 lines fully decoded; valid JSON
+taxonomy/v3.0/research-fields.json,52611,2833363e65fd83092bcbc1d99e79fc9df3054b6f2fe89b13cdb74ab3b6ffa939,text,1413 lines fully decoded; valid JSON
+taxonomy/v3.0/search-aliases.json,160100,0bb9b3c3afb17c4acfd0facf1b79f225d6bf6951fb1444e6e8a9fb5be023139e,text,6322 lines fully decoded; valid JSON
+taxonomy/v3.0/search-rules.json,5425,fdeb00a5dda37167944b475b5b62afee137317b274e696b856952180bb6dff6a,text,170 lines fully decoded; valid JSON
+taxonomy/v3.0/taxonomy.schema.json,1010,a17523d21a5d6ae897ddc79a7ffe25170ed36cb8f5053ce96aa54dfd12135eb5,text,58 lines fully decoded; valid JSON
+taxonomy/v3.0/test_search_smoke.py,1954,918fbc2331b32d473328142657b5db1bf7b11625e7e08ed67c71153bfabf73d3,text,22 lines fully decoded; AST valid (2 functions)
+taxonomy/v3.0/tools.json,7229,1594785d710c7c3fb23d34686e57ae85f70d8647e27cc265bc07e014701a30ab,text,258 lines fully decoded; valid JSON
+taxonomy/v3.0/ui-filter-groups.json,3311,b7e8cd8b5c2f14a5b9d781398182f33e039cda18665467551b86bf785ebc54d1,text,112 lines fully decoded; valid JSON
+taxonomy/v3.0/ui-group-members.json,9683,1e320011b460bb7d7aec36ef1bb8da5e99eeffbbbcc1f1b962c0ac24a4dd3e77,text,482 lines fully decoded; valid JSON
+taxonomy/v3.0/validate_taxonomy.py,2846,21921ce8b3c0144cd08f292f4df8c4c796d7fae21c67822e2f4030cf4171a88a,text,41 lines fully decoded; AST valid (3 functions)
+taxonomy/v3.0/validation-report.txt,1231,31249e0ab8674f85992998f73490f2fa8026e88c5ede2ddc4a3d4a666cc4804a,text,15 lines fully decoded
+taxonomy/v3.0/분류표 가이드_v3.pdf,574168,741f3ac9017f33c2e6de21798b3dc71658cec888ee72c6f5d5d9607699756342,pdf,17 pages; 8338 text characters; all pages extracted/rendered
+taxonomy/v4.0/README.md,16037,d6cb719e899e94719227209bfabdf15963157d1a010f409fea8ec81bf56cc506,text,290 lines fully decoded
+taxonomy/v4.0/WHAT_THE_LAB_Taxonomy_Production_Design_v4.xlsx,80673,be6392d97fad6ef5351cfd2783480eb2c8973eecd7d06beec8140690d18af4e3,xlsx,15 sheets; 9733 nonempty cells including formulas read
+taxonomy/v4.0/authority-references.json,2838,f61a6bb1ca9dae49037c2ea726bfa61fff801390677858708caaabc68707f963,text,74 lines fully decoded; valid JSON
+taxonomy/v4.0/capabilities.json,50080,25c6ecd77129f968b95235da476df2100412841bccb0208751e20bb1b367a2a9,text,1362 lines fully decoded; valid JSON
+taxonomy/v4.0/categories.json,4216,bbe94350acfff0385eb5a83640be717e60248736905a85365fdfd380bbd53bb2,text,170 lines fully decoded; valid JSON
+taxonomy/v4.0/golden-test-cases.json,6552,91810d7894ca61580ff751fd7e5a036e5b5d47be57070183b0ef44b6e116272f,text,266 lines fully decoded; valid JSON
+taxonomy/v4.0/item-review-ledger.json,76994,3adfe8d2606f6650870b964d76efda6d3ed78f81c7875fb3726f96b25b579b92,text,2284 lines fully decoded; valid JSON
+taxonomy/v4.0/migration-v2-review.json,25902,fcead1c144c08c34a70c9bd602fabb6e22a68981d451d08f3956b468e4c48d6f,text,762 lines fully decoded; valid JSON
+taxonomy/v4.0/related-search-terms.json,17200,5668e5e2521aee4b3d3a6ddc70215b8641d346d003c7e3b06eac1660e7ed8c23,text,714 lines fully decoded; valid JSON
+taxonomy/v4.0/research-fields.json,52611,2833363e65fd83092bcbc1d99e79fc9df3054b6f2fe89b13cdb74ab3b6ffa939,text,1413 lines fully decoded; valid JSON
+taxonomy/v4.0/search-aliases.json,160100,0bb9b3c3afb17c4acfd0facf1b79f225d6bf6951fb1444e6e8a9fb5be023139e,text,6322 lines fully decoded; valid JSON
+taxonomy/v4.0/search-rules.json,5425,fdeb00a5dda37167944b475b5b62afee137317b274e696b856952180bb6dff6a,text,170 lines fully decoded; valid JSON
+taxonomy/v4.0/taxonomy.schema.json,1010,a17523d21a5d6ae897ddc79a7ffe25170ed36cb8f5053ce96aa54dfd12135eb5,text,58 lines fully decoded; valid JSON
+taxonomy/v4.0/tools.json,7229,1594785d710c7c3fb23d34686e57ae85f70d8647e27cc265bc07e014701a30ab,text,258 lines fully decoded; valid JSON
+taxonomy/v4.0/ui-filter-groups.json,3311,b7e8cd8b5c2f14a5b9d781398182f33e039cda18665467551b86bf785ebc54d1,text,112 lines fully decoded; valid JSON
+taxonomy/v4.0/ui-group-members.json,9683,1e320011b460bb7d7aec36ef1bb8da5e99eeffbbbcc1f1b962c0ac24a4dd3e77,text,482 lines fully decoded; valid JSON
+taxonomy/v4.0/validate_release.py,1432,d1af68ad43e5a82154e66e451dec7f39d288c219e589c2482d7033af02851f4e,text,21 lines fully decoded; AST valid (0 functions)
+taxonomy/v4.0/분류표 가이드_v4.html,105064,599feec31964c8be0ae8841541a0f0c8bd58628a36f8b28196ae7aff2feca613,text,8 lines fully decoded
+taxonomy/분류체계 ERD.pdf,949583,913603687b9d4379fb365d9b830a01ac6b7b04afedcf0e38dc9523f0df39ddf3,pdf,7 pages; 6369 text characters; all pages extracted/rendered
+tests/README.md,848,732b82b3d196db1ebbe7d44dad231c3dc674cb74772ff1aefddc464489da24b3,text,20 lines fully decoded

@@ -1,0 +1,188 @@
+[
+  {
+    "slug": "lettuce-biomass-estimation",
+    "kind": "case",
+    "title": "사진만으로 상추와 케일의 생체중을 예측할 수 있을까?",
+    "href": "/cases/lettuce-biomass-estimation"
+  },
+  {
+    "slug": "periodontal-bone-loss-analysis",
+    "kind": "case",
+    "title": "치과 파노라마 X-ray에서 치주골 손실을 분석한 AI 협업",
+    "href": "/cases/periodontal-bone-loss-analysis"
+  },
+  {
+    "slug": "concrete-crack-segmentation",
+    "kind": "case",
+    "title": "콘크리트 균열을 25 FPS로 분할한 경량 AI 모델",
+    "href": "/cases/concrete-crack-segmentation"
+  },
+  {
+    "slug": "cancer-cell-classification",
+    "kind": "case",
+    "title": "세포 이미지 분류 AI를 설계한다면: 데이터와 검증부터 살펴보기",
+    "href": "/cases/cancer-cell-classification"
+  },
+  {
+    "slug": "microscope-cell-drawing",
+    "kind": "case",
+    "title": "현미경 사진 속 세포, 이제 손으로 그리지 않는다",
+    "href": "/cases/microscope-cell-drawing"
+  },
+  {
+    "slug": "eeg-behavior",
+    "kind": "case",
+    "title": "뇌 신호에서 과제 패턴을 구분한다: EEGNet을 읽는 방법",
+    "href": "/cases/eeg-behavior"
+  },
+  {
+    "slug": "protein-structure",
+    "kind": "case",
+    "title": "아미노산 서열만으로 단백질 3차원 구조를 예측하다",
+    "href": "/cases/protein-structure"
+  },
+  {
+    "slug": "battery-life",
+    "kind": "case",
+    "title": "초기 충방전 기록으로 배터리 수명을 예측할 수 있을까?",
+    "href": "/cases/battery-life"
+  },
+  {
+    "slug": "weather-graph",
+    "kind": "case",
+    "title": "10일 글로벌 기상 예보를 그래프 신경망으로 계산하다",
+    "href": "/cases/weather-graph"
+  },
+  {
+    "slug": "protein-design",
+    "kind": "case",
+    "title": "원하는 구조의 단백질 후보를 만든다: RFdiffusion의 설계와 검증",
+    "href": "/cases/protein-design"
+  },
+  {
+    "slug": "fluid-simulation",
+    "kind": "case",
+    "title": "유체 시뮬레이션의 반복 계산을 줄인다: FNO가 배우는 관계",
+    "href": "/cases/fluid-simulation"
+  },
+  {
+    "slug": "retrosynthesis",
+    "kind": "case",
+    "title": "목표 화합물의 합성 경로를 거꾸로 찾아가다",
+    "href": "/cases/retrosynthesis"
+  },
+  {
+    "slug": "ancient-inscription",
+    "kind": "case",
+    "title": "깨진 고대 비문의 빈 글자를 채우고 연대를 추정하다",
+    "href": "/cases/ancient-inscription"
+  },
+  {
+    "slug": "solar-panels",
+    "kind": "case",
+    "title": "위성 사진에서 미국 전역의 태양광 패널을 찾아 지도로 그리다",
+    "href": "/cases/solar-panels"
+  },
+  {
+    "slug": "orca-audio",
+    "kind": "case",
+    "title": "바닷속 녹음에서 범고래 소리만 골라내다",
+    "href": "/cases/orca-audio"
+  },
+  {
+    "slug": "metastasis-multimodal",
+    "kind": "case",
+    "title": "암 연구에서 영상과 표 데이터를 함께 쓴다면: 멀티모달 설계 시나리오",
+    "href": "/cases/metastasis-multimodal"
+  },
+  {
+    "slug": "research-agent",
+    "kind": "trend",
+    "title": "AI가 가설을 만들고 토론한다: Co-Scientist가 바꾸는 연구의 시작",
+    "href": "/trends/research-agent"
+  },
+  {
+    "slug": "mattergen-material-design",
+    "kind": "trend",
+    "title": "AI가 새로운 소재를 설계한다는 건 무슨 뜻일까?",
+    "href": "/trends/mattergen-material-design"
+  },
+  {
+    "slug": "mattergen-experimental-validation",
+    "kind": "case",
+    "title": "MatterGen 연구: AI가 제안한 소재를 어떻게 실험으로 확인했을까?",
+    "href": "/cases/mattergen-experimental-validation"
+  },
+  {
+    "slug": "alphaevolve-algorithm-discovery",
+    "kind": "trend",
+    "title": "코드를 진화시켜 알고리즘을 찾는다: AlphaEvolve의 연구 방식",
+    "href": "/trends/alphaevolve-algorithm-discovery"
+  },
+  {
+    "slug": "literature-review-llm",
+    "kind": "trend",
+    "title": "문헌 리뷰, LLM에게 어디까지 맡겨도 될까",
+    "href": "/trends/literature-review-llm"
+  },
+  {
+    "slug": "surrogate-models",
+    "kind": "trend",
+    "title": "느린 계산을 빠르게 근사한다: 대리 모델은 언제 도움이 될까?",
+    "href": "/trends/surrogate-models"
+  },
+  {
+    "slug": "few-shot-vision",
+    "kind": "trend",
+    "title": "라벨이 적을 때 이미지 분석을 시작하는 방법: 전이 학습과 SAM의 차이",
+    "href": "/trends/few-shot-vision"
+  },
+  {
+    "slug": "diffusion-molecules",
+    "kind": "trend",
+    "title": "확산 모델이 분자를 만든다는 뜻: 이미지 생성과 무엇이 다를까?",
+    "href": "/trends/diffusion-molecules"
+  },
+  {
+    "slug": "sensor-logs",
+    "kind": "trend",
+    "title": "장비 센서 로그, 버리지 말고 모아 두세요",
+    "href": "/trends/sensor-logs"
+  },
+  {
+    "slug": "experiment-optimization",
+    "kind": "trend",
+    "title": "실험 조건 찾기를 줄여 주는 최적화 도구 정리",
+    "href": "/trends/experiment-optimization"
+  },
+  {
+    "slug": "reproducibility-checklist",
+    "kind": "trend",
+    "title": "AI를 쓴 논문, 무엇을 함께 공개해야 할까",
+    "href": "/trends/reproducibility-checklist"
+  },
+  {
+    "slug": "graph-neural-nets",
+    "kind": "trend",
+    "title": "구조가 있는 데이터라면 그래프 신경망을 떠올려 보자",
+    "href": "/trends/graph-neural-nets"
+  },
+  {
+    "slug": "private-data-ai",
+    "kind": "trend",
+    "title": "미공개 데이터, 외부 AI에 올려도 괜찮을까",
+    "href": "/trends/private-data-ai"
+  },
+  {
+    "slug": "food-image-quality",
+    "kind": "trend",
+    "title": "식품·과수 영상 AI: 개수 세기와 품질 판정은 다릅니다",
+    "href": "/trends/food-image-quality"
+  },
+  {
+    "slug": "medical-imaging-limits",
+    "kind": "trend",
+    "title": "딥러닝 기반 의료 영상 분석의 가능성과 한계",
+    "href": "/trends/medical-imaging-limits"
+  }
+]

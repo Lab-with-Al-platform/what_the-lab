@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CollabRequestDialog } from "@/components/collab-request-dialog";
 import { PageContainer } from "@/components/page-container";
 import { Avatar } from "@/components/request-parts";
@@ -16,13 +17,15 @@ type Role = "researcher" | "expert" | null; // null = 로그인 안 했거나 �
 
 /** AI 전문가 찾기. 공개한 전문가를 검색어·맡길 일·분야·내 연구로 찾고, 카드에서 바로 협업을 요청해요. */
 export function ExpertSearch() {
+  const searchParams = useSearchParams();
+  const incomingQuery = (searchParams.get("q") ?? searchParams.get("skill") ?? "").slice(0, 50);
   const [ableWorks, setAbleWorks] = useState<AbleWorkOption[]>([]);
   const [categories, setCategories] = useState<FieldCategory[]>([]);
   const [role, setRole] = useState<Role>(null);
   const [researches, setResearches] = useState<Research[] | null>(null); // 연구회원의 등록한 연구
 
-  const [draft, setDraft] = useState(""); // 검색창에 치는 중인 글자
-  const [query, setQuery] = useState(""); // [검색]을 눌러 적용한 검색어
+  const [draft, setDraft] = useState(incomingQuery); // 게시판 태그·홈에서 넘어온 검색어도 반영
+  const [query, setQuery] = useState(incomingQuery); // [검색]을 눌러 적용한 검색어
   const [works, setWorks] = useState<string[]>([]);
   const [fields, setFields] = useState<string[]>([]); // 대분류 ID
   const [applied, setApplied] = useState<Research | null>(null); // [내 연구로 찾기]로 고른 연구
@@ -30,8 +33,14 @@ export function ExpertSearch() {
 
   const [result, setResult] = useState<ExpertSearchResult | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
+  const searchGeneration = useRef(0);
   const [error, setError] = useState("");
   const [requesting, setRequesting] = useState<ExpertCardData | null>(null); // 협업 요청 창을 연 전문가
+
+  useEffect(() => {
+    setDraft(incomingQuery);
+    setQuery(incomingQuery);
+  }, [incomingQuery]);
 
   // 처음 한 번: 보기 목록(맡길 일·분야)과 로그인 정보
   useEffect(() => {
@@ -66,24 +75,30 @@ export function ExpertSearch() {
   // 조건이 바뀌면 처음부터 다시 찾아요.
   useEffect(() => {
     let alive = true;
+    searchGeneration.current += 1;
+    setLoadingMore(false);
+    setResult(null);
     search(0)
       .then((data) => alive && (setResult(data), setError("")))
       .catch((caught) => alive && setError(caught instanceof ApiError ? caught.message : "잠시 후 다시 시도해 주세요"));
     return () => {
       alive = false;
+      searchGeneration.current += 1;
     };
   }, [search]);
 
   async function loadMore() {
-    if (!result) return;
+    if (!result || loadingMore) return;
+    const generation = searchGeneration.current;
     setLoadingMore(true);
     try {
       const next = await search(result.items.length);
+      if (generation !== searchGeneration.current) return;
       setResult({ ...next, items: [...result.items, ...next.items] });
     } catch (caught) {
-      setError(caught instanceof ApiError ? caught.message : "잠시 후 다시 시도해 주세요");
+      if (generation === searchGeneration.current) setError(caught instanceof ApiError ? caught.message : "잠시 후 다시 시도해 주세요");
     } finally {
-      setLoadingMore(false);
+      if (generation === searchGeneration.current) setLoadingMore(false);
     }
   }
 

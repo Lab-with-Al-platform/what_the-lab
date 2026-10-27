@@ -1,6 +1,6 @@
 """협업 공간: collaboration(협업) · collaboration_schedule(일정) 테이블을 공통 Supabase에 만듭니다.
 
-SQL 본문은 backend/migrations/sql/20261028_11/ 에 동결해 두었습니다. (Docker용 database/init/010 과 같은 내용)
+SQL 본문은 backend/migrations/sql/20261028_13/ 에 동결해 두었습니다. (Docker용 database/init/012 와 같은 내용)
 이미 [협업 시작하기]를 누른 요청(status=started)은 협업으로 옮겨 줘요. 기존 요청·연구는 지우지 않아요.
 """
 
@@ -8,8 +8,8 @@ from pathlib import Path
 
 from alembic import op
 
-revision = "20261028_11"
-down_revision = "20261027_10"
+revision = "20261028_13"
+down_revision = "20261027_12"
 branch_labels = None
 depends_on = None
 
@@ -18,7 +18,7 @@ SQL_FILE = Path(__file__).resolve().parents[1] / "sql" / revision / "001_create_
 
 def upgrade() -> None:
     # 같은 DB에 동시에 적용하지 않도록 트랜잭션이 끝날 때까지 잠급니다.
-    op.execute("SELECT pg_advisory_xact_lock(20261028, 11)")
+    op.execute("SELECT pg_advisory_xact_lock(20261028, 13)")
     op.execute("SET LOCAL search_path TO public, pg_catalog")
     # 이미 적용된 DB에는 다시 적용하지 않고 멈춥니다.
     op.execute("""

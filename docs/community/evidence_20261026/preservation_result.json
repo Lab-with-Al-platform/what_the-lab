@@ -1,0 +1,25 @@
+{
+  "latest_files": 766,
+  "preserved_byte_identical": 749,
+  "modified_existing": [
+    ".env.example",
+    "frontend/package.json",
+    "frontend/next.config.ts",
+    "frontend/eslint.config.mjs",
+    "backend/README.md",
+    "docs/product/MVP_SCOPE.md",
+    "docs/product/03_DECISION_LOG.md",
+    "frontend/src/components/expert-search.tsx",
+    "frontend/src/components/site-header.tsx",
+    "frontend/src/components/article-view.tsx",
+    "frontend/src/components/received-requests.tsx",
+    "frontend/src/components/sent-requests.tsx",
+    "frontend/src/components/site-footer.tsx",
+    "frontend/src/app/experts/page.tsx",
+    "backend/tests/conftest.py",
+    "backend/app/main.py",
+    "backend/app/routers/auth.py"
+  ],
+  "all_latest_paths_preserved": true,
+  "original_migrations_and_init_unchanged": true
+}
