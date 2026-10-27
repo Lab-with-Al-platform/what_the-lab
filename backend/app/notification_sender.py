@@ -32,7 +32,8 @@ PENDING_SQL = """
            COALESCE(s.notify_workspace, TRUE) AS notify_workspace,
            s.discord_joined_at,
            a.nickname AS actor_nickname, r.title AS research_title,
-           cr.reject_reason, cr.expert_id, cr.status AS request_status
+           cr.reject_reason, cr.expert_id, cr.status AS request_status,
+           cr.is_urgent, cr.expires_at, cr.accepted_start_date, cr.cancel_reason, cr.responded_at
     FROM notification n
     JOIN users u ON u.user_id = n.user_id
     LEFT JOIN notification_setting s ON s.user_id = n.user_id

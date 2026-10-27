@@ -2,42 +2,48 @@ import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.community.middleware import CommunityPrivacyMiddleware, validation_error
-
 from app.config import CORS_ORIGINS
-
 from app.discord_bot import bot_ready
 from app.notification_sender import run_forever, wake_up
-
+from app.request_store import expire_forever
 from app.routers import (
     analytics,
     auth,
-    community,
     collab_requests,
+    community,
     expert,
     expert_history,
     expert_portfolio,
     expert_profile,
     experts,
     insights,
+    notifications,
     operations,
+    profile_photo,
     researcher,
     researcher_research,
     taxonomy,
     verification,
-    notifications,
-    profile_photo,
+    workspace,
 )
+
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
-    """서버가 켜질 때 디스코드 알림 보내기를 시작하고, 꺼질 때 멈춰요. 봇 설정이 없으면 시작하지 않아요."""
-    task = asyncio.create_task(run_forever()) if bot_ready() else None
+    """서버가 켜질 때 백그라운드 작업을 시작하고, 꺼질 때 멈춰요.
+
+    - 협업 요청 만료 처리: 1분마다 (항상)
+    - 디스코드 알림 보내기: 봇 설정이 있을 때만
+    """
+    tasks = [asyncio.create_task(expire_forever())]
+    if bot_ready():
+        tasks.append(asyncio.create_task(run_forever()))
     yield
-    if task:
+    for task in tasks:
         task.cancel()
 
 
@@ -88,4 +94,5 @@ app.include_router(collab_requests.researcher_router)
 app.include_router(collab_requests.expert_router)
 app.include_router(notifications.router)
 app.include_router(profile_photo.router)
+app.include_router(workspace.router)
 app.include_router(community.router)

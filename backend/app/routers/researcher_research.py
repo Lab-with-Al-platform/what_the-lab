@@ -104,6 +104,7 @@ def update_research(
 
     with transaction() as cursor:
         current = find_research(cursor, user_id, research_id)
+        check_no_open_requests(cursor, research_id, "수정")
         previous_status = current["status"]
         if previous_status == "registered" and values["status"] == "draft":
             raise bad_request("등록한 연구는 임시 저장으로 되돌릴 수 없어요")
@@ -129,6 +130,13 @@ def delete_research(research_id: int, user_id: int = Depends(get_current_user_id
     require_researcher(user_id)
     with transaction() as cursor:
         find_research(cursor, user_id, research_id)
+        check_no_open_requests(cursor, research_id, "삭제")
+        cursor.execute(
+            "SELECT 1 FROM collaboration_request WHERE research_id = %s AND status = 'started'",
+            (research_id,),
+        )
+        if cursor.fetchone():
+            raise HTTPException(status_code=409, detail="협업한 기록이 있는 연구는 삭제할 수 없어요")
         # 고른 값들은 FK의 ON DELETE CASCADE로 같이 지워집니다.
         cursor.execute("DELETE FROM research WHERE research_id = %s", (research_id,))
         fix_primary(cursor, user_id)
@@ -301,3 +309,20 @@ def fix_primary(cursor, user_id: int) -> None:
         cursor.execute(
             "UPDATE research SET is_primary = TRUE WHERE research_id = %s", (latest["research_id"],)
         )
+
+def check_no_open_requests(cursor, research_id: int, action: str) -> None:
+    """답을 기다리거나 수락된 요청이 있는 연구는 수정·삭제할 수 없어요. (요청을 모두 닫은 뒤 가능)
+
+    action: "수정" / "삭제" (안내 문구에 들어가요)
+    """
+    cursor.execute(
+        "SELECT count(*) AS count FROM collaboration_request"
+        " WHERE research_id = %s AND status IN ('pending', 'accepted')",
+        (research_id,),
+    )
+    count = cursor.fetchone()["count"]
+    if count:
+        raise HTTPException(
+            status_code=409,
+            detail=f"진행 중인 요청 {count}건이 있어 {action}할 수 없어요. 요청을 모두 취소한 뒤 {action}해 주세요",
+        )        

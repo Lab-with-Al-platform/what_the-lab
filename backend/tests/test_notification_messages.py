@@ -1,6 +1,9 @@
 """알림 문구 만들기 (DB 없이). 받는 사람이 전문가인지 연구회원인지에 따라 문구가 달라요."""
 
+from datetime import datetime
+
 from app.notification_store import build_message
+from app.request_rules import KST
 
 EXPERT, RESEARCHER = 10, 20
 
@@ -13,6 +16,11 @@ def row(type_: str, **extra) -> dict:
         "reject_reason": None,
         "expert_id": EXPERT,
         "request_status": "pending",
+        "is_urgent": False,
+        "expires_at": datetime(2026, 10, 26, 0, 0, tzinfo=KST),
+        "accepted_start_date": None,
+        "cancel_reason": None,
+        "responded_at": None,
     }
     return {**base, **extra}
 
@@ -20,7 +28,7 @@ def row(type_: str, **extra) -> dict:
 def test_received_goes_with_deadline_only_while_waiting():
     title, detail = build_message(row("request_received", actor_nickname="cell_jung"), EXPERT)
     assert title == "cell_jung 님이 협업을 요청했어요"
-    assert detail == "세포 이미지 자동 계수 · 7일 안에 답해 주세요"
+    assert detail == "세포 이미지 자동 계수 · 10.25 밤까지 답해 주세요"
     _, answered = build_message(row("request_received", request_status="accepted"), EXPERT)
     assert answered == "세포 이미지 자동 계수"
 
@@ -42,3 +50,23 @@ def test_left_member_and_deleted_research():
     title, detail = build_message(gone, RESEARCHER)
     assert title == "탈퇴한 회원 님이 협업 요청을 수락했어요"
     assert detail == "삭제된 연구"
+
+def test_urgent_and_adjusted_and_withdrawn():
+    title, _ = build_message(row("request_received", is_urgent=True, actor_nickname="cell_jung"), EXPERT)
+    assert title == "🔥 cell_jung 님이 급한 협업을 요청했어요"
+    title, _ = build_message(row("request_accepted", accepted_start_date="2026-11-03"), RESEARCHER)
+    assert title == "neural_kim 님이 기간을 조정해서 수락했어요"
+    title, _ = build_message(row("request_withdrawn"), RESEARCHER)
+    assert title == "neural_kim 님이 수락을 취소했어요"
+
+
+def test_canceled_wording_follows_reason():
+    other, _ = build_message(row("request_canceled", cancel_reason="other_started"), EXPERT)
+    declined, _ = build_message(row("request_canceled", cancel_reason="declined"), EXPERT)
+    assert other == "neural_kim 님의 연구는 협업 인원이 다 찼어요"
+    assert declined == "neural_kim 님이 이번 협업은 진행하지 않기로 했어요"
+
+
+def test_expired_after_accept_has_its_own_wording():
+    title, _ = build_message(row("request_expired", responded_at="x"), RESEARCHER)
+    assert title == "neural_kim 님이 수락한 요청이 시작 기한이 지나 만료됐어요"

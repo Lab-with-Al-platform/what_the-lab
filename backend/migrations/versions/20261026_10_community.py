@@ -6,7 +6,7 @@
 
 from pathlib import Path
 
-from alembic import op
+from alembic import context, op
 from sqlalchemy import text
 
 revision = "20261026_10"
@@ -16,10 +16,12 @@ depends_on = None
 
 
 def upgrade() -> None:
-    # 게시판 표만 먼저 만든 DB에서는 같은 표를 다시 만들지 않습니다.
-    exists = op.get_bind().execute(text("SELECT to_regclass('community_private.posts')")).scalar()
-    if exists:
-        return
+    # SQL만 뽑는 offline 모드에는 DB 연결이 없어서 존재 확인을 건너뜁니다.
+    if not context.is_offline_mode():
+        # 게시판 표만 먼저 만든 DB에서는 같은 표를 다시 만들지 않습니다.
+        exists = op.get_bind().execute(text("SELECT to_regclass('community_private.posts')")).scalar()
+        if exists:
+            return
     source = Path(__file__).resolve().parents[1] / "sql/20261026_10_community.sql"
     op.execute(source.read_text(encoding="utf-8"))
 

@@ -31,6 +31,19 @@
   --color-editorial-warning: #805211;
   --color-editorial-warning-soft: #fff8e8;
   --color-navy: #101c3c;
+    /* 협업 공간: 협업마다 다른 색 (달력에서 어느 협업 일정인지 구분) */
+  --color-collab-1: #5036f4;
+  --color-collab-1-soft: #ece9ff;
+  --color-collab-2: #0f9d84;
+  --color-collab-2-soft: #ddf4ef;
+  --color-collab-3: #e8590c;
+  --color-collab-3-soft: #fde9dc;
+  --color-collab-4: #1098ad;
+  --color-collab-4-soft: #e0f4f7;
+  --color-collab-5: #c2255c;
+  --color-collab-5-soft: #fde8ef;
+  --color-collab-6: #5c7cfa;
+  --color-collab-6-soft: #e7ecff;
   --radius-card: 12px;
   --radius-button: 10px;
   --shadow-card: 0 6px 24px rgb(18 32 75 / 0.04);

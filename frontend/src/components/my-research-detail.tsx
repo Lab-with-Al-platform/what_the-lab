@@ -16,6 +16,8 @@ import {
   SHARE_LABELS,
 } from "@/lib/my-research";
 import { AbleWorkOption, FieldCategory, MyResearchModal } from "@/components/my-research-modal";
+import { ResearchRequestLock } from "@/components/research-request-lock";
+
 
 /** 내 연구 상세. 연구 하나와 분류표 목록을 불러와 보여 주고, 여기서 수정·삭제·지정할 수 있어요. */
 export function MyResearchDetail({ researchId }: { researchId: number }) {
@@ -51,6 +53,8 @@ export function MyResearchDetail({ researchId }: { researchId: number }) {
   const draft = research.status === "draft";
   const edited = research.updated_at.slice(0, 10) !== research.created_at.slice(0, 10);
   const tasks = research.task_unsure ? ["잘 모르겠어요"] : research.able_work_ids.map((id) => workName.get(id) ?? id);
+  const locked = research.open_request_count > 0; // 진행 중인 요청이 있으면 수정·삭제 잠금
+  const hasCollab = research.started_count > 0; // 협업한 기록이 있으면 삭제 불가
 
   /** 저장·지정 API는 최신 목록 전체를 돌려줘요. 그중 이 연구만 골라 화면을 다시 그립니다. */
   function pickThis(list: Research[]) {
@@ -101,13 +105,21 @@ export function MyResearchDetail({ researchId }: { researchId: number }) {
             이 연구로 지정
           </button>
         )}
-        <button type="button" onClick={() => setEditing(true)} className="h-9 rounded-button border border-line px-4 text-[13px] font-semibold text-muted hover:bg-page hover:text-ink">
+        <button type="button" onClick={() => setEditing(true)} disabled={locked} className="h-9 rounded-button border border-line px-4 text-[13px] font-semibold text-muted hover:bg-page hover:text-ink disabled:opacity-40">
           {draft ? "이어서 작성" : "수정"}
         </button>
-        <button type="button" onClick={() => setConfirmDelete(true)} disabled={busy} className="h-9 rounded-button px-3 text-[13px] font-semibold text-danger hover:bg-danger-soft disabled:opacity-50">
+        <button
+          type="button"
+          onClick={() => setConfirmDelete(true)}
+          disabled={busy || locked || hasCollab}
+          title={hasCollab ? "협업한 기록이 있는 연구는 삭제할 수 없어요" : undefined}
+          className="h-9 rounded-button px-3 text-[13px] font-semibold text-danger hover:bg-danger-soft disabled:opacity-40"
+        >
           삭제
         </button>
       </div>
+      <ResearchRequestLock research={research} onUnlocked={pickThis} />
+      {hasCollab && !locked && <p className="mt-2 text-right text-xs text-faint">협업한 기록이 있는 연구는 삭제할 수 없어요. 수정은 할 수 있어요.</p>}
 
       {confirmDelete && (
         <div className="mt-3 flex flex-wrap items-center gap-2 rounded-card border border-danger/30 bg-danger-soft px-4 py-3">

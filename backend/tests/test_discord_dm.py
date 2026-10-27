@@ -7,6 +7,7 @@ import pytest
 
 from app import discord_bot
 from app.notification_sender import dm_text, skip_reason
+from app.request_rules import KST
 
 
 def fake_post(responses: list, calls: list):
@@ -60,6 +61,11 @@ def pending(**extra) -> dict:
         "reject_reason": None,
         "expert_id": 10,
         "request_status": "pending",
+        "is_urgent": False,
+        "expires_at": datetime(2026, 10, 26, tzinfo=KST),  # 10.25 밤까지
+        "accepted_start_date": None,
+        "cancel_reason": None,
+        "responded_at": None,
     }
     return {**base, **extra}
 
@@ -75,5 +81,5 @@ def test_skip_reasons():
 def test_dm_text_has_title_detail_and_link():
     text = dm_text(pending())
     assert text.startswith("**cell_jung 님이 협업을 요청했어요**\n")
-    assert "세포 이미지 자동 계수 · 7일 안에 답해 주세요" in text
+    assert "세포 이미지 자동 계수 · 10.25 밤까지 답해 주세요" in text
     assert text.endswith("/requests")

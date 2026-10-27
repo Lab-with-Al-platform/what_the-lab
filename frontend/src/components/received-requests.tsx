@@ -3,13 +3,21 @@
 import { ReactNode, useEffect, useState } from "react";
 import { ApiError, requestApi } from "@/lib/api";
 import {
-  daysLeft,
+  addDays,
+  adjustRange,
+  daysBetween,
+  deadlineText,
+  effectivePeriod,
   formatPeriod,
   LIMITS,
+  periodLength,
   photoOrDefault,
   ReceivedRequest,
   REJECT_REASON_LABELS,
   RejectReason,
+  RULES,
+  shortDate,
+  timeLeft,
 } from "@/lib/collab-requests";
 import type { CareerProfile } from "@/lib/my-career";
 import {
@@ -74,17 +82,20 @@ export function ReceivedRequests() {
   const shown = lists[tab];
   const selected = shown.find((request) => request.request_id === selectedId) ?? shown[0] ?? null;
 
-  /** 수락·거절 API. 백엔드가 돌려준 최신 목록으로 다시 그려요. */
-  async function respond(requestId: number, action: "accept" | "reject", body: object) {
-    setRequests(await requestApi<ReceivedRequest[]>(`/expert/requests/${requestId}/${action}`, { method: "POST", body: JSON.stringify(body) }));
+  /** 수락·거절·수락 취소 API. 백엔드가 돌려준 최신 목록으로 다시 그려요. */
+  async function respond(requestId: number, action: "accept" | "reject" | "withdraw", body: object) {
+    const next = await requestApi<ReceivedRequest[]>(`/expert/requests/${requestId}/${action}`, { method: "POST", body: JSON.stringify(body) });
+    setRequests(next);
     setSelectedId(requestId);
-    setTab(action === "accept" ? "waiting" : "past"); // 처리한 요청이 옮겨 간 탭으로 따라가요
+    // 처리한 요청이 옮겨 간 탭으로 따라가요 (급한 요청은 수락하면 바로 협업이 시작돼 '지난 요청'으로)
+    const moved = next.find((request) => request.request_id === requestId);
+    setTab(moved ? TAB_OF[moved.status] : "past");
   }
 
   return (
     <div>
       <h1 className="text-[28px] font-bold">요청관리</h1>
-      <p className="mt-1 text-sm text-muted">연구자가 보낸 협업 요청이에요. 데이터 공유 조건에 동의해야 수락할 수 있어요.</p>
+      <p className="mt-1 text-sm text-muted">연구자가 보낸 협업 요청이에요. 데이터 공유 조건에 동의해야 수락할 수 있고, 답 기한이 지나면 자동으로 만료돼요.</p>
 
       <div className="mt-6">
         <Tabs
@@ -96,7 +107,7 @@ export function ReceivedRequests() {
           }}
           tabs={[
             { key: "new", label: "새 요청", count: lists.new.length, dot: lists.new.length > 0 },
-            { key: "waiting", label: "확정 기다리는 중", short: "확정 대기", count: lists.waiting.length },
+            { key: "waiting", label: "연구자 선택 기다리는 중", short: "선택 대기", count: lists.waiting.length },
             { key: "past", label: "지난 요청", count: lists.past.length },
           ]}
         />
@@ -133,8 +144,9 @@ export function ReceivedRequests() {
                 request={selected}
                 names={names}
                 myMeeting={myMeeting}
-                onAccept={(message) => respond(selected.request_id, "accept", { message })}
+                onAccept={(body) => respond(selected.request_id, "accept", body)}
                 onReject={(reason, text) => respond(selected.request_id, "reject", { reason, text })}
+                onWithdraw={(text) => respond(selected.request_id, "withdraw", { text })}
               />
             </div>
           )}
@@ -156,6 +168,7 @@ function ListItem({ request, active, onClick }: { request: ReceivedRequest; acti
       <div className="flex items-center gap-2">
         <Avatar src={photoOrDefault(request.researcher.user_photo, "researcher")} size={28} />
         <span className="min-w-0 flex-1 truncate text-sm font-bold">{request.researcher.nickname}</span>
+        {request.is_urgent && request.status === "pending" && <StatusBadge tone="danger">🔥 급해요</StatusBadge>}
         <ItemBadge request={request} />
       </div>
       <p className="mt-2 line-clamp-2 text-sm font-medium leading-snug">{request.research.title}</p>
@@ -169,7 +182,7 @@ function ItemBadge({ request }: { request: ReceivedRequest }) {
     case "pending":
       return <StatusBadge tone="brand">새 요청</StatusBadge>;
     case "accepted":
-      return <StatusBadge tone="success">확정 기다리는 중</StatusBadge>;
+      return <StatusBadge tone="success">선택 기다리는 중</StatusBadge>;
     case "started":
       return <StatusBadge tone="success">협업 시작됨</StatusBadge>;
     case "rejected":
@@ -177,13 +190,14 @@ function ItemBadge({ request }: { request: ReceivedRequest }) {
     case "expired":
       return <StatusBadge tone="muted">만료됨</StatusBadge>;
     default:
-      return <StatusBadge tone="muted">취소됨</StatusBadge>;
+      return <StatusBadge tone="muted">{request.cancel_reason === "expert_withdrew" ? "수락 취소함" : "닫힘"}</StatusBadge>;
   }
 }
 
 function itemLine(request: ReceivedRequest): string {
-  if (request.status === "pending") return `${formatDate(request.created_at)} · ${daysLeft(request.expires_at)}일 남음`;
-  if (request.status === "expired") return `${formatDate(request.expires_at)} 만료`;
+  if (request.status === "pending") return `${deadlineText(request.expires_at)}까지 답하기 · ${timeLeft(request.expires_at)}`;
+  if (request.status === "accepted" && request.select_expires_at) return `연구자 선택 기한 ${deadlineText(request.select_expires_at)}`;
+  if (request.status === "expired") return request.responded_at ? "연구자가 시작하지 않아 만료" : `${deadlineText(request.expires_at)} 만료`;
   return `${formatDate(request.responded_at ?? request.created_at)} ${request.status === "rejected" ? "거절" : "수락"}`;
 }
 
@@ -194,14 +208,17 @@ function RequestDetail({
   myMeeting,
   onAccept,
   onReject,
+  onWithdraw,
 }: {
   request: ReceivedRequest;
   names: Names;
   myMeeting: string;
-  onAccept: (message: string) => Promise<void>;
+  onAccept: (body: AcceptBody) => Promise<void>;
   onReject: (reason: RejectReason, text: string) => Promise<void>;
+  onWithdraw: (text: string) => Promise<void>;
 }) {
   const { researcher, research } = request;
+  const period = effectivePeriod(request);
   const works = research.task_unsure ? ["잘 모르겠어요"] : research.able_work_ids.map((id) => names.works.get(id) ?? id);
   const shareText =
     research.share_policy === "conditional"
@@ -224,20 +241,30 @@ function RequestDetail({
           {affiliation && <p className="mt-0.5 text-xs text-muted">{affiliation}</p>}
         </div>
         {request.status === "pending" && (
-          <p className="text-xs font-semibold text-danger">{formatDate(request.expires_at)}까지 답하지 않으면 만료돼요</p>
+          <p className="text-xs font-semibold text-danger">
+            {deadlineText(request.expires_at)}까지 답하지 않으면 만료돼요 ({timeLeft(request.expires_at)})
+          </p>
         )}
       </header>
+
+      {request.is_urgent && request.status === "pending" && (
+        <p className="border-b border-line bg-danger-soft px-5 py-3 text-[13px] font-semibold text-danger">
+          🔥 급한 요청이에요. 수락하면 바로 협업이 시작되고, 기간은 조정할 수 없어요.
+        </p>
+      )}
 
       <Section>
         <p className="text-xs font-semibold text-faint">{researcher.nickname} 님의 메시지</p>
         <p className="mt-2 whitespace-pre-line rounded-button bg-page px-4 py-3 text-sm leading-relaxed">{request.message || "메시지를 적지 않았어요"}</p>
       </Section>
 
-      
-
       <Section title="요청 내용">
         <InfoGrid>
-          <Info label="희망 기간" value={formatPeriod(request.start_date, request.end_date)} />
+          <Info
+            label={period.adjusted ? "조정한 기간" : "희망 기간"}
+            value={formatPeriod(period.start, period.end)}
+            note={period.adjusted ? `요청한 기간: ${formatPeriod(request.start_date, request.end_date)}` : undefined}
+          />
           <Info label="보상 형태" value={research.rewards.map((code) => REWARD_LABELS[code]).join(", ") || "선택 안 함"} />
           <Info
             label="미팅 방식"
@@ -276,10 +303,13 @@ function RequestDetail({
         </InfoGrid>
       </Section>
 
-      <Footer request={request} shareText={shareText} onAccept={onAccept} onReject={onReject} />
+      <Footer request={request} shareText={shareText} onAccept={onAccept} onReject={onReject} onWithdraw={onWithdraw} />
     </article>
   );
 }
+
+/** 수락할 때 보내는 값. 기간을 조정하면 start_date·end_date를 함께 보내요. */
+type AcceptBody = { message: string; start_date?: string; end_date?: string };
 
 /** 맨 아래: 상태에 따라 수락 영역 또는 안내 */
 function Footer({
@@ -287,32 +317,59 @@ function Footer({
   shareText,
   onAccept,
   onReject,
+  onWithdraw,
 }: {
   request: ReceivedRequest;
   shareText: string;
-  onAccept: (message: string) => Promise<void>;
+  onAccept: (body: AcceptBody) => Promise<void>;
   onReject: (reason: RejectReason, text: string) => Promise<void>;
+  onWithdraw: (text: string) => Promise<void>;
 }) {
   const [agreed, setAgreed] = useState(false);
   const [reply, setReply] = useState("");
+  const [adjusting, setAdjusting] = useState(false); // "기간을 조정해서 수락"
+  const [start, setStart] = useState(request.start_date);
+  const [end, setEnd] = useState(request.end_date);
   const [rejecting, setRejecting] = useState(false);
+  const [withdrawing, setWithdrawing] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
   if (request.status === "accepted") {
     return (
-      <Notice tone="success">
-        {formatDate(request.responded_at ?? request.created_at)}에 수락했어요. 연구자가 협업 시작을 확정하면 사이트 알림으로 알려 드려요. 디스코드 DM은 연결·수신 설정에 따라 보내며, 별도 협업 공간이나 채널은 자동 생성되지 않아요.
-      </Notice>
+      <div className="rounded-b-card bg-success-soft px-5 py-4 text-sm text-success">
+        <p>
+          {formatDate(request.responded_at ?? request.created_at)}에 수락했어요. 연구자가
+          {request.select_expires_at ? ` ${deadlineText(request.select_expires_at)}까지` : ""} 협업 시작을 고르면 협업 공간이 만들어지고 DM으로 알려 드려요.
+        </p>
+        <button type="button" onClick={() => setWithdrawing(true)} className="mt-3 h-9 rounded-button border border-line bg-card px-3 text-[13px] font-semibold text-muted hover:bg-page">
+          수락 취소
+        </button>
+        {withdrawing && <WithdrawModal nickname={request.researcher.nickname} onClose={() => setWithdrawing(false)} onWithdraw={onWithdraw} />}
+      </div>
     );
   }
   if (request.status !== "pending") return <Notice tone="muted">{pastText(request)}</Notice>;
+
+  const range = adjustRange(request.start_date);
+  const length = daysBetween(request.start_date, request.end_date) + 1; // 원래 기간 날 수
+  const newLength = daysBetween(start, end) + 1;
+  const rangeOk = start >= range.low && start <= range.high;
+  const lengthOk = end >= start && newLength >= length / 2 && newLength <= length * 2;
+  const changed = start !== request.start_date || end !== request.end_date;
+  const periodOk = !adjusting || (rangeOk && lengthOk && changed);
+
+  /** 시작일을 옮기면 종료일도 같은 길이만큼 따라 움직여요. (종료일은 따로 고칠 수 있어요) */
+  function moveStart(next: string) {
+    setStart(next);
+    setEnd(addDays(next, length - 1));
+  }
 
   async function accept() {
     setBusy(true);
     setError("");
     try {
-      await onAccept(reply.trim());
+      await onAccept(adjusting ? { message: reply.trim(), start_date: start, end_date: end } : { message: reply.trim() });
     } catch (caught) {
       setError(caught instanceof ApiError ? caught.message : "잠시 후 다시 시도해 주세요");
       setBusy(false);
@@ -320,8 +377,46 @@ function Footer({
   }
 
   return (
-    // 모바일에서는 동의와 버튼이 화면 아래에 붙어 있어요. (PC에서는 제자리)
-    <div className="sticky bottom-0 space-y-3 rounded-b-card border-t border-line bg-card p-5 lg:static">
+    // 기간 조정 칸이 생겨 길어져서, 모바일에서도 화면 아래에 붙이지 않고 제자리에 둬요.
+    <div className="space-y-3 rounded-b-card border-t border-line bg-card p-5">
+      {request.overlap_count > 0 && (
+        <p className="rounded-button bg-trend-soft px-4 py-3 text-[13px] text-trend">
+          이 기간에 진행 중인 협업이 {request.overlap_count}개 있어요. 일정이 겹쳐도 괜찮은지 확인해 주세요.
+        </p>
+      )}
+
+      {/* 기간: 그대로 / 조정해서 수락 (급한 요청은 조정 불가) */}
+      {!request.is_urgent && (
+        <div className="rounded-button border border-line p-4">
+          <p className="text-sm font-semibold">기간</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <Choice on={!adjusting} onClick={() => setAdjusting(false)}>
+              그대로 좋아요 · {shortDate(request.start_date)} ~ {shortDate(request.end_date)}
+            </Choice>
+            <Choice on={adjusting} onClick={() => setAdjusting(true)}>
+              기간을 조정해서 수락할게요
+            </Choice>
+          </div>
+          {adjusting && (
+            <div className="mt-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <input type="date" aria-label="조정할 시작일" value={start} min={range.low} max={range.high} onChange={(event) => moveStart(event.target.value)} className={`${INPUT_CLASS} w-auto min-w-[150px] flex-1`} />
+                <span className="text-muted">~</span>
+                <input type="date" aria-label="조정할 종료일" value={end} min={start} onChange={(event) => setEnd(event.target.value)} className={`${INPUT_CLASS} w-auto min-w-[150px] flex-1`} />
+              </div>
+              <p className="mt-2 text-xs leading-5 text-faint">
+                시작일은 <b className="text-ink">{shortDate(range.low)} ~ {shortDate(range.high)}</b> 중에서 고를 수 있어요
+                {range.low === request.start_date ? " (이 요청은 시작일을 앞당길 수 없어요)" : ""}. 시작일을 옮기면 종료일도 같은 길이만큼 따라가요.
+                기간은 원래({periodLength(request.start_date, request.end_date)})의 절반에서 2배 사이로 정해 주세요. {RULES.adjustDays}일 넘게 미뤄야 하면 거절 후 메시지로 알려 주세요.
+              </p>
+              {!rangeOk && <p className="mt-1 text-xs text-danger">시작일은 {shortDate(range.low)} ~ {shortDate(range.high)} 중에서 골라 주세요.</p>}
+              {rangeOk && !lengthOk && <p className="mt-1 text-xs text-danger">기간 길이를 원래의 절반에서 2배 사이로 맞춰 주세요.</p>}
+              {rangeOk && lengthOk && !changed && <p className="mt-1 text-xs text-muted">원래 기간과 같아요. 그대로 수락하려면 위에서 [그대로 좋아요]를 골라 주세요.</p>}
+            </div>
+          )}
+        </div>
+      )}
+
       <label className="flex cursor-pointer items-start gap-3 rounded-button border border-line p-4">
         <input type="checkbox" checked={agreed} onChange={(event) => setAgreed(event.target.checked)} className="mt-0.5 h-4 w-4 accent-brand" />
         <span>
@@ -332,7 +427,7 @@ function Footer({
       <textarea
         value={reply}
         onChange={(event) => setReply(event.target.value.slice(0, LIMITS.reply))}
-        placeholder="수락하면서 연구자에게 한마디 남기기 (선택)"
+        placeholder={adjusting ? "기간을 조정한 이유를 남겨 주세요 (선택) 예) 11월 첫 주까지 다른 일정이 있어요" : "수락하면서 연구자에게 한마디 남기기 (선택)"}
         rows={2}
         className={`${INPUT_CLASS} h-auto py-3`}
       />
@@ -341,8 +436,8 @@ function Footer({
         <button type="button" onClick={() => setRejecting(true)} disabled={busy} className="h-11 rounded-button border border-line px-5 text-sm font-semibold text-muted hover:bg-page">
           거절
         </button>
-        <button type="button" onClick={accept} disabled={!agreed || busy} className="h-11 rounded-button bg-brand px-6 text-sm font-semibold text-white hover:bg-brand-hover disabled:opacity-40">
-          {busy ? "수락하는 중…" : "수락하기"}
+        <button type="button" onClick={accept} disabled={!agreed || !periodOk || busy} className="h-11 rounded-button bg-brand px-6 text-sm font-semibold text-white hover:bg-brand-hover disabled:opacity-40">
+          {busy ? "수락하는 중…" : request.is_urgent ? "수락하고 바로 시작하기" : adjusting ? "조정한 기간으로 수락하기" : "수락하기"}
         </button>
       </div>
       {rejecting && <RejectModal nickname={request.researcher.nickname} onClose={() => setRejecting(false)} onReject={onReject} />}
@@ -350,19 +445,87 @@ function Footer({
   );
 }
 
+function Choice({ on, onClick, children }: { on: boolean; onClick: () => void; children: ReactNode }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={on}
+      className={`h-10 rounded-button border px-3 text-[13px] ${on ? "border-brand bg-brand-soft font-semibold text-brand" : "border-line text-muted hover:bg-page"}`}
+    >
+      {children}
+    </button>
+  );
+}
+
+/** [수락 취소] 창. 이유는 필수이고 연구자에게 전달돼요. */
+function WithdrawModal({ nickname, onClose, onWithdraw }: { nickname: string; onClose: () => void; onWithdraw: (text: string) => Promise<void> }) {
+  const [text, setText] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  async function submit() {
+    setBusy(true);
+    setError("");
+    try {
+      await onWithdraw(text.trim());
+    } catch (caught) {
+      setError(caught instanceof ApiError ? caught.message : "잠시 후 다시 시도해 주세요");
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Modal
+      title="수락을 취소할까요?"
+      description={`이유는 ${nickname} 님에게 전달돼요. 취소하면 이 연구로는 다시 요청을 받지 않아요.`}
+      onClose={onClose}
+      footer={
+        <div className="flex items-center justify-end gap-2">
+          {error && <p className="mr-auto text-[13px] text-danger">{error}</p>}
+          <button type="button" onClick={onClose} disabled={busy} className="h-10 rounded-button border border-line px-4 text-sm font-semibold text-muted">
+            아니요
+          </button>
+          <button type="button" onClick={submit} disabled={!text.trim() || busy} className="h-10 rounded-button bg-danger px-5 text-sm font-semibold text-white disabled:opacity-40">
+            {busy ? "취소하는 중…" : "수락 취소하기"}
+          </button>
+        </div>
+      }
+    >
+      <textarea
+        value={text}
+        onChange={(event) => setText(event.target.value.slice(0, LIMITS.withdrawText))}
+        placeholder="예) 갑자기 다른 일정이 생겨 이 기간에는 어려워졌어요"
+        rows={3}
+        className={`${INPUT_CLASS} h-auto py-3`}
+      />
+      <p className="mt-1 text-right text-xs text-faint">
+        {text.length} / {LIMITS.withdrawText} · 필수
+      </p>
+    </Modal>
+  );
+}
+
 function pastText(request: ReceivedRequest): string {
   const when = formatDate(request.responded_at ?? request.created_at);
   switch (request.status) {
     case "started":
-      return "협업 시작이 기록됐어요. 합의한 작업 방식과 연락 수단으로 진행해 주세요.";
+      return "협업이 시작됐어요. 협업 공간에서 이어서 진행해요.";
     case "rejected": {
       const reason = request.reject_text || (request.reject_reason ? REJECT_REASON_LABELS[request.reject_reason] : "");
       return `${when}에 거절했어요${reason ? ` · “${reason}”` : ""}`;
     }
     case "expired":
-      return `${formatDate(request.expires_at)}에 만료됐어요. 7일 동안 답하지 않았어요.`;
+      return request.responded_at
+        ? "수락했지만 연구자가 기한 안에 협업을 시작하지 않아 만료됐어요."
+        : `${deadlineText(request.expires_at)}에 만료됐어요. 기한 안에 답하지 않았어요.`;
     default:
-      return "연구자가 요청을 취소했어요.";
+      return {
+        withdrawn: "연구자가 요청을 취소했어요.",
+        declined: "연구자가 이번 협업은 진행하지 않기로 했어요.",
+        expert_withdrew: `수락을 취소했어요${request.cancel_text ? ` · “${request.cancel_text}”` : ""}`,
+        other_started: "이 연구의 협업 인원이 다 차서 요청이 닫혔어요.",
+      }[request.cancel_reason ?? "withdrawn"];
   }
 }
 
@@ -469,7 +632,7 @@ function Notice({ tone, children }: { tone: "success" | "muted"; children: React
 function EmptyTab({ tab }: { tab: Tab }) {
   const text = {
     new: ["새 요청이 없어요", "내 이력을 공개해 두면 연구자가 요청을 보낼 수 있어요."],
-    waiting: ["확정을 기다리는 요청이 없어요", "수락한 요청은 연구자가 확정할 때까지 여기에 있어요."],
+    waiting: ["연구자 선택을 기다리는 요청이 없어요", "수락한 요청은 연구자가 협업 시작을 고를 때까지 여기에 있어요."],
     past: ["지난 요청이 없어요", "거절·만료되거나 협업이 시작된 요청이 여기에 모여요."],
   }[tab];
   return (
