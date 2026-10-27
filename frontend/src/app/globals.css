@@ -208,6 +208,13 @@
   position: absolute;
   inset: 0 0 0 32%;
   mask-image: linear-gradient(180deg, #000 85%, transparent);
+  opacity: 0;
+  transition: opacity 600ms ease;
+}
+
+/* 추천 글이 바뀌면 사진은 천천히 겹치며 바뀝니다. */
+.insight-feature__art[data-active="true"] {
+  opacity: 1;
 }
 
 .insight-feature::after {
@@ -246,6 +253,76 @@
   line-height: 1.3;
   letter-spacing: -0.035em;
   white-space: pre-line;
+}
+
+/* 모든 글을 한 칸에 겹쳐 가장 긴 글 높이를 쓰므로, 아래 버튼이 위아래로 흔들리지 않습니다. */
+.insight-feature__slides {
+  display: grid;
+}
+
+.insight-feature__slide {
+  grid-area: 1 / 1;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 300ms ease, visibility 0s linear 300ms;
+}
+
+.insight-feature__slide[data-active="true"] {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 300ms ease 150ms, visibility 0s;
+}
+
+/* 막대 자체는 얇게 보이되, 누르는 영역은 44px 높이를 확보합니다. */
+.insight-feature__step {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  max-width: 72px;
+  height: 44px;
+}
+
+.insight-feature__step-fill {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-ink) 14%, transparent);
+}
+
+.insight-feature__step-fill::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--color-brand);
+  transform-origin: left;
+  transform: scaleX(0);
+}
+
+.insight-feature__step-fill[data-state="done"]::after {
+  transform: scaleX(1);
+  background: color-mix(in srgb, var(--color-brand) 45%, transparent);
+}
+
+.insight-feature__step-fill[data-state="active"]::after {
+  animation: insight-feature-progress var(--feature-duration) linear forwards;
+}
+
+/* 멈춘 동안에는 막대도 그 자리에서 멈추고, 다시 재생하면 남은 시간부터 이어집니다. */
+.insight-feature__step-fill[data-running="false"]::after {
+  animation-play-state: paused;
+}
+
+.insight-feature__step:hover .insight-feature__step-fill,
+.insight-feature__step:focus-visible .insight-feature__step-fill {
+  background: color-mix(in srgb, var(--color-ink) 28%, transparent);
+}
+
+@keyframes insight-feature-progress {
+  to { transform: scaleX(1); }
 }
 
 .insight-editorial-card {
@@ -322,7 +399,8 @@
     background: linear-gradient(180deg, var(--insight-surface) calc(100% - 240px), color-mix(in srgb, var(--insight-surface) 65%, transparent) calc(100% - 180px), transparent calc(100% - 80px), var(--insight-surface));
   }
   /* 모바일은 글을 먼저 읽고 사진을 보도록 공간을 분리하되 경계는 페이드로 연결합니다. */
-  .insight-feature__copy { padding-block: 32px 216px; }
+  /* 아래 진행 막대 줄이 사진과 겹치지 않도록 사진 높이(240px)만큼 비워 둡니다. */
+  .insight-feature__copy { padding-block: 32px 240px; }
   .insight-perspective__copy { padding-block: 24px; padding-right: 0; }
   .insight-perspective__art { inset-inline-start: 0; opacity: 0.12; }
   .insight-perspective__mark { font-size: 48px; }
@@ -330,6 +408,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .insight-editorial-card { transition: none; }
+  /* 동작 줄이기 설정에서는 사진·글이 겹치는 효과 없이 바로 바뀝니다. */
+  .insight-feature__art,
+  .insight-feature__slide,
+  .insight-feature__slide[data-active="true"] { transition: none; }
 }
 
 /* 페이지마다 같은 좌우 기준선. 모바일 20px, 태블릿 이상 32px. */
@@ -346,6 +428,12 @@
 
 html {
   scroll-behavior: smooth;
+}
+
+/* 관리자 메뉴를 바꿀 때 스크롤바가 생겼다 사라지며 화면이 좌우로 밀리지 않게 합니다. */
+html.admin-stable-scroll {
+  scrollbar-gutter: stable;
+  scroll-behavior: auto;
 }
 
 @media (prefers-reduced-motion: reduce) {

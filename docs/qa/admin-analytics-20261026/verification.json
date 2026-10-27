@@ -1,0 +1,22 @@
+{
+  "checks": [
+    {
+      "name": "demo",
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "name": "demo",
+      "width": 768,
+      "scrollWidth": 768
+    },
+    {
+      "name": "demo",
+      "width": 390,
+      "scrollWidth": 390
+    }
+  ],
+  "writes": 0,
+  "errors": [],
+  "note": "실데이터 화면은 수집 전 가상 응답. 128은 데모에만 있습니다."
+}

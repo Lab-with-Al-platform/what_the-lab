@@ -1,6 +1,6 @@
 -- 협업 공간과 일정에 필요한 테이블입니다. (PostgreSQL) 006, 007, 009 다음에 실행됩니다.
 -- 화면: 협업 공간 (목록 · 전체 달력 · 협업 상세의 공유 달력)
--- 같은 내용이 Supabase용 backend/migrations/sql/20261028_08/ 에도 있습니다. 둘을 함께 고칩니다.
+-- 같은 내용이 Supabase용 backend/migrations/sql/20261028_11/ 에도 있습니다. 둘을 함께 고칩니다.
 
 -- 1) 협업 공간: collaboration_request 1 : 1 (연구회원이 [협업 시작하기]를 누른 요청 하나 = 협업 하나)
 --    연구 하나로 전문가 여러 명과 각각 1:1 협업하므로 research 1 : N, expert 1 : N 이에요.

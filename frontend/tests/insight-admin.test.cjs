@@ -125,3 +125,31 @@ test("API 오류는 상태 코드와 읽을 수 있는 입력 오류를 보존�
   });
   await assert.rejects(api.requestApi("/fake"), (error) => error instanceof api.ApiError && error.status === 422 && error.message.includes("claims"));
 });
+
+test("후보 묶음은 drafts 객체와 배열을 모두 받고, 파일의 dry_run 값은 쓰지 않는다", () => {
+  const draft = { kind: "case", title: "예시" };
+  const fromObject = helpers.parseImportBatch(JSON.stringify({ dry_run: false, drafts: [draft] }));
+  assert.equal(fromObject.drafts.length, 1);
+  assert.equal("dry_run" in fromObject, false);
+  assert.equal(helpers.parseImportBatch(JSON.stringify([draft, draft])).drafts.length, 2);
+});
+
+test("후보 묶음의 형식 오류는 서버로 보내기 전에 이유와 함께 막는다", () => {
+  assert.match(helpers.parseImportBatch("{drafts:").error, /JSON 형식/);
+  assert.match(helpers.parseImportBatch(JSON.stringify({ items: [] })).error, /drafts 배열/);
+  assert.match(helpers.parseImportBatch(JSON.stringify({ drafts: [] })).error, /후보가 없습니다/);
+  assert.match(helpers.parseImportBatch(JSON.stringify({ drafts: [1, "a"] })).error, /객체/);
+  const tooMany = Array.from({ length: helpers.MAX_IMPORT_ITEMS + 1 }, () => ({}));
+  assert.match(helpers.parseImportBatch(JSON.stringify(tooMany)).error, /최대 50건/);
+});
+
+test("승인된 기술 목록은 대분류별로 묶되 서버가 준 순서를 바꾸지 않는다", () => {
+  const groups = helpers.groupKeywords([
+    { id: "CAP001", label: "데이터 수집", category_id: "C01", category_label: "데이터 준비·품질" },
+    { id: "CAP010", label: "가설 검정", category_id: "C02", category_label: "통계·연구설계" },
+    { id: "CAP002", label: "데이터 정제", category_id: "C01", category_label: "데이터 준비·품질" },
+  ]);
+  assert.equal(groups.map((group) => group.id).join(","), "C01,C02");
+  assert.equal(groups[0].items.map((item) => item.id).join(","), "CAP001,CAP002");
+  assert.equal(helpers.groupKeywords([]).length, 0);
+});

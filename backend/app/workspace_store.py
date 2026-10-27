@@ -14,7 +14,7 @@ from app.db import get_connection
 TODAY_KST = "(now() AT TIME ZONE 'Asia/Seoul')::date"
 
 # 시작할 때 합의한 내용 복사본. 요청(cr)과 연구(rs)에서 읽어요.
-# (마이그레이션 010/20261028_08 에서 기존 협업을 옮길 때와 같은 모양)
+# (마이그레이션 010/20261028_11 에서 기존 협업을 옮길 때와 같은 모양)
 AGREEMENT_SQL = """
   jsonb_build_object(
     'title', rs.title,

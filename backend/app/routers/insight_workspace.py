@@ -14,6 +14,7 @@ from app.insights.collection_sources import recommended_sources
 from app.insights.database import get_session
 from app.insights.models import Candidate, CollectionSetting, Publication, Revision, Source, utc_now
 from app.insights.schemas import VersionInput
+from app.insights.views import counts_for
 from app.insights.workspace_schemas import (
     ArticleRevisionInput,
     CollectionConfig,
@@ -61,7 +62,8 @@ def workspace(
     q: str = Query("", max_length=200),
     category: str = Query("", max_length=100),
     keyword: str = Query("", max_length=64),
-    order: Literal["newest", "oldest"] = "newest",
+    order: Literal["newest", "oldest", "period", "cumulative"] = "newest",
+    view_preset: str = Query("30d", max_length=20),
 ) -> dict:
     # 전체 본문 대신 목록·분류에 필요한 JSON 조각만 받습니다. 현재 판본만 연결합니다.
     rows = session.execute(
@@ -175,6 +177,8 @@ def workspace(
         if q.strip().casefold() not in searchable.casefold():
             continue
         filtered.append(item)
+    if order in {"period", "cumulative"}:
+        filtered = _sort_by_views(session, filtered, order, view_preset)
     offset = (page - 1) * page_size
     return {
         "items": filtered[offset : offset + page_size],
@@ -184,6 +188,23 @@ def workspace(
         "categories": categories,
         "keywords": keywords,
     }
+
+
+def _sort_by_views(session: Session, items: list[dict], order: str, preset: str) -> list[dict]:
+    """현재 페이지만 재정렬하지 않도록, 걸러진 전체 목록을 한 번의 집계로 정렬합니다."""
+    ids = [item["publication_id"] for item in items if item["publication_id"]]
+    try:
+        metrics = counts_for(session, ids, preset, None, None)["items"]
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from error
+    key = "period_views" if order == "period" else "cumulative_views"
+
+    def value_of(item: dict) -> int:
+        metric = metrics.get(item["publication_id"] or "", {}).get(key, {})
+        value = metric.get("value")
+        return value if isinstance(value, int) else -1
+
+    return sorted(items, key=value_of, reverse=True)
 
 
 def default_collection_config() -> dict:

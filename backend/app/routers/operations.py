@@ -1,0 +1,319 @@
+"""운영자용 읽기 전용 API. 회원 상태와 연구 본문은 바꾸지 않습니다."""
+
+from datetime import date, datetime, time, timedelta
+from typing import Annotated, Literal
+
+from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel, Field
+
+from app.analytics.collect import collection_enabled
+from app.analytics.read import PostgresAnalyticsSource
+from app.analytics.report import build_analytics_report
+from app.analytics.store import server_now
+from app.insights.auth import require_trusted_origin
+from app.operations.account_actions import (
+    AccountActionError,
+    MemoryAccountStore,
+    PostgresAccountStore,
+    parse_change,
+)
+from app.operations.auth import require_operations_reader
+from app.operations.collaboration import (
+    STATUS_CODES,
+    PostgresCollaborationSource,
+    build_collaboration_report,
+)
+from app.operations.metrics import (
+    build_summary,
+    filter_members,
+    filter_researches,
+    member_detail,
+    research_detail,
+    research_summary,
+)
+from app.operations.periods import SEOUL, describe_range, resolve_range, seoul_today
+from app.operations.records import OperationsSnapshot, fetch_snapshot
+
+router = APIRouter(prefix="/api/v1/admin/operations", tags=["operations"])
+
+
+class StatusBody(BaseModel):
+    expected_status: Literal["active", "suspended"]
+    next_status: Literal["active", "suspended"]
+    reason: str = Field(min_length=1, max_length=200)
+    notice: str = Field(default="", max_length=200)
+    idempotency_key: str
+
+
+Reader = Annotated[dict, Depends(require_operations_reader)]
+Preset = Literal["today", "7d", "30d", "month", "custom"]
+
+
+def get_snapshot() -> OperationsSnapshot:
+    """테스트가 가상 회원으로 바꿀 수 있게 조회 함수를 분리합니다."""
+    return fetch_snapshot()
+
+
+def get_analytics_source() -> PostgresAnalyticsSource:
+    """테스트는 메모리 원본으로 바꿉니다. 기본은 분석 표를 읽습니다."""
+    return PostgresAnalyticsSource()
+
+
+def get_collaboration_source() -> PostgresCollaborationSource:
+    """테스트는 메모리 원본으로 바꿉니다. 기본은 협업 요청 표를 읽습니다."""
+    return PostgresCollaborationSource()
+
+
+def get_account_store() -> PostgresAccountStore:
+    """테스트는 메모리 저장소로 바꿉니다. 기본 구현은 실제 회원 표를 바꿉니다."""
+    return PostgresAccountStore()
+
+
+def _bounds(start: date | None, end: date | None) -> tuple[datetime | None, datetime | None]:
+    if start is not None and end is not None and end <= start:
+        raise HTTPException(422, "끝 날짜는 시작 날짜보다 뒤여야 합니다.")
+    start_at = datetime.combine(start, time.min, SEOUL) if start else None
+    end_at = datetime.combine(end, time.min, SEOUL) if end else None
+    return start_at, end_at
+
+
+def _period(preset: str, start: date | None, end: date | None) -> tuple[datetime, datetime, dict]:
+    try:
+        start_at, end_at = resolve_range(preset, start, end, seoul_today())
+    except ValueError as error:
+        raise HTTPException(422, str(error)) from error
+    return start_at, end_at, describe_range(start_at, end_at, seoul_today())
+
+
+@router.get("/access")
+def access(reader: Reader) -> dict[str, bool]:
+    """메뉴를 그리기 전에 서버가 운영 조회 권한을 확인합니다."""
+    del reader
+    return {"can_read_operations": True}
+
+
+@router.get("/summary")
+def summary(
+    reader: Reader,
+    snapshot: Annotated[OperationsSnapshot, Depends(get_snapshot)],
+    preset: Preset = "7d",
+    start: date | None = None,
+    end: date | None = None,
+) -> dict:
+    """오늘 볼 수 있는 현재 상태와, 기간으로 셀 수 있는 계정 생성만 돌려줍니다."""
+    del reader
+    start_at, end_at, described = _period(preset, start, end)
+    body = build_summary(snapshot, start_at, end_at, seoul_today())
+    body["range"] = {"preset": preset, **described}
+    return body
+
+
+@router.get("/analytics")
+def analytics(
+    reader: Reader,
+    source: Annotated[PostgresAnalyticsSource, Depends(get_analytics_source)],
+    preset: Preset = "7d",
+    start: date | None = None,
+    end: date | None = None,
+    grain: Literal["day", "week", "month"] = "day",
+) -> dict:
+    """방문·글 이동·등록 과정. 수집 전 숫자는 null이고 0으로 채우지 않습니다."""
+    del reader
+    start_at, end_at, described = _period(preset, start, end)
+    now = server_now()
+    table_ready, events, started_at = source.load(start_at, end_at, now - timedelta(days=9))
+    body = build_analytics_report(
+        events,
+        enabled=collection_enabled(),
+        table_ready=table_ready,
+        start=start_at,
+        end=end_at,
+        now=now,
+        started_at=started_at,
+        grain=grain,
+    )
+    body["range"] = {"preset": preset, "grain": grain, **described}
+    return body
+
+
+@router.get("/collaboration")
+def collaboration(
+    reader: Reader,
+    source: Annotated[PostgresCollaborationSource, Depends(get_collaboration_source)],
+    preset: Preset = "7d",
+    start: date | None = None,
+    end: date | None = None,
+    status: str = "",
+    page: Annotated[int, Query(ge=1)] = 1,
+) -> dict:
+    """협업 요청의 현재 상태. 메시지와 성공률은 포함하지 않습니다."""
+    del reader
+    if status not in STATUS_CODES and status != "":
+        raise HTTPException(422, "알 수 없는 요청 상태입니다.")
+    start_at, end_at, described = _period(preset, start, end)
+    table_ready, rows = source.load()
+    body = build_collaboration_report(
+        rows,
+        table_ready=table_ready,
+        start=start_at,
+        end=end_at,
+        status=status,
+        page=page,
+    )
+    body["range"] = {"preset": preset, **described}
+    return body
+
+
+@router.get("/members")
+def members(
+    reader: Reader,
+    snapshot: Annotated[OperationsSnapshot, Depends(get_snapshot)],
+    q: Annotated[str, Query(max_length=30)] = "",
+    role: Literal["", "researcher", "expert", "unset"] = "",
+    status: Literal["", "active", "suspended", "deleted", "any"] = "",
+    signup_step: Literal["", "role", "verify", "info", "done"] = "",
+    created_start: date | None = None,
+    created_end: date | None = None,
+    page: Annotated[int, Query(ge=1)] = 1,
+) -> dict:
+    del reader
+    start_at, end_at = _bounds(created_start, created_end)
+    query = {
+        "q": q,
+        "role": role,
+        "status": status,
+        "signup_step": signup_step,
+        "created_start": start_at,
+        "created_end": end_at,
+    }
+    return filter_members(snapshot.members, query, page)
+
+
+@router.get("/members/{user_id}")
+def one_member(
+    user_id: int,
+    reader: Reader,
+    snapshot: Annotated[OperationsSnapshot, Depends(get_snapshot)],
+    store: Annotated[PostgresAccountStore | MemoryAccountStore, Depends(get_account_store)],
+) -> dict:
+    del reader
+    body = member_detail(snapshot, user_id)
+    if body is None:
+        raise HTTPException(404, "회원을 찾을 수 없습니다.")
+    body["audit"] = _audit_body(store, user_id)
+    return body
+
+
+@router.post("/members/{user_id}/status", dependencies=[Depends(require_trusted_origin)])
+def change_status(
+    user_id: int,
+    body: StatusBody,
+    reader: Reader,
+    store: Annotated[PostgresAccountStore | MemoryAccountStore, Depends(get_account_store)],
+) -> dict:
+    """정상↔정지만 바꿉니다. 같은 재시도 키는 이력을 한 번만 남깁니다."""
+    try:
+        change = parse_change(body.model_dump())
+        result = store.change(reader["user_id"], user_id, change)
+    except AccountActionError as error:
+        raise HTTPException(error.status_code, error.detail) from error
+    return {
+        "user_id": user_id,
+        "status": result["after_status"],
+        "previous_status": result["before_status"],
+        "replayed": result["replayed"],
+        "action": result["action"],
+    }
+
+
+@router.get("/researches/summary")
+def researches_summary(
+    reader: Reader,
+    snapshot: Annotated[OperationsSnapshot, Depends(get_snapshot)],
+    preset: Preset = "7d",
+    start: date | None = None,
+    end: date | None = None,
+) -> dict:
+    del reader
+    start_at, end_at, described = _period(preset, start, end)
+    return {
+        "range": {"preset": preset, **described},
+        **research_summary(snapshot, start_at, end_at),
+    }
+
+
+@router.get("/researches")
+def researches(
+    reader: Reader,
+    snapshot: Annotated[OperationsSnapshot, Depends(get_snapshot)],
+    q: Annotated[str, Query(max_length=60)] = "",
+    status: Literal["", "draft", "registered"] = "",
+    progress_status: Literal[
+        "",
+        "recruiting",
+        "unmatched_closed",
+        "scheduled",
+        "in_progress",
+        "completed",
+        "recruitment_canceled",
+        "paused",
+        "completion_pending",
+        "discontinued",
+        "not_applicable",
+        "not_linked",
+    ] = "",
+    field_id: Annotated[str, Query(max_length=10)] = "",
+    able_work_id: Annotated[str, Query(max_length=10)] = "",
+    created_start: date | None = None,
+    created_end: date | None = None,
+    page: Annotated[int, Query(ge=1)] = 1,
+) -> dict:
+    del reader
+    start_at, end_at = _bounds(created_start, created_end)
+    query = {
+        "q": q,
+        "status": status,
+        "progress_status": progress_status,
+        "field_id": field_id,
+        "able_work_id": able_work_id,
+        "created_start": start_at,
+        "created_end": end_at,
+    }
+    return filter_researches(snapshot.researches, query, page)
+
+
+def _audit_body(store: PostgresAccountStore | MemoryAccountStore, user_id: int) -> dict:
+    """표가 없으면 회원 상세 전체를 막지 않고, 이력만 아직 없다고 표시합니다."""
+    try:
+        rows = store.history(user_id)
+    except AccountActionError as error:
+        return {"status": "not_collected", "note": error.detail, "items": []}
+    return {
+        "status": "ready",
+        "note": "성공한 정지·해제만 보여 줍니다. 화면에서 고치거나 지우지 않습니다.",
+        "items": [
+            {
+                "actor_user_id": row["actor_user_id"],
+                "action": row["action"],
+                "before_status": row["before_status"],
+                "after_status": row["after_status"],
+                "reason": row["reason"],
+                "notice": row["notice"],
+                "created_at": row["created_at"].isoformat(),
+            }
+            for row in rows
+        ],
+    }
+
+
+@router.get("/researches/{research_id}")
+def one_research(
+    research_id: int,
+    reader: Reader,
+    snapshot: Annotated[OperationsSnapshot, Depends(get_snapshot)],
+) -> dict:
+    del reader
+    body = research_detail(snapshot, research_id)
+    if body is None:
+        raise HTTPException(404, "연구를 찾을 수 없습니다.")
+    return body

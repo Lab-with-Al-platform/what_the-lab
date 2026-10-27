@@ -10,10 +10,10 @@
     "not_equivalent_to": "무단 수집 및 저작권 판단을 보장하지 않음",
     "user_query_example": "공개 데이터와 센서 기록을 수집하고 싶어요",
     "sort_order": 1,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -27,10 +27,10 @@
     "not_equivalent_to": "단순 파일 다운로드와 구별",
     "user_query_example": "여러 병원에서 받은 데이터를 한 형태로 합치고 싶어요",
     "sort_order": 2,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -44,10 +44,10 @@
     "not_equivalent_to": "라벨 부여 자체는 별도 기술",
     "user_query_example": "실험 데이터의 결측값과 이상 형식을 정리하고 싶어요",
     "sort_order": 3,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -61,10 +61,10 @@
     "not_equivalent_to": "모델 예측 실행과 구별",
     "user_query_example": "세포 이미지에 정답 영역을 표시하고 싶어요",
     "sort_order": 4,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -78,10 +78,10 @@
     "not_equivalent_to": "AI 모델 성능 평가와 구분",
     "user_query_example": "환자 데이터의 중복과 누락 비율을 점검하고 싶어요",
     "sort_order": 5,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -95,10 +95,10 @@
     "not_equivalent_to": "언어 이해 모델 개발과 다름",
     "user_query_example": "문서와 로그를 표 형태로 정리하고 싶어요",
     "sort_order": 6,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -112,10 +112,10 @@
     "not_equivalent_to": "모델 서빙 자체와 구별",
     "user_query_example": "매일 들어오는 센서 데이터를 자동 처리하고 싶어요",
     "sort_order": 7,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -129,10 +129,10 @@
     "not_equivalent_to": "원인과 효과의 확정적 주장과 구별",
     "user_query_example": "설문 데이터의 분포부터 확인하고 싶어요",
     "sort_order": 8,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -146,10 +146,10 @@
     "not_equivalent_to": "인과관계 검증과 동일하지 않음",
     "user_query_example": "두 실험 집단 간 차이를 검정하고 싶어요",
     "sort_order": 9,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -163,10 +163,10 @@
     "not_equivalent_to": "실험 실행 장비 구축과 별개",
     "user_query_example": "실험에 필요한 샘플 수를 계산하고 싶어요",
     "sort_order": 10,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -180,10 +180,10 @@
     "not_equivalent_to": "모든 관측 연구가 인과성을 입증하지 않음",
     "user_query_example": "정책 시행이 결과에 미친 효과를 알고 싶어요",
     "sort_order": 11,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -197,10 +197,10 @@
     "not_equivalent_to": "일반 시계열 예측과 다름",
     "user_query_example": "환자 재발까지 걸리는 시간을 분석하고 싶어요",
     "sort_order": 12,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -214,10 +214,10 @@
     "not_equivalent_to": "베이지안 딥러닝 전체와 동일하지 않음",
     "user_query_example": "소규모 임상자료에서 불확실성까지 보고 싶어요",
     "sort_order": 13,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -231,10 +231,10 @@
     "not_equivalent_to": "개방형 응답 NLP 처리만 의미하지 않음",
     "user_query_example": "설문 자료의 대표성을 고려한 분석이 필요해요",
     "sort_order": 14,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -248,10 +248,10 @@
     "not_equivalent_to": "이미지 분류는 별도 작업으로 구분",
     "user_query_example": "응답자를 위험군으로 분류하고 싶어요",
     "sort_order": 15,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -265,10 +265,10 @@
     "not_equivalent_to": "회귀계수 인과해석과 구분",
     "user_query_example": "실험 결과값을 수치로 예측하고 싶어요",
     "sort_order": 16,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -282,10 +282,10 @@
     "not_equivalent_to": "지도학습 분류와 다른 작업",
     "user_query_example": "비슷한 환자 유형을 묶어 보고 싶어요",
     "sort_order": 17,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -299,10 +299,10 @@
     "not_equivalent_to": "데이터 오류 여부만 점검하는 작업과 구별",
     "user_query_example": "공정 센서의 이상 징후를 찾고 싶어요",
     "sort_order": 18,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -316,10 +316,10 @@
     "not_equivalent_to": "검색 엔진 일반과 구별",
     "user_query_example": "유사한 논문이나 연구 파트너를 찾고 싶어요",
     "sort_order": 19,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -333,10 +333,10 @@
     "not_equivalent_to": "특정 예측 목적(분류/회귀)은 별도로 선택",
     "user_query_example": "임상 표 데이터로 예측 모델을 구축하고 싶어요",
     "sort_order": 20,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -350,10 +350,10 @@
     "not_equivalent_to": "원본 데이터 품질 진단과 구별",
     "user_query_example": "여러 측정 변수에서 유용한 특성을 고르고 싶어요",
     "sort_order": 21,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -367,10 +367,10 @@
     "not_equivalent_to": "이미지 내 객체 위치를 찾지는 않음",
     "user_query_example": "현미경 사진을 정상·비정상으로 분류하고 싶어요",
     "sort_order": 22,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -384,10 +384,10 @@
     "not_equivalent_to": "픽셀 경계 추출과 다른 작업",
     "user_query_example": "사진 안의 세포 위치와 개수를 찾고 싶어요",
     "sort_order": 23,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -401,10 +401,10 @@
     "not_equivalent_to": "바운딩박스 탐지만 하는 경우와 구별",
     "user_query_example": "종양 경계를 픽셀 단위로 구분하고 싶어요",
     "sort_order": 24,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -418,10 +418,10 @@
     "not_equivalent_to": "한 장의 이미지 객체 탐지만 뜻하지 않음",
     "user_query_example": "실험 영상에서 세포의 움직임을 추적하고 싶어요",
     "sort_order": 25,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -435,10 +435,10 @@
     "not_equivalent_to": "객체 위치 추적과 다른 목적",
     "user_query_example": "동물 행동을 영상으로 분류하고 싶어요",
     "sort_order": 26,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -452,10 +452,10 @@
     "not_equivalent_to": "생성형 이미지 제작과 구분",
     "user_query_example": "저화질 현미경 이미지의 선명도를 높이고 싶어요",
     "sort_order": 27,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -469,10 +469,10 @@
     "not_equivalent_to": "일반 2D 이미지 분류와 구별",
     "user_query_example": "CT 3D 구조의 특징을 분석하고 싶어요",
     "sort_order": 28,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -486,10 +486,10 @@
     "not_equivalent_to": "문맥상 사실 추출과는 다른 작업",
     "user_query_example": "스캔한 옛 문서를 디지털 텍스트로 바꾸고 싶어요",
     "sort_order": 29,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -503,10 +503,10 @@
     "not_equivalent_to": "비지도 주제 발견과 구분",
     "user_query_example": "연구 초록을 분야별로 분류하고 싶어요",
     "sort_order": 30,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -520,10 +520,10 @@
     "not_equivalent_to": "전체 문서 검색과 구별",
     "user_query_example": "계약서에서 기관명과 날짜를 추출하고 싶어요",
     "sort_order": 31,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -537,10 +537,10 @@
     "not_equivalent_to": "LLM 답변 생성이 필수는 아님",
     "user_query_example": "내 논문 1만 건에서 관련 문헌을 찾고 싶어요",
     "sort_order": 32,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -554,10 +554,10 @@
     "not_equivalent_to": "원문 근거의 진위까지 자동 보증하지 않음",
     "user_query_example": "논문 수백 편의 핵심 내용을 정리하고 싶어요",
     "sort_order": 33,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -571,10 +571,10 @@
     "not_equivalent_to": "RAG 시스템 전체 구축과 구별",
     "user_query_example": "표현이 다른 같은 주제의 논문을 찾고 싶어요",
     "sort_order": 34,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -588,10 +588,10 @@
     "not_equivalent_to": "사전에 정한 범주로 분류하는 것과 다름",
     "user_query_example": "신문 기사에서 주요 담론이 어떻게 변했는지 보고 싶어요",
     "sort_order": 35,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -605,10 +605,10 @@
     "not_equivalent_to": "의학적 정신 건강 진단으로 취급하지 않음",
     "user_query_example": "인터뷰 텍스트의 긍정·부정 표현을 분석하고 싶어요",
     "sort_order": 36,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -622,10 +622,10 @@
     "not_equivalent_to": "전문 번역 정확성을 무조건 보장하지 않음",
     "user_query_example": "다국어 설문 응답을 통일된 언어로 분석하고 싶어요",
     "sort_order": 37,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -639,10 +639,10 @@
     "not_equivalent_to": "감정이나 화자 관계를 분석하는 것과 다름",
     "user_query_example": "인터뷰 녹음을 글자로 옮기고 싶어요",
     "sort_order": 38,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -656,10 +656,10 @@
     "not_equivalent_to": "실제 사람의 음성 사용에는 별도 권리 검토",
     "user_query_example": "연구용 안내 음성을 자동으로 만들고 싶어요",
     "sort_order": 39,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -673,10 +673,10 @@
     "not_equivalent_to": "법적 신원확인 보장을 뜻하지 않음",
     "user_query_example": "회의 녹음에서 누가 언제 말했는지 구분하고 싶어요",
     "sort_order": 40,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -690,10 +690,10 @@
     "not_equivalent_to": "대화의 내용을 전사하는 것과 구별",
     "user_query_example": "기계 고장 소리를 자동 분류하고 싶어요",
     "sort_order": 41,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -707,10 +707,10 @@
     "not_equivalent_to": "이미지 단독 분류와 구별",
     "user_query_example": "실험 사진에 관한 질문에 답하는 AI를 만들고 싶어요",
     "sort_order": 42,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -724,10 +724,10 @@
     "not_equivalent_to": "각 데이터 하나만 분석하는 작업과 구분",
     "user_query_example": "영상과 센서 신호를 함께 분석하고 싶어요",
     "sort_order": 43,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -741,10 +741,10 @@
     "not_equivalent_to": "미래값 예측을 반드시 포함하지 않음",
     "user_query_example": "센서 데이터의 계절 패턴을 찾고 싶어요",
     "sort_order": 44,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -758,10 +758,10 @@
     "not_equivalent_to": "단순 패턴 분석과 구별",
     "user_query_example": "내년 기온 변화를 예측하고 싶어요",
     "sort_order": 45,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -775,10 +775,10 @@
     "not_equivalent_to": "단순 독립 표본 이상치 탐지와 다름",
     "user_query_example": "센서 급변 구간을 찾고 싶어요",
     "sort_order": 46,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -792,10 +792,10 @@
     "not_equivalent_to": "원격탐사 이미지 해석과 반드시 같지 않음",
     "user_query_example": "지역별 질병 분포의 공간 패턴을 찾고 싶어요",
     "sort_order": 47,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -809,10 +809,10 @@
     "not_equivalent_to": "일반 사진 분석과 환경·센서 조건이 다름",
     "user_query_example": "위성영상으로 도시 변화 지역을 찾고 싶어요",
     "sort_order": 48,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -826,10 +826,10 @@
     "not_equivalent_to": "그래프 신경망 학습을 뜻하지 않음",
     "user_query_example": "공동 저자 네트워크의 중심 연구자를 찾고 싶어요",
     "sort_order": 49,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -843,10 +843,10 @@
     "not_equivalent_to": "단순 그래프 통계와 구별",
     "user_query_example": "분자 그래프로 물성을 예측하고 싶어요",
     "sort_order": 50,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -860,10 +860,10 @@
     "not_equivalent_to": "대규모 기반모델 자체 훈련과 구별",
     "user_query_example": "실험 기록을 질문할 수 있는 챗봇을 만들고 싶어요",
     "sort_order": 51,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -877,10 +877,10 @@
     "not_equivalent_to": "단순 문서 검색과 구별",
     "user_query_example": "논문 근거를 제시하는 AI 답변을 만들고 싶어요",
     "sort_order": 52,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -894,10 +894,10 @@
     "not_equivalent_to": "모든 자동화가 에이전트인 것은 아님",
     "user_query_example": "연구 보고서용 자료를 순서대로 처리하고 싶어요",
     "sort_order": 53,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -911,10 +911,10 @@
     "not_equivalent_to": "모델 가중치 변경과 구별",
     "user_query_example": "AI 답변을 일정한 JSON 형태로 받고 싶어요",
     "sort_order": 54,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -928,10 +928,10 @@
     "not_equivalent_to": "프롬프트 수정과 구별",
     "user_query_example": "전문 분야 문체에 맞는 모델을 학습하고 싶어요",
     "sort_order": 55,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -945,10 +945,10 @@
     "not_equivalent_to": "원본 이미지의 사실적 복원과 다른 작업",
     "user_query_example": "가상 실험 이미지를 생성하고 싶어요",
     "sort_order": 56,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -962,10 +962,10 @@
     "not_equivalent_to": "실제 데이터 대체 적합성은 별도 검증",
     "user_query_example": "부족한 실험 데이터의 합성 샘플을 만들고 싶어요",
     "sort_order": 57,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -979,10 +979,10 @@
     "not_equivalent_to": "그래프 신경망 모델 개발과 구별",
     "user_query_example": "논문의 개념 관계를 지식그래프로 만들고 싶어요",
     "sort_order": 58,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -996,10 +996,10 @@
     "not_equivalent_to": "AI 모델 학습 하이퍼파라미터 튜닝과 구별",
     "user_query_example": "실험 예산과 설비 배분을 최적화하고 싶어요",
     "sort_order": 59,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1013,10 +1013,10 @@
     "not_equivalent_to": "연속 최적화 전체와 동일하지 않음",
     "user_query_example": "배송 경로와 실험 작업 순서를 최적화하고 싶어요",
     "sort_order": 60,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1030,10 +1030,10 @@
     "not_equivalent_to": "단순 규칙 기반 제어와 구분",
     "user_query_example": "시뮬레이션에서 로봇 정책을 학습하고 싶어요",
     "sort_order": 61,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1047,10 +1047,10 @@
     "not_equivalent_to": "학습 기반 강화학습과 구별",
     "user_query_example": "실험 장비 온도를 안정적으로 제어하고 싶어요",
     "sort_order": 62,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1064,10 +1064,10 @@
     "not_equivalent_to": "일반 이미지 분석만으로 충분하지 않음",
     "user_query_example": "연구 로봇이 스스로 이동하게 하고 싶어요",
     "sort_order": 63,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1081,10 +1081,10 @@
     "not_equivalent_to": "항상 AI 모델을 사용하는 것은 아님",
     "user_query_example": "반복적인 실험 조건 조정을 자동화하고 싶어요",
     "sort_order": 64,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1098,10 +1098,10 @@
     "not_equivalent_to": "생물학적 해석은 분야 전문성 필요",
     "user_query_example": "유전자 발현 데이터에서 표지자를 찾고 싶어요",
     "sort_order": 65,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1115,10 +1115,10 @@
     "not_equivalent_to": "의료 효능을 검증한 것으로 볼 수 없음",
     "user_query_example": "단백질 결합 구조 후보를 분석하고 싶어요",
     "sort_order": 66,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1132,10 +1132,10 @@
     "not_equivalent_to": "실험 검증 없이 실제 물성 보장하지 않음",
     "user_query_example": "신소재의 물성을 예측하고 싶어요",
     "sort_order": 67,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1149,10 +1149,10 @@
     "not_equivalent_to": "데이터 기반 예측만 수행하는 작업과 구별",
     "user_query_example": "유체 흐름을 수치적으로 시뮬레이션하고 싶어요",
     "sort_order": 68,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1166,10 +1166,10 @@
     "not_equivalent_to": "일반 수치해석만 수행한 경력과 구별",
     "user_query_example": "물리 법칙을 활용해 적은 데이터로 학습하고 싶어요",
     "sort_order": 69,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1183,10 +1183,10 @@
     "not_equivalent_to": "기본 실험계획법과 구별",
     "user_query_example": "다음 실험으로 측정할 샘플을 추천하고 싶어요",
     "sort_order": 70,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1200,10 +1200,10 @@
     "not_equivalent_to": "단발성 독립 시뮬레이션과 다름",
     "user_query_example": "공장 설비 상태를 실시간 가상 모델로 모니터링하고 싶어요",
     "sort_order": 71,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1217,10 +1217,10 @@
     "not_equivalent_to": "모델 호출 API만 붙이는 것과 구별",
     "user_query_example": "소규모 연구자료로 모델을 다시 학습하고 싶어요",
     "sort_order": 72,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1234,10 +1234,10 @@
     "not_equivalent_to": "일반 데이터 무결성 검사와 다름",
     "user_query_example": "AI 모델의 과적합과 재현성을 검증하고 싶어요",
     "sort_order": 73,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1251,10 +1251,10 @@
     "not_equivalent_to": "SHAP 결과를 인과효과로 해석하지 않음",
     "user_query_example": "예측 결과에 영향을 준 변수를 설명하고 싶어요",
     "sort_order": 74,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1268,10 +1268,10 @@
     "not_equivalent_to": "운영 최적화 문제와 구분",
     "user_query_example": "모델을 모바일에서 빠르게 실행하고 싶어요",
     "sort_order": 75,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1285,10 +1285,10 @@
     "not_equivalent_to": "모델 학습 능력까지 자동 추정하지 않음",
     "user_query_example": "학습한 모델을 웹 API로 제공하고 싶어요",
     "sort_order": 76,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1302,10 +1302,10 @@
     "not_equivalent_to": "클라우드 인프라 운영 전체와 같지 않음",
     "user_query_example": "배포 후 성능 변화를 추적하고 싶어요",
     "sort_order": 77,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1319,10 +1319,10 @@
     "not_equivalent_to": "법률적 차별 판정은 별도 전문가 필요",
     "user_query_example": "모델 성능이 집단별로 다른지 점검하고 싶어요",
     "sort_order": 78,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1336,10 +1336,10 @@
     "not_equivalent_to": "모든 개인정보 규제 준수 보장과 구별",
     "user_query_example": "원자료를 모으지 않고 공동학습하고 싶어요",
     "sort_order": 79,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1353,10 +1353,10 @@
     "not_equivalent_to": "보안 감사 전체와 동일하지 않음",
     "user_query_example": "연구 챗봇이 근거 없이 답하는지 검증하고 싶어요",
     "sort_order": 80,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   }
 ]

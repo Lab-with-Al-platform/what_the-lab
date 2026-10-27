@@ -9,6 +9,7 @@ from app.discord_bot import bot_ready
 from app.notification_sender import run_forever, wake_up
 from app.request_store import expire_forever
 from app.routers import (
+    analytics,
     auth,
     collab_requests,
     expert,
@@ -19,6 +20,7 @@ from app.routers import (
     insights,
     notifications,
     profile_photo,
+    operations,
     researcher,
     researcher_research,
     taxonomy,
@@ -69,10 +71,12 @@ def health() -> dict[str, str]:
 
 
 # 회원·인증 API와 인사이트 API를 모두 등록해야 한쪽 기능이 사라지지 않습니다.
+app.include_router(analytics.router)
 app.include_router(auth.router)
 app.include_router(verification.router)
 app.include_router(researcher.router)
 app.include_router(insights.router)
+app.include_router(operations.router)
 
 app.include_router(expert.router)
 app.include_router(expert_profile.router)

@@ -1,0 +1,19 @@
+{
+  "checks": [
+    {
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "width": 768,
+      "scrollWidth": 768
+    },
+    {
+      "width": 390,
+      "scrollWidth": 390
+    }
+  ],
+  "interactions": "추가 네 상태 및 완료의 필터·상세, 작성 상태 교차 검색, 빈 결과, 초기화, 실데이터 연결 전, 구형 API 호환",
+  "writes": 0,
+  "errors": []
+}

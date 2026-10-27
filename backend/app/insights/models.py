@@ -1,12 +1,13 @@
 """DB에 저장할 객체. 검토 자료와 공개 스냅샷은 서로 다른 테이블입니다."""
 
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from typing import ClassVar
 from uuid import uuid4
 
 from sqlalchemy import (
     JSON,
     CheckConstraint,
+    Date,
     DateTime,
     ForeignKey,
     Integer,
@@ -124,3 +125,27 @@ class CollectionSetting(Base):
     content: Mapped[dict] = mapped_column(JSON)
     updated_by: Mapped[str] = mapped_column(String(32))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+
+class InsightPageView(Base):
+    """공개 글 상세가 실제로 보인 한 번의 방문. 같은 event_id는 재시도로 한 번만 셉니다."""
+
+    __tablename__ = "insight_page_views"
+    __table_args__: ClassVar[dict[str, str]] = {"schema": SCHEMA}
+
+    event_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    content_id: Mapped[str] = mapped_column(ForeignKey(f"{SCHEMA}.publications.id"))
+    received_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class InsightPageViewDaily(Base):
+    """콘텐츠·한국 날짜별 조회수. 주·월 합은 이 일별 값을 더해 만들며 방문자 수에는 쓰지 않습니다."""
+
+    __tablename__ = "insight_page_view_daily"
+    __table_args__: ClassVar[dict[str, str]] = {"schema": SCHEMA}
+
+    content_id: Mapped[str] = mapped_column(
+        ForeignKey(f"{SCHEMA}.publications.id"), primary_key=True
+    )
+    view_date: Mapped[date] = mapped_column(Date, primary_key=True)
+    page_views: Mapped[int] = mapped_column(Integer)

@@ -51,10 +51,11 @@
 
 - `source.bibliography_checked=false`, `source.access_level=unknown`
 - 모든 `claims[].verification=needs_review`
-- `scores=[]`, `keyword_ids=[]`, `image_policy=no_image`
+- `scores=[]`, `image_policy=no_image`
+- `keyword_ids`: 2026-10-23 변경. 분류체계 v4.0에서 운영 승인된 CAP ID만 **수집 제안값**으로 남기고, 목록에 없는 ID는 버립니다. 미리 보기 응답의 `keyword_ids`·`dropped_keyword_ids`로 남는 값과 버리는 값을 보여 줍니다. 관리자가 승인 전에 확인·수정하며, 승인할 때 서버가 다시 검사합니다.
 
 주장 본문·출처 링크·근거 위치는 검토 재료로 남기되 확인 완료로 선언하지 않습니다.
-점수·기술 ID·이미지 권리는 관리자가 새 revision에서 확인해 입력해야 합니다.
+점수·이미지 권리는 관리자가 새 revision에서 확인해 입력해야 합니다. 기술 ID는 제안값을 확인하고 필요할 때만 고칩니다.
 수집기를 나중에 연결하더라도 이 API가 승인을 대신하지 않습니다.
 
 ## 3. 중복·실패·편집 보호

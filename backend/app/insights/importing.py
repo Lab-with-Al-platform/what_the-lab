@@ -1,6 +1,6 @@
 """관리자가 준비한 후보 묶음을 미리 확인하고, 새 초안만 저장합니다."""
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 
 from fastapi import HTTPException
 from sqlalchemy import or_, select
@@ -17,17 +17,32 @@ class ImportItem:
     action: str
     candidate_id: str | None = None
     duplicate_of: int | None = None
+    # 새로 만들 후보에만 채웁니다. 승인 목록에 있어 남길 기술 ID와 버린 기술 ID입니다.
+    keyword_ids: list[str] = field(default_factory=list)
+    dropped_keyword_ids: list[str] = field(default_factory=list)
+
+
+def suggested_keywords(draft: Draft) -> tuple[list[str], list[str]]:
+    """수집이 고른 기술 ID 중 분류체계에서 운영 승인된 CAP만 제안값으로 남깁니다."""
+    approved = {item["id"] for item in service.approved_capabilities()}
+    kept = [keyword_id for keyword_id in draft.keyword_ids if keyword_id in approved]
+    dropped = [keyword_id for keyword_id in draft.keyword_ids if keyword_id not in approved]
+    return kept, dropped
 
 
 def unverified_draft(draft: Draft) -> Draft:
-    """파일에 적힌 검증 완료·점수·키워드 승인을 실제 검토로 신뢰하지 않습니다."""
+    """파일에 적힌 검증 완료·점수·이미지 권리를 실제 검토로 신뢰하지 않습니다.
+
+    기술 ID는 승인된 CAP 목록에 있는 것만 '수집 제안값'으로 남깁니다(2026-10-23 합의).
+    관리자가 승인 전에 확인·수정하며, 서버는 승인할 때 다시 검사합니다.
+    """
     content = draft.model_dump(mode="json")
     content["source"]["bibliography_checked"] = False
     content["source"]["access_level"] = "unknown"
     for claim in content["claims"]:
         claim["verification"] = "needs_review"
     content["scores"] = []
-    content["keyword_ids"] = []
+    content["keyword_ids"] = suggested_keywords(draft)[0]
     content["image_policy"] = "no_image"
     return Draft.model_validate(content)
 
@@ -106,13 +121,19 @@ def import_candidates(session: Session, request: CandidateImportInput, actor: st
     """기존 등록 규칙을 재사용하며 승인·게시 함수는 호출하지 않습니다."""
     items = plan_import(session, request.drafts)
     for item in items:
+        if item.action == "would_create":
+            # 미리 보기에서도 어떤 기술 ID가 남고 빠지는지 관리자에게 보여 줍니다.
+            item.keyword_ids, item.dropped_keyword_ids = suggested_keywords(request.drafts[item.index])
         if not request.dry_run and item.action == "would_create":
             candidate = service.create_candidate(
                 session,
                 unverified_draft(request.drafts[item.index]),
                 actor,
             )
-            service.add_event(session, candidate, actor, "imported", "일괄 입력: 근거 재검토 필요")
+            note = "일괄 입력: 근거 재검토 필요"
+            if item.keyword_ids:
+                note += f" · 기술 ID {len(item.keyword_ids)}개는 수집 제안값(승인 전 확인)"
+            service.add_event(session, candidate, actor, "imported", note)
             item.action = "created"
             item.candidate_id = candidate.id
         if item.duplicate_of is not None:

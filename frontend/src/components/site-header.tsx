@@ -52,6 +52,7 @@ export function SiteHeader() {
   const [meLoading, setMeLoading] = useState(true);
   const [profileOpen, setProfileOpen] = useState(false);
   const [canManageInsights, setCanManageInsights] = useState(false);
+  const [canReadOperations, setCanReadOperations] = useState(false);
   const [meVersion, setMeVersion] = useState(0); // 프로필 설정에서 사진을 바꾸면 1씩 올라가요 → 내 정보를 다시 불러와요
   const profileRef = useRef<HTMLDivElement>(null);
 
@@ -78,14 +79,19 @@ export function SiteHeader() {
   useEffect(() => {
     let active = true;
     setCanManageInsights(false);
+    setCanReadOperations(false);
     requestApi<Me>("/auth/me")
       .then(async (user) => {
         if (!active) return;
         setMe(user);
-        // 일반 관리자와 인사이트 허용 목록을 서버에서 함께 판단합니다.
-        const access = await requestApi<{ can_manage_insights: boolean }>("/admin/insights/access")
-          .catch(() => null);
-        if (active) setCanManageInsights(access?.can_manage_insights === true);
+        // 인사이트 수정과 운영 조회는 서버에서 따로 판단합니다.
+        const [access, operations] = await Promise.all([
+          requestApi<{ can_manage_insights: boolean }>("/admin/insights/access").catch(() => null),
+          requestApi<{ can_read_operations: boolean }>("/admin/operations/access").catch(() => null),
+        ]);
+        if (!active) return;
+        setCanManageInsights(access?.can_manage_insights === true);
+        setCanReadOperations(operations?.can_read_operations === true);
       })
       .catch(() => { if (active) setMe(null); })
       .finally(() => { if (active) setMeLoading(false); });
@@ -206,6 +212,11 @@ export function SiteHeader() {
                     </Link>
                   ))}
 
+                  {canReadOperations ? (
+                    <Link href="/admin" className="flex min-h-11 items-center px-4 text-sm font-semibold text-brand hover:bg-brand-soft" onClick={() => setProfileOpen(false)}>
+                      운영 현황
+                    </Link>
+                  ) : null}
                   {canManageInsights ? (
                     <Link href="/admin/insights" className="flex min-h-11 items-center px-4 text-sm font-semibold text-brand hover:bg-brand-soft" onClick={() => setProfileOpen(false)}>
                       인사이트 관리자
@@ -296,6 +307,11 @@ export function SiteHeader() {
                     {item.label}
                   </Link>
                 ))}
+                {canReadOperations ? (
+                  <Link href="/admin" className="flex min-h-11 items-center rounded-button px-3 text-sm font-semibold text-brand hover:bg-brand-soft" onClick={() => setMenuOpen(false)}>
+                    운영 현황
+                  </Link>
+                ) : null}
                 {canManageInsights ? (
                   <Link href="/admin/insights" className="flex min-h-11 items-center rounded-button px-3 text-sm font-semibold text-brand hover:bg-brand-soft" onClick={() => setMenuOpen(false)}>
                     인사이트 관리자
