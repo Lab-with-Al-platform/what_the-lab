@@ -31,7 +31,9 @@ API_PROXY_TARGET=http://127.0.0.1:8000
 
 ## 공용 Supabase DB — 담당자만 적용
 
-기존 [SETUP_NOTIFICATION_PROFILE.md](../development/SETUP_NOTIFICATION_PROFILE.md)의 **“각자 alembic upgrade를 실행하지 마세요. 공용 DB는 DB 담당자만 바꿉니다.”** 원칙을 따릅니다. 이 작업에서 공용 DB에 접속하거나 migration을 실행하지 않았습니다.
+기존 [SETUP_NOTIFICATION_PROFILE.md](../development/SETUP_NOTIFICATION_PROFILE.md)의 **“각자 alembic upgrade를 실행하지 마세요. 공용 DB는 DB 담당자만 바꿉니다.”** 원칙을 따릅니다. 통합 PR 자체에서는 공용 DB에 접속하지 않았습니다.
+
+2026-10-27에 게시판 연결 오류를 고치면서, 공용 DB에는 게시판 SQL만 적용했습니다. Alembic 개정 번호는 `20261025_06` 그대로이고 조회수·운영 이력·방문 수집(`07`~`09`)은 만들지 않았습니다. 이후 담당자가 `alembic upgrade 20261026_11`을 실행하면 `07`~`09`를 만든 뒤, `community_private.posts`와 댓글 알림 열이 이미 있으면 `10`·`11`은 건너뜁니다.
 
 일반 팀원은 backend에서 상태만 확인하고 DB 담당자의 완료 안내를 기다립니다.
 
