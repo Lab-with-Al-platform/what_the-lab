@@ -1,15 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { CoverArt } from "@/components/cover-art";
-import { KeywordTag } from "@/components/keyword-tag";
 import { PageContainer } from "@/components/page-container";
 import { InsightCard } from "@/components/insight-card";
+import { InsightFeatureCarousel } from "@/components/insight-feature-carousel";
 import {
-  articlePath,
   kindLabel,
   matchesTopicFilter,
   topicCount,
@@ -23,14 +20,13 @@ const PAGE_SIZE = 6;
 interface InsightBrowserProps {
   kind: InsightKind;
   articles: InsightArticle[];
-  featured: InsightArticle;
+  // 상단 추천 영역에서 순서대로 돌아가며 보여 줄 글입니다.
+  featuredItems: InsightArticle[];
   topics: InsightTopic[];
   eyebrow: string;
   title: string;
   kicker: string;
   description: string;
-  featuredHeadline: string;
-  featuredDescription: string;
   listTitle: string;
   // 인용 콘텐츠가 있는 페이지만 이 묶음을 전달합니다.
   perspective?: {
@@ -44,14 +40,12 @@ interface InsightBrowserProps {
 export function InsightBrowser({
   kind,
   articles,
-  featured,
+  featuredItems,
   topics,
   eyebrow,
   title,
   kicker,
   description,
-  featuredHeadline,
-  featuredDescription,
   listTitle,
   perspective,
   footnote,
@@ -107,38 +101,7 @@ export function InsightBrowser({
         </PageContainer>
       </header>
 
-      <section aria-labelledby={`${kind}-feature-heading`}>
-        {/* 배경 사진의 기준점을 화면 전체가 아닌 공통 본문 프레임으로 제한합니다. */}
-        <PageContainer className="insight-feature">
-          {/* 사진 위에 배경색 그라데이션을 겹쳐 글과 이미지의 경계를 없앱니다. */}
-          <div className="insight-feature__art" aria-hidden="true">
-            <CoverArt
-              theme={featured.cover} src={featured.coverSrc} className="h-full w-full" priority
-              sizes="(min-width: 1440px) 960px, (min-width: 1024px) 68vw, (min-width: 768px) 80vw, 100vw"
-            />
-          </div>
-          <div className="relative z-10">
-            <div className="insight-feature__copy">
-              <p className="text-xs font-semibold tracking-[0.08em] text-brand">
-                {kind === "case" ? "이번 주 추천 사례" : "이번 주 주목 트렌드"}
-              </p>
-              <h2 id={`${kind}-feature-heading`} className="insight-feature__title">{featuredHeadline}</h2>
-              <p className="mt-4 max-w-lg text-sm leading-7 text-muted md:text-base">{featuredDescription}</p>
-              <p className="mt-3 text-xs text-muted">
-                {featured.field}
-                {featured.field !== featured.topicLabel ? ` · ${featured.topicLabel}` : ""}
-              </p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {featured.tags.map((tag) => <KeywordTag key={tag} label={tag} />)}
-              </div>
-              <Link href={articlePath(featured)} className="mt-6 inline-flex min-h-11 items-center gap-3 rounded-button bg-brand px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-hover">
-                {kind === "case" ? "연구 과정 살펴보기" : "트렌드 살펴보기"}
-                <span aria-hidden="true">→</span>
-              </Link>
-            </div>
-          </div>
-        </PageContainer>
-      </section>
+      <InsightFeatureCarousel kind={kind} items={featuredItems} />
 
       {/* 공통 푸터에 이미 바깥 여백이 있으므로 목록 끝의 여백을 중복하지 않습니다. */}
       <PageContainer>

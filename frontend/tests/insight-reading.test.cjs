@@ -85,7 +85,7 @@ test("전용 표지 우선·공통 사진 폴백과 생성 이미지 설명을 �
 });
 
 test("목록·홈·추천·상세·관련 글에서 전용 표지를 전달한다", () => {
-  const files = ["insight-card.tsx", "insight-browser.tsx", "article-view.tsx"];
+  const files = ["insight-card.tsx", "insight-feature-carousel.tsx", "article-view.tsx"];
   for (const file of files) {
     const source = fs.readFileSync(path.resolve(__dirname, "../src/components", file), "utf8");
     const covers = [...source.matchAll(/<CoverArt\b[^>]*\/>/g)].map((match) => match[0]);
@@ -138,7 +138,10 @@ test("기존 치주골·MatterGen 내용은 보존하고 허용된 트렌드 표
   };
   for (const [slug, hash] of Object.entries(expected)) {
     const article = { ...getInsight(slug) };
-    // 표지 교체 요청은 허용하되 본문·분류·URL 등의 회귀 검사는 유지합니다.
+    // 표지 교체와 목록 추천 문구는 허용하되 본문·분류·URL 회귀 검사는 유지합니다.
+    delete article.featuredRank;
+    delete article.featuredHeadline;
+    delete article.featuredSummary;
     if (slug === "mattergen-material-design") {
       delete article.coverSrc;
       delete article.imageAlt;
