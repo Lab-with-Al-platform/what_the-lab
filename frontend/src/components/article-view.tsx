@@ -4,8 +4,9 @@ import { ArticleToc } from "@/components/article-toc";
 import { PageContainer } from "@/components/page-container";
 import { CoverArt } from "@/components/cover-art";
 import { KeywordTag } from "@/components/keyword-tag";
-import { InsightCard } from "@/components/insight-card";
 import { ArticleGlossary, ArticleParagraph } from "@/components/article-editorial";
+import { InsightViewBeacon } from "@/components/insight-view-beacon";
+import { AnalyticsArticleBeacon, RelatedArticleCard, TrackedArticleLink } from "@/components/analytics-article-links";
 import { articlePath, getInsight, kindLabel, relatedInsights, type InsightArticle } from "@/lib/insights";
 
 /** 같은 현미경 사진을 다른 위치로 잘라, 세포 종류마다 다른 연구 그림인 것처럼 보이지 않게 합니다. */
@@ -113,8 +114,9 @@ export function ArticleView({ article, hideCover = false, contentOnly = false }:
   const listHref = article.kind === "case" ? "/cases" : "/trends";
   const expertQuery = encodeURIComponent(article.technologies[0]?.title ?? article.topicLabel);
 
-  return (
-    <PageContainer className={contentOnly ? "article-content-preview" : "py-4 md:py-5"}>
+  return <PageContainer className={contentOnly ? "article-content-preview" : "py-4 md:py-5"}>
+      {contentOnly ? null : <InsightViewBeacon slug={article.slug} kind={article.kind} />}
+      {contentOnly ? null : <AnalyticsArticleBeacon kind={article.kind} slug={article.slug} />}
       {!contentOnly ? <nav aria-label="경로" className="truncate text-[11px] text-muted">
         <Link href="/" className="hover:text-ink">
           홈
@@ -203,10 +205,10 @@ export function ArticleView({ article, hideCover = false, contentOnly = false }:
           {companion ? (
             <nav aria-label="같은 주제, 다른 관점" className="article-companion mt-5 rounded-card border border-line p-4">
               <p className="text-xs font-semibold text-muted">같은 주제, 다른 관점</p>
-              <Link href={articlePath(companion)} className="mt-1 flex min-h-11 items-center justify-between gap-3 text-sm font-semibold text-brand hover:text-ink">
+              <TrackedArticleLink href={articlePath(companion)} eventName="related_article_open" target={`${companion.kind}/${companion.slug}`} className="mt-1 flex min-h-11 items-center justify-between gap-3 text-sm font-semibold text-brand hover:text-ink">
                 <span>{article.kind === "case" ? "작동 원리를 쉽게 이해하기" : "실제 연구 적용 과정 살펴보기"}<span className="mt-1 block font-normal text-muted">{companion.title}</span></span>
                 <span aria-hidden="true">→</span>
-              </Link>
+              </TrackedArticleLink>
               <p className="mt-1 text-xs leading-5 text-muted">같은 연구를 서로 다른 관점에서 설명합니다. 별개의 연구 성과가 아닙니다.</p>
             </nav>
           ) : null}
@@ -327,12 +329,14 @@ export function ArticleView({ article, hideCover = false, contentOnly = false }:
                 </li>
               ))}
             </ul>
-            <Link
+            <TrackedArticleLink
               href={`/experts?skill=${expertQuery}`}
+              eventName="expert_search_click"
+              target={`${article.kind}/${article.slug}`}
               className="mt-3 flex min-h-14 items-center justify-between rounded-[8px] bg-brand-soft px-3 text-xs font-semibold text-brand"
             >
               <span>이 기술을 다루는 전문가 찾기</span><span aria-hidden="true">→</span>
-            </Link>
+            </TrackedArticleLink>
           </section>
 
           {related.length > 0 ? (
@@ -341,13 +345,13 @@ export function ArticleView({ article, hideCover = false, contentOnly = false }:
               <ul className="mt-3 space-y-3">
                 {related.map((item) => (
                   <li key={item.slug}>
-                    <Link href={articlePath(item)} className="flex gap-3 rounded-2xl hover:text-brand">
+                    <TrackedArticleLink href={articlePath(item)} eventName="related_article_open" target={`${item.kind}/${item.slug}`} className="flex gap-3 rounded-2xl hover:text-brand">
                       <CoverArt theme={item.cover} src={item.coverSrc} className="h-14 w-16 shrink-0 rounded-lg" sizes="64px" />
                       <span>
                         <span className="block text-sm font-semibold">{item.title}</span>
                         <span className="mt-1 block text-xs text-muted">{item.publishedOn}</span>
                       </span>
-                    </Link>
+                    </TrackedArticleLink>
                   </li>
                 ))}
               </ul>
@@ -362,11 +366,10 @@ export function ArticleView({ article, hideCover = false, contentOnly = false }:
           <h2 className="text-lg font-bold">이어서 볼 글</h2>
           <div className="mt-4 grid gap-4 md:grid-cols-3">
             {related.map((item) => (
-              <InsightCard key={item.slug} article={item} />
+              <RelatedArticleCard key={item.slug} article={item} />
             ))}
           </div>
         </section>
       ) : null}
-    </PageContainer>
-  );
+    </PageContainer>;
 }
