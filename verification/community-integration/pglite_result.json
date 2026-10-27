@@ -1,0 +1,17 @@
+{
+  "engine": "PGlite WASM PostgreSQL (single connection, not native concurrency)",
+  "revision": "20261026_08",
+  "migration_chain": "all 8 revisions applied (base -> latest06 with data -> board08)",
+  "tables": 8,
+  "rls": true,
+  "browser_roles_denied": true,
+  "bigint_member": true,
+  "exact_korean_json_tag": true,
+  "real_fastapi_psycopg_crud": true,
+  "cross_post_fk_enforced": true,
+  "latest_data_preserved": true,
+  "real_collaboration_request_accept_start": true,
+  "global_and_board_notifications_separate": true,
+  "expert_search_sql": true,
+  "native_concurrency_verified": false
+}

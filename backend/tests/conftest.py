@@ -16,5 +16,7 @@ os.environ.update(
         "DB_USER": "test",
         "DB_PASSWORD": "test-only-password",
         "APP_ENV": "production",
+        "DISCORD_BOT_TOKEN": "",
+        "DISCORD_GUILD_ID": "",
     }
 )

@@ -20,7 +20,7 @@ type Tab = "waiting" | "accepted" | "closed";
 
 const TAB_HELP: Record<Tab, string> = {
   waiting: "요청을 취소하면 목록에서 사라져요. 다시 보내고 싶으면 그 전문가 상세에서 다시 요청하면 돼요.",
-  accepted: "협업을 시작하면 협업 공간과 디스코드 채널이 만들어지고, 이 연구로 보낸 다른 요청은 자동으로 취소돼요.",
+  accepted: "협업 시작을 기록하면 이 연구로 보낸 다른 진행 중 요청은 자동으로 취소돼요. 작업 방식과 연락 수단은 상대방과 먼저 확인해 주세요.",
   closed: "만료된 요청은 다시 보낼 수 있어요. 거절한 전문가에게는 같은 연구로 다시 보낼 수 없어요.",
 };
 
@@ -112,8 +112,8 @@ export function SentRequests() {
           {startedWith && (
             <p className="mt-3 rounded-button bg-success-soft px-4 py-3 text-sm font-semibold text-success">
               {startedWith} 님과 협업을 시작했어요.{" "}
-              <Link href="/workspace" className="underline">
-                협업 공간으로 가기
+              <Link href="/faq#request-boundary" className="underline">
+                협업 시작 안내
               </Link>
             </p>
           )}
@@ -372,7 +372,8 @@ function StartConfirm({
         <dd className="font-medium">{meeting}</dd>
       </dl>
       <ul className="mt-4 space-y-2 text-sm text-muted">
-        <li>• 협업 공간이 만들어지고, 디스코드에 두 사람만 있는 협업 채널이 만들어져요</li>
+        <li>• 양쪽 계정에 협업 시작이 기록되고 사이트 알림이 전달돼요. 디스코드 DM은 연결·수신 설정에 따라 보내요</li>
+        <li>• 별도 협업 공간이나 디스코드 채널은 자동 생성되지 않아요. 작업 방식과 연락 수단을 먼저 합의해 주세요</li>
         {others.length > 0 && <li>• 같은 연구로 보낸 {others.map((other) => other.expert.nickname).join(", ")} 님 요청은 자동으로 취소돼요</li>}
       </ul>
     </Modal>

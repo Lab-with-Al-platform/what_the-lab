@@ -367,6 +367,12 @@ export function ArticleView({ article, hideCover = false, contentOnly = false }:
           </div>
         </section>
       ) : null}
+      {!contentOnly ? (
+        <section className="mt-8 flex flex-wrap items-center justify-between gap-4 rounded-card border border-line bg-brand-soft p-6">
+          <div><h2 className="text-base font-semibold">이 글에서 떠오른 질문이 있나요?</h2><p className="mt-2 text-sm text-muted">공개된 글의 맥락을 함께 연결해 연구자·개발자와 이야기해 보세요.</p></div>
+          <Link href={`/community/new?category=question&insight=${encodeURIComponent(article.slug)}`} className="inline-flex min-h-11 items-center rounded-button bg-brand px-5 text-sm font-semibold text-white">게시판에서 질문하기 →</Link>
+        </section>
+      ) : null}
     </PageContainer>
   );
 }
