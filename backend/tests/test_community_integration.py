@@ -100,9 +100,9 @@ def test_existing_routes_and_single_migration_head_are_preserved():
     } <= paths
     root = Path(__file__).resolve().parents[2]
     scripts = ScriptDirectory.from_config(Config(str(root / "backend/alembic.ini")))
-    assert scripts.get_heads() == ["20261028_13"]
+    assert scripts.get_heads() == ["20261028_14"]
     assert [r.revision for r in scripts.walk_revisions()] == [
-        "20261028_13", "20261027_12", "20261026_11", "20261026_10", "20261026_09", "20261026_08", "20261026_07",
+        "20261028_14", "20261028_13", "20261027_12", "20261026_11", "20261026_10", "20261026_09", "20261026_08", "20261026_07",
         "20261025_06", "20261022_05", "20261022_04", "20261021_03", "20261021_02", "20261016_01",
     ]
     for number, name in [("009_create_community.sql", "20261026_10_community.sql"), ("010_community_integrity.sql", "20261026_11_community_integrity.sql")]:
