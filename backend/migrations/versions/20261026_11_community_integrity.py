@@ -6,6 +6,7 @@
 from pathlib import Path
 
 from alembic import op
+from sqlalchemy import text
 
 revision = "20261026_11"
 down_revision = "20261026_10"
@@ -14,6 +15,16 @@ depends_on = None
 
 
 def upgrade() -> None:
+    # 댓글 알림 연결 열이 있으면 무결성 SQL을 다시 실행하지 않습니다.
+    ready = op.get_bind().execute(
+        text(
+            "SELECT 1 FROM information_schema.columns "
+            "WHERE table_schema = 'community_private' "
+            "AND table_name = 'notifications' AND column_name = 'comment_id'"
+        )
+    ).scalar()
+    if ready:
+        return
     source = Path(__file__).resolve().parents[1] / "sql/20261026_11_community_integrity.sql"
     op.execute(source.read_text(encoding="utf-8"))
 

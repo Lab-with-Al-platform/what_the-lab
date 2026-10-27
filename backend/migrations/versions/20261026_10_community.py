@@ -7,6 +7,7 @@
 from pathlib import Path
 
 from alembic import op
+from sqlalchemy import text
 
 revision = "20261026_10"
 down_revision = "20261026_09"
@@ -15,6 +16,10 @@ depends_on = None
 
 
 def upgrade() -> None:
+    # 게시판 표만 먼저 만든 DB에서는 같은 표를 다시 만들지 않습니다.
+    exists = op.get_bind().execute(text("SELECT to_regclass('community_private.posts')")).scalar()
+    if exists:
+        return
     source = Path(__file__).resolve().parents[1] / "sql/20261026_10_community.sql"
     op.execute(source.read_text(encoding="utf-8"))
 
