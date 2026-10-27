@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Chip, FieldTitle, INPUT_CLASS, Modal, toggle, useSaving } from "@/components/modal";
 import {
   DATA_STATUS_LABELS,
@@ -19,9 +19,10 @@ import {
   RewardCode,
   SHARE_LABELS,
   SharePolicy,
-  stepReady,
+  stepBlocker,
   toInput,
 } from "@/lib/my-research";
+import { LEAVE_REASONS, LeaveReason, STEP_TARGETS, sendAnalytics, writingAttemptId } from "@/lib/analytics-collect";
 
 // 분류표 목록 (내 이력과 같은 API 응답 모양)
 export type AbleWorkOption = { able_work_id: string; name: string; show_default: boolean };
@@ -51,12 +52,42 @@ export function MyResearchModal({ research, ableWorks, fields, onClose, onSave, 
   const [categoryId, setCategoryId] = useState(fields[0]?.field_category_id ?? "");
   const [showAllWorks, setShowAllWorks] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [leaving, setLeaving] = useState(false);
+  const [attemptId, setAttemptId] = useState<string | null>(null);
+  const [stepHint, setStepHint] = useState("");
   const { saving, error, run } = useSaving();
 
   const registered = research?.status === "registered"; // 이미 등록한 연구를 고치는 중인지
+  const mode = research == null ? "create" : registered ? "edit" : "resume";
   const fieldName = new Map(fields.flatMap((category) => category.fields.map((field) => [field.field_id, field.name])));
   const workName = new Map(ableWorks.map((work) => [work.able_work_id, work.name]));
-  const ready = stepReady(step, input);
+
+  useEffect(() => {
+    try {
+      const id = writingAttemptId(window.sessionStorage);
+      setAttemptId(id);
+      sendAnalytics({
+        event_name: "registration_open",
+        target: "research",
+        attempt_id: id,
+        mode,
+        research_id: research?.research_id,
+      });
+    } catch {
+      // 저장소를 쓸 수 없어도 연구 작성 창은 열립니다.
+    }
+  }, [mode, research?.research_id]);
+
+  useEffect(() => {
+    if (!attemptId) return;
+    sendAnalytics({
+      event_name: "registration_step",
+      target: STEP_TARGETS[step - 1] ?? "research",
+      attempt_id: attemptId,
+      mode,
+      research_id: research?.research_id,
+    });
+  }, [attemptId, step, mode, research?.research_id]);
 
   /** 입력값 일부만 바꿉니다. 예: change({ title: "..." }) */
   function change(patch: Partial<ResearchInput>) {
@@ -71,7 +102,83 @@ export function MyResearchModal({ research, ableWorks, fields, onClose, onSave, 
   }
 
   function save(status: "draft" | "registered") {
-    run(() => onSave({ ...input, status, title: input.title.trim(), description: input.description.trim() }));
+    const failed = status === "draft" ? "draft_failed" : registered ? "edit_failed" : "register_failed";
+    const saved = status === "draft" ? "draft_ok" : registered ? "edit_ok" : null;
+    run(async () => {
+      try {
+        await onSave({
+          ...input,
+          status,
+          title: input.title.trim(),
+          description: input.description.trim(),
+          writing_attempt_id: attemptId ?? undefined,
+        });
+      } catch (caught) {
+        noteSave(failed);
+        throw caught;
+      }
+      // 처음 등록 성공은 서버가 연구 저장과 함께 남깁니다. 버튼 클릭만으로 완료를 만들지 않아요.
+      if (saved) noteSave(saved);
+    });
+  }
+
+  function noteSave(resultCode: string) {
+    if (!attemptId) return;
+    sendAnalytics({
+      event_name: "registration_save",
+      target: STEP_TARGETS[step - 1] ?? "review",
+      attempt_id: attemptId,
+      mode,
+      result_code: resultCode,
+      research_id: research?.research_id,
+    });
+  }
+
+  function goNext() {
+    const blocker = stepBlocker(step, input);
+    if (blocker) {
+      setStepHint("필수 항목을 채워야 다음으로 갈 수 있어요.");
+      if (attemptId) {
+        sendAnalytics({
+          event_name: "registration_validation_failed",
+          target: STEP_TARGETS[step - 1] ?? "research",
+          attempt_id: attemptId,
+          mode,
+          result_code: blocker,
+          research_id: research?.research_id,
+        });
+      }
+      return;
+    }
+    setStepHint("");
+    if (attemptId) {
+      sendAnalytics({
+        event_name: "registration_advance",
+        target: STEP_TARGETS[step - 1] ?? "research",
+        attempt_id: attemptId,
+        mode,
+        research_id: research?.research_id,
+      });
+    }
+    setStep(step + 1);
+  }
+
+  function askLeave() {
+    setLeaving(true);
+  }
+
+  function finishLeave(reason: LeaveReason) {
+    if (attemptId) {
+      sendAnalytics({
+        event_name: "registration_close",
+        target: STEP_TARGETS[step - 1] ?? "research",
+        attempt_id: attemptId,
+        mode,
+        reason_code: reason,
+        research_id: research?.research_id,
+      });
+    }
+    onClose();
   }
 
   const footer = confirmDelete ? (
@@ -104,7 +211,7 @@ export function MyResearchModal({ research, ableWorks, fields, onClose, onSave, 
           </FooterButton>
         )}
         {step < 4 ? (
-          <PrimaryButton onClick={() => setStep(step + 1)} disabled={!ready}>
+          <PrimaryButton onClick={goNext}>
             다음
           </PrimaryButton>
         ) : (
@@ -120,7 +227,7 @@ export function MyResearchModal({ research, ableWorks, fields, onClose, onSave, 
     <Modal
       title={research ? "연구 수정" : "연구 등록"}
       description="등록한 연구는 나만 볼 수 있고, 협업 요청을 보낼 때 골라서 함께 보내요."
-      onClose={onClose}
+      onClose={askLeave}
       footer={
         <div>
           {error && (
@@ -128,7 +235,8 @@ export function MyResearchModal({ research, ableWorks, fields, onClose, onSave, 
               {error}
             </p>
           )}
-          {footer}
+          {stepHint && <p className="mb-3 text-[13px] text-muted">{stepHint}</p>}
+          {leaving ? <LeaveChoices onPick={finishLeave} /> : footer}
         </div>
       }
     >
@@ -449,6 +557,24 @@ function PickedList({ label, items, onRemove }: { label: string; items: { id: st
             </button>
           </span>
         ))}
+      </div>
+    </div>
+  );
+}
+
+function LeaveChoices({ onPick }: { onPick: (reason: LeaveReason) => void }) {
+  return (
+    <div>
+      <p className="mb-3 text-sm font-semibold">지금 닫는 이유를 알려 주셔도 좋아요. 답하지 않고 닫을 수 있어요.</p>
+      <div className="flex flex-wrap gap-2">
+        {LEAVE_REASONS.map(([code, label]) => (
+          <button key={code} type="button" onClick={() => onPick(code)} className="h-10 rounded-button border border-line px-3 text-[13px] font-semibold text-ink hover:bg-page">
+            {label}
+          </button>
+        ))}
+        <button type="button" onClick={() => onPick("unanswered")} className="h-10 rounded-button px-3 text-[13px] font-semibold text-muted hover:bg-page">
+          답하지 않고 닫기
+        </button>
       </div>
     </div>
   );

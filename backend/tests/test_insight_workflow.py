@@ -469,13 +469,33 @@ def test_approval_blocks_incomplete_evidence(client, problem):
         for score in draft["scores"]:
             score["value"] = 0
     elif problem == "keyword":
-        draft["keyword_ids"] = ["CAP023"]  # 현재 registry의 pending_review 항목
+        draft["keyword_ids"] = ["CAP999"]  # 분류체계에 없는 기술 ID
     candidate = submit(client, create(client, draft))
     response = client.post(
         f"{ADMIN_PATH}/{candidate['id']}/approve", headers=ORIGIN, json=approval_body(candidate)
     )
     assert response.status_code == 422, response.text
     assert client.get(PUBLIC_PATH).json()["total"] == 0
+
+
+def test_approved_capability_list_and_keyword_publication(client):
+    login(client)
+    response = client.get("/api/v1/admin/insights/keywords")
+    assert response.status_code == 200, response.text
+    items = response.json()["items"]
+    # 2026-10-23 v4.0 전체 승인: CAP 80개가 모두 선택 목록에 나옵니다.
+    assert len(items) == 80
+    assert items[0] == {"id": "CAP001", "label": "데이터 수집", "category_id": "C01", "category_label": "데이터 준비·품질"}
+
+    draft = make_draft()
+    draft["keyword_ids"] = ["CAP023"]
+    published = publish(client, approve(client, submit(client, create(client, draft))))
+    assert published.status_code == 200, published.text
+    assert [item["id"] for item in published.json()["keywords"]] == ["CAP023"]
+
+
+def test_keyword_list_requires_admin(client):
+    assert client.get("/api/v1/admin/insights/keywords").status_code in {401, 403}
 
 
 def test_future_schedule_and_naive_timezone(client):

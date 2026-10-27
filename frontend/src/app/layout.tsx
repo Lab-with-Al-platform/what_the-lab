@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AnalyticsPageBeacon } from "@/components/analytics-page-beacon";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           본문으로 건너뛰기
         </a>
         <SiteHeader />
+        <AnalyticsPageBeacon />
         <main id="content">{children}</main>
         <SiteFooter />
       </body>

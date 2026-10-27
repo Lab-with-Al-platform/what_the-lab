@@ -10,10 +10,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "유전학·유전체학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 1,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -27,10 +27,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "분자·세포생물학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 2,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -44,10 +44,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "생물정보학·계산생물학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 3,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -61,10 +61,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "미생물학·감염생물학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 4,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -78,10 +78,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "생태·진화생물학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 5,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -95,10 +95,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "신경과학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 6,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -112,10 +112,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "생화학·구조생물학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 7,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -129,10 +129,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "생물공학·합성생물학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 8,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -146,10 +146,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "기초의학·병리학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 9,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -163,10 +163,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "임상의학·임상연구 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 10,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -180,10 +180,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "의료영상·영상의학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 11,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -197,10 +197,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "공중보건·역학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 12,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -214,10 +214,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "약학·신약개발 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 13,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -231,10 +231,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "간호·보건서비스 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 14,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -248,10 +248,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "치의학·구강보건 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 15,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -265,10 +265,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "재활·운동의학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 16,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -282,10 +282,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "정신건강·정신의학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 17,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -299,10 +299,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "의료정보학·디지털헬스 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 18,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -316,10 +316,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "컴퓨터과학·소프트웨어 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 19,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -333,10 +333,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "인공지능·정보과학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 20,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -350,10 +350,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "수학·응용수학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 21,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -367,10 +367,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "통계학·확률과정 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 22,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -384,10 +384,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "물리학·응용물리 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 23,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -401,10 +401,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "천문·우주과학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 24,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -418,10 +418,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "양자과학·양자정보 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 25,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -435,10 +435,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "계산과학·수치해석 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 26,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -452,10 +452,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "일반·분석화학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 27,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -469,10 +469,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "계산화학·이론화학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 28,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -486,10 +486,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "화학공학·공정 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 29,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -503,10 +503,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "재료·신소재공학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 30,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -520,10 +520,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "나노과학·나노소재 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 31,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -537,10 +537,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "에너지·배터리 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 32,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -554,10 +554,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "반도체·전자재료 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 33,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -571,10 +571,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "기계·기계설계 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 34,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -588,10 +588,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "전기·전자공학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 35,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -605,10 +605,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "로봇·제어공학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 36,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -622,10 +622,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "산업·시스템공학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 37,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -639,10 +639,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "스마트제조·품질공학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 38,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -656,10 +656,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "항공우주·우주공학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 39,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -673,10 +673,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "토목·건설공학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 40,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -690,10 +690,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "교통·모빌리티 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 41,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -707,10 +707,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "의공학·의료기기 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 42,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -724,10 +724,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "기후·대기과학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 43,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -741,10 +741,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "지구·지질과학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 44,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -758,10 +758,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "환경과학·환경공학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 45,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -775,10 +775,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "해양·수산과학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 46,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -792,10 +792,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "원격탐사·지리정보 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 47,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -809,10 +809,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "농업·작물과학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 48,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -826,10 +826,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "식품과학·식품공학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 49,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -843,10 +843,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "수의·축산과학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 50,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -860,10 +860,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "산림·생태자원 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 51,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -877,10 +877,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "경제학·계량경제 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 52,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -894,10 +894,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "정치·국제관계 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 53,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -911,10 +911,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "사회학·인구학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 54,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -928,10 +928,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "행정·정책평가 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 55,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -945,10 +945,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "사회복지·불평등 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 56,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -962,10 +962,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "도시·지역계획 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 57,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -979,10 +979,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "국제개발·공공협력 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 58,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -996,10 +996,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "미디어·커뮤니케이션 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 59,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1013,10 +1013,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "경영전략·조직 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 60,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1030,10 +1030,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "금융·투자 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 61,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1047,10 +1047,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "회계·감사·내부통제 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 62,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1064,10 +1064,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "마케팅·소비자행동 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 63,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1081,10 +1081,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "운영·공급망 관리 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 64,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1098,10 +1098,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "법학·법률정보 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 65,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1115,10 +1115,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "규제·준법·리스크 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 66,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1132,10 +1132,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "보험·계리 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 67,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1149,10 +1149,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "언어학·문헌학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 68,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1166,10 +1166,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "역사학·사료연구 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 69,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1183,10 +1183,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "철학·윤리학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 70,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1200,10 +1200,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "문학·텍스트 연구 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 71,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1217,10 +1217,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "종교·종교문화 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 72,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1234,10 +1234,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "고고·문화유산 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 73,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1251,10 +1251,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "미술·디자인·공연예술 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 74,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1268,10 +1268,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "디지털 인문학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 75,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1285,10 +1285,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "교육학·교육평가 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 76,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1302,10 +1302,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "교육공학·에듀테크 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 77,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1319,10 +1319,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "심리학·행동과학 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 78,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1336,10 +1336,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "인지과학·뇌인지 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 79,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1353,10 +1353,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "인간컴퓨터상호작용 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 80,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1370,10 +1370,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "UX·사용자 연구 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 81,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1387,10 +1387,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "학습과학·학습분석 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 82,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   },
   {
@@ -1404,10 +1404,10 @@
     "not_equivalent_to": "학문 분야는 기술 수행 역량을 보장하지 않음",
     "user_query_example": "디자인·서비스 연구 분야 프로젝트 전문가를 찾고 싶어요",
     "sort_order": 83,
-    "status": "pending_review",
+    "status": "active",
     "version": "3.0.0-rc1",
-    "reviewer": "",
-    "approved_at": "",
+    "reviewer": "WHAT THE LAB 팀 합의(일괄 승인)",
+    "approved_at": "2026-10-23",
     "source_type": "curated_service_taxonomy"
   }
 ]

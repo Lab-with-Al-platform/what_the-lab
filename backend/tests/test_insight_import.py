@@ -87,6 +87,22 @@ def test_import_clears_untrusted_verification_scores_and_keyword_links(client):
     assert response.status_code == 422
 
 
+def test_import_keeps_only_approved_keyword_suggestions(client):
+    login(client)
+    draft = make_draft()
+    draft["keyword_ids"] = ["CAP023", "CAP-FAKE", "CAP024"]
+    preview = import_request(client, [draft]).json()["items"][0]
+    # 미리 보기에서 남길 ID와 버릴 ID를 함께 보여 줍니다.
+    assert preview["keyword_ids"] == ["CAP023", "CAP024"]
+    assert preview["dropped_keyword_ids"] == ["CAP-FAKE"]
+
+    saved = import_request(client, [draft], dry_run=False).json()["items"][0]
+    detail = client.get(f"{ADMIN_PATH}/{saved['candidate_id']}").json()
+    assert detail["revisions"][0]["content"]["keyword_ids"] == ["CAP023", "CAP024"]
+    assert detail["status"] == "draft" and detail["approved_revision"] is None
+    assert any("수집 제안값" in event["reason"] for event in detail["events"] if event["action"] == "imported")
+
+
 def test_same_doi_with_different_spelling_and_url_is_one_candidate(client):
     login(client)
     draft = make_draft()
