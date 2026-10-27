@@ -21,19 +21,19 @@ class ScheduleInput(BaseModel):
     kind: str  # meeting / work / due / etc
     title: str  # 60자
     start_date: date
-    end_date: date | None = None  # 작업 기간일 때만. 나머지는 start_date 와 같게 저장해요
-    start_time: time | None = None  # 미팅·기타만 (선택)
-    end_time: time | None = None  # 미팅·기타만 (선택, 시작 시각보다 뒤)
+    end_date: date | None = None  # 종료일 (비우면 start_date 와 같은 하루짜리)
+    start_time: time | None = None  # 하루짜리 미팅·기타만 (선택)
+    end_time: time | None = None  # 하루짜리 미팅·기타만 (선택, 시작 시각보다 뒤)
     place: str = ""  # 장소·링크 (선택, 300자)
     memo: str = ""  # 메모 (선택, 500자)
     assignee: str | None = None  # 작업 기간 담당: researcher / expert / None(함께)
-    repeat_weekly: bool = False  # 매주 같은 요일에 반복 (협업 종료일까지). 새로 만들 때만 써요
+    repeat_weekly: bool = False  # 매주 같은 요일에 반복 (협업 종료일까지). 하루짜리를 새로 만들 때만 써요
 
 
 def clean_schedule(body: ScheduleInput, period: tuple[date, date]) -> dict:
     """입력을 저장할 모양으로 정리합니다. 규칙에 어긋나면 400.
 
-    - 종류마다 쓰는 칸이 달라요: 작업 기간만 여러 날·담당, 미팅·기타만 시각
+    - 모든 종류가 여러 날이 될 수 있어요. 시각은 하루짜리 미팅·기타만, 담당은 작업 기간만
     - 날짜는 협업 기간(시작일~종료일) 안이어야 해요
     """
     if body.kind not in KINDS:
@@ -42,20 +42,38 @@ def clean_schedule(body: ScheduleInput, period: tuple[date, date]) -> dict:
     place = optional_text(body.place, MAX_PLACE, "장소·링크")
     memo = optional_text(body.memo, MAX_MEMO, "메모")
 
-    is_work = body.kind == "work"
     start = body.start_date
-    end = (body.end_date or start) if is_work else start
+    end = body.end_date or start
     if end < start:
         raise bad_request("끝나는 날은 시작하는 날과 같거나 뒤여야 해요")
     check_in_period(start, end, period)
 
-    has_time = body.kind in {"meeting", "etc"}
+    has_time = body.kind in {"meeting", "etc"} and start == end  # 여러 날 일정은 시각 없이
     start_time = body.start_time if has_time else None
     end_time = body.end_time if has_time and start_time else None
     if end_time and end_time <= start_time:
         raise bad_request("끝나는 시각은 시작 시각보다 뒤여야 해요")
 
-    assignee = body.assignee if is_work else None
+    assignee = body.assignee if body.kind == "work" else None
+    if assignee is not None and assignee not in ASSIGNEES:
+        raise bad_request("담당을 다시 골라 주세요")
+    title = required_text(body.title, MAX_TITLE, "제목")
+    place = optional_text(body.place, MAX_PLACE, "장소·링크")
+    memo = optional_text(body.memo, MAX_MEMO, "메모")
+
+    start = body.start_date
+    end = body.end_date or start
+    if end < start:
+        raise bad_request("끝나는 날은 시작하는 날과 같거나 뒤여야 해요")
+    check_in_period(start, end, period)
+
+    has_time = body.kind in {"meeting", "etc"} and start == end  # 여러 날 일정은 시각 없이
+    start_time = body.start_time if has_time else None
+    end_time = body.end_time if has_time and start_time else None
+    if end_time and end_time <= start_time:
+        raise bad_request("끝나는 시각은 시작 시각보다 뒤여야 해요")
+
+    assignee = body.assignee if body.kind == "work" else None
     if assignee is not None and assignee not in ASSIGNEES:
         raise bad_request("담당을 다시 골라 주세요")
 

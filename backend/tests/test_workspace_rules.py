@@ -16,16 +16,19 @@ def make(**fields) -> rules.ScheduleInput:
     return rules.ScheduleInput(**{**base, **fields})
 
 
-# ---------- 종류마다 쓰는 칸 ----------
-def test_meeting_keeps_time_and_is_one_day():
-    saved = rules.clean_schedule(
-        make(start_time=time(14), end_time=time(15), end_date=date(2026, 11, 5), assignee="expert", place=" 구글 미트 "),
-        PERIOD,
-    )
-    assert saved["end_date"] == date(2026, 11, 3)  # 미팅은 하루짜리
+def test_one_day_meeting_keeps_time():
+    saved = rules.clean_schedule(make(start_time=time(14), end_time=time(15), assignee="expert", place=" 구글 미트 "), PERIOD)
+    assert saved["end_date"] == date(2026, 11, 3)  # 종료일을 비우면 하루짜리
     assert (saved["start_time"], saved["end_time"]) == (time(14), time(15))
     assert saved["assignee"] is None  # 담당은 작업 기간만
     assert saved["place"] == "구글 미트"
+
+
+@pytest.mark.parametrize("kind", ["meeting", "due", "etc"])
+def test_every_kind_can_span_days_without_time(kind):
+    saved = rules.clean_schedule(make(kind=kind, end_date=date(2026, 11, 5), start_time=time(14), end_time=time(15)), PERIOD)
+    assert (saved["start_date"], saved["end_date"]) == (date(2026, 11, 3), date(2026, 11, 5))
+    assert (saved["start_time"], saved["end_time"]) == (None, None)  # 여러 날 일정은 시각 없이
 
 
 def test_work_spans_days_and_drops_time():
@@ -56,7 +59,9 @@ def test_end_time_without_start_is_dropped():
         ({"title": "가" * 61}, "60자"),
         ({"start_date": date(2026, 10, 27)}, "협업 기간(10.28 ~ 11.26)"),
         ({"kind": "work", "end_date": date(2026, 11, 27)}, "협업 기간"),
+        ({"end_date": date(2026, 11, 27)}, "협업 기간"),
         ({"kind": "work", "end_date": date(2026, 11, 2)}, "끝나는 날"),
+        ({"kind": "due", "end_date": date(2026, 11, 2)}, "끝나는 날"),
         ({"start_time": time(15), "end_time": time(14)}, "끝나는 시각"),
         ({"kind": "work", "assignee": "both"}, "담당"),
     ],

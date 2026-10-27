@@ -1,6 +1,6 @@
 -- 협업 공간과 일정 테이블을 공통 Supabase에 만듭니다. (alembic revision 20261028_13)
 -- 화면: 협업 공간 (목록 · 전체 달력 · 협업 상세의 공유 달력)
--- Docker용 database/init/012_create_collaboration.sql 과 같은 내용입니다. 둘을 함께 고칩니다.
+-- Docker용 database/init/013_create_collaboration.sql 과 같은 내용입니다. 둘을 함께 고칩니다.
 
 -- 1) 협업 공간: collaboration_request 1 : 1 (연구회원이 [협업 시작하기]를 누른 요청 하나 = 협업 하나)
 --    연구 하나로 전문가 여러 명과 각각 1:1 협업하므로 research 1 : N, expert 1 : N 이에요.
@@ -49,8 +49,8 @@ CREATE TABLE collaboration_schedule (
   collaboration_id  BIGINT        NOT NULL,                  -- 어느 협업 일정인가
   kind              VARCHAR(20)   NOT NULL,                  -- meeting / work / due / etc (아래 ck_schedule_kind)
   title             VARCHAR(60)   NOT NULL,                  -- 일정 제목 (예: 주간 미팅)
-  start_date        DATE          NOT NULL,                  -- 날짜 (작업 기간이면 시작일)
-  end_date          DATE          NOT NULL,                  -- 작업 기간의 끝날. 하루짜리 일정은 start_date 와 같아요
+  start_date        DATE          NOT NULL,                  -- 시작일
+  end_date          DATE          NOT NULL,                  -- 종료일. 하루짜리 일정은 start_date 와 같아요
   start_time        TIME          NULL,                      -- 시작 시각 (미팅·기타, 선택)
   end_time          TIME          NULL,                      -- 끝 시각 (선택)
   place             VARCHAR(300)  NULL,                      -- 장소·링크 (예: 온라인 · 구글 미트 링크 / OO대 인문대 302호)
@@ -70,7 +70,6 @@ CREATE TABLE collaboration_schedule (
     'etc'       -- 기타
   )),
   CONSTRAINT ck_schedule_period CHECK (end_date >= start_date),
-  CONSTRAINT ck_schedule_one_day CHECK (kind = 'work' OR end_date = start_date),  -- 여러 날은 작업 기간만
   CONSTRAINT ck_schedule_time CHECK (end_time IS NULL OR (start_time IS NOT NULL AND end_time > start_time)),
   CONSTRAINT ck_schedule_assignee CHECK (assignee IS NULL OR assignee IN ('researcher', 'expert'))
 );

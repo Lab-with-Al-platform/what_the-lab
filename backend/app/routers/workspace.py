@@ -53,7 +53,8 @@ def add_schedule(
         values = rules.clean_schedule(body, (collab["start_date"], collab["end_date"]))
         values.update(collaboration_id=collaboration_id, created_by=user_id, series_id=None)
 
-        repeat = body.repeat_weekly and values["kind"] != "work"  # 작업 기간은 반복하지 않아요
+        # 하루짜리만 반복해요 (작업 기간·여러 날 일정은 반복하지 않아요)
+        repeat = body.repeat_weekly and values["kind"] != "work" and values["start_date"] == values["end_date"]
         days = rules.weekly_dates(values["start_date"], collab["end_date"]) if repeat else [values["start_date"]]
         series_id = None
         for day in days:

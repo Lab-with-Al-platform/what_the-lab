@@ -51,9 +51,8 @@ CREATE TABLE collaboration_schedule (
   title             VARCHAR(60)   NOT NULL,                  -- 일정 제목 (예: 주간 미팅)
   start_date        DATE          NOT NULL,                  -- 날짜 (작업 기간이면 시작일)
   end_date          DATE          NOT NULL,                  -- 작업 기간의 끝날. 하루짜리 일정은 start_date 와 같아요
-  start_time        TIME          NULL,                      -- 시작 시각 (미팅·기타, 선택)
-  end_time          TIME          NULL,                      -- 끝 시각 (선택)
-  place             VARCHAR(300)  NULL,                      -- 장소·링크 (예: 온라인 · 구글 미트 링크 / OO대 인문대 302호)
+  start_date        DATE          NOT NULL,                  -- 시작일
+  end_date          DATE          NOT NULL,                  -- 종료일. 하루짜리 일정은 start_date 와 같아요  place             VARCHAR(300)  NULL,                      -- 장소·링크 (예: 온라인 · 구글 미트 링크 / OO대 인문대 302호)
   memo              VARCHAR(500)  NULL,                      -- 메모 (선택)
   assignee          VARCHAR(10)   NULL,                      -- 작업 기간 담당: researcher / expert / 비어 있으면 함께
   series_id         BIGINT        NULL,                      -- 매주 반복으로 만든 일정 묶음 (첫 일정의 schedule_id)
@@ -70,7 +69,6 @@ CREATE TABLE collaboration_schedule (
     'etc'       -- 기타
   )),
   CONSTRAINT ck_schedule_period CHECK (end_date >= start_date),
-  CONSTRAINT ck_schedule_one_day CHECK (kind = 'work' OR end_date = start_date),  -- 여러 날은 작업 기간만
   CONSTRAINT ck_schedule_time CHECK (end_time IS NULL OR (start_time IS NOT NULL AND end_time > start_time)),
   CONSTRAINT ck_schedule_assignee CHECK (assignee IS NULL OR assignee IN ('researcher', 'expert'))
 );
