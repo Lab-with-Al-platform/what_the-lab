@@ -13,6 +13,8 @@ const NAV_ITEMS = [
   { href: "/cases", label: "AI 연구 협업 사례" },
   { href: "/trends", label: "AI 트렌드" },
   { href: "/experts", label: "AI 전문가 찾기" },
+  { href: "/community", label: "자유게시판" },
+  { href: "/faq", label: "FAQ" },
 ];
 
 type Me = {
@@ -136,7 +138,7 @@ export function SiteHeader() {
           LabBridge
         </Link>
 
-        <nav className="hidden items-center gap-8 text-sm text-ink lg:flex" aria-label="주요 메뉴">
+        <nav className="hidden items-center gap-5 whitespace-nowrap text-sm text-ink xl:flex" aria-label="주요 메뉴">
           {NAV_ITEMS.map((item) => {
             const current = isCurrent(pathname, item.href);
             return (
@@ -238,7 +240,7 @@ export function SiteHeader() {
 
           <button
             type="button"
-            className="grid h-11 w-11 place-items-center rounded-button hover:bg-page lg:hidden"
+            className="grid h-11 w-11 place-items-center rounded-button hover:bg-page xl:hidden"
             aria-expanded={menuOpen}
             aria-controls="mobile-nav"
             onClick={() => setMenuOpen((open) => !open)}
@@ -270,7 +272,7 @@ export function SiteHeader() {
       ) : null}
 
       {menuOpen ? (
-        <nav id="mobile-nav" className="border-t border-line bg-white py-3 lg:hidden" aria-label="모바일 메뉴">
+        <nav id="mobile-nav" className="border-t border-line bg-white py-3 xl:hidden" aria-label="모바일 메뉴">
           <PageContainer>
           {NAV_ITEMS.map((item) => (
             <Link

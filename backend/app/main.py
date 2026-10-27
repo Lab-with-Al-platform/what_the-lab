@@ -3,6 +3,9 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
+
+from app.community.middleware import CommunityPrivacyMiddleware, validation_error
 
 from app.config import CORS_ORIGINS
 
@@ -12,6 +15,7 @@ from app.notification_sender import run_forever, wake_up
 from app.routers import (
     analytics,
     auth,
+    community,
     collab_requests,
     expert,
     expert_history,
@@ -38,6 +42,8 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(title="LabBridge API", lifespan=lifespan)
+app.add_middleware(CommunityPrivacyMiddleware)
+app.add_exception_handler(RequestValidationError, validation_error)
 
 @app.middleware("http")
 async def send_notifications_soon(request, call_next):
@@ -82,3 +88,4 @@ app.include_router(collab_requests.researcher_router)
 app.include_router(collab_requests.expert_router)
 app.include_router(notifications.router)
 app.include_router(profile_photo.router)
+app.include_router(community.router)

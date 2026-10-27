@@ -37,6 +37,11 @@ SETTINGS_PATH = "/settings/profile"
 TOKEN_MAX_AGE = 7 * 24 * 60 * 60  # 7일(초)
 
 
+def cookie_secure() -> bool:
+    """HTTPS OAuth 배포에서는 인증 쿠키를 HTTPS 연결로만 전달합니다."""
+    return DISCORD_REDIRECT_URI.startswith("https://")
+
+
 @router.get("/discord/login")
 def discord_login(access_token: str | None = Cookie(default=None)) -> RedirectResponse:
     """① 이미 로그인했으면 가입 단계 화면으로, 아니면 디스코드 승인 화면으로 보냅니다."""
@@ -56,7 +61,7 @@ def discord_connect(user: Annotated[dict, Depends(get_current_user)]) -> Redirec
     """
     ensure_active_user(user)
     response = discord_authorize()
-    response.set_cookie(NEXT_COOKIE, "settings", max_age=600, httponly=True, samesite="lax")
+    response.set_cookie(NEXT_COOKIE, "settings", max_age=600, httponly=True, samesite="lax", secure=cookie_secure())
     return response
 
 
@@ -71,7 +76,8 @@ def discord_authorize() -> RedirectResponse:
         "state": state,
     }
     response = RedirectResponse(f"{DISCORD_AUTHORIZE_URL}?{urlencode(params)}")
-    response.set_cookie(STATE_COOKIE, state, max_age=600, httponly=True, samesite="lax")
+    response.set_cookie(STATE_COOKIE, state, max_age=600, httponly=True, samesite="lax", secure=cookie_secure())
+    response.headers["Cache-Control"] = "private, no-store"
     return response
 
 
@@ -111,9 +117,11 @@ def discord_callback(
         max_age=TOKEN_MAX_AGE,
         httponly=True,
         samesite="lax",
+        secure=cookie_secure(),
     )
-    response.delete_cookie(STATE_COOKIE)
-    response.delete_cookie(NEXT_COOKIE)
+    response.delete_cookie(STATE_COOKIE, httponly=True, samesite="lax", secure=cookie_secure())
+    response.delete_cookie(NEXT_COOKIE, httponly=True, samesite="lax", secure=cookie_secure())
+    response.headers["Cache-Control"] = "private, no-store"
     return response
 
 
@@ -132,15 +140,17 @@ def connect_discord(user_id: int, discord_id: str, discord_token: str) -> bool:
 
 
 @router.get("/me")
-def me(user: Annotated[dict, Depends(get_current_user)]) -> dict:
+def me(user: Annotated[dict, Depends(get_current_user)], response: Response) -> dict:
     """③ 지금 로그인한 사람의 정보를 돌려줍니다."""
+    response.headers["Cache-Control"] = "private, no-store"
     return user
 
 @router.post("/logout")
 def logout() -> Response:
     """④ 로그인 쿠키(JWT)를 지워서 로그아웃합니다."""
     response = Response(status_code=204)
-    response.delete_cookie(TOKEN_COOKIE, httponly=True, samesite="lax")
+    response.delete_cookie(TOKEN_COOKIE, httponly=True, samesite="lax", secure=cookie_secure())
+    response.headers["Cache-Control"] = "private, no-store"
     return response
 
 

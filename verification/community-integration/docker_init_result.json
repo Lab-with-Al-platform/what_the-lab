@@ -1,0 +1,7 @@
+{
+  "engine": "PGlite WASM PostgreSQL",
+  "files": 10,
+  "community_tables": 8,
+  "latest_request_and_notification": true,
+  "docker_container_verified": false
+}

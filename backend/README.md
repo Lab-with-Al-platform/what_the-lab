@@ -152,3 +152,12 @@ uv run uvicorn app.main:app --reload --port 8000
 - 협업 요청과 참여 신청의 상태 흐름
 - 협업 확정 이후 일정·기록·종료·평가
 - 디스코드 DM 알림과 최소 관리자 기능
+
+
+## 자유게시판·FAQ 통합 (2026-10-26)
+
+공개·비공개 게시판 API와 FAQ를 오늘 전문가 검색·협업 요청·알림·프로필 설정 코드에 통합했습니다. 공통 `DATABASE_URL`·Discord JWT·`users.is_admin`을 재사용합니다. 인사이트 관리자 허용목록은 게시판 권한을 주지 않습니다.
+
+기존 알림 revision `20261025_06`과 운영 조회 `20261026_07`~`09`를 유지하고, 게시판 `20261026_10` → `20261026_11`을 그 뒤에 연결했습니다. 공용 Supabase 변경은 기존 [알림 설정 안내](../docs/development/SETUP_NOTIFICATION_PROFILE.md)에 따라 DB 담당자만 수행합니다. 일반 팀원은 `alembic current`로 확인하며 임의 upgrade/stamp를 실행하지 않습니다.
+
+[현재 설치·DB 적용](../docs/community/INSTALL_AND_QA.md), [호환성](../docs/community/SOURCE_COMPATIBILITY.md), [API 계약](../docs/community/API.md), [통합 검증](../docs/community/INTEGRATION_VERIFICATION_20261026.md)을 확인하세요. 이전 게시판 V2의 05·06 적용 안내를 이 통합본에 사용하지 않습니다.

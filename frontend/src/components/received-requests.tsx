@@ -302,7 +302,7 @@ function Footer({
   if (request.status === "accepted") {
     return (
       <Notice tone="success">
-        {formatDate(request.responded_at ?? request.created_at)}에 수락했어요. 연구자가 협업 시작을 확정하면 협업 공간과 디스코드 채널이 만들어지고 DM으로 알려 드려요.
+        {formatDate(request.responded_at ?? request.created_at)}에 수락했어요. 연구자가 협업 시작을 확정하면 사이트 알림으로 알려 드려요. 디스코드 DM은 연결·수신 설정에 따라 보내며, 별도 협업 공간이나 채널은 자동 생성되지 않아요.
       </Notice>
     );
   }
@@ -354,7 +354,7 @@ function pastText(request: ReceivedRequest): string {
   const when = formatDate(request.responded_at ?? request.created_at);
   switch (request.status) {
     case "started":
-      return "협업이 시작됐어요. 협업 공간에서 이어서 진행해요.";
+      return "협업 시작이 기록됐어요. 합의한 작업 방식과 연락 수단으로 진행해 주세요.";
     case "rejected": {
       const reason = request.reject_text || (request.reject_reason ? REJECT_REASON_LABELS[request.reject_reason] : "");
       return `${when}에 거절했어요${reason ? ` · “${reason}”` : ""}`;
