@@ -1,6 +1,6 @@
 """협업 공간: collaboration(협업) · collaboration_schedule(일정) 테이블을 공통 Supabase에 만듭니다.
 
-SQL 본문은 backend/migrations/sql/20261028_13/ 에 동결해 두었습니다. (Docker용 database/init/012 와 같은 내용)
+SQL 본문은 backend/migrations/sql/20261028_13/ 에 동결해 두었습니다. (Docker용 database/init/013 와 같은 내용)
 이미 [협업 시작하기]를 누른 요청(status=started)은 협업으로 옮겨 줘요. 기존 요청·연구는 지우지 않아요.
 """
 

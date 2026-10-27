@@ -49,10 +49,11 @@ CREATE TABLE collaboration_schedule (
   collaboration_id  BIGINT        NOT NULL,                  -- 어느 협업 일정인가
   kind              VARCHAR(20)   NOT NULL,                  -- meeting / work / due / etc (아래 ck_schedule_kind)
   title             VARCHAR(60)   NOT NULL,                  -- 일정 제목 (예: 주간 미팅)
-  start_date        DATE          NOT NULL,                  -- 날짜 (작업 기간이면 시작일)
-  end_date          DATE          NOT NULL,                  -- 작업 기간의 끝날. 하루짜리 일정은 start_date 와 같아요
   start_date        DATE          NOT NULL,                  -- 시작일
-  end_date          DATE          NOT NULL,                  -- 종료일. 하루짜리 일정은 start_date 와 같아요  place             VARCHAR(300)  NULL,                      -- 장소·링크 (예: 온라인 · 구글 미트 링크 / OO대 인문대 302호)
+  end_date          DATE          NOT NULL,                  -- 종료일. 하루짜리 일정은 start_date 와 같아요
+  start_time        TIME          NULL,                      -- 시작 시각 (미팅·기타, 선택)
+  end_time          TIME          NULL,                      -- 끝 시각 (선택)
+  place             VARCHAR(300)  NULL,                      -- 장소·링크 (예: 온라인 · 구글 미트 링크 / OO대 인문대 302호)
   memo              VARCHAR(500)  NULL,                      -- 메모 (선택)
   assignee          VARCHAR(10)   NULL,                      -- 작업 기간 담당: researcher / expert / 비어 있으면 함께
   series_id         BIGINT        NULL,                      -- 매주 반복으로 만든 일정 묶음 (첫 일정의 schedule_id)

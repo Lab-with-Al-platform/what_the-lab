@@ -1,5 +1,5 @@
 -- 협업 요청 규칙 보완 (급한 요청 · 전문가 기간 조정 · 연구자 선택 기한 · 취소 이유). 공통 Supabase용 동결본 (Alembic 20261027_12).
--- Docker용 database/init/011 와 같은 내용이에요. 둘을 함께 고칩니다.
+-- Docker용 database/init/012_alter_request_rules.sql 와 같은 내용이에요. 둘을 함께 고칩니다.
 
 -- 1) 협업 요청에 칸 추가 (기존 요청은 기본값으로 채워져요)
 ALTER TABLE collaboration_request

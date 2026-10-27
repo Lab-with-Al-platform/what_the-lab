@@ -1,6 +1,6 @@
 """협업 요청 규칙 보완: collaboration_request 칸 6개 + 알림 종류 1개를 공통 Supabase에 추가합니다.
 
-SQL 본문은 backend/migrations/sql/20261027_12/ 에 동결해 두었습니다. (Docker용 database/init/011 와 같은 내용)
+SQL 본문은 backend/migrations/sql/20261027_12/ 에 동결해 두었습니다. (Docker용 database/init/012 와 같은 내용)
 기존 요청·알림은 지우지 않아요. 새 칸은 기본값(급해요 아님, 나머지 비어 있음)으로 채워져요.
 """
 
