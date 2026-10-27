@@ -102,7 +102,13 @@ def plan_import(session: Session, drafts: list[Draft]) -> list[ImportItem]:
                         & (Revision.number == Candidate.current_revision)
                     ),
                 )
-                .where(Revision.content["slug"].as_string() == draft.slug)
+                .where(
+                    or_(
+                        Revision.content["slug"].as_string() == draft.slug,
+                        # 게시용 판본은 주소를 article 안에 보관하므로 두 구조를 함께 검사합니다.
+                        Revision.content["article"]["slug"].as_string() == draft.slug,
+                    )
+                )
             )
             published = session.scalar(select(Publication.id).where(Publication.slug == draft.slug))
             if draft.slug in seen_slugs or slug_owner or published:
@@ -123,7 +129,9 @@ def import_candidates(session: Session, request: CandidateImportInput, actor: st
     for item in items:
         if item.action == "would_create":
             # 미리 보기에서도 어떤 기술 ID가 남고 빠지는지 관리자에게 보여 줍니다.
-            item.keyword_ids, item.dropped_keyword_ids = suggested_keywords(request.drafts[item.index])
+            item.keyword_ids, item.dropped_keyword_ids = suggested_keywords(
+                request.drafts[item.index]
+            )
         if not request.dry_run and item.action == "would_create":
             candidate = service.create_candidate(
                 session,

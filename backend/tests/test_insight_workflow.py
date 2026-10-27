@@ -1,5 +1,6 @@
 """외부 API 없이 권한·근거·승인 버전·게시 중복의 실제 실패 경계를 확인합니다."""
 
+from contextlib import asynccontextmanager
 from datetime import timedelta
 
 import jwt
@@ -73,6 +74,14 @@ def client(tmp_path, monkeypatch):
     monkeypatch.setenv("INSIGHTS_ENABLED", "true")
     monkeypatch.setenv("INSIGHT_ADMIN_DISCORD_IDS", ADMIN_ID)
     monkeypatch.setenv("INSIGHT_ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:8000")
+
+    @asynccontextmanager
+    async def insight_test_lifespan(_app):
+        # 인사이트 검사에서 협업 만료 worker·알림 전송을 실행하면 다른 DB를 건드릴 수 있습니다.
+        # 실제 서버의 시작 코드는 바꾸지 않고 이 테스트 client에서만 작업을 격리합니다.
+        yield
+
+    monkeypatch.setattr(app.router, "lifespan_context", insight_test_lifespan)
     # 회원 저장소의 구현이 바뀌어도 인사이트 검사는 실제 회원 DB에 접속하지 않습니다.
     users: dict[int, dict] = {}
 
@@ -485,7 +494,12 @@ def test_approved_capability_list_and_keyword_publication(client):
     items = response.json()["items"]
     # 2026-10-23 v4.0 전체 승인: CAP 80개가 모두 선택 목록에 나옵니다.
     assert len(items) == 80
-    assert items[0] == {"id": "CAP001", "label": "데이터 수집", "category_id": "C01", "category_label": "데이터 준비·품질"}
+    assert items[0] == {
+        "id": "CAP001",
+        "label": "데이터 수집",
+        "category_id": "C01",
+        "category_label": "데이터 준비·품질",
+    }
 
     draft = make_draft()
     draft["keyword_ids"] = ["CAP023"]
