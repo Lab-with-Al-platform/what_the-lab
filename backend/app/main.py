@@ -23,6 +23,7 @@ from app.routers import (
     researcher_research,
     taxonomy,
     verification,
+    workspace,
 )
 
 
@@ -84,3 +85,4 @@ app.include_router(collab_requests.researcher_router)
 app.include_router(collab_requests.expert_router)
 app.include_router(notifications.router)
 app.include_router(profile_photo.router)
+app.include_router(workspace.router)

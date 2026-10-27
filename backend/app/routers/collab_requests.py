@@ -23,6 +23,7 @@ from app.request_store import (
 from app.research_store import require_researcher
 from app.routers.expert import check_code
 from app.security import get_current_user_id
+from app.workspace_store import complete_ended_collaborations, create_collaboration
 
 researcher_router = APIRouter(prefix="/api/v1/researcher/requests", tags=["researcher-request"])
 expert_router = APIRouter(prefix="/api/v1/expert/requests", tags=["expert-request"])
@@ -283,6 +284,7 @@ def start(cursor, request: dict) -> None:
         " WHERE request_id = %s",
         (request["request_id"],),
     )
+    create_collaboration(cursor, request["request_id"])  # 같은 트랜잭션에서 협업 공간도 만들어요
     notify_requests(cursor, "collab_started", [request["request_id"]])
     if active_count(cursor, request["research_id"]) >= rules.MAX_ACTIVE:
         cursor.execute(
@@ -291,7 +293,6 @@ def start(cursor, request: dict) -> None:
             (request["research_id"],),
         )
         cancel(cursor, [row["request_id"] for row in cursor.fetchall()], "other_started")
-
 
 def cancel(cursor, request_ids: list[int], reason: str) -> None:
     """요청들을 이유와 함께 닫고 전문가에게 알려요. reason: withdrawn / declined / other_started"""
@@ -349,10 +350,10 @@ def check_status(request: dict, expected: str) -> None:
 
 
 def active_count(cursor, research_id: int) -> int:
-    """이 연구로 진행 중인 협업 수 (시작했고 종료일이 안 지난 것)."""
+    """이 연구로 진행 중인 협업 수 (시작 전 포함, 완료·중도 종료·취소는 빼요)."""
+    complete_ended_collaborations(cursor)
     cursor.execute(
-        "SELECT count(*) AS count FROM collaboration_request WHERE research_id = %s"
-        " AND status = 'started' AND COALESCE(accepted_end_date, end_date) >= CURRENT_DATE",
+        "SELECT count(*) AS count FROM collaboration WHERE research_id = %s AND status = 'ongoing'",
         (research_id,),
     )
     return cursor.fetchone()["count"]

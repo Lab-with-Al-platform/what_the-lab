@@ -11,6 +11,7 @@ from fastapi import HTTPException
 from app.db import get_connection, transaction
 from app.notification_store import notify_requests
 from app.research_store import CHILD_TABLES, load_child
+from app.workspace_store import complete_ended_collaborations
 
 # 두 화면이 함께 쓰는 요청 칸
 REQUEST_COLUMNS = """
@@ -52,9 +53,10 @@ def expire_old_requests(cursor) -> None:
 
 
 def expire_now() -> None:
-    """만료 처리만 한 번 (백그라운드에서 불러요)."""
+    """만료 처리 한 번 (백그라운드에서 불러요): 기한 지난 요청 만료 + 종료일 지난 협업 완료."""
     with transaction() as cursor:
         expire_old_requests(cursor)
+        complete_ended_collaborations(cursor)
 
 
 async def expire_forever() -> None:
