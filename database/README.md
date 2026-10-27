@@ -17,7 +17,8 @@ PostgreSQL/Supabase 데이터 구조와 변경 이력을 관리합니다.
 2026-10-16 확정 DB는 Supabase(PostgreSQL)입니다. 첫 인사이트 마이그레이션은 FastAPI 모델과 함께 관리하기 위해 `backend/migrations/`에 두었습니다. 로컬 Docker가 같은 구조를 만들 수 있도록 `database/init/011_create_insight.sql`에 표 정의만 다시 적었습니다. 사용자 승인 후 개발용 `labbridge-dev`에 `20261016_01`을 적용하고 구조·역할 권한·동시성 검사를 완료했습니다. 운영 DB 적용이나 공개 서비스 배포는 아닙니다.
 
 - [최초 마이그레이션](../backend/migrations/versions/20261016_01_insight_foundation.py): 서버 전용 insight_private schema와 5개 테이블
-- 2026-10-27: 로컬 Docker용 `database/init/011_create_insight.sql`에 같은 구조와 수집 설정 표를 넣었습니다. 공용 DB의 글 내용은 복사하지 않습니다. 조회수·운영 이력·방문 수집 개정은 공용 DB와 로컬 초기화 모두에 아직 없습니다.
+- 2026-10-27: 로컬 Docker용 `database/init/011_create_insight.sql`에 같은 구조와 수집 설정 표를 넣었습니다. 공용 DB의 글 내용은 복사하지 않습니다.
+- 2026-10-27: 공용 DB에 적용된 조회수·운영 이력·방문 수집 표를 `014`~`016`에 넣었습니다. 기록 행은 복사하지 않습니다. `017`은 개정 번호 `20261028_13`만 적습니다.
 - [실행·안전 확인 순서](../docs/ai-case-automation/FOUNDATION_RUNBOOK.md): 개발 DB 확인, 권한, 테스트, 파괴적인 되돌리기 주의
 - [개발용 DB 검증 결과](../docs/qa/INSIGHT_SUPABASE_MIGRATION_2026-10-16.md): 인사이트 테이블 5개와 public의 버전 테이블 1개, 실제 콘텐츠는 0건
 
