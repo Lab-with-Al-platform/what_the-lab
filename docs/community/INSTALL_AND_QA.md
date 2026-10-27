@@ -78,7 +78,7 @@ SELECT count(*) FROM pg_tables WHERE schemaname = 'community_private'; -- 8
 
 ## 로컬 Docker DB
 
-새 빈 볼륨에서는 기존 `database/init/001~008` 뒤에 `009_create_community.sql`, `010_community_integrity.sql`이 자동 실행됩니다. 009·010 내용은 Alembic 10·11 SQL과 같습니다. Docker 초기화 번호와 Alembic 개정 번호는 다릅니다. 기존 `docker-compose.yml`을 유지했습니다.
+새 빈 볼륨에서는 기존 `database/init/001~008` 뒤에 게시판 `009`·`010`, 인사이트 구조 `011_create_insight.sql`이 자동 실행됩니다. 009의 회원 번호는 `public.users.user_id`와 같은 `BIGINT`라서, Docker가 이 파일만 실행해도 회원 표에 연결됩니다. 010은 댓글 알림과 무결성을 더합니다. 009·010 내용은 Alembic 10·11 SQL과 같습니다. Docker 초기화 번호와 Alembic 개정 번호는 다릅니다. 기존 `docker-compose.yml`을 유지했습니다.
 
 이미 **001~008이 적용된** 로컬 DB에는 담당자가 프로젝트 루트에서 아래 두 파일만 한 트랜잭션으로 실행합니다. 먼저 백업·존재 여부를 확인하고, 이미 게시판이 있다면 재실행하지 않습니다.
 
