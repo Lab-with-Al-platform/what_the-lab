@@ -1,5 +1,5 @@
 -- 협업 전용 디스코드 채널 칸을 공통 Supabase에 추가합니다. (alembic revision 20261028_15)
--- Docker용 database/init/019_add_collaboration_discord.sql 과 같은 내용입니다. 둘을 함께 고칩니다.
+-- Docker용 database/init/019 의 칸 추가와 같습니다. 개정 번호는 Alembic이 직접 바꿉니다.
 
 -- 1) 협업마다 디스코드 비공개 채널 하나 (협업-12 같은 이름, 두 사람 + 봇만 보여요)
 --    [협업 시작] 때는 pending 으로만 남기고, 백그라운드 작업이 채널을 만든 뒤 ready 로 바꿔요.
