@@ -29,3 +29,6 @@ UPLOAD_DIR = Path(os.getenv("UPLOAD_DIR", str(ROOT_DIR / "backend" / "uploads"))
 # 디스코드 알림 봇 (서버 전용). 비어 있으면 서버 참가·DM 보내기를 건너뛰고 사이트 안 알림만 써요.
 DISCORD_BOT_TOKEN = os.getenv("DISCORD_BOT_TOKEN", "")
 DISCORD_GUILD_ID = os.getenv("DISCORD_GUILD_ID", "")  # LabBridge 디스코드 서버 ID
+
+# 협업 전용 채널을 모아 둘 카테고리 ID (선택). 비어 있으면 카테고리 없이 만들어요.
+DISCORD_COLLAB_CATEGORY_ID = os.getenv("DISCORD_COLLAB_CATEGORY_ID", "")

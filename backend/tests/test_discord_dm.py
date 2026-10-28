@@ -5,8 +5,8 @@ from datetime import UTC, datetime
 import httpx
 import pytest
 
-from app import discord_bot
-from app.notification_sender import dm_text, skip_reason
+from app import discord_bot, notification_sender
+from app.notification_sender import dm_text, skip_reason, waiting_for_channel
 from app.request_rules import KST
 
 
@@ -83,3 +83,29 @@ def test_dm_text_has_title_detail_and_link():
     assert text.startswith("**cell_jung 님이 협업을 요청했어요**\n")
     assert "세포 이미지 자동 계수 · 10.25 밤까지 답해 주세요" in text
     assert text.endswith("/requests")
+
+
+# ---------- "협업 시작" DM: 채널 링크 ----------
+def started(**extra) -> dict:
+    return pending(**{"type": "collab_started", "request_status": "started", "just_made": True, **extra})
+
+
+def test_collab_started_dm_has_channel_link_and_workspace(monkeypatch):
+    monkeypatch.setattr(notification_sender, "channel_url", lambda channel_id: f"https://discord.com/channels/999/{channel_id}")
+    text = dm_text(started(channel_status="ready", discord_channel_id="555"))
+    assert text.startswith("**cell_jung 님과 협업을 시작했어요**\n")
+    assert "https://discord.com/channels/999/555" in text
+    assert text.endswith("/workspace")
+
+
+def test_collab_started_dm_without_channel_still_goes():
+    text = dm_text(started(channel_status="failed", discord_channel_id=None))
+    assert "discord.com/channels" not in text  # 채널이 없으면 링크만 빠지고
+    assert text.endswith("/workspace")  # 협업 시작 안내는 그대로 가요
+
+
+def test_waits_for_channel_only_for_a_while():
+    assert waiting_for_channel(started(channel_status="pending")) is True  # 채널 만드는 중 → 잠깐 기다림
+    assert waiting_for_channel(started(channel_status="pending", just_made=False)) is False  # 3분 지나면 그냥 보냄
+    assert waiting_for_channel(started(channel_status="ready")) is False
+    assert waiting_for_channel(pending(channel_status="pending", just_made=True)) is False  # 다른 알림은 안 기다림

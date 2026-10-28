@@ -1,5 +1,8 @@
 """'보낼 예정'(pending) 알림을 디스코드 DM으로 보내요. 서버가 켜져 있는 동안 15초마다 돌아요.
 
+같은 차례에 협업 전용 디스코드 채널도 먼저 만들어요. (collab_channel.py)
+그래서 "협업 시작" DM에 채널 링크를 넣을 수 있어요.
+
 사이트 안 알림(종)은 이미 저장돼 있어서, 여기서 실패해도 회원은 사이트에서 알림을 볼 수 있어요.
 """
 
@@ -8,9 +11,10 @@ import logging
 
 import httpx
 
+from app.collab_channel import make_pending_channels
 from app.config import FRONTEND_URL
 from app.db import get_connection
-from app.discord_bot import DmBlocked, bot_ready, send_dm
+from app.discord_bot import DmBlocked, bot_ready, channel_url, send_dm
 from app.notification_store import build_message
 
 log = logging.getLogger(__name__)
@@ -21,11 +25,14 @@ BATCH = 20  # 한 번에 보낼 최대 개수
 MAX_ATTEMPTS = 3  # 디스코드가 잠깐 안 될 때 다시 시도하는 횟수
 # 이보다 오래된 알림은 DM으로 보내지 않아요 (서버를 오래 꺼 뒀다 켰을 때 한꺼번에 가지 않게)
 FRESH_MINUTES = 60
+# "협업 시작" DM은 채널이 만들어질 때까지 이만큼 기다려요. 넘으면 링크 없이 보내요.
+WAIT_CHANNEL_MINUTES = 3
 WORKSPACE_TYPES: set[str] = set()  # 협업공간 알림 종류 (협업공간 기능 때 추가)
 
 PENDING_SQL = """
     SELECT n.notification_id, n.user_id, n.type, n.discord_attempts,
            n.created_at < now() - make_interval(mins => %(fresh)s) AS too_old,
+           n.created_at > now() - make_interval(mins => %(wait)s) AS just_made,
            u.discord_id,
            COALESCE(s.discord_dm, TRUE) AS discord_dm,
            COALESCE(s.notify_request, TRUE) AS notify_request,
@@ -33,13 +40,15 @@ PENDING_SQL = """
            s.discord_joined_at,
            a.nickname AS actor_nickname, r.title AS research_title,
            cr.reject_reason, cr.expert_id, cr.status AS request_status,
-           cr.is_urgent, cr.expires_at, cr.accepted_start_date, cr.cancel_reason, cr.responded_at
+           cr.is_urgent, cr.expires_at, cr.accepted_start_date, cr.cancel_reason, cr.responded_at,
+           c.discord_status AS channel_status, c.discord_channel_id
     FROM notification n
     JOIN users u ON u.user_id = n.user_id
     LEFT JOIN notification_setting s ON s.user_id = n.user_id
     LEFT JOIN users a ON a.user_id = n.actor_id
     LEFT JOIN collaboration_request cr ON cr.request_id = n.request_id
     LEFT JOIN research r ON r.research_id = cr.research_id
+    LEFT JOIN collaboration c ON c.request_id = n.request_id
     WHERE n.discord_status = 'pending'
     ORDER BY n.created_at
     LIMIT %(batch)s
@@ -61,10 +70,21 @@ def skip_reason(row: dict) -> str | None:
     return None
 
 
+def waiting_for_channel(row: dict) -> bool:
+    """"협업 시작" DM인데 채널을 아직 만드는 중이면 True (이번 차례는 건너뛰고 다음에 보내요)"""
+    return row["type"] == "collab_started" and row.get("channel_status") == "pending" and row["just_made"]
+
+
 def dm_text(row: dict) -> str:
-    """DM 글: 제목(굵게) + 설명 + 사이트 주소"""
+    """DM 글: 제목(굵게) + 설명 + 사이트 주소. "협업 시작"은 채널 링크와 협업 공간 주소를 넣어요."""
     title, detail = build_message(row, row["user_id"])
-    return f"**{title}**\n{detail}\n{FRONTEND_URL}/requests"
+    if row["type"] != "collab_started":
+        return f"**{title}**\n{detail}\n{FRONTEND_URL}/requests"
+    lines = [f"**{title}**", detail]
+    if row.get("discord_channel_id"):
+        lines.append(f"💬 둘만의 협업 채널: {channel_url(row['discord_channel_id'])}")
+    lines.append(f"📅 협업 공간: {FRONTEND_URL}/workspace")
+    return "\n".join(lines)
 
 
 def send_pending() -> int:
@@ -77,7 +97,9 @@ def send_pending() -> int:
         return 0
     sent = 0
     with get_connection() as conn, conn.transaction(), conn.cursor() as cursor:
-        cursor.execute(PENDING_SQL, {"fresh": FRESH_MINUTES, "batch": BATCH})
+        cursor.execute(
+            PENDING_SQL, {"fresh": FRESH_MINUTES, "wait": WAIT_CHANNEL_MINUTES, "batch": BATCH}
+        )
         for row in cursor.fetchall():
             reason = skip_reason(row)
             if reason:
@@ -85,6 +107,8 @@ def send_pending() -> int:
                     cursor, row["notification_id"], "skipped", reason, row["discord_attempts"]
                 )
                 continue
+            if waiting_for_channel(row):
+                continue  # 그대로 pending. 채널이 생기면 다음 차례에 링크와 함께 보내요
             attempts = row["discord_attempts"] + 1
             try:
                 send_dm(row["discord_id"], dm_text(row))
@@ -132,6 +156,10 @@ def wake_up() -> None:
 async def run_forever() -> None:
     """서버가 켜져 있는 동안 보낼 알림을 보내요. 깨우면 바로, 아니면 15초마다. (main.py에서 시작)"""
     while True:
+        try:
+            await asyncio.to_thread(make_pending_channels)  # 채널 먼저 → DM에 링크를 넣을 수 있게
+        except Exception:
+            log.exception("협업 디스코드 채널 만들기 실패")
         try:
             await asyncio.to_thread(send_pending)  # DB·디스코드 요청 동안 다른 API가 멈추지 않게
         except Exception:  # 한 번 실패해도 다음 차례에 다시 돌아요
