@@ -53,6 +53,8 @@ export interface InsightListItem {
   /** 추천 영역 전용 질문형 제목. 줄바꿈은 줄바꿈 문자로 지정합니다. */
   featuredHeadline?: string;
   featuredSummary?: string;
+  /** 전문가가 고르는 할 수 있는 일(UG). 있으면 전문가 찾기에 이 ID로 넘깁니다. */
+  ableWorkIds?: string[];
 }
 
 export function articlePath(article: Pick<InsightListItem, "kind" | "slug">): string {

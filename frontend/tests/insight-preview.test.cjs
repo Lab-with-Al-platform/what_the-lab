@@ -27,6 +27,7 @@ function loadArticleView() {
       "@/components/insight-card": { InsightCard: () => null },
       "@/components/article-editorial": { ArticleParagraph: ({ children }) => React.createElement("p", null, children), ArticleGlossary: () => null },
       "@/lib/insight-meta": { articlePath: (item) => `/${item.kind}/${item.slug}`, kindLabel: () => "AI 트렌드" },
+      "@/lib/expert-search": { expertSearchHref: () => "/experts" },
       "@/lib/insights": {},
     };
     return components[request] ?? require(request);

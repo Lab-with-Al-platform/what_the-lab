@@ -7,6 +7,7 @@ import { KeywordTag } from "@/components/keyword-tag";
 import { InsightCard } from "@/components/insight-card";
 import { ArticleGlossary, ArticleParagraph } from "@/components/article-editorial";
 import { articlePath, kindLabel, type InsightListItem } from "@/lib/insight-meta";
+import { expertSearchHref } from "@/lib/expert-search";
 import type { InsightArticle } from "@/lib/insights";
 
 /** 같은 현미경 사진을 다른 위치로 잘라, 세포 종류마다 다른 연구 그림인 것처럼 보이지 않게 합니다. */
@@ -119,7 +120,10 @@ export function ArticleView({
 }: ArticleViewProps) {
   const sectionName = article.kind === "case" ? "AI 연구 협업 사례" : "AI 트렌드";
   const listHref = article.kind === "case" ? "/cases" : "/trends";
-  const expertQuery = encodeURIComponent(article.technologies[0]?.title ?? article.topicLabel);
+  const expertHref = expertSearchHref({
+    works: article.ableWorkIds,
+    skill: article.technologies[0]?.title ?? article.topicLabel,
+  });
 
   return (
     <PageContainer className={contentOnly ? "article-content-preview" : "py-4 md:py-5"}>
@@ -336,7 +340,7 @@ export function ArticleView({
               ))}
             </ul>
             <Link
-              href={`/experts?skill=${expertQuery}`}
+              href={expertHref}
               className="mt-3 flex min-h-14 items-center justify-between rounded-[8px] bg-brand-soft px-3 text-xs font-semibold text-brand"
             >
               <span>이 기술을 다루는 전문가 찾기</span><span aria-hidden="true">→</span>

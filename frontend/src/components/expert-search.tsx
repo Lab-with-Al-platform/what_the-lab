@@ -8,7 +8,7 @@ import { PageContainer } from "@/components/page-container";
 import { Avatar } from "@/components/request-parts";
 import { ApiError, requestApi } from "@/lib/api";
 import { photoOrDefault } from "@/lib/collab-requests";
-import { buildNames, categoryNames, engagedLabel, headAndRest, type ExpertCardData, type ExpertSearchResult, type Names } from "@/lib/expert-search";
+import { buildNames, categoryNames, engagedLabel, headAndRest, splitTaxonomyIds, type ExpertCardData, type ExpertSearchResult, type Names } from "@/lib/expert-search";
 import type { AbleWorkOption, FieldCategory } from "@/lib/my-career";
 import { DATA_STATUS_LABELS, type Research } from "@/lib/my-research";
 
@@ -19,6 +19,10 @@ type Role = "researcher" | "expert" | null; // null = 로그인 안 했거나 �
 export function ExpertSearch() {
   const searchParams = useSearchParams();
   const incomingQuery = (searchParams.get("q") ?? searchParams.get("skill") ?? "").slice(0, 50);
+  const incomingWorksKey = searchParams.get("works") ?? "";
+  const incomingFieldsKey = searchParams.get("fields") ?? "";
+  const incomingWorks = splitTaxonomyIds(incomingWorksKey, "work");
+  const incomingFields = splitTaxonomyIds(incomingFieldsKey, "category");
   const [ableWorks, setAbleWorks] = useState<AbleWorkOption[]>([]);
   const [categories, setCategories] = useState<FieldCategory[]>([]);
   const [role, setRole] = useState<Role>(null);
@@ -26,8 +30,8 @@ export function ExpertSearch() {
 
   const [draft, setDraft] = useState(incomingQuery); // 게시판 태그·홈에서 넘어온 검색어도 반영
   const [query, setQuery] = useState(incomingQuery); // [검색]을 눌러 적용한 검색어
-  const [works, setWorks] = useState<string[]>([]);
-  const [fields, setFields] = useState<string[]>([]); // 대분류 ID
+  const [works, setWorks] = useState<string[]>(incomingWorks);
+  const [fields, setFields] = useState<string[]>(incomingFields); // 대분류 ID
   const [applied, setApplied] = useState<Research | null>(null); // [내 연구로 찾기]로 고른 연구
   const [panel, setPanel] = useState<Panel>(null);
 
@@ -40,7 +44,9 @@ export function ExpertSearch() {
   useEffect(() => {
     setDraft(incomingQuery);
     setQuery(incomingQuery);
-  }, [incomingQuery]);
+    setWorks(splitTaxonomyIds(incomingWorksKey, "work"));
+    setFields(splitTaxonomyIds(incomingFieldsKey, "category"));
+  }, [incomingQuery, incomingWorksKey, incomingFieldsKey]);
 
   // 처음 한 번: 보기 목록(맡길 일·분야)과 로그인 정보
   useEffect(() => {
