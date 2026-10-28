@@ -33,7 +33,7 @@ function loadTypeScript(relativePath) {
   return module.exports;
 }
 
-const { INSIGHTS, getInsight, articlePath, insightsByKind } = loadTypeScript("src/lib/insights.ts");
+const { INSIGHTS, getInsight, articlePath, insightsByKind, listInsights, toListItem, topicCounts } = loadTypeScript("src/lib/insights.ts");
 const { ArticleParagraph, ArticleGlossary } = loadTypeScript("src/components/article-editorial.tsx");
 const { CoverArt } = loadTypeScript("src/components/cover-art.tsx");
 const { GENERATED_INSIGHT_COVERS } = loadTypeScript("src/lib/insight-covers.ts");
@@ -242,6 +242,19 @@ test("상추 최종 모형과 콘크리트 원문 내부의 지표 차이를 분
 test("기존 Co-Scientist·AlphaEvolve의 검토된 여섯 섹션을 그대로 보존한다", () => {
   assert.equal(hashOf(getInsight("research-agent").sections.slice(0, 6)), "7ce7921d288224859f0684e9badb7231fc0f6984cf951d817869e54707a0b72b");
   assert.equal(hashOf(getInsight("alphaevolve-algorithm-discovery").sections.slice(0, 6)), "5b5d6767fc96552030142f80d8e1706afe063439ff43a2862148d76e63a18950");
+});
+
+test("목록 요약은 본문 섹션을 빼고 카드 칸만 남긴다", () => {
+  const items = listInsights("case");
+  assert.ok(items.length > 0);
+  assert.equal("sections" in items[0], false);
+  assert.equal("glossary" in items[0], false);
+  assert.ok(items[0].title);
+  assert.equal(articlePath(items[0]).startsWith("/cases/"), true);
+  const lettuce = toListItem(getInsight("lettuce-biomass-estimation"));
+  assert.equal(lettuce.slug, "lettuce-biomass-estimation");
+  assert.equal("highlights" in lettuce, false);
+  assert.equal(topicCounts("case").all, insightsByKind("case").length);
 });
 
 test("같은 주제의 두 글은 기존 URL과 서로 다른 유형·경로를 가진다", () => {

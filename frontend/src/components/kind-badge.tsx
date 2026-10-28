@@ -1,4 +1,4 @@
-import { kindLabel, type InsightKind } from "@/lib/insights";
+import { kindLabel, type InsightKind } from "@/lib/insight-meta";
 
 interface KindBadgeProps {
   kind: InsightKind;

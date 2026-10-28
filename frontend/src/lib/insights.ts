@@ -2,34 +2,14 @@
  * 로컬 인사이트의 목록 정보와 기존 보강 원고입니다.
  * 추가 본문은 insight-enrichment.ts에서 주제별 자료와 조립합니다.
  * 실제 연구 해설과 설명용 시나리오를 구분하며 운영 DB 게시물은 아닙니다.
+ * 목록 화면은 insight-meta.ts의 요약만 받고, 이 파일의 본문은 상세·서버에서만 씁니다.
  */
 import { enrichInsight } from "./insight-enrichment";
 import { applyInsightCover } from "./insight-covers";
+import type { CoverTheme, InsightKind, InsightListItem, InsightTopic } from "./insight-meta";
 
-export type InsightKind = "case" | "trend";
-
-export type CoverTheme =
-  | "cells"
-  | "biomass"
-  | "dental"
-  | "concrete"
-  | "coScientist"
-  | "mattergen"
-  | "alphaEvolve"
-  | "turbines"
-  | "brain"
-  | "protein"
-  | "climate"
-  | "battery"
-  | "flow"
-  | "molecule"
-  | "script"
-  | "solar"
-  | "audio"
-  | "agent"
-  | "food"
-  | "medical"
-  | "chart";
+export type { CoverTheme, InsightKind, InsightListItem, InsightTopic } from "./insight-meta";
+export { articlePath, kindLabel, matchesTopicFilter } from "./insight-meta";
 
 export interface InsightStep {
   title: string;
@@ -77,22 +57,8 @@ export interface InsightTechnology {
   description: string;
 }
 
-export interface InsightArticle {
-  slug: string;
-  kind: InsightKind;
-  title: string;
-  summary: string;
-  field: string;
-  topicId: string;
-  topicLabel: string;
-  domains: string[];
-  tags: string[];
+export interface InsightArticle extends InsightListItem {
   source: string;
-  publishedOn: string;
-  readingMinutes: number;
-  cover: CoverTheme;
-  /** 글별 표지가 있으면 공통 분야 사진보다 우선합니다. */
-  coverSrc?: string;
   institution?: string;
   doi?: string;
   sourceUrl?: string;
@@ -107,11 +73,6 @@ export interface InsightArticle {
   facts: InsightFact[];
   technologies: InsightTechnology[];
   relatedSlugs: string[];
-}
-
-export interface InsightTopic {
-  id: string;
-  label: string;
 }
 
 export const CASE_TOPICS: InsightTopic[] = [
@@ -1915,34 +1876,39 @@ export function landingInsights(): InsightArticle[] {
   });
 }
 
-export function topicCount(kind: InsightKind, topicId: string): number {
+export function toListItem(article: InsightArticle): InsightListItem {
+  return {
+    slug: article.slug,
+    kind: article.kind,
+    title: article.title,
+    summary: article.summary,
+    field: article.field,
+    topicId: article.topicId,
+    topicLabel: article.topicLabel,
+    domains: article.domains,
+    tags: article.tags,
+    publishedOn: article.publishedOn,
+    readingMinutes: article.readingMinutes,
+    cover: article.cover,
+    coverSrc: article.coverSrc,
+  };
+}
+
+export function listInsights(kind: InsightKind): InsightListItem[] {
+  return insightsByKind(kind).map(toListItem);
+}
+
+export function topicCounts(kind: InsightKind): Record<string, number> {
   const articles = insightsByKind(kind);
-  if (topicId === "all") {
-    return articles.length;
+  const counts: Record<string, number> = { all: articles.length };
+  for (const article of articles) {
+    counts[article.topicId] = (counts[article.topicId] ?? 0) + 1;
   }
-  return articles.filter((article) => article.topicId === topicId).length;
+  return counts;
 }
 
-export function articlePath(article: InsightArticle): string {
-  const section = article.kind === "case" ? "cases" : "trends";
-  return `/${section}/${article.slug}`;
-}
-
-export function kindLabel(kind: InsightKind): string {
-  return kind === "case" ? "AI 연구 협업 사례" : "AI 트렌드";
-}
-
-export function matchesTopicFilter(article: InsightArticle, topic: string): boolean {
-  if (!topic || topic === "all") {
-    return true;
-  }
-  if (article.topicId === topic || article.topicLabel === topic) {
-    return true;
-  }
-  if (topic === "LLM·생성형 AI") {
-    return article.topicId === "llm" || article.topicId === "generative" || article.domains.includes(topic);
-  }
-  return article.domains.includes(topic) || article.field.includes(topic);
+export function topicCount(kind: InsightKind, topicId: string): number {
+  return topicCounts(kind)[topicId] ?? 0;
 }
 
 export function searchInsights(query: string): InsightArticle[] {
