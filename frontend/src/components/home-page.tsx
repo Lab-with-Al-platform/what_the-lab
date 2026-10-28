@@ -12,7 +12,7 @@ function topicHref(path: string, key: string, value: string): string {
 const ENTRY_CARDS = [
   {
     href: "/cases",
-    image: "/generated/research-cases-card-v1.png",
+    image: "/generated/research-cases-card-v1.jpg",
     imageClass: "opacity-95",
     kicker: "AI RESEARCH CASES",
     title: "AI 연구 협업 사례",
@@ -27,7 +27,7 @@ const ENTRY_CARDS = [
   },
   {
     href: "/trends",
-    image: "/generated/ai-trends-card-v1.png",
+    image: "/generated/ai-trends-card-v1.jpg",
     imageClass: "opacity-95",
     kicker: "AI TRENDS",
     title: "AI 트렌드",
@@ -42,7 +42,7 @@ const ENTRY_CARDS = [
   },
   {
     href: "/experts",
-    image: "/generated/find-experts-card-v1.png",
+    image: "/generated/find-experts-card-v1.jpg",
     imageClass: "opacity-95",
     kicker: "FIND EXPERTS",
     title: "AI 전문가 찾기",
@@ -147,7 +147,7 @@ function HeroCollage() {
   // CSS로 숨기는 것만으로는 다운로드를 막지 못합니다. media로 PC 사진을 선택합니다.
   const sizes = "(min-width: 1440px) 760px, 55vw";
   const { props: { srcSet } } = getImageProps({
-    src: "/generated/labbridge-hero-v1.png", alt: "", fill: true, sizes,
+    src: "/generated/labbridge-hero-v1.jpg", alt: "", fill: true, sizes,
   });
 
   return (

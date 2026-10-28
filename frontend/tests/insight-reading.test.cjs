@@ -71,6 +71,21 @@ test("31개 글의 최종 표지 경로와 실제 파일이 중복되지 않는�
   assert.equal(Object.keys(GENERATED_INSIGHT_COVERS).length, 18);
 });
 
+test("생성 표지는 JPEG라서 저장소 원본이 작다", () => {
+  const dir = path.resolve(__dirname, "../public/generated");
+  const files = fs.readdirSync(dir);
+  assert.equal(files.filter((name) => name.endsWith(".png")).length, 0);
+  const jpegs = files.filter((name) => name.endsWith(".jpg"));
+  assert.equal(jpegs.length, 28);
+  let total = 0;
+  for (const name of jpegs) {
+    const size = fs.statSync(path.join(dir, name)).size;
+    assert.ok(size < 350_000, `${name}: ${size}`);
+    total += size;
+  }
+  assert.ok(total < 6_000_000, String(total));
+});
+
 test("전용 표지 우선·공통 사진 폴백과 생성 이미지 설명을 유지한다", () => {
   const custom = renderToStaticMarkup(React.createElement(CoverArt, { theme: "battery", src: "/generated/custom.png", className: "aspect-video", sizes: "320px", alt: "설명" }));
   const fallback = renderToStaticMarkup(React.createElement(CoverArt, { theme: "battery", className: "aspect-video", sizes: "64px" }));
