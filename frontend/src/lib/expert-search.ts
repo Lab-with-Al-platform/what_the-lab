@@ -122,4 +122,32 @@ export function headAndRest(names: string[], limit = 3): { shown: string[]; rest
   return { shown: names.slice(0, limit), rest: Math.max(0, names.length - limit) };
 }
 
+/** 주소의 쉼표 목록에서 분류 ID만 남깁니다. FIELD001은 대분류 F01과 헷갈리지 않게 뺍니다. */
+export function splitTaxonomyIds(value: string, kind: "work" | "category"): string[] {
+  const prefix = kind === "work" ? "UG" : "F";
+  const seen = new Set<string>();
+  const ids: string[] = [];
+  for (const raw of value.split(",")) {
+    const id = raw.trim();
+    if (kind === "category" && id.startsWith("FIELD")) continue;
+    if (!id.startsWith(prefix) || id.length > 10 || seen.has(id)) continue;
+    seen.add(id);
+    ids.push(id);
+  }
+  return ids;
+}
+
+/** 글·연구에서 전문가 찾기로 넘어갈 때 쓰는 주소. CAP ID는 넣지 않습니다. */
+export function expertSearchHref(options: { works?: string[]; categories?: string[]; skill?: string } = {}): string {
+  const params = new URLSearchParams();
+  const works = splitTaxonomyIds((options.works ?? []).join(","), "work");
+  const categories = splitTaxonomyIds((options.categories ?? []).join(","), "category");
+  if (works.length) params.set("works", works.join(","));
+  if (categories.length) params.set("fields", categories.join(","));
+  const skill = options.skill?.trim().slice(0, 50) ?? "";
+  if (!works.length && skill) params.set("q", skill);
+  const query = params.toString();
+  return query ? `/experts?${query}` : "/experts";
+}
+
 export const MESSAGE_LIMIT = 300; // 백엔드 MAX_MESSAGE와 같은 값

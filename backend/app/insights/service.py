@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 
 from app.insights.models import Candidate, Publication, ReviewEvent, Revision, Source, utc_now
 from app.insights.schemas import REQUIRED_CLAIMS, SCORE_MAXIMUMS, ApprovalInput, Draft
+from app.taxonomy_bridge import able_work_ids_for_keywords, expert_search_path
 
 SECTION_TITLES = {
     "research_problem": "연구 문제",
@@ -348,9 +349,10 @@ def publish_candidate(
             "doi": draft.source.doi,
         },
         "keywords": approved_keyword_labels(draft.keyword_ids),
+        "able_work_ids": able_work_ids_for_keywords(draft.keyword_ids),
         "score_total": total,
-        # ID 기반 전문가 검색은 아직 없어 잘못된 skill=CAP...를 전달하지 않습니다.
-        "expert_search_url": "/experts",
+        # CAP을 주소에 넣지 않고, 전문가가 고르는 UG로 바꿔 찾습니다.
+        "expert_search_url": expert_search_path(draft.keyword_ids),
         # 새 게시에서도 근거 메모만 내보내지 않고 승인된 전체 본문을 보존합니다.
         "article": {**editorial_article, "publishedOn": utc_now().strftime("%Y.%m.%d")},
         "origin": "reviewed_article",

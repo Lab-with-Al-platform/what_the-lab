@@ -17,7 +17,7 @@ import {
 } from "@/lib/my-research";
 import { AbleWorkOption, FieldCategory, MyResearchModal } from "@/components/my-research-modal";
 import { ResearchRequestLock } from "@/components/research-request-lock";
-
+import { expertSearchHref } from "@/lib/expert-search";
 
 /** 내 연구 상세. 연구 하나와 분류표 목록을 불러와 보여 주고, 여기서 수정·삭제·지정할 수 있어요. */
 export function MyResearchDetail({ researchId }: { researchId: number }) {
@@ -50,6 +50,11 @@ export function MyResearchDetail({ researchId }: { researchId: number }) {
 
   const workName = new Map(ableWorks.map((work) => [work.able_work_id, work.name]));
   const fieldName = new Map(fields.flatMap((category) => category.fields.map((field) => [field.field_id, field.name])));
+  const categoryOf = new Map(fields.flatMap((category) => category.fields.map((field) => [field.field_id, category.field_category_id])));
+  const findExpertsHref = expertSearchHref({
+    works: research.able_work_ids,
+    categories: research.field_ids.map((id) => categoryOf.get(id) ?? "").filter(Boolean),
+  });
   const draft = research.status === "draft";
   const edited = research.updated_at.slice(0, 10) !== research.created_at.slice(0, 10);
   const tasks = research.task_unsure ? ["잘 모르겠어요"] : research.able_work_ids.map((id) => workName.get(id) ?? id);
@@ -73,7 +78,7 @@ export function MyResearchDetail({ researchId }: { researchId: number }) {
     setActionError("");
     try {
       pickThis(await requestApi<Research[]>(`/researcher/researches/${researchId}/primary`, { method: "PUT" }));
-      if (thenFindExperts) router.push("/experts");
+      if (thenFindExperts) router.push(findExpertsHref);
     } catch (error) {
       setActionError(error instanceof ApiError ? error.message : "잠시 후 다시 시도해 주세요");
     } finally {
@@ -229,7 +234,7 @@ export function MyResearchDetail({ researchId }: { researchId: number }) {
                 이어서 작성하기
               </button>
             ) : research.is_primary ? (
-              <Link href="/experts" className="mt-4 flex h-11 w-full items-center justify-center rounded-button bg-brand text-sm font-semibold text-white hover:bg-brand-hover">
+              <Link href={findExpertsHref} className="mt-4 flex h-11 w-full items-center justify-center rounded-button bg-brand text-sm font-semibold text-white hover:bg-brand-hover">
                 이 연구로 전문가 찾기
               </Link>
             ) : (

@@ -1926,6 +1926,7 @@ export function toListItem(article: InsightArticle): InsightListItem {
     featuredRank: article.featuredRank,
     featuredHeadline: article.featuredHeadline,
     featuredSummary: article.featuredSummary,
+    ableWorkIds: article.ableWorkIds,
   };
 }
 

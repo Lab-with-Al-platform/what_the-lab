@@ -46,6 +46,25 @@ test("외부 검색어는 API 길이 한도에 맞추고 q를 우선한다", () 
   assert.ok(!html.includes("기존 링크"));
 });
 
+test("글·연구의 전문가 찾기 주소는 UG·대분류만 넣고 CAP·FIELD 상세는 뺀다", () => {
+  const { expertSearchHref, splitTaxonomyIds } = load("src/lib/expert-search.ts");
+  assert.equal(expertSearchHref({ works: ["UG04"] }), "/experts?works=UG04");
+  assert.equal(expertSearchHref({ works: ["UG04"], categories: ["F02", "FIELD011"] }), "/experts?works=UG04&fields=F02");
+  assert.equal(expertSearchHref({ skill: "세포 이미지 분석" }), "/experts?q=%EC%84%B8%ED%8F%AC+%EC%9D%B4%EB%AF%B8%EC%A7%80+%EB%B6%84%EC%84%9D");
+  assert.equal(expertSearchHref({ works: ["UG04"], skill: "객체 탐지" }), "/experts?works=UG04");
+  assert.equal(expertSearchHref({}), "/experts");
+  assert.equal(splitTaxonomyIds("UG04,CAP023,FIELD011", "work").join(","), "UG04");
+  assert.equal(splitTaxonomyIds("F02,FIELD011,F02", "category").join(","), "F02");
+});
+
+test("works·fields 주소는 전문가 찾기 조건으로 미리 골라진다", () => {
+  const { ExpertSearch } = load("src/components/expert-search.tsx", new URLSearchParams({ works: "UG04", fields: "F02" }));
+  const html = renderToStaticMarkup(React.createElement(ExpertSearch));
+  assert.match(html, /UG04/);
+  assert.match(html, /F02/);
+  assert.match(html, /무엇을 맡길까요\?/);
+});
+
 test("FAQ는 오늘의 요청관리·설정 화면을 안내하고 비공개 답변의 DM을 약속하지 않는다", () => {
   const { FAQS } = load("src/lib/faq.ts");
   const request = FAQS.find((item) => item.id === "request-boundary");

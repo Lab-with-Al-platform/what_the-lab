@@ -506,6 +506,8 @@ def test_approved_capability_list_and_keyword_publication(client):
     published = publish(client, approve(client, submit(client, create(client, draft))))
     assert published.status_code == 200, published.text
     assert [item["id"] for item in published.json()["keywords"]] == ["CAP023"]
+    assert published.json()["able_work_ids"] == ["UG04"]
+    assert published.json()["expert_search_url"] == "/experts?works=UG04"
 
 
 def test_keyword_list_requires_admin(client):
