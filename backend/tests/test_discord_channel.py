@@ -70,29 +70,21 @@ def test_add_member_false_when_not_in_server(monkeypatch):
     monkeypatch.setattr(discord_bot.httpx, "put", fake(404, {"code": 10013}, []))  # Unknown Member
     assert discord_bot.add_member("555", "123") is False
 
-
-def test_find_channel_by_name(monkeypatch):
-    channels = [{"id": "1", "name": "공지"}, {"id": "555", "name": "협업-12"}]
-    monkeypatch.setattr(discord_bot.httpx, "get", fake(200, channels, []))
-    assert discord_bot.find_channel("협업-12") == "555"
-    assert discord_bot.find_channel("협업-13") is None
-
-
 # ---------- 협업 하나 → 채널 하나 ----------
 ROW = {"collaboration_id": 12, "title": "세포 수 세기", "researcher_discord_id": "111", "expert_discord_id": "222"}
 
 
 def test_open_channel_creates_and_adds_both(monkeypatch):
     added: list = []
-    monkeypatch.setattr(collab_channel, "find_channel", lambda name: None)
     monkeypatch.setattr(collab_channel, "create_private_channel", lambda name, topic: f"new:{name}:{topic}")
     monkeypatch.setattr(collab_channel, "add_member", lambda channel_id, discord_id: added.append(discord_id) or True)
     assert collab_channel.open_channel(ROW) == ("new:협업-12:세포 수 세기", None)
     assert added == ["111", "222"]
 
 
-def test_open_channel_reuses_existing_and_reports_missing(monkeypatch):
-    monkeypatch.setattr(collab_channel, "find_channel", lambda name: "555")  # 지난번에 만들고 저장 전에 멈춤
-    monkeypatch.setattr(collab_channel, "create_private_channel", lambda name, topic: pytest.fail("두 번 만들면 안 돼요"))
+def test_open_channel_never_reuses_and_reports_missing(monkeypatch):
+    # 같은 이름 채널이 있어도 찾지 않고 늘 새로 만들어요 (팀원끼리 협업 번호가 겹쳐도 안 섞이게)
+    assert not hasattr(collab_channel, "find_channel")
+    monkeypatch.setattr(collab_channel, "create_private_channel", lambda name, topic: "556")
     monkeypatch.setattr(collab_channel, "add_member", lambda channel_id, discord_id: discord_id == "111")
-    assert collab_channel.open_channel(ROW) == ("555", "서버 미참가: AI 전문가")
+    assert collab_channel.open_channel(ROW) == ("556", "서버 미참가: AI 전문가")

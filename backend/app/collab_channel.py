@@ -7,13 +7,7 @@
 import httpx
 
 from app.db import get_connection
-from app.discord_bot import (
-    add_member,
-    bot_ready,
-    channel_name,
-    create_private_channel,
-    find_channel,
-)
+from app.discord_bot import add_member, bot_ready, channel_name, create_private_channel
 
 BATCH = 10  # 한 번에 만들 최대 개수
 MAX_ATTEMPTS = 5  # 이만큼 실패하면 멈추고 failed 로 남겨요 (이유는 discord_error)
@@ -71,13 +65,15 @@ def make_pending_channels() -> int:
 
 
 def open_channel(row: dict) -> tuple[str, str | None]:
-    """채널 하나를 만들고 (이미 있으면 그대로 쓰고) 두 사람에게 보여 줘요.
+    """채널 하나를 새로 만들고 두 사람에게 보여 줘요.
 
     돌려주는 값: (채널 번호, 못 넣은 사람 안내 또는 None)
     서버에 없는 사람은 채널에 못 넣어요. 채널은 만들고 이유만 남겨요.
+    같은 이름 채널이 있어도 다시 쓰지 않아요. 팀원마다 DB가 달라 협업 번호가 겹치면
+    남의 채널에 들어가게 되기 때문이에요. (이름이 같아도 채널은 따로 생겨요)
     """
     name = channel_name(row["collaboration_id"])
-    channel_id = find_channel(name) or create_private_channel(name, row["title"] or "")
+    channel_id = create_private_channel(name, row["title"] or "")
     members = (("연구회원", row["researcher_discord_id"]), ("AI 전문가", row["expert_discord_id"]))
     missing = [who for who, discord_id in members if not add_member(channel_id, discord_id)]
     return channel_id, (f"서버 미참가: {', '.join(missing)}" if missing else None)

@@ -9,6 +9,8 @@
 
 | [SIGNUP_LOGIN_GUIDE.md](SIGNUP_LOGIN_GUIDE.md) | 회원가입·로그인 로컬 실행·테스트 (DB, 백엔드, 프론트) |
 
+| [SETUP_DISCORD_COLLAB_CHANNEL.md](SETUP_DISCORD_COLLAB_CHANNEL.md) | 협업 디스코드 비공개 채널 — pull 받은 뒤 세팅 |
+
 코드 작성 전에 저장소 루트의 [AGENTS.md](../../AGENTS.md), [제품 범위](../product/MVP_SCOPE.md), 담당 기능 문서를 함께 확인합니다.
 
 화면 작업은 [디자인 기준](../design/README.md), 검증 결과는 [QA 기록](../qa/README.md)을 참고합니다.
