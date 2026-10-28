@@ -320,7 +320,7 @@ def build_summary(
                 "value": len(completed),
                 "active": sum(row.status == "active" for row in completed),
                 "suspended": sum(row.status == "suspended" for row in completed),
-                "note": "현재 signup_step=done 이고 탈퇴가 아닌 계정. 정지를 포함합니다.",
+                "note": "가입을 끝까지 마친 계정입니다. 정지된 계정도 포함합니다.",
             },
             "in_progress": {
                 "status": "ready",
@@ -347,7 +347,7 @@ def build_summary(
                 "value": len(created),
                 "comparison": _flow(len(created), len(previous_created)),
                 "series": _series(days, created),
-                "note": "users.created_at 기준. 가입 완료 수가 아니고 탈퇴 계정도 포함합니다.",
+                "note": "이 기간에 새로 만들어진 계정 수입니다. 가입을 끝낸 수가 아니며, 탈퇴한 계정도 들어갑니다.",
             },
             "signup_completed_in_period": {
                 "status": "not_collected",
@@ -400,7 +400,7 @@ def _research_metrics(
         "registered": {
             "status": "ready",
             "value": len(registered),
-            "note": "research.status=registered. 공개 모집 상태가 아닙니다.",
+            "note": "지금 등록 상태인 연구 수입니다. 공개 모집 중인 연구 수가 아닙니다.",
         },
         "records": {
             "status": "ready",
@@ -417,7 +417,7 @@ def _research_metrics(
         "first_registered_in_period": {
             "status": "not_collected",
             "value": None,
-            "note": "등록 상태에 처음 도달한 시각이 없습니다. updated_at으로 대신하지 않습니다.",
+            "note": "등록 상태가 된 시각을 따로 남기지 않아 기간 등록 수를 계산하지 않습니다. 마지막 수정 시각으로 대신하지 않습니다.",
         },
         "fields": {
             "status": "ready",

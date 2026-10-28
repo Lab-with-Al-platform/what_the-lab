@@ -182,6 +182,17 @@ def test_summary_separates_completion_creation_and_registration():
     assert sum(item["count"] for item in researches["fields"]["items"]) == 2
     assert researches["abandonment"]["status"] == "not_collected"
     assert body["unavailable"][0]["status"] == "not_collected"
+    assert completed["note"] == "가입을 끝까지 마친 계정입니다. 정지된 계정도 포함합니다."
+    assert created["note"] == "이 기간에 새로 만들어진 계정 수입니다. 가입을 끝낸 수가 아니며, 탈퇴한 계정도 들어갑니다."
+    assert researches["registered"]["note"] == "지금 등록 상태인 연구 수입니다. 공개 모집 중인 연구 수가 아닙니다."
+    assert researches["first_registered_in_period"]["note"] == (
+        "등록 상태가 된 시각을 따로 남기지 않아 기간 등록 수를 계산하지 않습니다. "
+        "마지막 수정 시각으로 대신하지 않습니다."
+    )
+    assert "signup_step" not in completed["note"]
+    assert "created_at" not in created["note"]
+    assert "status=" not in researches["registered"]["note"]
+    assert "updated_at" not in researches["first_registered_in_period"]["note"]
 
 
 def test_previous_zero_has_no_rate_and_search_is_literal():
