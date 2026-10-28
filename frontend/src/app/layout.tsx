@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { AnalyticsPageBeacon } from "@/components/analytics-page-beacon";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { pretendard } from "./fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -14,13 +15,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ko">
-      <head>
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"
-        />
-      </head>
+    <html lang="ko" className={pretendard.variable}>
       <body className="min-h-screen antialiased">
         <a
           href="#content"

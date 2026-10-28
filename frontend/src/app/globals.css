@@ -6,7 +6,7 @@
   트렌드·전문가 색은 작은 분류 라벨에만 씁니다.
 */
 @theme {
-  --font-sans: "Pretendard", "Noto Sans KR", system-ui, sans-serif;
+  --font-sans: var(--font-pretendard), "Pretendard", "Noto Sans KR", system-ui, sans-serif;
   --color-brand: #5036f4;
   --color-brand-hover: #4126d9;
   --color-brand-deep: #4126d9;
