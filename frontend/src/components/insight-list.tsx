@@ -10,6 +10,8 @@ import {
   type InsightListItem,
   type InsightTopic,
 } from "@/lib/insight-meta";
+import { articleReason, rankRelated } from "@/lib/related-rank";
+import { useViewerInterest } from "@/lib/viewer-interest";
 
 const PAGE_SIZE = 6;
 
@@ -36,16 +38,20 @@ export function InsightList({
   const topic = searchParams.get("topic") ?? "all";
   const [sort, setSort] = useState<"latest" | "title">("latest");
   const [page, setPage] = useState(1);
+  const interest = useViewerInterest();
 
   const filtered = useMemo(() => {
     const matched = articles.filter((article) => matchesTopicFilter(article, topic));
-    return [...matched].sort((left, right) => {
+    const ordered = [...matched].sort((left, right) => {
       if (sort === "title") {
         return left.title.localeCompare(right.title, "ko");
       }
       return right.publishedOn.localeCompare(left.publishedOn);
     });
-  }, [articles, sort, topic]);
+    if (sort !== "latest" || !interest) return ordered;
+    return rankRelated(ordered, (article) => Boolean(articleReason(article, interest)));
+  }, [articles, interest, sort, topic]);
+  const rankedCount = interest && sort === "latest" ? filtered.filter((article) => articleReason(article, interest)).length : 0;
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const safePage = Math.min(page, pageCount);
@@ -105,6 +111,10 @@ export function InsightList({
           );
         })}
       </div>
+      {rankedCount > 0 ? (
+        <p className="mt-3 text-sm text-muted">나와 같은 키워드의 글 {rankedCount}편을 위에 두었어요. 나머지 글도 그대로 볼 수 있어요.</p>
+      ) : null}
+
       {topic !== "all" && !topics.some((item) => item.id === topic || item.label === topic) ? (
         <p className="mt-3 text-sm text-muted">
           ‘{topic}’ 분야만 보는 중입니다.{" "}
@@ -119,7 +129,7 @@ export function InsightList({
       ) : (
         <div className="mt-6 grid items-stretch gap-5 md:grid-cols-2 xl:grid-cols-3" aria-label="콘텐츠 목록">
           {visible.map((article) => (
-            <InsightCard key={article.slug} article={article} variant="editorial" />
+            <InsightCard key={article.slug} article={article} variant="editorial" reason={interest && sort === "latest" ? articleReason(article, interest) : null} />
           ))}
         </div>
       )}

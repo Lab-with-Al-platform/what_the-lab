@@ -9,8 +9,9 @@ import { Avatar } from "@/components/request-parts";
 import { ApiError, requestApi } from "@/lib/api";
 import { photoOrDefault } from "@/lib/collab-requests";
 import { buildNames, categoryNames, engagedLabel, headAndRest, splitTaxonomyIds, type ExpertCardData, type ExpertSearchResult, type Names } from "@/lib/expert-search";
-import type { AbleWorkOption, FieldCategory } from "@/lib/my-career";
+import type { AbleWorkOption, CareerProfile, FieldCategory } from "@/lib/my-career";
 import { DATA_STATUS_LABELS, type Research } from "@/lib/my-research";
+import { expertReason, interestFromExpert, interestFromResearch, type Interest } from "@/lib/related-rank";
 
 type Panel = "works" | "fields" | "research" | null;
 type Role = "researcher" | "expert" | null; // null = 로그인 안 했거나 유형 미선택
@@ -27,6 +28,7 @@ export function ExpertSearch() {
   const [categories, setCategories] = useState<FieldCategory[]>([]);
   const [role, setRole] = useState<Role>(null);
   const [researches, setResearches] = useState<Research[] | null>(null); // 연구회원의 등록한 연구
+  const [expertProfile, setExpertProfile] = useState<CareerProfile | null>(null);
 
   const [draft, setDraft] = useState(incomingQuery); // 게시판 태그·홈에서 넘어온 검색어도 반영
   const [query, setQuery] = useState(incomingQuery); // [검색]을 눌러 적용한 검색어
@@ -64,18 +66,32 @@ export function ExpertSearch() {
             .then((list) => setResearches(list.filter((item) => item.status === "registered")))
             .catch(() => setResearches([]));
         }
+        if (me.user_role === "expert") {
+          requestApi<CareerProfile>("/expert/profile")
+            .then(setExpertProfile)
+            .catch(() => setExpertProfile(null));
+        }
       })
       .catch(() => setRole(null)); // 로그인 안 함: 목록은 그대로 볼 수 있어요
   }, []);
 
   const names = useMemo<Names>(() => buildNames(ableWorks, categories), [ableWorks, categories]);
+  const interest = useMemo(() => {
+    if (role === "researcher" && researches) return interestFromResearch(researches, names);
+    if (role === "expert" && expertProfile) return interestFromExpert(expertProfile, names);
+    return null;
+  }, [expertProfile, names, researches, role]);
+  const preferWorksKey = works.length === 0 && fields.length === 0 ? (interest?.workIds ?? []).join(",") : "";
+  const preferFieldsKey = works.length === 0 && fields.length === 0 ? (interest?.categoryIds ?? []).join(",") : "";
 
   const search = useCallback(
     async (offset: number) => {
       const params = new URLSearchParams({ q: query, works: works.join(","), fields: fields.join(","), offset: String(offset) });
+      if (preferWorksKey) params.set("prefer_works", preferWorksKey);
+      if (preferFieldsKey) params.set("prefer_fields", preferFieldsKey);
       return requestApi<ExpertSearchResult>(`/experts?${params}`);
     },
-    [query, works, fields],
+    [fields, preferFieldsKey, preferWorksKey, query, works],
   );
 
   // 조건이 바뀌면 처음부터 다시 찾아요.
@@ -222,7 +238,11 @@ export function ExpertSearch() {
         <h2 className="text-lg font-bold">
           전문가 <span className="text-brand">{result ? `${result.total}명` : ""}</span>
         </h2>
-        <p className="text-xs text-faint">새로 가입한 순 · 참여 중인 전문가는 뒤에 보여요</p>
+        <p className="text-xs text-faint">
+          {preferWorksKey || preferFieldsKey
+            ? "나와 같은 키워드의 전문가를 위에 두었어요. 나머지 전문가도 이어서 보여요"
+            : "새로 가입한 순 · 참여 중인 전문가는 뒤에 보여요"}
+        </p>
       </div>
 
       {error && <p className="mt-4 text-sm text-danger">{error}</p>}
@@ -250,7 +270,7 @@ export function ExpertSearch() {
           <ul className="mt-5 grid items-stretch gap-4 md:grid-cols-2 xl:grid-cols-3">
             {result.items.map((expert) => (
               <li key={expert.user_id}>
-                <ExpertCard expert={expert} names={names} onRequest={() => setRequesting(expert)} />
+                <ExpertCard expert={expert} names={names} interest={preferWorksKey || preferFieldsKey ? interest : null} onRequest={() => setRequesting(expert)} />
               </li>
             ))}
           </ul>
@@ -365,10 +385,11 @@ function ResearchPicker({ role, researches, names, onPick }: { role: Role; resea
   );
 }
 
-function ExpertCard({ expert, names, onRequest }: { expert: ExpertCardData; names: Names; onRequest: () => void }) {
+function ExpertCard({ expert, names, interest, onRequest }: { expert: ExpertCardData; names: Names; interest: Interest | null; onRequest: () => void }) {
   const tags = [...expert.domain_ids.map((id) => names.fields.get(id) ?? id), ...expert.able_work_ids.map((id) => names.works.get(id) ?? id)];
   const { shown, rest } = headAndRest(tags);
   const engaged = engagedLabel(expert);
+  const reason = interest ? expertReason(expert, interest, names) : null;
 
   return (
     <article className="flex h-full flex-col rounded-card border border-line bg-card p-5 shadow-card">
@@ -379,7 +400,8 @@ function ExpertCard({ expert, names, onRequest }: { expert: ExpertCardData; name
           {engaged && <p className="text-xs font-semibold text-trend">● {engaged}</p>}
         </div>
       </div>
-      <p className="mt-3 line-clamp-2 min-h-[2lh] text-sm leading-6">{expert.introduce || "아직 소개를 적지 않았어요"}</p>
+      {reason ? <p className="mt-3 text-xs font-medium text-brand">{reason}</p> : null}
+      <p className={`line-clamp-2 min-h-[2lh] text-sm leading-6 ${reason ? "mt-2" : "mt-3"}`}>{expert.introduce || "아직 소개를 적지 않았어요"}</p>
       <ul className="mt-3 flex flex-wrap gap-1.5">
         {shown.map((tag) => (
           <li key={tag} className="rounded-full bg-brand-soft px-2.5 py-1 text-xs font-medium text-brand">

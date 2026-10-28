@@ -72,9 +72,19 @@ ENGAGED_SQL = """
 
 
 def search_experts(
-    query: str, able_work_ids: list[str], category_ids: list[str], offset: int, limit: int
+    query: str,
+    able_work_ids: list[str],
+    category_ids: list[str],
+    offset: int,
+    limit: int,
+    prefer_work_ids: list[str] | None = None,
+    prefer_category_ids: list[str] | None = None,
 ) -> dict:
-    """공개 전문가 목록. 정렬: 지금 협업 가능한 사람(최근 가입 순) → 참여 중인 사람(종료일 빠른 순)."""
+    """공개 전문가 목록.
+
+    정렬: (선택한 키워드와 맞는 사람) → 지금 협업 가능한 사람(최근 가입 순)
+    → 참여 중인 사람(종료일 빠른 순). 맞는 사람만 남기지는 않습니다.
+    """
     group_ids, field_ids = expand_query(query)
     conditions = ["e.is_public = TRUE", "u.status = 'active'", "u.user_role = 'expert'"]
     params: list = []
@@ -118,15 +128,34 @@ def search_experts(
     with get_connection() as conn, conn.cursor() as cursor:
         cursor.execute(f"SELECT COUNT(*) AS total {base}", params)
         total = cursor.fetchone()["total"]
+        order_sql = "engaged, g.engaged_until NULLS LAST, e.created_at DESC, e.user_id DESC"
+        order_params: list = []
+        prefer_works = prefer_work_ids or []
+        prefer_fields = prefer_category_ids or []
+        related_checks: list[str] = []
+        if prefer_works:
+            related_checks.append(
+                "EXISTS (SELECT 1 FROM expert_able_work w"
+                " WHERE w.user_id = e.user_id AND w.able_work_id = ANY(%s))"
+            )
+            order_params.append(prefer_works)
+        if prefer_fields:
+            related_checks.append(
+                "EXISTS (SELECT 1 FROM expert_domain d JOIN research_field f ON f.field_id = d.field_id"
+                " WHERE d.user_id = e.user_id AND f.field_category_id = ANY(%s))"
+            )
+            order_params.append(prefer_fields)
+        if related_checks:
+            order_sql = f"CASE WHEN {' OR '.join(related_checks)} THEN 0 ELSE 1 END, " + order_sql
         cursor.execute(
             f"""
             SELECT e.user_id, u.nickname, u.user_photo, e.introduce,
                    g.expert_id IS NOT NULL AS engaged, g.engaged_until
             {base}
-            ORDER BY engaged, g.engaged_until NULLS LAST, e.created_at DESC, e.user_id DESC
+            ORDER BY {order_sql}
             LIMIT %s OFFSET %s
             """,
-            [*params, limit, offset],
+            [*params, *order_params, limit, offset],
         )
         rows = cursor.fetchall()
         ids = [row["user_id"] for row in rows]
