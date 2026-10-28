@@ -1,4 +1,4 @@
-"""LabBridge 디스코드 봇으로 디스코드 API를 부릅니다. (서버에 넣기 · DM 보내기)
+"""LabBridge 디스코드 봇으로 디스코드 API를 부릅니다. (서버에 넣기 · DM 보내기 · 협업 채널 만들기)
 
 봇을 계속 켜 두지 않고, 필요할 때만 봇 토큰으로 HTTP 요청을 보내요.
 봇 토큰(DISCORD_BOT_TOKEN)과 서버 ID(DISCORD_GUILD_ID)가 없으면 아무것도 하지 않아요.
@@ -6,7 +6,12 @@
 
 import httpx
 
-from app.config import DISCORD_BOT_TOKEN, DISCORD_GUILD_ID
+from app.config import (
+    DISCORD_BOT_TOKEN,
+    DISCORD_CLIENT_ID,
+    DISCORD_COLLAB_CATEGORY_ID,
+    DISCORD_GUILD_ID,
+)
 
 DISCORD_API = "https://discord.com/api/v10"
 TIMEOUT = 5  # 초. 디스코드가 느려도 우리 서버가 오래 멈추지 않게
@@ -72,3 +77,77 @@ def send_dm(discord_id: str, content: str) -> None:
     if message.status_code == 403:  # 50007: Cannot send messages to this user
         raise DmBlocked()
     message.raise_for_status()
+
+    
+
+# ---------- 협업 전용 비공개 채널 ----------
+# 디스코드 권한은 숫자 비트로 적어요. (https://discord.com/developers/docs/topics/permissions)
+VIEW_CHANNEL = 1 << 10  # 채널 보기
+SEND_MESSAGES = 1 << 11  # 메시지 보내기
+EMBED_LINKS = 1 << 14  # 링크 미리보기
+ATTACH_FILES = 1 << 15  # 파일 올리기
+READ_HISTORY = 1 << 16  # 지난 메시지 보기
+ADD_REACTIONS = 1 << 6  # 이모지 반응
+MEMBER_ALLOW = VIEW_CHANNEL | SEND_MESSAGES | EMBED_LINKS | ATTACH_FILES | READ_HISTORY | ADD_REACTIONS
+BOT_ALLOW = VIEW_CHANNEL | SEND_MESSAGES | EMBED_LINKS | READ_HISTORY
+
+
+def channel_name(collaboration_id: int) -> str:
+    """협업 채널 이름: 협업-12 (연구 제목은 넣지 않아요. 제목은 채널 주제에 넣어요)"""
+    return f"협업-{collaboration_id}"
+
+
+def channel_url(channel_id: str) -> str:
+    """채널 바로가기 링크. 누르면 디스코드 앱·웹에서 그 채널이 열려요."""
+    return f"https://discord.com/channels/{DISCORD_GUILD_ID}/{channel_id}"
+
+
+def find_channel(name: str) -> str | None:
+    """서버에 같은 이름의 채널이 이미 있으면 그 번호. (만들고 DB 저장 전에 멈췄을 때 두 번 만들지 않게)"""
+    response = httpx.get(f"{DISCORD_API}/guilds/{DISCORD_GUILD_ID}/channels", headers=bot_headers(), timeout=TIMEOUT)
+    response.raise_for_status()
+    for channel in response.json():
+        if channel.get("name") == name:
+            return channel["id"]
+    return None
+
+
+def create_private_channel(name: str, topic: str) -> str:
+    """비공개 채널을 만들고 번호를 돌려줘요. 처음에는 봇만 보여요. (사람은 add_member 로 넣어요)
+
+    name: 채널 이름 (협업-12) / topic: 채널 주제 (연구 제목. 채널 멤버만 볼 수 있어요)
+    @everyone(서버의 모든 사람)은 보기를 막고, 봇만 허용해요. 디스코드가 안 되면 httpx.HTTPError.
+    """
+    body = {
+        "name": name,
+        "type": 0,  # 0 = 글 채널
+        "topic": topic[:1024],
+        "permission_overwrites": [
+            {"id": DISCORD_GUILD_ID, "type": 0, "deny": str(VIEW_CHANNEL), "allow": "0"},  # @everyone 의 번호 = 서버 번호
+            {"id": DISCORD_CLIENT_ID, "type": 1, "allow": str(BOT_ALLOW), "deny": "0"},  # 봇 번호 = 앱 번호
+        ],
+    }
+    if DISCORD_COLLAB_CATEGORY_ID:
+        body["parent_id"] = DISCORD_COLLAB_CATEGORY_ID
+    response = httpx.post(
+        f"{DISCORD_API}/guilds/{DISCORD_GUILD_ID}/channels", headers=bot_headers(), json=body, timeout=TIMEOUT
+    )
+    response.raise_for_status()
+    return response.json()["id"]
+
+
+def add_member(channel_id: str, discord_id: str) -> bool:
+    """회원 한 명에게 채널을 보여 줘요. 넣었으면 True, 서버 멤버가 아니라서 못 넣으면 False.
+
+    채널 권한에 이 사람만 '보기·쓰기 허용'을 붙여요. 디스코드가 안 되면 httpx.HTTPError.
+    """
+    response = httpx.put(
+        f"{DISCORD_API}/channels/{channel_id}/permissions/{discord_id}",
+        headers=bot_headers(),
+        json={"type": 1, "allow": str(MEMBER_ALLOW), "deny": "0"},  # 1 = 회원 한 명
+        timeout=TIMEOUT,
+    )
+    if response.status_code in (400, 404):  # 서버에 없는 사람 (Unknown Member)
+        return False
+    response.raise_for_status()
+    return True
