@@ -6,7 +6,8 @@ import { CoverArt } from "@/components/cover-art";
 import { KeywordTag } from "@/components/keyword-tag";
 import { InsightCard } from "@/components/insight-card";
 import { ArticleGlossary, ArticleParagraph } from "@/components/article-editorial";
-import { articlePath, getInsight, kindLabel, relatedInsights, type InsightArticle } from "@/lib/insights";
+import { articlePath, kindLabel, type InsightListItem } from "@/lib/insight-meta";
+import type { InsightArticle } from "@/lib/insights";
 
 /** 같은 현미경 사진을 다른 위치로 잘라, 세포 종류마다 다른 연구 그림인 것처럼 보이지 않게 합니다. */
 const CHIP_CROPS = ["object-[18%_35%]", "object-[72%_28%]", "object-[40%_78%]", "object-[82%_68%]"];
@@ -88,6 +89,9 @@ interface ArticleViewProps {
   hideCover?: boolean;
   /** 관리자 미리보기에서는 같은 본문만 재사용하고 주변 탐색 영역은 제외합니다. */
   contentOnly?: boolean;
+  /** 공개 상세만 넘깁니다. 미리보기는 받은 원고만 그리므로 카탈로그를 찾지 않습니다. */
+  related?: InsightListItem[];
+  companion?: Pick<InsightListItem, "kind" | "slug" | "title">;
 }
 
 function HighlightIcon({ index }: { index: number }) {
@@ -106,9 +110,13 @@ function HighlightIcon({ index }: { index: number }) {
   );
 }
 
-export function ArticleView({ article, hideCover = false, contentOnly = false }: ArticleViewProps) {
-  const related = relatedInsights(article);
-  const companion = article.companionSlug ? getInsight(article.companionSlug) : undefined;
+export function ArticleView({
+  article,
+  hideCover = false,
+  contentOnly = false,
+  related = [],
+  companion,
+}: ArticleViewProps) {
   const sectionName = article.kind === "case" ? "AI 연구 협업 사례" : "AI 트렌드";
   const listHref = article.kind === "case" ? "/cases" : "/trends";
   const expertQuery = encodeURIComponent(article.technologies[0]?.title ?? article.topicLabel);
@@ -200,7 +208,7 @@ export function ArticleView({ article, hideCover = false, contentOnly = false }:
           </ul>
           {article.sampleNotice ? <p className="mt-2 text-[10px] leading-4 text-faint">{article.sampleNotice}</p> : null}
 
-          {companion ? (
+          {!contentOnly && companion ? (
             <nav aria-label="같은 주제, 다른 관점" className="article-companion mt-5 rounded-card border border-line p-4">
               <p className="text-xs font-semibold text-muted">같은 주제, 다른 관점</p>
               <Link href={articlePath(companion)} className="mt-1 flex min-h-11 items-center justify-between gap-3 text-sm font-semibold text-brand hover:text-ink">
