@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { CoverArt, INSIGHT_CARD_COVER_CLASS } from "@/components/cover-art";
 import { KindBadge } from "@/components/kind-badge";
-import { articlePath, kindLabel, type InsightArticle } from "@/lib/insights";
+import { articlePath, kindLabel, type InsightListItem } from "@/lib/insight-meta";
 
 interface InsightCardProps {
-  article: InsightArticle;
+  article: InsightListItem;
   variant?: "default" | "landing" | "editorial";
 }
 

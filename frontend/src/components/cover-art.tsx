@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { CoverTheme } from "@/lib/insights";
+import type { CoverTheme } from "@/lib/insight-meta";
 
 /**
  * 주제별 표지 사진입니다.
