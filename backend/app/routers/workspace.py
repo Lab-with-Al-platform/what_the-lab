@@ -5,6 +5,8 @@
 일정 입력 규칙은 app/workspace_rules.py 에 모아 두었어요.
 """
 
+from datetime import date
+
 from fastapi import APIRouter, Depends, HTTPException
 
 from app import workspace_rules as rules
@@ -50,7 +52,7 @@ def add_schedule(
     with transaction() as cursor:
         collab = find_collaboration(cursor, user_id, collaboration_id, lock=True)
         check_ongoing(collab)
-        values = rules.clean_schedule(body, (collab["start_date"], collab["end_date"]))
+        values = rules.clean_schedule(body, allowed_period(collab))
         values.update(collaboration_id=collaboration_id, created_by=user_id, series_id=None)
 
         # 하루짜리만 반복해요 (작업 기간·여러 날 일정은 반복하지 않아요)
@@ -75,8 +77,7 @@ def update_schedule(
     with transaction() as cursor:
         collab = find_collaboration(cursor, user_id, schedule_owner(cursor, schedule_id), lock=True)
         check_ongoing(collab)
-        period = rules.schedule_period(collab["start_date"], collab["end_date"], collab["confirmed_on"])
-        values = rules.clean_schedule(body, period)        
+        values = rules.clean_schedule(body, allowed_period(collab))
         cursor.execute(
             """
             UPDATE collaboration_schedule SET kind = %(kind)s, title = %(title)s, start_date = %(start_date)s,
@@ -107,6 +108,11 @@ def delete_schedule(schedule_id: int, series: bool = False, user_id: int = Depen
         if not series or cursor.rowcount == 0:  # 반복 일정이 아니면 이 일정 하나만
             cursor.execute("DELETE FROM collaboration_schedule WHERE schedule_id = %s", (schedule_id,))
     return load_workspace(user_id)
+
+
+def allowed_period(collab: dict) -> tuple[date, date]:
+    """일정을 잡을 수 있는 기간. 추가·수정이 같은 기간을 쓰도록 여기서만 계산해요."""
+    return rules.schedule_period(collab["start_date"], collab["end_date"], collab["confirmed_on"])
 
 
 def schedule_owner(cursor, schedule_id: int) -> int:
