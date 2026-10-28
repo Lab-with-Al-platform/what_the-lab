@@ -26,3 +26,12 @@ test("헤더 기본 프로필은 next/image로 32px만 받는다", () => {
   assert.match(source, /default-researcher\.png/);
   assert.match(source, /default-expert\.png/);
 });
+
+test("헤더 관리자 진입은 한 메뉴이고 권한 API를 따로 치지 않는다", () => {
+  assert.match(source, /adminHomeHref/);
+  assert.match(source, />\s*관리자\s*</);
+  assert.doesNotMatch(source, /운영 현황/);
+  assert.doesNotMatch(source, /인사이트 관리자/);
+  assert.doesNotMatch(source, /\/admin\/insights\/access/);
+  assert.doesNotMatch(source, /\/admin\/operations\/access/);
+});

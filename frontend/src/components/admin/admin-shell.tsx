@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { createContext, ReactNode, Suspense, useContext, useEffect, useState } from "react";
 import { PageContainer } from "@/components/page-container";
 import { ApiError, requestApi } from "@/lib/api";
+import { ADMIN_MENU, adminFallbackPath, permittedAdminMenu } from "@/lib/admin-nav";
 import styles from "./admin-workspace.module.css";
 
 export type AdminIconName = "overview" | "members" | "research" | "insights" | "lock" | "arrow" | "chart";
@@ -21,13 +22,6 @@ const PATHS: Record<AdminIconName, string> = {
 export function AdminIcon({ name, size = 18 }: { name: AdminIconName; size?: number }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={PATHS[name]} /></svg>;
 }
-
-const MENU = [
-  { href: "/admin", label: "운영 요약", icon: "overview", area: "operations" },
-  { href: "/admin/members", label: "회원 관리", icon: "members", area: "operations" },
-  { href: "/admin/projects", label: "연구 등록", icon: "research", area: "operations" },
-  { href: "/admin/insights", label: "인사이트 관리", icon: "insights", area: "insights" },
-] as const;
 
 const PreviewContext = createContext(false);
 export const useAdminDemo = () => useContext(PreviewContext);
@@ -51,15 +45,17 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
 function AdminWorkspace({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [access, setAccess] = useState<{ operations: boolean; insights: boolean } | null>(null);
   const [failure, setFailure] = useState("");
   const [login, setLogin] = useState(false);
   const [retry, setRetry] = useState(0);
   const [demo, setDemo] = useState(false);
   const isInsights = pathname.startsWith("/admin/insights");
+  const menus = permittedAdminMenu(access);
   const activeMenu = pathname.startsWith("/admin/analytics")
-    ? MENU[0]
-    : MENU.find(item => item.href === "/admin" ? pathname === item.href : pathname.startsWith(item.href));
+    ? ADMIN_MENU[0]
+    : ADMIN_MENU.find(item => item.href === "/admin" ? pathname === item.href : pathname.startsWith(item.href));
 
   useEffect(() => {
     document.documentElement.classList.add("admin-stable-scroll");
@@ -84,11 +80,17 @@ function AdminWorkspace({ children }: { children: ReactNode }) {
     return () => { active = false; };
   }, [retry]);
 
+  useEffect(() => {
+    if (!access) return;
+    const next = adminFallbackPath(access, pathname);
+    if (next) router.replace(next);
+  }, [access, pathname, router]);
+
   return <PageContainer className={styles.shell}>
     <aside className={styles.sidebar}>
-      <div className={styles.sidebarTitle}><strong>관리자 워크스페이스</strong><small>LABBRIDGE · OPERATIONS</small></div>
+      <div className={styles.sidebarTitle}><strong>관리자 워크스페이스</strong><small>LABBRIDGE</small></div>
       <nav className={styles.nav} aria-label="관리자 메뉴">
-        {MENU.filter(item => !access || access[item.area]).map(item => <Link key={item.href} href={adminHref(item.href, demo)} className={styles.navLink} aria-current={activeMenu?.href === item.href ? "page" : undefined}><AdminIcon name={item.icon} />{item.label}</Link>)}
+        {menus.map(item => <Link key={item.href} href={adminHref(item.href, demo)} className={styles.navLink} aria-current={activeMenu?.href === item.href ? "page" : undefined}><AdminIcon name={item.icon} />{item.label}</Link>)}
       </nav>
       <div className={styles.sidebarFoot}><AdminIcon name="lock" size={13} />권한이 있는 메뉴만 표시됩니다</div>
     </aside>
