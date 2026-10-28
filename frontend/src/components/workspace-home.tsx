@@ -3,23 +3,26 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ApiError } from "@/lib/api";
-import { daysBetween, formatPeriod, photoOrDefault, todayDate } from "@/lib/collab-requests";
-import { Collaboration, isOngoing, loadWorkspace, openCollaboration, Schedule, WorkspaceData } from "@/lib/workspace";
+import { formatPeriod, photoOrDefault, todayDate } from "@/lib/collab-requests";
+import { Collaboration, isOngoing, loadWorkspace, Schedule, WorkspaceData } from "@/lib/workspace";
 import { Avatar, StatusBadge, Tabs } from "@/components/request-parts";
 import { WorkspaceCalendar } from "@/components/workspace-calendar";
 import { CollabList } from "@/components/workspace-collab-list";
-import { OpenCollabDialog } from "@/components/workspace-open-dialog";
+import { ScheduleDialog } from "@/components/workspace-schedule-dialog";
+import { ScheduleView } from "@/components/workspace-schedule-view";
 import { TodoBox, TodoItem } from "@/components/workspace-todo";
 import { UpcomingList } from "@/components/workspace-upcoming";
 
 type Tab = "ongoing" | "finished";
+// 일정 창: 새로 추가(협업·날짜를 골라 둘 수 있음) / 보기 / 수정
+type Editor = { mode: "add"; collabId?: number; date?: string } | { mode: "view"; schedule: Schedule } | { mode: "edit"; schedule: Schedule };
 
 /** 협업 공간 첫 화면: 위 내 협업 목록, 가운데 달력, 오른쪽 지금 할 일·다가오는 일정. [완료] 탭에서는 달력을 숨겨요. */
-export function WorkspaceHome({ role, myNickname }: { role: "researcher" | "expert"; myNickname: string }) {
+export function WorkspaceHome({ role }: { role: "researcher" | "expert" }) {
   const [data, setData] = useState<WorkspaceData | null>(null);
   const [loadError, setLoadError] = useState("");
   const [tab, setTab] = useState<Tab>("ongoing");
-  const [opening, setOpening] = useState<Collaboration | null>(null); // [협업 공간 열기] 창
+  const [editor, setEditor] = useState<Editor | null>(null); // 일정 추가·보기·수정 창
   const [hidden, setHidden] = useState<number[]>([]); // 달력에서 끈 협업
   const [dismissed, setDismissed] = useState<string[]>([]); // × 로 숨긴 할 일
 
@@ -33,18 +36,20 @@ export function WorkspaceHome({ role, myNickname }: { role: "researcher" | "expe
   if (!data) return <p className="py-20 text-center text-sm text-faint">불러오는 중…</p>;
 
   const today = todayDate();
-  // 진행 중 탭: 시작 전 + 진행 중. 안 연 협업 먼저, 그다음 날짜가 가까운 순 (시작 전은 시작일, 진행 중은 종료일 기준)
-  const ongoing = data.collaborations.filter(isOngoing).sort(
-    (a, b) =>
-      Number(a.opened) - Number(b.opened) || // 아직 안 연 협업이 맨 위
-      (a.status === "waiting" ? a.start_date : a.end_date).localeCompare(b.status === "waiting" ? b.start_date : b.end_date),
-  );
+  // 진행 중 탭: 시작 전 + 진행 중. 날짜가 가까운 순 (시작 전은 시작일, 진행 중은 종료일 기준)
+  const ongoing = data.collaborations
+    .filter(isOngoing)
+    .sort((a, b) => (a.status === "waiting" ? a.start_date : a.end_date).localeCompare(b.status === "waiting" ? b.start_date : b.end_date));
   const finished = data.collaborations.filter((collab) => !isOngoing(collab)).sort((a, b) => b.end_date.localeCompare(a.end_date));
-  // 달력에는 열어 둔 협업 일정만, 끈 협업은 빼고 보여요
-  const opened = ongoing.filter((collab) => collab.opened);
-  const shownIds = new Set(opened.filter((collab) => !hidden.includes(collab.collaboration_id)).map((collab) => collab.collaboration_id));
+  // 달력에는 진행 중 협업의 일정을 모두, 색 네모로 끈 협업만 빼고 보여요
+  const shownIds = new Set(ongoing.filter((collab) => !hidden.includes(collab.collaboration_id)).map((collab) => collab.collaboration_id));
   const schedules = data.schedules.filter((item) => shownIds.has(item.collaboration_id));
-  const todos = buildTodos(ongoing, data.schedules, today, setOpening).filter((item) => !dismissed.includes(item.key));
+  const todos = buildTodos(ongoing, data.schedules, (collabId) => setEditor({ mode: "add", collabId })).filter((item) => !dismissed.includes(item.key));
+  const pick = (schedule: Schedule) => schedule.schedule_id > 0 && setEditor({ mode: "view", schedule }); // 자동으로 넣은 시작·종료일은 안 열려요
+  const saved = (next: WorkspaceData) => {
+    setData(next);
+    setEditor(null);
+  };
 
   return (
     <div>
@@ -63,7 +68,7 @@ export function WorkspaceHome({ role, myNickname }: { role: "researcher" | "expe
       </div>
 
       {tab === "finished" ? (
-        <FinishedList collabs={finished} role={role} />
+        <FinishedList collabs={finished} />
       ) : ongoing.length === 0 ? (
         <EmptyOngoing role={role} />
       ) : (
@@ -74,30 +79,31 @@ export function WorkspaceHome({ role, myNickname }: { role: "researcher" | "expe
             hidden={hidden}
             today={today}
             onToggle={(id) => setHidden((list) => (list.includes(id) ? list.filter((item) => item !== id) : [...list, id]))}
-            onOpen={setOpening}
           />
 
           {/* 가운데: 달력 / 오른쪽: 지금 할 일 + 다가오는 일정 (모바일에서는 할 일·일정이 달력보다 먼저) */}
           <div className="mt-5 grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
-            <WorkspaceCalendar schedules={schedules} today={today} openedCount={opened.length} />
+            <WorkspaceCalendar schedules={schedules} today={today} onAdd={(date) => setEditor({ mode: "add", date })} onPick={pick} />
             <div className="order-first space-y-5 lg:order-none">
               <TodoBox items={todos.map((item) => (item.dismissible ? { ...item, onDismiss: () => setDismissed((list) => [...list, item.key]) } : item))} />
-              <UpcomingList collabs={ongoing} schedules={schedules} today={today} />
+              <UpcomingList collabs={ongoing} schedules={schedules} today={today} onPick={pick} />
             </div>
           </div>
         </>
       )}
 
-      {opening && (
-        <OpenCollabDialog
-          collab={opening}
-          myNickname={myNickname}
-          onClose={() => setOpening(null)}
-          onOpen={async () => {
-            // 구글 연결(withGoogle)은 다음 단계에서 붙여요. 지금은 열림만 저장해요.
-            setData(await openCollaboration(opening.collaboration_id));
-            setOpening(null);
-          }}
+      {editor?.mode === "add" && (
+        <ScheduleDialog collabs={ongoing} defaultCollabId={editor.collabId} defaultDate={editor.date} today={today} onClose={() => setEditor(null)} onSaved={saved} />
+      )}
+      {editor?.mode === "edit" && <ScheduleDialog collabs={ongoing} editing={editor.schedule} today={today} onClose={() => setEditor(null)} onSaved={saved} />}
+      {editor?.mode === "view" && (
+        <ScheduleView
+          schedule={editor.schedule}
+          collab={ongoing.find((collab) => collab.collaboration_id === editor.schedule.collaboration_id)}
+          editable
+          onClose={() => setEditor(null)}
+          onEdit={() => setEditor({ mode: "edit", schedule: editor.schedule })}
+          onDeleted={saved}
         />
       )}
     </div>
@@ -106,35 +112,20 @@ export function WorkspaceHome({ role, myNickname }: { role: "researcher" | "expe
 
 /**
  * "지금 할 일" 만들기. 협업마다 지금 상태를 보고 해야 할 일을 골라요.
- * ① 아직 안 연 협업 → 열기 (시작이 내일 이내면 빨간 점)
- * ② 열었지만 직접 잡은 일정이 없음 → 첫 미팅 잡기
- * ③ 열었지만 구글 캘린더에 안 넣음 → 권장 (× 로 숨길 수 있어요)
+ * ① 직접 잡은 일정이 없음 → 첫 미팅 잡기
+ * ② 구글 캘린더에 안 넣음 → 권장 (× 로 숨길 수 있어요)
  */
-function buildTodos(collabs: Collaboration[], schedules: Schedule[], today: string, open: (collab: Collaboration) => void) {
+function buildTodos(collabs: Collaboration[], schedules: Schedule[], add: (collabId: number) => void) {
   const items: (TodoItem & { dismissible?: boolean })[] = [];
   for (const collab of collabs) {
     const who = <b>{collab.partner.nickname}</b>;
-    const soon = collab.status === "waiting" && daysBetween(today, collab.start_date) <= 1;
-    if (!collab.opened) {
-      items.push({
-        key: `open-${collab.collaboration_id}`,
-        tone: soon ? "danger" : "brand",
-        text: (
-          <>
-            {who} 님과의 협업이 {startText(collab, today)}. 협업 공간을 열어 주세요
-          </>
-        ),
-        action: <TodoButton onClick={() => open(collab)}>협업 공간 열기</TodoButton>,
-      });
-      continue;
-    }
     // 번호가 양수인 일정 = 직접 잡은 일정 (음수는 자동으로 넣은 시작일·종료일)
     if (!schedules.some((item) => item.collaboration_id === collab.collaboration_id && item.schedule_id > 0)) {
       items.push({
         key: `first-${collab.collaboration_id}`,
         tone: "brand",
         text: <>{who} 님과 첫 미팅 날짜를 잡아 보세요</>,
-        action: <TodoButton onClick={() => undefined}>+ 일정 추가</TodoButton>, // TODO(다음 단계): 일정 추가 창
+        action: <TodoButton onClick={() => add(collab.collaboration_id)}>+ 일정 추가</TodoButton>,
       });
     }
     if (!collab.google_linked) {
@@ -147,15 +138,7 @@ function buildTodos(collabs: Collaboration[], schedules: Schedule[], today: stri
       });
     }
   }
-  const order = (key: string) => (key.startsWith("open") ? 0 : key.startsWith("first") ? 1 : 2);
-  return items.sort((a, b) => order(a.key) - order(b.key));
-}
-
-/** "내일 시작돼요" · "6일 뒤 시작돼요" · "오늘 시작됐어요" · "진행 중이에요" */
-function startText(collab: Collaboration, today: string): string {
-  if (collab.status !== "waiting") return "진행 중이에요";
-  const days = daysBetween(today, collab.start_date);
-  return days <= 0 ? "오늘 시작됐어요" : days === 1 ? "내일 시작돼요" : `${days}일 뒤 시작돼요`;
+  return items.sort((a, b) => Number(a.key.startsWith("google")) - Number(b.key.startsWith("google")));
 }
 
 function TodoButton({ onClick, children }: { onClick: () => void; children: string }) {
@@ -167,7 +150,7 @@ function TodoButton({ onClick, children }: { onClick: () => void; children: stri
 }
 
 /** [완료] 탭: 달력 없이 끝난 협업 목록만. 평가는 협업 상세에서 남겨요. */
-function FinishedList({ collabs, role }: { collabs: Collaboration[]; role: "researcher" | "expert" }) {
+function FinishedList({ collabs }: { collabs: Collaboration[] }) {
   if (collabs.length === 0) {
     return <p className="mt-3 rounded-card border border-dashed border-line px-6 py-12 text-center text-sm text-muted">끝난 협업이 아직 없어요</p>;
   }
@@ -186,12 +169,7 @@ function FinishedList({ collabs, role }: { collabs: Collaboration[]; role: "rese
                 {collab.partner.nickname} 님과 1:1 · {formatPeriod(collab.start_date, collab.end_date)}
               </p>
             </div>
-            <Link
-              href={`/workspace/${collab.collaboration_id}`}
-              className="inline-flex h-10 items-center justify-center rounded-button border border-line px-4 text-[13px] font-semibold text-muted hover:bg-page"
-            >
-              {role === "researcher" && collab.status !== "canceled" ? "기록 보기 · 평가" : "기록 보기"}
-            </Link>
+            {/* TODO(협업 상세): 기록 보기 · 평가 */}
           </li>
         ))}
       </ul>

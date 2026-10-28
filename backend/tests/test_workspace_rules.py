@@ -72,6 +72,20 @@ def test_rejects(fields, message):
     assert error.value.status_code == 400
     assert message in error.value.detail
 
+# ---------- 일정을 잡을 수 있는 기간 ----------
+def test_schedule_period_starts_from_confirmed_day():
+    start, end = date(2026, 11, 3), date(2026, 11, 30)
+    assert rules.schedule_period(start, end, date(2026, 10, 28)) == (date(2026, 10, 28), end)  # 확정한 날부터 (사전 미팅)
+    assert rules.schedule_period(start, end, date(2026, 11, 5)) == (start, end)  # 시작일 뒤에 만든 협업은 시작일부터
+
+
+def test_pre_start_meeting_allowed_after_confirmed():
+    period = rules.schedule_period(date(2026, 11, 3), date(2026, 11, 30), date(2026, 10, 28))
+    saved = rules.clean_schedule(make(start_date=date(2026, 10, 30)), period)  # 시작 전 사전 미팅
+    assert saved["start_date"] == date(2026, 10, 30)
+    with pytest.raises(HTTPException) as error:
+        rules.clean_schedule(make(start_date=date(2026, 10, 27)), period)  # 확정 전 날짜는 안 돼요
+    assert "10.28 ~ 11.30" in error.value.detail
 
 # ---------- 매주 반복 ----------
 def test_weekly_dates_until_end_and_capped():

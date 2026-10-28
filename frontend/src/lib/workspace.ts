@@ -12,9 +12,11 @@ export type Collaboration = {
   partner: { nickname: string; user_photo: string | null; role: "researcher" | "expert" }; // 상대방
   start_date: string; // YYYY-MM-DD (요청에서 확정된 기간을 복사)
   end_date: string;
+  confirmed_on: string; // 협업을 확정한 날. 일정은 이날(또는 시작일 중 이른 날)부터 잡을 수 있어요
   status: CollabStatus;
-  opened: boolean; // 내가 이 협업 공간을 처음 열었는지 (안 열었으면 [협업 공간 열기] 창부터)
+  opened: boolean; // 예전 [협업 공간 열기] 기록 (지금 화면에서는 쓰지 않아요)
   google_linked: boolean; // 내 구글 캘린더에 이 협업 캘린더를 추가했는지 (구글 연동 전이라 지금은 늘 false)
+  discord_channel_url: string | null; // 둘만의 디스코드 채널 링크 (아직 못 만들었으면 null)
 };
 
 /** 일정 종류: 미팅 · 작업 기간 · 결과물 마감 · 기타 */
@@ -34,6 +36,24 @@ export type Schedule = {
   assignee: "researcher" | "expert" | null; // 작업 기간 담당 (비어 있으면 함께)
   series_id: number | null; // 매주 반복으로 만든 일정 묶음
   created_by: number | null; // 등록한 사람 (자동으로 넣은 협업 시작·종료일은 null)
+  created_by_nickname: string | null; // 등록한 사람 닉네임
+  created_at: string | null; // 등록한 때 (ISO)
+  updated_at: string | null; // 마지막으로 고친 때 (ISO)
+};
+
+/** 일정 저장할 때 보내는 값 (백엔드 ScheduleInput 과 같은 모양) */
+export type ScheduleInput = {
+  kind: ScheduleKind;
+  title: string;
+  start_date: string;
+  end_date: string;
+  memo: string;
+  repeat_weekly: boolean; // 하루짜리 미팅을 매주 같은 요일에 (새로 만들 때만)
+  // 화면에서는 안 받지만, 고칠 때 원래 값을 지우지 않도록 그대로 돌려보내요
+  start_time?: string | null;
+  end_time?: string | null;
+  place?: string;
+  assignee?: "researcher" | "expert" | null;
 };
 
 export const KIND_LABELS: Record<ScheduleKind, string> = { meeting: "미팅", work: "작업 기간", due: "결과물 마감", etc: "기타" };
@@ -55,6 +75,12 @@ export type CollabTone = (typeof COLLAB_TONES)[number];
 /** 협업 번호로 색을 정해요. 같은 협업은 어느 화면에서나 같은 색이에요. */
 export function toneOf(collaborationId: number): CollabTone {
   return COLLAB_TONES[(collaborationId - 1) % COLLAB_TONES.length];
+}
+
+/** 일정을 잡을 수 있는 기간: 확정한 날(또는 시작일 중 이른 날) ~ 종료일. 백엔드 schedule_period 와 같아요. */
+export function schedulePeriod(collab: Collaboration): { first: string; last: string } {
+  const first = collab.confirmed_on < collab.start_date ? collab.confirmed_on : collab.start_date;
+  return { first, last: collab.end_date };
 }
 
 /** 진행 중 탭에 보일 협업인지 (시작 전 + 진행 중) */
@@ -124,9 +150,19 @@ export async function loadWorkspace(): Promise<WorkspaceData> {
   return withAutoItems(await requestApi<WorkspaceData>("/workspace"));
 }
 
-/** [협업 공간 열기] — 처음 한 번. 내 쪽에서 연 때를 DB에 남기고 최신 목록을 돌려받아요. (구글 연결은 다음 단계) */
-export async function openCollaboration(collaborationId: number): Promise<WorkspaceData> {
-  return withAutoItems(await requestApi<WorkspaceData>(`/workspace/${collaborationId}/open`, { method: "POST" }));
+/** 일정 추가. 저장한 뒤의 최신 목록을 돌려받아요. */
+export async function addSchedule(collaborationId: number, input: ScheduleInput): Promise<WorkspaceData> {
+  return withAutoItems(await requestApi<WorkspaceData>(`/workspace/${collaborationId}/schedules`, { method: "POST", body: JSON.stringify(input) }));
+}
+
+/** 일정 하나 수정 (반복 일정이어도 이 날짜 하나만) */
+export async function updateSchedule(scheduleId: number, input: ScheduleInput): Promise<WorkspaceData> {
+  return withAutoItems(await requestApi<WorkspaceData>(`/workspace/schedules/${scheduleId}`, { method: "PUT", body: JSON.stringify(input) }));
+}
+
+/** 일정 삭제. series=true 면 같은 반복 일정 중 이 날짜와 그 뒤를 모두 지워요. */
+export async function deleteSchedule(scheduleId: number, series = false): Promise<WorkspaceData> {
+  return withAutoItems(await requestApi<WorkspaceData>(`/workspace/schedules/${scheduleId}?series=${series}`, { method: "DELETE" }));
 }
 
 /** 진행 중 협업마다 "협업 시작"(점)·"협업 종료일"(⚑)을 달력에 넣어요. 번호는 실제 일정과 겹치지 않게 음수예요. */
@@ -145,6 +181,9 @@ function withAutoItems(data: WorkspaceData): WorkspaceData {
     assignee: null,
     series_id: null,
     created_by: null,
+    created_by_nickname: null,
+    created_at: null,
+    updated_at: null,
   });
   const extra = data.collaborations
     .filter(isOngoing)

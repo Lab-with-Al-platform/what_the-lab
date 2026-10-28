@@ -25,7 +25,7 @@ export function WorkspacePage() {
 
   return (
     <MySpaceShell role={me.user_role}>
-      <WorkspaceHome role={me.user_role} myNickname={me.nickname} />
+      <WorkspaceHome role={me.user_role} />
     </MySpaceShell>
   );
 }

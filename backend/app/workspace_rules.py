@@ -89,6 +89,13 @@ def clean_schedule(body: ScheduleInput, period: tuple[date, date]) -> dict:
         "assignee": assignee,
     }
 
+def schedule_period(start: date, end: date, confirmed_on: date) -> tuple[date, date]:
+    """일정을 잡을 수 있는 기간: 협업을 확정한 날 ~ 협업 종료일.
+
+    확정하면 디스코드 채널이 바로 열려서, 시작일 전에 사전 미팅을 잡을 수 있게 해요.
+    start: 협업 시작일 / end: 협업 종료일 / confirmed_on: 협업을 확정한 날 (한국 날짜)
+    """
+    return min(start, confirmed_on), end
 
 def check_in_period(start: date, end: date, period: tuple[date, date]) -> None:
     """일정 날짜가 협업 기간 안인지 확인합니다."""
