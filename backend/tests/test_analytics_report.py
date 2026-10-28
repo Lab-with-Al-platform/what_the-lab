@@ -7,9 +7,9 @@ import pytest
 
 from app.analytics.collect import AnalyticsEvent
 from app.analytics.read import MemoryAnalyticsSource
-from app.analytics.report import build_analytics_report
+from app.analytics.report import DailyCount, build_analytics_report
 from app.main import app
-from app.operations.periods import resolve_range
+from app.operations.periods import resolve_range, seoul_day
 from app.routers.operations import get_analytics_source
 from tests.test_insight_workflow import client as client  # noqa: PLC0414
 from tests.test_operations_admin import login_ops
@@ -50,6 +50,31 @@ def test_period_sessions_are_not_the_sum_of_daily_sessions():
     assert daily["visits"]["visitors"]["value"] is None
     assert daily["visits"]["device"]["value"] is None
     assert daily["articles"] == []
+
+
+def test_page_view_totals_come_from_daily_rows_not_raw_event_length():
+    session_id = str(uuid4())
+    events = [page("keep-session", NOW, session_id, "home")]
+    start, end = resolve_range("custom", start=NOW.date(), end=(NOW + timedelta(days=7)).date(), today=NOW.date())
+    body = build_analytics_report(
+        events,
+        enabled=True,
+        table_ready=True,
+        start=start,
+        end=end,
+        now=NOW,
+        started_at=NOW,
+        daily=[
+            DailyCount("page_view", "home", seoul_day(NOW), 5),
+            DailyCount("page_view", "cases", seoul_day(NOW + timedelta(days=1)), 3),
+            DailyCount("expert_search_click", "case/lettuce-biomass-estimation", seoul_day(NOW), 4),
+        ],
+    )
+    assert body["visits"]["page_views"]["value"] == 8
+    assert body["visits"]["sessions"]["value"] == 1
+    assert body["visits"]["pages"][0]["page_views"] == 5
+    assert body["articles"][0]["expert_clicks"] == 4
+    assert sum(point["page_views"] for point in body["visits"]["series"]) == 8
 
 
 def test_registration_modes_stay_separate_and_open_windows_are_not_finished():
