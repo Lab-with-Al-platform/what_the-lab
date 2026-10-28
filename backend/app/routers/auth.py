@@ -10,7 +10,9 @@ from fastapi.responses import RedirectResponse, Response
 from app import user_store
 from app.config import DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, DISCORD_REDIRECT_URI, FRONTEND_URL
 from app.discord_bot import join_guild
+from app.insights.auth import insights_enabled, is_insight_admin
 from app.notification_store import mark_discord_joined
+from app.operations.auth import can_read_operations
 from app.security import (
     create_access_token,
     ensure_active_user,
@@ -141,9 +143,13 @@ def connect_discord(user_id: int, discord_id: str, discord_token: str) -> bool:
 
 @router.get("/me")
 def me(user: Annotated[dict, Depends(get_current_user)], response: Response) -> dict:
-    """③ 지금 로그인한 사람의 정보를 돌려줍니다."""
+    """③ 지금 로그인한 사람의 정보와, 헤더 메뉴에 쓸 권한 사실을 돌려줍니다."""
     response.headers["Cache-Control"] = "private, no-store"
-    return user
+    return {
+        **user,
+        "can_manage_insights": insights_enabled() and is_insight_admin(user),
+        "can_read_operations": can_read_operations(user),
+    }
 
 @router.post("/logout")
 def logout() -> Response:
