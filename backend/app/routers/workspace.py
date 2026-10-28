@@ -3,8 +3,9 @@
 같은 협업의 두 사람(연구회원, 전문가)만 볼 수 있고 바꿀 수 있어요. 남의 협업은 404.
 저장 API는 모두 처리가 끝난 최신 목록 전체(load_workspace)를 돌려줍니다. 화면은 받은 값으로 그대로 다시 그려요.
 일정 입력 규칙은 app/workspace_rules.py 에 모아 두었어요.
-구글 캘린더가 있는 협업이면 바뀐 일정을 구글에도 반영해요. (실제 반영은 app/google_sync.py 가 뒤에서)
 """
+
+from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException
 
@@ -28,7 +29,7 @@ INSERT_SCHEDULE = """
 
 def google_status(collab: dict) -> str:
     """구글 캘린더가 있는 협업이면 '구글에 반영할 차례(pending)', 없으면 'none'"""
-    return "pending" if collab["google_calendar_id"] else "none"
+    return "pending" if collab.get("google_calendar_id") else "none"
 
 
 @router.get("")
@@ -58,8 +59,7 @@ def add_schedule(
     with transaction() as cursor:
         collab = find_collaboration(cursor, user_id, collaboration_id, lock=True)
         check_ongoing(collab)
-        period = rules.schedule_period(collab["start_date"], collab["end_date"], collab["confirmed_on"])
-        values = rules.clean_schedule(body, period)
+        values = rules.clean_schedule(body, allowed_period(collab))
         values.update(
             collaboration_id=collaboration_id, created_by=user_id, series_id=None, google_status=google_status(collab)
         )
@@ -86,8 +86,7 @@ def update_schedule(
     with transaction() as cursor:
         collab = find_collaboration(cursor, user_id, schedule_owner(cursor, schedule_id), lock=True)
         check_ongoing(collab)
-        period = rules.schedule_period(collab["start_date"], collab["end_date"], collab["confirmed_on"])
-        values = rules.clean_schedule(body, period)
+        values = rules.clean_schedule(body, allowed_period(collab))
         cursor.execute(
             """
             UPDATE collaboration_schedule SET kind = %(kind)s, title = %(title)s, start_date = %(start_date)s,
@@ -131,6 +130,11 @@ def delete_schedule(schedule_id: int, series: bool = False, user_id: int = Depen
                 [(collab["google_calendar_id"], event_id(item)) for item in deleted],
             )
     return load_workspace(user_id)
+
+
+def allowed_period(collab: dict) -> tuple[date, date]:
+    """일정을 잡을 수 있는 기간. 추가·수정이 같은 기간을 쓰도록 여기서만 계산해요."""
+    return rules.schedule_period(collab["start_date"], collab["end_date"], collab["confirmed_on"])
 
 
 def schedule_owner(cursor, schedule_id: int) -> int:
