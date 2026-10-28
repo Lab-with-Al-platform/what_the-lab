@@ -22,6 +22,7 @@ from app.routers import (
     expert_portfolio,
     expert_profile,
     experts,
+    google,
     insights,
     notifications,
     operations,
@@ -65,7 +66,10 @@ async def send_notifications_soon(request, call_next):
     response = await call_next(request)
     if request.method == "POST" and "/requests" in request.url.path and response.status_code < 400:
         wake_up()
-    if request.method in ("POST", "PUT", "DELETE") and "/workspace" in request.url.path and response.status_code < 400:
+    path = request.url.path
+    if response.status_code < 400 and (
+        (request.method in ("POST", "PUT", "DELETE") and "/workspace" in path) or path.endswith("/google/callback")
+    ):
         google_sync.wake_up()
     return response
 
@@ -105,4 +109,5 @@ app.include_router(collab_requests.expert_router)
 app.include_router(notifications.router)
 app.include_router(profile_photo.router)
 app.include_router(workspace.router)
+app.include_router(google.router)
 app.include_router(community.router)

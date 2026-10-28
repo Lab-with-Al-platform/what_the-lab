@@ -119,3 +119,30 @@ def test_share_is_read_only(monkeypatch):
     monkeypatch.setattr(gc.httpx, "post", fake([200], calls))
     gc.share_calendar("cal1", "someone@gmail.com")
     assert calls[0]["json"] == {"role": "reader", "scope": {"type": "user", "value": "someone@gmail.com"}}
+
+
+
+# ---------- [내 구글 캘린더에 추가]: 구글 로그인에서 이메일만 꺼내기 ----------
+def token_response(claims: dict, calls: list):
+    def post(url, data, timeout):
+        calls.append(data)
+        id_token = jwt.encode(claims, "anything", algorithm="HS256")  # 서버가 구글에서 직접 받은 토큰이라 서명은 확인 안 해요
+        return httpx.Response(200, json={"id_token": id_token, "access_token": "버림"}, request=httpx.Request("POST", url))
+
+    return post
+
+
+def test_fetch_google_email_returns_verified_email(monkeypatch):
+    from app.routers import google
+
+    calls: list = []
+    monkeypatch.setattr(google.httpx, "post", token_response({"email": "me@gmail.com", "email_verified": True}, calls))
+    assert google.fetch_google_email("code123") == "me@gmail.com"
+    assert calls[0]["code"] == "code123" and calls[0]["grant_type"] == "authorization_code"
+
+
+def test_fetch_google_email_ignores_unverified(monkeypatch):
+    from app.routers import google
+
+    monkeypatch.setattr(google.httpx, "post", token_response({"email": "me@gmail.com", "email_verified": False}, []))
+    assert google.fetch_google_email("code123") is None 
