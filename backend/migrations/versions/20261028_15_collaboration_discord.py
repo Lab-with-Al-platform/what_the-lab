@@ -1,6 +1,6 @@
 """협업 전용 디스코드 채널: collaboration 에 채널 번호·상태 칸을 추가합니다.
 
-SQL 본문은 backend/migrations/sql/20261028_15/ 에 동결해 두었습니다. (Docker용 database/init/019 와 같은 내용)
+SQL 본문은 backend/migrations/sql/20261028_15/ 에 동결해 두었습니다. Docker용 init/019 도 같은 칸을 추가하고, 개정 번호만 따로 올립니다.
 기존 협업은 지우지 않아요. 진행 중인 협업은 채널을 만들 차례(pending)가 되고, 끝난 협업은 skipped 예요.
 """
 

@@ -1,5 +1,5 @@
 -- 협업 전용 디스코드 채널 칸을 추가합니다. (PostgreSQL) 013 협업 테이블 다음에 실행됩니다.
--- 같은 내용이 Supabase용 backend/migrations/sql/20261028_15/ 에도 있습니다. 둘을 함께 고칩니다.
+-- 칸 추가는 Supabase용 backend/migrations/sql/20261028_15/ 와 같습니다. 아래 개정 번호만 Docker에 있습니다.
 
 -- 1) 협업마다 디스코드 비공개 채널 하나 (협업-12 같은 이름, 두 사람 + 봇만 보여요)
 --    [협업 시작] 때는 pending 으로만 남기고, 백그라운드 작업이 채널을 만든 뒤 ready 로 바꿔요.
@@ -24,3 +24,9 @@ UPDATE collaboration SET discord_status = 'skipped' WHERE status <> 'ongoing';
 -- 3) 만들 차례인 협업 찾기 (백그라운드 작업이 15초마다)
 CREATE INDEX idx_collaboration_discord_pending ON collaboration (discord_retry_at)
   WHERE discord_status = 'pending';
+
+-- 018이 적어 둔 개정 번호를 이 변경까지 포함하도록 올립니다.
+-- Alembic SQL에는 넣지 않습니다. Alembic이 책갈피를 직접 바꿉니다.
+UPDATE public.insight_alembic_version
+SET version_num = '20261028_15'
+WHERE version_num = '20261028_14';
