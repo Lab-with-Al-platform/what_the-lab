@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { NotificationBell } from "@/components/notification-bell";
 import { PageContainer } from "@/components/page-container";
 import { apiAsset, requestApi } from "@/lib/api";
+import { adminHomeHref } from "@/lib/admin-nav";
 import { ME_CHANGED_EVENT } from "@/lib/profile-settings";
 
 const NAV_ITEMS = [
@@ -58,6 +59,7 @@ export function SiteHeader() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [canManageInsights, setCanManageInsights] = useState(false);
   const [canReadOperations, setCanReadOperations] = useState(false);
+  const adminHome = adminHomeHref(canReadOperations, canManageInsights);
   const [meVersion, setMeVersion] = useState(0); // 프로필 설정에서 사진을 바꾸면 1씩 올라가요 → 내 정보를 다시 불러와요
   const profileRef = useRef<HTMLDivElement>(null);
   const meRef = useRef(me);
@@ -222,14 +224,9 @@ export function SiteHeader() {
                     </Link>
                   ))}
 
-                  {canReadOperations ? (
-                    <Link href="/admin" className="flex min-h-11 items-center px-4 text-sm font-semibold text-brand hover:bg-brand-soft" onClick={() => setProfileOpen(false)}>
-                      운영 현황
-                    </Link>
-                  ) : null}
-                  {canManageInsights ? (
-                    <Link href="/admin/insights" className="flex min-h-11 items-center px-4 text-sm font-semibold text-brand hover:bg-brand-soft" onClick={() => setProfileOpen(false)}>
-                      인사이트 관리자
+                  {adminHome ? (
+                    <Link href={adminHome} className="flex min-h-11 items-center px-4 text-sm font-semibold text-brand hover:bg-brand-soft" onClick={() => setProfileOpen(false)}>
+                      관리자
                     </Link>
                   ) : null}
 
@@ -317,14 +314,9 @@ export function SiteHeader() {
                     {item.label}
                   </Link>
                 ))}
-                {canReadOperations ? (
-                  <Link href="/admin" className="flex min-h-11 items-center rounded-button px-3 text-sm font-semibold text-brand hover:bg-brand-soft" onClick={() => setMenuOpen(false)}>
-                    운영 현황
-                  </Link>
-                ) : null}
-                {canManageInsights ? (
-                  <Link href="/admin/insights" className="flex min-h-11 items-center rounded-button px-3 text-sm font-semibold text-brand hover:bg-brand-soft" onClick={() => setMenuOpen(false)}>
-                    인사이트 관리자
+                {adminHome ? (
+                  <Link href={adminHome} className="flex min-h-11 items-center rounded-button px-3 text-sm font-semibold text-brand hover:bg-brand-soft" onClick={() => setMenuOpen(false)}>
+                    관리자
                   </Link>
                 ) : null}
                 <button
