@@ -26,7 +26,8 @@ function loadArticleView() {
       "@/components/keyword-tag": { KeywordTag: ({ label }) => React.createElement("span", null, label) },
       "@/components/insight-card": { InsightCard: () => null },
       "@/components/article-editorial": { ArticleParagraph: ({ children }) => React.createElement("p", null, children), ArticleGlossary: () => null },
-      "@/lib/insights": { relatedInsights: () => [], getInsight: () => undefined, kindLabel: () => "AI 트렌드" },
+      "@/lib/insight-meta": { articlePath: (item) => `/${item.kind}/${item.slug}`, kindLabel: () => "AI 트렌드" },
+      "@/lib/insights": {},
     };
     return components[request] ?? require(request);
   };
@@ -63,6 +64,25 @@ test("본문 전용 미리보기는 주변 패널만 제외하고 원고·캡션
   assert.match(html, /실제 연구 도판이 아닙니다/);
   assert.doesNotMatch(html, /aria-label="경로"|연구 정보|관련 AI 기술/);
   assert.equal(JSON.stringify(article), before);
+});
+
+test("관련 글은 공개 상세가 넘긴 목록만 그리고 카탈로그를 찾지 않는다", () => {
+  const related = [{ slug: "related-one", kind: "trend", title: "이어서 볼 검증 글", publishedOn: "2026.10.22", cover: "science" }];
+  const withRelated = renderToStaticMarkup(React.createElement(ArticleView, { article, related }));
+  const preview = renderToStaticMarkup(React.createElement(ArticleView, { article, contentOnly: true }));
+  assert.match(withRelated, /이어서 볼 글/);
+  assert.match(withRelated, /이어서 볼 검증 글/);
+  assert.doesNotMatch(preview, /이어서 볼 글|이어서 볼 검증 글/);
+});
+
+test("미리보기와 ArticleView는 원고 카탈로그를 값으로 가져오지 않는다", () => {
+  const view = fs.readFileSync(path.resolve(__dirname, "../src/components/article-view.tsx"), "utf8");
+  const preview = fs.readFileSync(path.resolve(__dirname, "../src/app/admin/insights/preview/page.tsx"), "utf8");
+  assert.doesNotMatch(view, /relatedInsights|getInsight/);
+  assert.match(view, /import type \{ InsightArticle \} from "@\/lib\/insights"/);
+  assert.doesNotMatch(view, /^import \{[^}]*\} from "@\/lib\/insights"/m);
+  assert.match(preview, /import type \{ InsightArticle \} from "@\/lib\/insights"/);
+  assert.doesNotMatch(preview, /^import \{[^}]*\} from "@\/lib\/insights"/m);
 });
 
 test("이미지 없는 원고의 빈 칩·단계 배열은 빈 사진 캡션을 만들지 않는다", () => {

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ArticleView } from "@/components/article-view";
-import { getInsight, insightsByKind } from "@/lib/insights";
+import { getInsight, insightsByKind, relatedInsights } from "@/lib/insights";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -26,5 +26,11 @@ export default async function CaseDetailPage({ params }: PageProps) {
   if (!article || article.kind !== "case") {
     notFound();
   }
-  return <ArticleView article={article} />;
+  return (
+    <ArticleView
+      article={article}
+      related={relatedInsights(article)}
+      companion={article.companionSlug ? getInsight(article.companionSlug) : undefined}
+    />
+  );
 }
