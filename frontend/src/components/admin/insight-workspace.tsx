@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -7,12 +8,21 @@ import { OperationsFrame } from "./operations-frame";
 import { ApiError, requestApi } from "@/lib/api";
 import { visiblePageNumbers, type WorkspaceItem, type WorkspaceResult } from "@/lib/admin-insights";
 import { ADMIN_BUTTON } from "./admin-ui";
-import { InsightEditorDialog } from "./insight-editor-dialog";
-import { InsightImportDialog } from "./insight-import-dialog";
-import { InsightCollectionSettings } from "./insight-collection-settings";
 import { InsightWorkspaceTable } from "./insight-workspace-table";
-import { InsightStatisticsPanel, type ViewMetric } from "./insight-statistics";
+import type { ViewMetric } from "./insight-statistics";
 import styles from "./insight-workspace.module.css";
+
+// 목록 첫 화면에는 편집기·통계·설정을 넣지 않고, 탭이나 창이 열릴 때만 받습니다.
+const InsightEditorDialog = dynamic(() => import("./insight-editor-dialog").then((mod) => mod.InsightEditorDialog));
+const InsightImportDialog = dynamic(() => import("./insight-import-dialog").then((mod) => mod.InsightImportDialog));
+const InsightCollectionSettings = dynamic(
+  () => import("./insight-collection-settings").then((mod) => mod.InsightCollectionSettings),
+  { loading: () => <p role="status">수집 설정을 준비하고 있습니다…</p> },
+);
+const InsightStatisticsPanel = dynamic(
+  () => import("./insight-statistics").then((mod) => mod.InsightStatisticsPanel),
+  { loading: () => <p role="status">통계 화면을 준비하고 있습니다…</p> },
+);
 
 const MENUS = [{ id: "all", label: "전체 목록", description: "수집후보와 게시글" },
   { id: "collected", label: "수집후보", description: "초안·검토 대기·수정본" },

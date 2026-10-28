@@ -143,6 +143,20 @@ test("후보 묶음의 형식 오류는 서버로 보내기 전에 이유와 함
   assert.match(helpers.parseImportBatch(JSON.stringify(tooMany)).error, /최대 50건/);
 });
 
+test("인사이트 관리 목록은 통계·설정·편집기를 나중에 받는다", () => {
+  const source = fs.readFileSync(
+    path.join(__dirname, "../src/components/admin/insight-workspace.tsx"),
+    "utf8",
+  );
+  assert.match(source, /from "next\/dynamic"/);
+  assert.match(source, /import\("\.\/insight-statistics"\)/);
+  assert.match(source, /import\("\.\/insight-collection-settings"\)/);
+  assert.match(source, /import\("\.\/insight-editor-dialog"\)/);
+  assert.match(source, /import\("\.\/insight-import-dialog"\)/);
+  assert.doesNotMatch(source, /import \{ InsightEditorDialog \}/);
+  assert.doesNotMatch(source, /import \{ InsightStatisticsPanel/);
+});
+
 test("승인된 기술 목록은 대분류별로 묶되 서버가 준 순서를 바꾸지 않는다", () => {
   const groups = helpers.groupKeywords([
     { id: "CAP001", label: "데이터 수집", category_id: "C01", category_label: "데이터 준비·품질" },
