@@ -8,8 +8,10 @@ from datetime import date
 
 from fastapi import HTTPException
 
+from app.config import GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 from app.db import get_connection
 from app.discord_bot import channel_url
+from app.google_calendar import add_calendar_url, google_ready
 
 # 오늘 날짜는 한국 시간 기준 (DB 서버 시간대와 상관없이)
 TODAY_KST = "(now() AT TIME ZONE 'Asia/Seoul')::date"
@@ -39,7 +41,7 @@ AGREEMENT_SQL = """
 SCHEDULE_COLUMNS = """
   s.schedule_id, s.collaboration_id, s.kind, s.title, s.start_date, s.end_date,
   to_char(s.start_time, 'HH24:MI') AS start_time, to_char(s.end_time, 'HH24:MI') AS end_time,
-  s.place, s.memo, s.assignee, s.series_id, s.created_by, s.created_at, s.updated_at
+  s.place, s.memo, s.assignee, s.series_id, s.created_by, s.created_at, s.updated_at, s.updated_by
 """
 
 
@@ -88,7 +90,7 @@ def find_collaboration(cursor, user_id: int, collaboration_id: int, lock: bool =
     cursor.execute(
         f"""
         SELECT c.collaboration_id, c.status, c.start_date, c.end_date,
-               (c.created_at AT TIME ZONE 'Asia/Seoul')::date AS confirmed_on,
+               (c.created_at AT TIME ZONE 'Asia/Seoul')::date AS confirmed_on, c.google_calendar_id,
                CASE WHEN rs.user_id = %s THEN 'researcher' ELSE 'expert' END AS my_side
         FROM collaboration c
         JOIN research rs ON rs.research_id = c.research_id
@@ -127,6 +129,8 @@ def load_workspace(user_id: int) -> dict:
                    c.discord_status, c.discord_channel_id,
                    c.agreement ->> 'title' AS title,
                    {"c.researcher_opened_at" if role == "researcher" else "c.expert_opened_at"} IS NOT NULL AS opened,
+                   {"c.researcher_google_at" if role == "researcher" else "c.expert_google_at"} IS NOT NULL AS google_linked,
+                   c.google_calendar_id,
                    {TODAY_KST} AS today,
                    pu.nickname, pu.user_photo
             FROM collaboration c
@@ -140,8 +144,9 @@ def load_workspace(user_id: int) -> dict:
         rows = cursor.fetchall()
         ongoing_ids = [row["collaboration_id"] for row in rows if row["status"] == "ongoing"]
         cursor.execute(
-            f"SELECT {SCHEDULE_COLUMNS}, cu.nickname AS created_by_nickname"
+            f"SELECT {SCHEDULE_COLUMNS}, cu.nickname AS created_by_nickname, uu.nickname AS updated_by_nickname"
             " FROM collaboration_schedule s LEFT JOIN users cu ON cu.user_id = s.created_by"
+            " LEFT JOIN users uu ON uu.user_id = s.updated_by"
             " WHERE s.collaboration_id = ANY(%s) ORDER BY s.start_date, s.start_time NULLS FIRST, s.schedule_id",
             (ongoing_ids,),
         )
@@ -159,14 +164,21 @@ def load_workspace(user_id: int) -> dict:
             "status": screen_status(row["status"], row["start_date"], row["today"]),
 
             "opened": row["opened"],
-            "google_linked": False,  # 구글 캘린더 연동은 다음 단계
+            "google_linked": row["google_linked"],  # 내가 [내 구글 캘린더에 추가]를 했는지
+            "google_calendar_url": add_calendar_url(row["google_calendar_id"]) if row["google_linked"] else None,
             "discord_channel_url": (
                 channel_url(row["discord_channel_id"]) if row["discord_status"] in ("ready", "closed") else None
             ),
         }
         for row in rows
     ]
-    return {"collaborations": collaborations, "schedules": schedules}
+    # google_enabled: 서버에 구글 연동 설정이 있는지 (없으면 화면에서 구글 버튼을 숨겨요)
+    return {"collaborations": collaborations, "schedules": schedules, "google_enabled": google_login_ready()}
+
+
+def google_login_ready() -> bool:
+    """서비스 계정 키 + 구글 로그인 앱 값이 다 있는지 (화면의 구글 버튼을 보여 줄지)"""
+    return google_ready() and bool(GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET)
 
 
 def screen_status(status: str, start: date, today: date) -> str:

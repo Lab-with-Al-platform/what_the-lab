@@ -32,3 +32,10 @@ DISCORD_GUILD_ID = os.getenv("DISCORD_GUILD_ID", "")  # LabBridge 디스코드 �
 
 # 협업 전용 채널을 모아 둘 카테고리 ID (선택). 비어 있으면 카테고리 없이 만들어요.
 DISCORD_COLLAB_CATEGORY_ID = os.getenv("DISCORD_COLLAB_CATEGORY_ID", "")
+
+# 구글 캘린더 (서버 전용). 서비스 계정 키 파일이 없으면 구글 연동을 건너뛰고 LabBridge 달력만 써요.
+# 키 파일은 저장소 밖에 두고 경로만 적어요. (커밋·공유 금지)
+GOOGLE_SERVICE_ACCOUNT_FILE = os.getenv("GOOGLE_SERVICE_ACCOUNT_FILE", "")
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")  # 회원 구글 로그인 (이메일 한 번 받기용)
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "")
+GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:8000/api/v1/google/callback")
