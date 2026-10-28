@@ -33,7 +33,7 @@ function loadTypeScript(relativePath) {
   return module.exports;
 }
 
-const { INSIGHTS, getInsight, articlePath, insightsByKind, listInsights, toListItem, topicCounts } = loadTypeScript("src/lib/insights.ts");
+const { INSIGHTS, getInsight, articlePath, insightsByKind, listInsights, toListItem, topicCounts, featuredInsights } = loadTypeScript("src/lib/insights.ts");
 const { ArticleParagraph, ArticleGlossary } = loadTypeScript("src/components/article-editorial.tsx");
 const { CoverArt } = loadTypeScript("src/components/cover-art.tsx");
 const { GENERATED_INSIGHT_COVERS } = loadTypeScript("src/lib/insight-covers.ts");
@@ -100,7 +100,7 @@ test("전용 표지 우선·공통 사진 폴백과 생성 이미지 설명을 �
 });
 
 test("목록·홈·추천·상세·관련 글에서 전용 표지를 전달한다", () => {
-  const files = ["insight-card.tsx", "insight-browser.tsx", "article-view.tsx"];
+  const files = ["insight-card.tsx", "insight-feature-carousel.tsx", "article-view.tsx"];
   for (const file of files) {
     const source = fs.readFileSync(path.resolve(__dirname, "../src/components", file), "utf8");
     const covers = [...source.matchAll(/<CoverArt\b[^>]*\/>/g)].map((match) => match[0]);
@@ -153,7 +153,10 @@ test("기존 치주골·MatterGen 내용은 보존하고 허용된 트렌드 표
   };
   for (const [slug, hash] of Object.entries(expected)) {
     const article = { ...getInsight(slug) };
-    // 표지 교체 요청은 허용하되 본문·분류·URL 등의 회귀 검사는 유지합니다.
+    // 표지 교체와 목록 추천 문구는 허용하되 본문·분류·URL 회귀 검사는 유지합니다.
+    delete article.featuredRank;
+    delete article.featuredHeadline;
+    delete article.featuredSummary;
     if (slug === "mattergen-material-design") {
       delete article.coverSrc;
       delete article.imageAlt;
@@ -257,6 +260,21 @@ test("상추 최종 모형과 콘크리트 원문 내부의 지표 차이를 분
 test("기존 Co-Scientist·AlphaEvolve의 검토된 여섯 섹션을 그대로 보존한다", () => {
   assert.equal(hashOf(getInsight("research-agent").sections.slice(0, 6)), "7ce7921d288224859f0684e9badb7231fc0f6984cf951d817869e54707a0b72b");
   assert.equal(hashOf(getInsight("alphaevolve-algorithm-discovery").sections.slice(0, 6)), "5b5d6767fc96552030142f80d8e1706afe063439ff43a2862148d76e63a18950");
+});
+
+test("추천 글은 편집 순서로 고르고 목록 칸에 본문을 넣지 않는다", () => {
+  const cases = featuredInsights("case", 4);
+  const trends = featuredInsights("trend", 3);
+  assert.equal(
+    cases.map((item) => item.slug).join(","),
+    "lettuce-biomass-estimation,concrete-crack-segmentation,periodontal-bone-loss-analysis,mattergen-experimental-validation",
+  );
+  assert.equal(
+    trends.map((item) => item.slug).join(","),
+    "research-agent,mattergen-material-design,alphaevolve-algorithm-discovery",
+  );
+  assert.match(cases[0].featuredHeadline, /작물의 무게/);
+  assert.equal("sections" in cases[0], false);
 });
 
 test("목록 요약은 본문 섹션을 빼고 카드 칸만 남긴다", () => {
