@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -22,6 +23,8 @@ type Me = {
   user_role: "researcher" | "expert" | null;
   user_photo: string | null;
   signup_step: string;
+  can_manage_insights?: boolean;
+  can_read_operations?: boolean;
 };
 
 // 프로필 드롭다운 메뉴 (주소는 임시, 페이지 만들 때 팀과 맞추기)
@@ -57,6 +60,8 @@ export function SiteHeader() {
   const [canReadOperations, setCanReadOperations] = useState(false);
   const [meVersion, setMeVersion] = useState(0); // 프로필 설정에서 사진을 바꾸면 1씩 올라가요 → 내 정보를 다시 불러와요
   const profileRef = useRef<HTMLDivElement>(null);
+  const meRef = useRef(me);
+  meRef.current = me;
 
   useEffect(() => {
     function closeOnEscape(event: KeyboardEvent) {
@@ -76,29 +81,32 @@ export function SiteHeader() {
   }, []);
 
   // 로그인한 사람 정보 불러오기 (401이면 비로그인)
-  // 헤더는 페이지를 옮겨도 그대로 남아 있어서, 주소가 바뀔 때마다 다시 불러옵니다.
-  // (가입을 끝내고 홈으로 왔을 때 새로고침 없이 닉네임·사진이 보이게)
+  // 페이지를 옮길 때마다 치지 않습니다. 사진 변경·가입 중인 주소 이동만 다시 받습니다.
   useEffect(() => {
     let active = true;
-    setCanManageInsights(false);
-    setCanReadOperations(false);
     requestApi<Me>("/auth/me")
-      .then(async (user) => {
+      .then((user) => {
         if (!active) return;
         setMe(user);
-        // 인사이트 수정과 운영 조회는 서버에서 따로 판단합니다.
-        const [access, operations] = await Promise.all([
-          requestApi<{ can_manage_insights: boolean }>("/admin/insights/access").catch(() => null),
-          requestApi<{ can_read_operations: boolean }>("/admin/operations/access").catch(() => null),
-        ]);
-        if (!active) return;
-        setCanManageInsights(access?.can_manage_insights === true);
-        setCanReadOperations(operations?.can_read_operations === true);
+        setCanManageInsights(user.can_manage_insights === true);
+        setCanReadOperations(user.can_read_operations === true);
       })
-      .catch(() => { if (active) setMe(null); })
+      .catch(() => {
+        if (!active) return;
+        setMe(null);
+        setCanManageInsights(false);
+        setCanReadOperations(false);
+      })
       .finally(() => { if (active) setMeLoading(false); });
     return () => { active = false; };
-  }, [pathname, meVersion]);
+  }, [meVersion]);
+
+  // 가입이 끝나기 전에는 화면을 옮길 때 한 번 더 확인합니다. (완료 후 홈에서 메뉴가 바뀌게)
+  useEffect(() => {
+    if (meRef.current && meRef.current.signup_step !== "done") {
+      setMeVersion((version) => version + 1);
+    }
+  }, [pathname]);
 
   // 프로필 설정에서 사진을 바꿨다는 신호를 받으면 내 정보를 다시 불러와요.
   useEffect(() => {
@@ -196,7 +204,7 @@ export function SiteHeader() {
                 aria-controls="account-navigation"
                 onClick={() => setProfileOpen((open) => !open)}
               >
-                <img src={profileImageOf(me)} alt="" className="h-8 w-8 rounded-full object-cover" />
+                <ProfilePhoto me={me} />
                 <span className="hidden sm:inline">{me.nickname}</span>
               </button>
 
@@ -296,7 +304,7 @@ export function SiteHeader() {
             ) : (
               <>
                 <div className="flex items-center gap-2 px-3 py-2">
-                  <img src={profileImageOf(me)} alt="" className="h-8 w-8 rounded-full object-cover" />
+                  <ProfilePhoto me={me} />
                   <span className="text-sm font-semibold text-ink">{me.nickname}</span>
                 </div>
                 {(me.user_role === "expert" ? EXPERT_MENU : RESEARCHER_MENU).map((item) => (
@@ -353,9 +361,15 @@ function MenuIcon() {
   );
 }
 
-function profileImageOf(me: Me): string {
-  if (me.user_photo) return apiAsset(me.user_photo);
-  return me.user_role === "expert"
+function ProfilePhoto({ me }: { me: Me }) {
+  const className = "h-8 w-8 rounded-full object-cover";
+  if (me.user_photo) {
+    // 올린 사진은 백엔드 주소라 이번 범위에서 next/image 원격 설정을 넣지 않습니다.
+    // eslint-disable-next-line @next/next/no-img-element -- 사용자 사진은 API 주소입니다.
+    return <img src={apiAsset(me.user_photo)} alt="" className={className} />;
+  }
+  const src = me.user_role === "expert"
     ? "/profile-images/default-expert.png"
     : "/profile-images/default-researcher.png";
+  return <Image src={src} alt="" width={32} height={32} sizes="32px" className={className} />;
 }

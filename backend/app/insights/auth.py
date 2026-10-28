@@ -8,8 +8,13 @@ from fastapi import Depends, HTTPException, Request
 from app.security import get_current_user
 
 
+def insights_enabled() -> bool:
+    """인사이트 관리 메뉴를 켤지 /auth/me와 관리자 API가 같이 봅니다."""
+    return os.getenv("INSIGHTS_ENABLED", "false").lower() == "true"
+
+
 def require_enabled() -> None:
-    if os.getenv("INSIGHTS_ENABLED", "false").lower() != "true":
+    if not insights_enabled():
         raise HTTPException(404, "인사이트 기능이 활성화되지 않았습니다.")
 
 

@@ -236,6 +236,38 @@ def test_permissions_split_insight_and_operations(client, monkeypatch):
     assert client.get(INSIGHTS).status_code == 404
 
 
+def test_me_carries_admin_menu_flags(client, monkeypatch):
+    """헤더가 권한 API를 따로 치지 않도록 /auth/me에 메뉴 사실을 넣습니다."""
+    monkeypatch.setenv("OPERATIONS_ADMIN_DISCORD_IDS", "300000000000000003")
+    monkeypatch.setenv("INSIGHT_ADMIN_DISCORD_IDS", ADMIN_ID)
+    login(client, "200000000000000001")
+    regular = client.get("/api/v1/auth/me").json()
+    assert regular["can_manage_insights"] is False
+    assert regular["can_read_operations"] is False
+
+    login(client)
+    insight_admin = client.get("/api/v1/auth/me").json()
+    assert insight_admin["can_manage_insights"] is True
+    assert insight_admin["can_read_operations"] is False
+    assert insight_admin["is_admin"] is False
+
+    login_ops(client)
+    operations_admin = client.get("/api/v1/auth/me").json()
+    assert operations_admin["can_manage_insights"] is False
+    assert operations_admin["can_read_operations"] is True
+
+    shared = login(client, "200000000000000002")
+    shared["is_admin"] = True
+    both = client.get("/api/v1/auth/me").json()
+    assert both["can_manage_insights"] is True
+    assert both["can_read_operations"] is True
+
+    monkeypatch.setenv("INSIGHTS_ENABLED", "false")
+    hidden = client.get("/api/v1/auth/me").json()
+    assert hidden["can_manage_insights"] is False
+    assert hidden["can_read_operations"] is True
+
+
 def test_is_admin_can_read_without_operations_list(client, monkeypatch):
     monkeypatch.setenv("OPERATIONS_ADMIN_DISCORD_IDS", "")
     user = login(client, "200000000000000001")
