@@ -28,11 +28,23 @@ from app.operations.metrics import (
     filter_members,
     filter_researches,
     member_detail,
+    member_detail_from,
+    members_page,
     research_detail,
+    research_detail_from,
     research_summary,
+    researches_page,
 )
 from app.operations.periods import SEOUL, describe_range, resolve_range, seoul_today
-from app.operations.records import OperationsSnapshot, fetch_snapshot
+from app.operations.records import (
+    OperationsSnapshot,
+    fetch_member,
+    fetch_members_page,
+    fetch_research,
+    fetch_researches_of,
+    fetch_researches_page,
+    fetch_snapshot,
+)
 
 router = APIRouter(prefix="/api/v1/admin/operations", tags=["operations"])
 
@@ -52,6 +64,11 @@ Preset = Literal["today", "7d", "30d", "month", "custom"]
 def get_snapshot() -> OperationsSnapshot:
     """테스트가 가상 회원으로 바꿀 수 있게 조회 함수를 분리합니다."""
     return fetch_snapshot()
+
+
+def get_record_set() -> OperationsSnapshot | None:
+    """None이면 SQL에서 한 페이지만 읽습니다. 테스트는 가상 스냅샷을 넣습니다."""
+    return None
 
 
 def get_analytics_source() -> PostgresAnalyticsSource:
@@ -167,7 +184,7 @@ def collaboration(
 @router.get("/members")
 def members(
     reader: Reader,
-    snapshot: Annotated[OperationsSnapshot, Depends(get_snapshot)],
+    records: Annotated[OperationsSnapshot | None, Depends(get_record_set)],
     q: Annotated[str, Query(max_length=30)] = "",
     role: Literal["", "researcher", "expert", "unset"] = "",
     status: Literal["", "active", "suspended", "deleted", "any"] = "",
@@ -186,18 +203,25 @@ def members(
         "created_start": start_at,
         "created_end": end_at,
     }
-    return filter_members(snapshot.members, query, page)
+    if records is None:
+        total, rows = fetch_members_page(query, page)
+        return members_page(rows, total, page)
+    return filter_members(records.members, query, page)
 
 
 @router.get("/members/{user_id}")
 def one_member(
     user_id: int,
     reader: Reader,
-    snapshot: Annotated[OperationsSnapshot, Depends(get_snapshot)],
+    records: Annotated[OperationsSnapshot | None, Depends(get_record_set)],
     store: Annotated[PostgresAccountStore | MemoryAccountStore, Depends(get_account_store)],
 ) -> dict:
     del reader
-    body = member_detail(snapshot, user_id)
+    if records is None:
+        member = fetch_member(user_id)
+        body = None if member is None else member_detail_from(member, fetch_researches_of(user_id))
+    else:
+        body = member_detail(records, user_id)
     if body is None:
         raise HTTPException(404, "회원을 찾을 수 없습니다.")
     body["audit"] = _audit_body(store, user_id)
@@ -245,7 +269,7 @@ def researches_summary(
 @router.get("/researches")
 def researches(
     reader: Reader,
-    snapshot: Annotated[OperationsSnapshot, Depends(get_snapshot)],
+    records: Annotated[OperationsSnapshot | None, Depends(get_record_set)],
     q: Annotated[str, Query(max_length=60)] = "",
     status: Literal["", "draft", "registered"] = "",
     progress_status: Literal[
@@ -279,7 +303,10 @@ def researches(
         "created_start": start_at,
         "created_end": end_at,
     }
-    return filter_researches(snapshot.researches, query, page)
+    if records is None:
+        total, rows = fetch_researches_page(query, page)
+        return researches_page(rows, total, page)
+    return filter_researches(records.researches, query, page)
 
 
 def _audit_body(store: PostgresAccountStore | MemoryAccountStore, user_id: int) -> dict:
@@ -310,10 +337,14 @@ def _audit_body(store: PostgresAccountStore | MemoryAccountStore, user_id: int) 
 def one_research(
     research_id: int,
     reader: Reader,
-    snapshot: Annotated[OperationsSnapshot, Depends(get_snapshot)],
+    records: Annotated[OperationsSnapshot | None, Depends(get_record_set)],
 ) -> dict:
     del reader
-    body = research_detail(snapshot, research_id)
+    if records is None:
+        row = fetch_research(research_id)
+        body = None if row is None else research_detail_from(row)
+    else:
+        body = research_detail(records, research_id)
     if body is None:
         raise HTTPException(404, "연구를 찾을 수 없습니다.")
     return body

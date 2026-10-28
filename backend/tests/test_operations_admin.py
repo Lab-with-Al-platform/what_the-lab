@@ -15,13 +15,16 @@ from app.operations.records import (
     FIELD_SQL,
     FORBIDDEN_SQL_WORDS,
     MEMBER_SQL,
+    PAGE_SIZE,
     RESEARCH_SQL,
     WORK_SQL,
     MemberRow,
     OperationsSnapshot,
     ResearchRow,
+    member_page_query,
+    research_page_query,
 )
-from app.routers.operations import get_account_store, get_snapshot
+from app.routers.operations import get_account_store, get_record_set, get_snapshot
 from tests.test_insight_workflow import ADMIN_ID, ORIGIN, login, make_draft
 from tests.test_insight_workflow import client as client  # noqa: PLC0414 - pytest fixture 재노출
 
@@ -105,7 +108,9 @@ def snapshot() -> OperationsSnapshot:
 
 
 def use_snapshot(data: OperationsSnapshot | None = None) -> None:
-    app.dependency_overrides[get_snapshot] = lambda: data or snapshot()
+    records = data or snapshot()
+    app.dependency_overrides[get_snapshot] = lambda: records
+    app.dependency_overrides[get_record_set] = lambda: records
     app.dependency_overrides[get_account_store] = MemoryAccountStore
 
 
@@ -119,6 +124,30 @@ def test_sql_does_not_select_private_columns():
     combined = f"{MEMBER_SQL}\n{RESEARCH_SQL}\n{FIELD_SQL}\n{WORK_SQL}\n{DATA_TYPE_SQL}"
     for word in FORBIDDEN_SQL_WORDS:
         assert word not in combined
+
+
+def test_list_sql_uses_limit_and_keeps_percent_literal():
+    query = {
+        "q": "%",
+        "role": "",
+        "status": "",
+        "signup_step": "",
+        "created_start": None,
+        "created_end": None,
+        "progress_status": "",
+        "field_id": "",
+        "able_work_id": "",
+    }
+    member_sql, member_count, member_params, member_offset = member_page_query(query, 2)
+    research_sql, research_count, _research_params, research_offset = research_page_query(query, 2)
+    assert "LIMIT" in member_sql and "OFFSET" in member_sql
+    assert "LIMIT" in research_sql and "OFFSET" in research_sql
+    assert member_offset == PAGE_SIZE and research_offset == PAGE_SIZE
+    assert "position(" in member_sql and "LIKE" not in member_sql.upper()
+    assert member_params[0] == "%"
+    assert "COUNT(*)" in member_count and "COUNT(*)" in research_count
+    for word in FORBIDDEN_SQL_WORDS:
+        assert word not in member_sql and word not in research_sql
 
 
 def test_range_uses_seoul_midnight_and_limits_custom_span():

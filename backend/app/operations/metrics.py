@@ -3,9 +3,7 @@
 from datetime import date, datetime
 
 from app.operations.periods import each_day, in_range, previous_range, seoul_day
-from app.operations.records import MemberRow, OperationsSnapshot, ResearchRow
-
-PAGE_SIZE = 20
+from app.operations.records import PAGE_SIZE, MemberRow, OperationsSnapshot, ResearchRow
 
 ROLE_LABELS = {None: "미선택", "researcher": "연구자", "expert": "AI 전문가"}
 STEP_LABELS = {"role": "회원 유형", "verify": "소속 인증", "info": "기본 정보", "done": "가입 완료"}
@@ -112,11 +110,10 @@ def _member_item(row: MemberRow) -> dict:
     }
 
 
-def member_detail(snapshot: OperationsSnapshot, user_id: int) -> dict | None:
-    member = next((row for row in snapshot.members if row.user_id == user_id), None)
-    if member is None:
-        return None
-    researches = [
+def member_detail_from(member: MemberRow, researches: tuple[ResearchRow, ...]) -> dict:
+    body = _member_item(member)
+    body["is_admin"] = member.is_admin
+    body["researches"] = [
         {
             "research_id": row.research_id,
             "title": row.title,
@@ -124,12 +121,8 @@ def member_detail(snapshot: OperationsSnapshot, user_id: int) -> dict | None:
             "status_label": RESEARCH_STATUS.get(row.status, row.status),
             "created_at": row.created_at.isoformat(),
         }
-        for row in snapshot.researches
-        if row.user_id == user_id
+        for row in researches
     ]
-    body = _member_item(member)
-    body["is_admin"] = member.is_admin
-    body["researches"] = researches
     body["actions"] = _status_action(member.status, member.is_admin)
     body["audit"] = {
         "status": "not_collected",
@@ -137,6 +130,23 @@ def member_detail(snapshot: OperationsSnapshot, user_id: int) -> dict | None:
         "items": [],
     }
     return body
+
+
+def member_detail(snapshot: OperationsSnapshot, user_id: int) -> dict | None:
+    member = next((row for row in snapshot.members if row.user_id == user_id), None)
+    if member is None:
+        return None
+    researches = tuple(row for row in snapshot.researches if row.user_id == user_id)
+    return member_detail_from(member, researches)
+
+
+def members_page(rows: tuple[MemberRow, ...], total: int, page: int) -> dict:
+    return {
+        "total": total,
+        "page": page,
+        "page_size": PAGE_SIZE,
+        "items": [_member_item(row) for row in rows],
+    }
 
 
 def _status_action(status: str, is_admin: bool) -> dict:
@@ -226,10 +236,16 @@ def _research_item(row: ResearchRow) -> dict:
     }
 
 
-def research_detail(snapshot: OperationsSnapshot, research_id: int) -> dict | None:
-    row = next((item for item in snapshot.researches if item.research_id == research_id), None)
-    if row is None:
-        return None
+def researches_page(rows: tuple[ResearchRow, ...], total: int, page: int) -> dict:
+    return {
+        "total": total,
+        "page": page,
+        "page_size": PAGE_SIZE,
+        "items": [_research_item(row) for row in rows],
+    }
+
+
+def research_detail_from(row: ResearchRow) -> dict:
     body = _research_item(row)
     body["is_primary"] = row.is_primary
     body["task_unsure"] = row.task_unsure
@@ -251,6 +267,13 @@ def research_detail(snapshot: OperationsSnapshot, research_id: int) -> dict | No
         "note": "초안 본문과 공유 조건 문장은 보여 주지 않습니다.",
     }
     return body
+
+
+def research_detail(snapshot: OperationsSnapshot, research_id: int) -> dict | None:
+    row = next((item for item in snapshot.researches if item.research_id == research_id), None)
+    if row is None:
+        return None
+    return research_detail_from(row)
 
 
 def _active(members: tuple[MemberRow, ...]) -> list[MemberRow]:
