@@ -48,6 +48,11 @@ export interface InsightListItem {
   readingMinutes: number;
   cover: CoverTheme;
   coverSrc?: string;
+  /** 목록 상단 추천 영역에 나오는 순서. 숫자가 작을수록 먼저 나옵니다. */
+  featuredRank?: number;
+  /** 추천 영역 전용 질문형 제목. 줄바꿈은 줄바꿈 문자로 지정합니다. */
+  featuredHeadline?: string;
+  featuredSummary?: string;
 }
 
 export function articlePath(article: Pick<InsightListItem, "kind" | "slug">): string {

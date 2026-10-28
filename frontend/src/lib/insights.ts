@@ -65,7 +65,6 @@ export interface InsightArticle extends InsightListItem {
   imageAlt?: string;
   imageCaption?: string;
   sampleNotice?: string;
-  featured?: boolean;
   companionSlug?: string;
   glossary?: InsightTerm[];
   highlights: InsightHighlight[];
@@ -185,7 +184,9 @@ interface ArticleSeed {
   imageAlt?: string;
   imageCaption?: string;
   sampleNotice?: string;
-  featured?: boolean;
+  featuredRank?: number;
+  featuredHeadline?: string;
+  featuredSummary?: string;
   companionSlug?: string;
   glossary?: InsightTerm[];
   highlights: InsightHighlight[];
@@ -385,7 +386,10 @@ const seeds: ArticleSeed[] = [
       "사진에서 작물의 형태를 측정하는 과정을 재구성한 설명용 이미지입니다. 원 논문의 실험 사진이 아닙니다.",
     sampleNotice:
       "결과 수치는 논문 초록에서 확인한 값입니다. 대표 이미지는 주제를 설명하기 위해 생성했으며 원 논문의 도판이 아닙니다.",
-    featured: true,
+    featuredRank: 1,
+    featuredHeadline: "사진만으로 작물의 무게를\n예측할 수 있을까요?",
+    featuredSummary:
+      "상추와 케일 사진에서 잎 면적·폭·높이를 측정하고 회귀 모델로 생체중을 추정한 국내 연구 사례입니다.",
     highlights: [
       {
         label: "연구 문제",
@@ -503,6 +507,10 @@ const seeds: ArticleSeed[] = [
     publishedOn: "2026.10.10",
     readingMinutes: 9,
     cover: "dental",
+    featuredRank: 3,
+    featuredHeadline: "파노라마 X-ray 한 장으로\n치주골 손실을 잴 수 있을까요?",
+    featuredSummary:
+      "AI의 영상 검출과 기존 측정 규칙을 결합해 전문의 판독과 비교한 치과·융합과학 공동 연구입니다.",
     institution: "서울대학교치과병원·융합과학 공동연구",
     doi: "10.1038/s41598-020-64509-z",
     sourceUrl: "https://doi.org/10.1038/s41598-020-64509-z",
@@ -653,6 +661,10 @@ const seeds: ArticleSeed[] = [
     publishedOn: "2026.10.10",
     readingMinutes: 5,
     cover: "concrete",
+    featuredRank: 2,
+    featuredHeadline: "현장 영상 속 콘크리트 균열,\n실시간으로 찾아낼 수 있을까요?",
+    featuredSummary:
+      "AI-Hub 균열 데이터로 경량 분할 모델 PIDNet을 U-Net 계열·Mask R-CNN과 비교해 25 FPS 수준의 현장 점검 가능성을 확인한 국내 연구입니다.",
     doi: "10.14801/jkiit.2024.22.12.155",
     sourceUrl: "https://doi.org/10.14801/jkiit.2024.22.12.155",
     imageAlt:
@@ -772,7 +784,6 @@ const seeds: ArticleSeed[] = [
     doi: "10.1234/example.2024.001",
     sampleNotice:
       "기관명, DOI, 정확도 92%와 시간 70% 단축은 상세 화면 시안에 있던 예시 값입니다.",
-    featured: true,
     highlights: [
       {
         label: "연구 문제",
@@ -1151,7 +1162,10 @@ const seeds: ArticleSeed[] = [
       "여러 에이전트가 가설을 생성·비판·개선하고 연구자가 검증하는 흐름을 재구성한 이미지입니다. 실제 제품 화면이나 논문 도판이 아닙니다.",
     sampleNotice:
       "내용은 Nature 원 논문과 Google DeepMind 공식 발표를 교차 확인했습니다. 대표 이미지는 설명용 생성 이미지입니다.",
-    featured: true,
+    featuredRank: 1,
+    featuredHeadline: "AI가 가설을 만들고 토론하면,\n연구자는 무엇을 검증해야 할까요?",
+    featuredSummary:
+      "2026년 Nature에 발표된 Co-Scientist를 통해 멀티에이전트의 작동 방식과 실제 연구에서 지켜야 할 검증 경계를 살펴봅니다.",
     highlights: [
       { label: "지금 변하는 점", text: "한 번 답하는 AI에서 가설을 반복 토론하고 개선하는 AI로 넓어졌습니다." },
       { label: "작동 구조", text: "생성·성찰·순위·진화 등 전문 역할을 맡은 에이전트가 협력합니다." },
@@ -1187,6 +1201,10 @@ const seeds: ArticleSeed[] = [
     publishedOn: "2026.10.10",
     readingMinutes: 7,
     cover: "mattergen",
+    featuredRank: 2,
+    featuredHeadline: "글을 쓰던 생성형 AI가\n새로운 소재를 설계한다고요?",
+    featuredSummary:
+      "MatterGen을 예로, 후보를 고르는 AI와 새 구조를 제안하는 AI가 어떻게 다른지 비전공 연구자의 눈높이로 풀어봅니다.",
     institution: "Microsoft Research AI for Science",
     doi: "10.1038/s41586-025-08628-5",
     sourceUrl: "https://doi.org/10.1038/s41586-025-08628-5",
@@ -1292,6 +1310,10 @@ const seeds: ArticleSeed[] = [
     publishedOn: "2026.10.17",
     readingMinutes: 10,
     cover: "mattergen",
+    featuredRank: 4,
+    featuredHeadline: "AI가 제안한 소재,\n실험실에서 정말 만들어졌을까요?",
+    featuredSummary:
+      "원하는 물성에서 출발해 결정 구조를 제안한 MatterGen이 계산 검증과 합성 실험까지 어떻게 이어졌는지 따라가 봅니다.",
     institution: "Microsoft Research AI for Science · SIAT 실험 협력",
     doi: "10.1038/s41586-025-08628-5",
     sourceUrl: "https://doi.org/10.1038/s41586-025-08628-5",
@@ -1453,6 +1475,10 @@ const seeds: ArticleSeed[] = [
     publishedOn: "2026.10.10",
     readingMinutes: 6,
     cover: "alphaEvolve",
+    featuredRank: 3,
+    featuredHeadline: "AI가 코드를 고치고 겨루며\n더 나은 알고리즘을 찾는다면?",
+    featuredSummary:
+      "AlphaEvolve는 LLM이 만든 코드 후보를 자동으로 평가하고 좋은 해법만 남겨 진화시킵니다. 어떤 연구 문제에 맞는지 조건을 정리했습니다.",
     institution: "Google DeepMind",
     sourceUrl: "https://arxiv.org/abs/2506.13131",
     imageAlt:
@@ -1850,13 +1876,19 @@ export function relatedInsights(article: InsightArticle): InsightArticle[] {
     .filter((item): item is InsightArticle => item !== undefined);
 }
 
-export function featuredInsight(kind: InsightKind): InsightArticle {
-  const featured = insightsByKind(kind).find((article) => article.featured);
-  const fallback = insightsByKind(kind)[0];
-  if (!featured && !fallback) {
-    throw new Error(`${kind} 글이 없습니다.`);
-  }
-  return featured ?? fallback;
+/** 목록 상단에서 돌아가며 보여 줄 추천 글. 편집자가 정한 순서(featuredRank)를 따릅니다. */
+export function featuredInsights(kind: InsightKind, limit: number): InsightListItem[] {
+  const articles = insightsByKind(kind);
+  const ranked = articles
+    .filter((article) => article.featuredRank !== undefined)
+    .sort((left, right) => (left.featuredRank ?? 0) - (right.featuredRank ?? 0))
+    .slice(0, limit)
+    .map(toListItem);
+
+  // 추천 글을 아직 정하지 않았다면 최신 글 하나라도 보여 줍니다.
+  if (ranked.length > 0) return ranked;
+  if (articles[0]) return [toListItem(articles[0])];
+  throw new Error(`${kind} 글이 없습니다.`);
 }
 
 /** 랜딩의 최신 인사이트 3장. 이미지에 보인 글 순서를 유지합니다. */
@@ -1891,6 +1923,9 @@ export function toListItem(article: InsightArticle): InsightListItem {
     readingMinutes: article.readingMinutes,
     cover: article.cover,
     coverSrc: article.coverSrc,
+    featuredRank: article.featuredRank,
+    featuredHeadline: article.featuredHeadline,
+    featuredSummary: article.featuredSummary,
   };
 }
 
