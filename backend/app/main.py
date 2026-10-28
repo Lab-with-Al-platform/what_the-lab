@@ -5,9 +5,11 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
+from app import google_sync
 from app.community.middleware import CommunityPrivacyMiddleware, validation_error
 from app.config import CORS_ORIGINS
 from app.discord_bot import bot_ready
+from app.google_calendar import google_ready
 from app.notification_sender import run_forever, wake_up
 from app.request_store import expire_forever
 from app.routers import (
@@ -38,10 +40,13 @@ async def lifespan(_app: FastAPI):
 
     - 협업 요청 만료 처리: 1분마다 (항상)
     - 디스코드 알림 보내기: 봇 설정이 있을 때만
+    - 구글 캘린더에 일정 복사: 서비스 계정 키 파일이 있을 때만
     """
     tasks = [asyncio.create_task(expire_forever())]
     if bot_ready():
         tasks.append(asyncio.create_task(run_forever()))
+    if google_ready():
+        tasks.append(asyncio.create_task(google_sync.run_forever()))
     yield
     for task in tasks:
         task.cancel()
@@ -53,10 +58,15 @@ app.add_exception_handler(RequestValidationError, validation_error)
 
 @app.middleware("http")
 async def send_notifications_soon(request, call_next):
-    """협업 요청을 보내거나 수락·거절·취소·시작하면, 처리가 끝난 직후 디스코드 알림을 바로 보내요."""
+    """협업 요청을 보내거나 수락·거절·취소·시작하면, 처리가 끝난 직후 디스코드 알림을 바로 보내요.
+
+    협업 공간 일정을 넣거나 고치거나 지우면, 구글 캘린더에도 바로 반영하라고 깨워요.
+    """
     response = await call_next(request)
     if request.method == "POST" and "/requests" in request.url.path and response.status_code < 400:
         wake_up()
+    if request.method in ("POST", "PUT", "DELETE") and "/workspace" in request.url.path and response.status_code < 400:
+        google_sync.wake_up()
     return response
 
 # 프론트(localhost:3000)에서 이 서버로 요청을 보낼 수 있게 허용합니다.

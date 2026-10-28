@@ -3,12 +3,14 @@
 같은 협업의 두 사람(연구회원, 전문가)만 볼 수 있고 바꿀 수 있어요. 남의 협업은 404.
 저장 API는 모두 처리가 끝난 최신 목록 전체(load_workspace)를 돌려줍니다. 화면은 받은 값으로 그대로 다시 그려요.
 일정 입력 규칙은 app/workspace_rules.py 에 모아 두었어요.
+구글 캘린더가 있는 협업이면 바뀐 일정을 구글에도 반영해요. (실제 반영은 app/google_sync.py 가 뒤에서)
 """
 
 from fastapi import APIRouter, Depends, HTTPException
 
 from app import workspace_rules as rules
 from app.db import transaction
+from app.google_calendar import event_id
 from app.security import get_current_user_id
 from app.workspace_store import check_ongoing, find_collaboration, load_workspace
 
@@ -16,11 +18,17 @@ router = APIRouter(prefix="/api/v1/workspace", tags=["workspace"])
 
 INSERT_SCHEDULE = """
     INSERT INTO collaboration_schedule
-      (collaboration_id, kind, title, start_date, end_date, start_time, end_time, place, memo, assignee, series_id, created_by)
+      (collaboration_id, kind, title, start_date, end_date, start_time, end_time, place, memo, assignee, series_id,
+       created_by, google_status)
     VALUES (%(collaboration_id)s, %(kind)s, %(title)s, %(start_date)s, %(end_date)s, %(start_time)s, %(end_time)s,
-            %(place)s, %(memo)s, %(assignee)s, %(series_id)s, %(created_by)s)
+            %(place)s, %(memo)s, %(assignee)s, %(series_id)s, %(created_by)s, %(google_status)s)
     RETURNING schedule_id
 """
+
+
+def google_status(collab: dict) -> str:
+    """구글 캘린더가 있는 협업이면 '구글에 반영할 차례(pending)', 없으면 'none'"""
+    return "pending" if collab["google_calendar_id"] else "none"
 
 
 @router.get("")
@@ -50,8 +58,11 @@ def add_schedule(
     with transaction() as cursor:
         collab = find_collaboration(cursor, user_id, collaboration_id, lock=True)
         check_ongoing(collab)
-        values = rules.clean_schedule(body, (collab["start_date"], collab["end_date"]))
-        values.update(collaboration_id=collaboration_id, created_by=user_id, series_id=None)
+        period = rules.schedule_period(collab["start_date"], collab["end_date"], collab["confirmed_on"])
+        values = rules.clean_schedule(body, period)
+        values.update(
+            collaboration_id=collaboration_id, created_by=user_id, series_id=None, google_status=google_status(collab)
+        )
 
         # 하루짜리만 반복해요 (작업 기간·여러 날 일정은 반복하지 않아요)
         repeat = body.repeat_weekly and values["kind"] != "work" and values["start_date"] == values["end_date"]
@@ -71,41 +82,54 @@ def add_schedule(
 def update_schedule(
     schedule_id: int, body: rules.ScheduleInput, user_id: int = Depends(get_current_user_id)
 ) -> dict:
-    """일정 하나 수정. (반복 일정이어도 이 날짜 하나만 바뀌어요)"""
+    """일정 하나 수정. (반복 일정이어도 이 날짜 하나만 바뀌어요) 고친 사람을 남기고, 구글에도 다시 반영해요."""
     with transaction() as cursor:
         collab = find_collaboration(cursor, user_id, schedule_owner(cursor, schedule_id), lock=True)
         check_ongoing(collab)
         period = rules.schedule_period(collab["start_date"], collab["end_date"], collab["confirmed_on"])
-        values = rules.clean_schedule(body, period)        
+        values = rules.clean_schedule(body, period)
         cursor.execute(
             """
             UPDATE collaboration_schedule SET kind = %(kind)s, title = %(title)s, start_date = %(start_date)s,
               end_date = %(end_date)s, start_time = %(start_time)s, end_time = %(end_time)s, place = %(place)s,
-              memo = %(memo)s, assignee = %(assignee)s
+              memo = %(memo)s, assignee = %(assignee)s, updated_by = %(updated_by)s,
+              google_status = %(google_status)s, google_attempts = 0, google_error = NULL
             WHERE schedule_id = %(schedule_id)s
             """,
-            {**values, "schedule_id": schedule_id},
+            {**values, "schedule_id": schedule_id, "updated_by": user_id, "google_status": google_status(collab)},
         )
     return load_workspace(user_id)
 
 
 @router.delete("/schedules/{schedule_id}")
 def delete_schedule(schedule_id: int, series: bool = False, user_id: int = Depends(get_current_user_id)) -> dict:
-    """일정 삭제. series=true 면 같은 반복 묶음 중 이 날짜와 그 뒤 일정을 모두 지워요."""
+    """일정 삭제. series=true 면 같은 반복 묶음 중 이 날짜와 그 뒤 일정을 모두 지워요.
+
+    구글 캘린더가 있는 협업이면 지운 일정을 대기열(google_event_trash)에 적어 구글에서도 지워요.
+    """
     with transaction() as cursor:
         collab = find_collaboration(cursor, user_id, schedule_owner(cursor, schedule_id), lock=True)
         check_ongoing(collab)
+        deleted: list[int] = []
         if series:
             cursor.execute(
                 """
                 DELETE FROM collaboration_schedule t USING collaboration_schedule s
                 WHERE s.schedule_id = %s AND t.collaboration_id = s.collaboration_id
                   AND t.series_id = s.series_id AND t.start_date >= s.start_date
+                RETURNING t.schedule_id
                 """,
                 (schedule_id,),
             )
-        if not series or cursor.rowcount == 0:  # 반복 일정이 아니면 이 일정 하나만
-            cursor.execute("DELETE FROM collaboration_schedule WHERE schedule_id = %s", (schedule_id,))
+            deleted = [row["schedule_id"] for row in cursor.fetchall()]
+        if not deleted:  # 반복 일정이 아니면 이 일정 하나만
+            cursor.execute("DELETE FROM collaboration_schedule WHERE schedule_id = %s RETURNING schedule_id", (schedule_id,))
+            deleted = [row["schedule_id"] for row in cursor.fetchall()]
+        if collab["google_calendar_id"]:
+            cursor.executemany(
+                "INSERT INTO google_event_trash (calendar_id, event_id) VALUES (%s, %s)",
+                [(collab["google_calendar_id"], event_id(item)) for item in deleted],
+            )
     return load_workspace(user_id)
 
 

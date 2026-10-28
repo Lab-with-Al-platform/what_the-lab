@@ -39,7 +39,7 @@ AGREEMENT_SQL = """
 SCHEDULE_COLUMNS = """
   s.schedule_id, s.collaboration_id, s.kind, s.title, s.start_date, s.end_date,
   to_char(s.start_time, 'HH24:MI') AS start_time, to_char(s.end_time, 'HH24:MI') AS end_time,
-  s.place, s.memo, s.assignee, s.series_id, s.created_by, s.created_at, s.updated_at
+  s.place, s.memo, s.assignee, s.series_id, s.created_by, s.created_at, s.updated_at, s.updated_by
 """
 
 
@@ -88,8 +88,8 @@ def find_collaboration(cursor, user_id: int, collaboration_id: int, lock: bool =
     cursor.execute(
         f"""
         SELECT c.collaboration_id, c.status, c.start_date, c.end_date,
-               (c.created_at AT TIME ZONE 'Asia/Seoul')::date AS confirmed_on,
-               CASE WHEN rs.user_id = %s THEN 'researcher' ELSE 'expert' END AS my_side
+            (c.created_at AT TIME ZONE 'Asia/Seoul')::date AS confirmed_on, c.google_calendar_id,
+            CASE WHEN rs.user_id = %s THEN 'researcher' ELSE 'expert' END AS my_side
         FROM collaboration c
         JOIN research rs ON rs.research_id = c.research_id
         WHERE c.collaboration_id = %s AND (rs.user_id = %s OR c.expert_id = %s)
@@ -140,8 +140,9 @@ def load_workspace(user_id: int) -> dict:
         rows = cursor.fetchall()
         ongoing_ids = [row["collaboration_id"] for row in rows if row["status"] == "ongoing"]
         cursor.execute(
-            f"SELECT {SCHEDULE_COLUMNS}, cu.nickname AS created_by_nickname"
+            f"SELECT {SCHEDULE_COLUMNS}, cu.nickname AS created_by_nickname, uu.nickname AS updated_by_nickname"
             " FROM collaboration_schedule s LEFT JOIN users cu ON cu.user_id = s.created_by"
+            " LEFT JOIN users uu ON uu.user_id = s.updated_by"
             " WHERE s.collaboration_id = ANY(%s) ORDER BY s.start_date, s.start_time NULLS FIRST, s.schedule_id",
             (ongoing_ids,),
         )

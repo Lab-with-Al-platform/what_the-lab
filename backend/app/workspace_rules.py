@@ -9,7 +9,7 @@ from pydantic import BaseModel
 
 from app.form_rules import bad_request, optional_text, required_text
 
-KINDS = {"meeting", "work", "due", "etc"}  # 미팅 · 작업 기간 · 결과물 마감 · 기타
+KINDS = {"meeting", "work", "due", "data", "etc"}  # 미팅 · 작업 기간 · 결과물 마감 · 데이터 · 기타
 ASSIGNEES = {"researcher", "expert"}  # 작업 기간 담당 (비어 있으면 함께)
 MAX_TITLE = 60
 MAX_PLACE = 300
