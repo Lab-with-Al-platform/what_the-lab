@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { photoOrDefault, shortPeriod } from "@/lib/collab-requests";
 import { Collaboration, ddayText, progress, toneOf } from "@/lib/workspace";
@@ -11,23 +10,22 @@ const FOLDED = 3; // 처음에는 3개까지만, 나머지는 [n개 더 보기]
 /**
  * 맨 위 "내 협업" 목록. 한 줄에 협업 하나를 가로로 길게, 높이는 낮게 보여 줘요.
  * 1개면 1줄, 여러 개면 아래로 쌓이고 3개가 넘으면 접어요.
- * 색 네모 = 달력에서 이 협업 일정의 색. 열어 둔 협업이 2개 이상이면 눌러서 달력에서 끄고 켤 수 있어요.
+ * 색 네모 = 달력에서 이 협업 일정의 색. 협업이 2개 이상이면 눌러서 달력에서 끄고 켤 수 있어요.
+ * 오른쪽 [💬 디스코드] = 둘만의 비공개 채널로 바로 가기
  */
 export function CollabList({
   collabs,
   hidden,
   today,
   onToggle,
-  onOpen,
 }: {
   collabs: Collaboration[];
   hidden: number[]; // 달력에서 끈 협업 번호
   today: string;
   onToggle: (id: number) => void;
-  onOpen: (collab: Collaboration) => void; // 아직 안 열었을 때 [협업 공간 열기]
 }) {
   const [all, setAll] = useState(false);
-  const canToggle = collabs.filter((collab) => collab.opened).length > 1;
+  const canToggle = collabs.length > 1;
   const shown = all ? collabs : collabs.slice(0, FOLDED);
 
   return (
@@ -39,9 +37,8 @@ export function CollabList({
             collab={collab}
             today={today}
             off={hidden.includes(collab.collaboration_id)}
-            canToggle={canToggle && collab.opened}
+            canToggle={canToggle}
             onToggle={() => onToggle(collab.collaboration_id)}
-            onOpen={() => onOpen(collab)}
           />
         ))}
       </ul>
@@ -60,14 +57,12 @@ function Row({
   off,
   canToggle,
   onToggle,
-  onOpen,
 }: {
   collab: Collaboration;
   today: string;
   off: boolean;
   canToggle: boolean;
   onToggle: () => void;
-  onOpen: () => void;
 }) {
   const tone = toneOf(collab.collaboration_id);
   const waiting = collab.status === "waiting";
@@ -109,15 +104,21 @@ function Row({
 
         <div className="mt-2 flex items-center justify-between gap-3 sm:mt-0 sm:justify-end">
           <span className={`text-[13px] font-bold sm:w-16 sm:text-right ${tone.text}`}>{ddayText(collab, today)}</span>
+          {/* TODO(협업 상세): [상세 ›] 링크 */}
           <div className="sm:w-[104px] sm:text-right">
-            {collab.opened ? (
-              <Link href={`/workspace/${collab.collaboration_id}`} className="text-[13px] font-bold text-brand hover:underline">
-                협업 열기 ›
-              </Link>
+            {collab.discord_channel_url ? (
+              <a
+                href={collab.discord_channel_url}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex h-8 items-center gap-1 rounded-button bg-[#5865F2] px-3 text-[13px] font-semibold text-white hover:opacity-90"
+              >
+                💬 디스코드
+              </a>
             ) : (
-              <button type="button" onClick={onOpen} className="h-8 rounded-button bg-brand px-3 text-[13px] font-semibold text-white hover:bg-brand-hover">
-                공간 열기
-              </button>
+              <span title="협업을 확정하면 몇 초 안에 둘만의 채널이 생겨요" className="text-xs text-faint">
+                채널 준비 중
+              </span>
             )}
           </div>
         </div>

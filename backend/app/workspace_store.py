@@ -9,6 +9,7 @@ from datetime import date
 from fastapi import HTTPException
 
 from app.db import get_connection
+from app.discord_bot import channel_url
 
 # 오늘 날짜는 한국 시간 기준 (DB 서버 시간대와 상관없이)
 TODAY_KST = "(now() AT TIME ZONE 'Asia/Seoul')::date"
@@ -38,7 +39,7 @@ AGREEMENT_SQL = """
 SCHEDULE_COLUMNS = """
   s.schedule_id, s.collaboration_id, s.kind, s.title, s.start_date, s.end_date,
   to_char(s.start_time, 'HH24:MI') AS start_time, to_char(s.end_time, 'HH24:MI') AS end_time,
-  s.place, s.memo, s.assignee, s.series_id, s.created_by
+  s.place, s.memo, s.assignee, s.series_id, s.created_by, s.created_at, s.updated_at
 """
 
 
@@ -87,6 +88,7 @@ def find_collaboration(cursor, user_id: int, collaboration_id: int, lock: bool =
     cursor.execute(
         f"""
         SELECT c.collaboration_id, c.status, c.start_date, c.end_date,
+               (c.created_at AT TIME ZONE 'Asia/Seoul')::date AS confirmed_on,
                CASE WHEN rs.user_id = %s THEN 'researcher' ELSE 'expert' END AS my_side
         FROM collaboration c
         JOIN research rs ON rs.research_id = c.research_id
@@ -121,6 +123,8 @@ def load_workspace(user_id: int) -> dict:
         cursor.execute(
             f"""
             SELECT c.collaboration_id, c.status, c.start_date, c.end_date,
+                   (c.created_at AT TIME ZONE 'Asia/Seoul')::date AS confirmed_on,
+                   c.discord_status, c.discord_channel_id,
                    c.agreement ->> 'title' AS title,
                    {"c.researcher_opened_at" if role == "researcher" else "c.expert_opened_at"} IS NOT NULL AS opened,
                    {TODAY_KST} AS today,
@@ -136,7 +140,8 @@ def load_workspace(user_id: int) -> dict:
         rows = cursor.fetchall()
         ongoing_ids = [row["collaboration_id"] for row in rows if row["status"] == "ongoing"]
         cursor.execute(
-            f"SELECT {SCHEDULE_COLUMNS} FROM collaboration_schedule s"
+            f"SELECT {SCHEDULE_COLUMNS}, cu.nickname AS created_by_nickname"
+            " FROM collaboration_schedule s LEFT JOIN users cu ON cu.user_id = s.created_by"
             " WHERE s.collaboration_id = ANY(%s) ORDER BY s.start_date, s.start_time NULLS FIRST, s.schedule_id",
             (ongoing_ids,),
         )
@@ -150,9 +155,14 @@ def load_workspace(user_id: int) -> dict:
             "partner": {"nickname": row["nickname"], "user_photo": row["user_photo"], "role": partner_role},
             "start_date": row["start_date"],
             "end_date": row["end_date"],
+            "confirmed_on": row["confirmed_on"],
             "status": screen_status(row["status"], row["start_date"], row["today"]),
+
             "opened": row["opened"],
             "google_linked": False,  # 구글 캘린더 연동은 다음 단계
+            "discord_channel_url": (
+                channel_url(row["discord_channel_id"]) if row["discord_status"] in ("ready", "closed") else None
+            ),
         }
         for row in rows
     ]

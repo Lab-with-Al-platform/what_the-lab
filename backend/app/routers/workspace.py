@@ -75,7 +75,8 @@ def update_schedule(
     with transaction() as cursor:
         collab = find_collaboration(cursor, user_id, schedule_owner(cursor, schedule_id), lock=True)
         check_ongoing(collab)
-        values = rules.clean_schedule(body, (collab["start_date"], collab["end_date"]))
+        period = rules.schedule_period(collab["start_date"], collab["end_date"], collab["confirmed_on"])
+        values = rules.clean_schedule(body, period)        
         cursor.execute(
             """
             UPDATE collaboration_schedule SET kind = %(kind)s, title = %(title)s, start_date = %(start_date)s,
