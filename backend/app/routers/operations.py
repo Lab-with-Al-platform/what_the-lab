@@ -138,7 +138,7 @@ def analytics(
     del reader
     start_at, end_at, described = _period(preset, start, end)
     now = server_now()
-    table_ready, events, started_at = source.load(start_at, end_at, now - timedelta(days=9))
+    table_ready, events, started_at, daily = source.load(start_at, end_at, now - timedelta(days=9))
     body = build_analytics_report(
         events,
         enabled=collection_enabled(),
@@ -148,6 +148,7 @@ def analytics(
         now=now,
         started_at=started_at,
         grain=grain,
+        daily=daily,
     )
     body["range"] = {"preset": preset, "grain": grain, **described}
     return body

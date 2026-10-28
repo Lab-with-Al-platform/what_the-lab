@@ -1,14 +1,42 @@
 """방문·글 성과·등록 과정의 집계.
 
+조회수처럼 더할 수 있는 횟수는 일별 합을 씁니다.
 세션 수는 고른 기간의 원본에서 세션 번호를 세어 만듭니다.
 하루 세션 수를 더해 주·월 세션 수로 만들지 않습니다.
 사람 수, 유입 주소, 기기 유형은 수집하지 않았으므로 0으로 채우지 않습니다.
 """
 
+from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 
 from app.analytics.collect import AnalyticsEvent
 from app.operations.periods import as_utc, each_day, in_range, seoul_day
+
+ARTICLE_COUNT_EVENTS = frozenset({"article_view", "expert_search_click", "related_article_open"})
+
+
+@dataclass(frozen=True)
+class DailyCount:
+    """하루·대상·사건 종류의 횟수. 고유 세션 수가 아닙니다."""
+
+    event_name: str
+    target: str
+    event_date: date
+    event_count: int
+
+
+def daily_from_events(events: list[AnalyticsEvent]) -> list[DailyCount]:
+    """테스트나 일별 표가 없을 때, 원본과 같은 횟수를 만듭니다."""
+    buckets: dict[tuple[str, str, date], int] = {}
+    for event in events:
+        if event.received_at is None:
+            continue
+        key = (event.event_name, event.target, seoul_day(event.received_at))
+        buckets[key] = buckets.get(key, 0) + 1
+    return [
+        DailyCount(event_name, target, event_date, count)
+        for (event_name, target, event_date), count in buckets.items()
+    ]
 
 STEPS = ("research", "data", "collaboration", "review")
 STEP_LABELS = {"research": "01 연구", "data": "02 데이터", "collaboration": "03 협업", "review": "04 확인"}
@@ -42,17 +70,19 @@ def build_analytics_report(
     now: datetime,
     started_at: datetime | None,
     grain: str = "day",
+    daily: list[DailyCount] | None = None,
 ) -> dict:
     """수집 상태에 따라 숫자를 숨기거나, 있는 기록만 집계합니다."""
     collection = _collection(enabled, table_ready, started_at, events)
     show = collection["status"] in {"ready", "paused"}
-    visits = _visits(events, start, end, grain) if show else _hidden_visits(collection["note"])
+    counts = daily if daily is not None else daily_from_events(events)
+    visits = _visits(events, counts, start, end, grain) if show else _hidden_visits(collection["note"])
     return {
         "generated_at": as_utc(now).isoformat(),
         "timezone": "Asia/Seoul",
         "collection": collection,
         "visits": visits,
-        "articles": _articles(events, start, end) if show else [],
+        "articles": _articles(events, counts, start, end) if show else [],
         "registration": _registration(events, now) if show else _hidden_registration(collection["note"]),
     }
 
@@ -97,29 +127,42 @@ def _hidden_visits(note: str) -> dict:
     }
 
 
-def _visits(events: list[AnalyticsEvent], start: datetime, end: datetime, grain: str) -> dict:
+def _visits(
+    events: list[AnalyticsEvent],
+    counts: list[DailyCount],
+    start: datetime,
+    end: datetime,
+    grain: str,
+) -> dict:
     pages = [event for event in events if event.event_name == "page_view" and _inside(event, start, end)]
     session_ids = {event.session_id for event in pages if event.session_id}
     by_day = _events_by_day(pages, start, end)
+    days = set(each_day(start, end))
+    page_views = _count_named(counts, "page_view", days)
     return {
         "visitors": _metric(None, "사람 수는 세지 않습니다. 세션 수와 다른 값입니다.", "not_collected"),
         "sessions": _metric(
             len(session_ids),
             "선택 기간에 페이지를 연 세션 수입니다. 하루 세션을 더해 만든 값이 아닙니다.",
         ),
-        "page_views": _metric(len(pages), "페이지가 보인 횟수입니다. 같은 세션의 다른 페이지도 각각 셉니다."),
-        "series": _series(by_day, start, end, grain),
-        "pages": _page_rows(pages),
+        "page_views": _metric(page_views, "페이지가 보인 횟수입니다. 같은 세션의 다른 페이지도 각각 셉니다."),
+        "series": _series(by_day, counts, start, end, grain),
+        "pages": _page_rows(pages, counts, days),
         "referrer": _metric(None, "유입 주소는 수집하지 않았습니다.", "not_collected"),
         "device": _metric(None, "기기 유형은 수집하지 않았습니다.", "not_collected"),
     }
 
 
 def _series(
-    by_day: dict[date, list[AnalyticsEvent]], start: datetime, end: datetime, grain: str
+    by_day: dict[date, list[AnalyticsEvent]],
+    counts: list[DailyCount],
+    start: datetime,
+    end: datetime,
+    grain: str,
 ) -> list[dict]:
-    """조회수는 기간 안에서 더하고, 세션은 그 묶음의 원본을 다시 셉니다."""
+    """조회수는 일별 합을 더하고, 세션은 그 묶음의 원본을 다시 셉니다."""
     days = each_day(start, end)
+    daily_views = _named_by_day(counts, "page_view", set(days))
     if grain == "day":
         buckets = [(day, day + timedelta(days=1)) for day in days]
     else:
@@ -127,16 +170,18 @@ def _series(
     points = []
     for bucket_start, bucket_end in buckets:
         grouped: list[AnalyticsEvent] = []
+        page_views = 0
         cursor = bucket_start
         while cursor < bucket_end:
             grouped.extend(by_day.get(cursor, []))
+            page_views += daily_views.get(cursor, 0)
             cursor += timedelta(days=1)
         sessions = {event.session_id for event in grouped if event.session_id}
         label = bucket_start.isoformat() if grain != "month" else bucket_start.strftime("%Y-%m")
         points.append(
             {
                 "date": label,
-                "page_views": len(grouped),
+                "page_views": page_views,
                 "sessions": len(sessions),
                 "until": (bucket_end - timedelta(days=1)).isoformat(),
             }
@@ -163,42 +208,54 @@ def _span_buckets(days: list[date], grain: str) -> list[tuple[date, date]]:
     return buckets
 
 
-def _page_rows(pages: list[AnalyticsEvent]) -> list[dict]:
-    grouped: dict[str, list[AnalyticsEvent]] = {}
+def _page_rows(pages: list[AnalyticsEvent], counts: list[DailyCount], days: set[date]) -> list[dict]:
+    views: dict[str, int] = {}
+    for row in counts:
+        if row.event_name == "page_view" and row.event_date in days:
+            views[row.target] = views.get(row.target, 0) + row.event_count
+    sessions: dict[str, set[str]] = {}
     for event in pages:
-        grouped.setdefault(event.target, []).append(event)
+        if event.session_id:
+            sessions.setdefault(event.target, set()).add(event.session_id)
     rows = []
-    for target, items in grouped.items():
+    for target in set(views) | set(sessions):
         rows.append(
             {
                 "target": target,
                 "label": PAGE_LABELS.get(target, target),
-                "page_views": len(items),
-                "sessions": len({event.session_id for event in items if event.session_id}),
+                "page_views": views.get(target, 0),
+                "sessions": len(sessions.get(target, set())),
             }
         )
     return sorted(rows, key=lambda item: (-item["page_views"], item["target"]))
 
 
-def _articles(events: list[AnalyticsEvent], start: datetime, end: datetime) -> list[dict]:
+def _articles(
+    events: list[AnalyticsEvent], counts: list[DailyCount], start: datetime, end: datetime
+) -> list[dict]:
+    days = set(each_day(start, end))
     grouped: dict[str, dict] = {}
+    for row in counts:
+        if row.event_name not in ARTICLE_COUNT_EVENTS or row.event_date not in days:
+            continue
+        item = grouped.setdefault(
+            row.target,
+            {"target": row.target, "page_views": 0, "read_sessions": set(), "expert_clicks": 0, "related_opens": 0},
+        )
+        if row.event_name == "article_view":
+            item["page_views"] += row.event_count
+        elif row.event_name == "expert_search_click":
+            item["expert_clicks"] += row.event_count
+        else:
+            item["related_opens"] += row.event_count
     for event in events:
-        if event.event_name not in {"article_view", "expert_search_click", "related_article_open"}:
+        if event.event_name != "article_view" or not _inside(event, start, end) or not event.session_id:
             continue
-        if not _inside(event, start, end):
-            continue
-        row = grouped.setdefault(
+        item = grouped.setdefault(
             event.target,
             {"target": event.target, "page_views": 0, "read_sessions": set(), "expert_clicks": 0, "related_opens": 0},
         )
-        if event.event_name == "article_view":
-            row["page_views"] += 1
-            if event.session_id:
-                row["read_sessions"].add(event.session_id)
-        elif event.event_name == "expert_search_click":
-            row["expert_clicks"] += 1
-        else:
-            row["related_opens"] += 1
+        item["read_sessions"].add(event.session_id)
     result = []
     for row in grouped.values():
         kind, _, slug = row["target"].partition("/")
@@ -215,6 +272,19 @@ def _articles(events: list[AnalyticsEvent], start: datetime, end: datetime) -> l
             }
         )
     return sorted(result, key=lambda item: (-item["page_views"], item["target"]))
+
+
+def _count_named(counts: list[DailyCount], event_name: str, days: set[date]) -> int:
+    return sum(row.event_count for row in counts if row.event_name == event_name and row.event_date in days)
+
+
+def _named_by_day(counts: list[DailyCount], event_name: str, days: set[date]) -> dict[date, int]:
+    by_day: dict[date, int] = {}
+    for row in counts:
+        if row.event_name != event_name or row.event_date not in days:
+            continue
+        by_day[row.event_date] = by_day.get(row.event_date, 0) + row.event_count
+    return by_day
 
 
 def _hidden_registration(note: str) -> dict:
