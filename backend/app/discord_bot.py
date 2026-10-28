@@ -101,17 +101,6 @@ def channel_url(channel_id: str) -> str:
     """채널 바로가기 링크. 누르면 디스코드 앱·웹에서 그 채널이 열려요."""
     return f"https://discord.com/channels/{DISCORD_GUILD_ID}/{channel_id}"
 
-
-def find_channel(name: str) -> str | None:
-    """서버에 같은 이름의 채널이 이미 있으면 그 번호. (만들고 DB 저장 전에 멈췄을 때 두 번 만들지 않게)"""
-    response = httpx.get(f"{DISCORD_API}/guilds/{DISCORD_GUILD_ID}/channels", headers=bot_headers(), timeout=TIMEOUT)
-    response.raise_for_status()
-    for channel in response.json():
-        if channel.get("name") == name:
-            return channel["id"]
-    return None
-
-
 def create_private_channel(name: str, topic: str) -> str:
     """비공개 채널을 만들고 번호를 돌려줘요. 처음에는 봇만 보여요. (사람은 add_member 로 넣어요)
 
