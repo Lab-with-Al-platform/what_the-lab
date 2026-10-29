@@ -128,19 +128,21 @@ export function InsightEditorDialog({ item, onClose, onChanged }: {
     finally { setBusy(""); }
   }
 
-  async function perform(action: "submit" | "approve" | "publish", scheduledFor: string | null = null) {
+  async function perform(action: "submit" | "approve" | "publish" | "rewrite", scheduledFor: string | null = null) {
     if (!detail || dirty || busy || !review.reason.trim()) return;
     const selected = detail;
     setBusy(action); setError("");
     try {
-      await requestApi(`${ADMIN_INSIGHTS_PATH}/${selected.id}/${action}`, { method: "POST", body: JSON.stringify({
+      const path = action === "rewrite" ? `${ADMIN_INSIGHTS_PATH}/${selected.id}/rewrite-request` : `${ADMIN_INSIGHTS_PATH}/${selected.id}/${action}`;
+      await requestApi(path, { method: "POST", body: JSON.stringify({
         expected_version: selected.version, reason: review.reason,
+        ...(action === "rewrite" ? { run_id: selected.agent_run?.run_id, expected_run_version: selected.agent_run?.state_version } : {}),
         ...(action === "approve" ? { editorial_checked: review.editorial, rights_checked: review.rights, reading_checks: review.reading, scheduled_for: scheduledFor } : {}),
         ...(action === "publish" ? { idempotency_key: publicationKey(selected) } : {}),
       }) });
       await load(selected.id); onChanged();
       if (action === "publish" && article) setPublicArticle(article);
-      setNotice(action === "submit" ? "검토 대기로 전환했습니다." : action === "approve" ? "저장된 판본을 승인했습니다. 공개본은 아직 유지됩니다." : "공개 API 스냅샷에 반영했습니다. 일반 사이트는 아직 정적 원고를 사용합니다.");
+      setNotice(action === "submit" ? "검토 대기로 전환했습니다." : action === "approve" ? "저장된 판본을 승인했습니다. 공개본은 아직 유지됩니다." : action === "rewrite" ? "다시 작성 요청을 기록했습니다. 현재 원고와 공개본은 덮어쓰지 않았습니다." : "공개 API 스냅샷에 반영했습니다. 일반 사이트는 아직 정적 원고를 사용합니다.");
     } catch (problem) {
       setError(problem instanceof Error ? problem.message : "처리하지 못했습니다.");
       // 쓰기 응답이 끊겨도 자동 재전송하지 않습니다. 먼저 서버의 현재 상태를 확인합니다.
@@ -151,8 +153,9 @@ export function InsightEditorDialog({ item, onClose, onChanged }: {
     } finally { setBusy(""); setConfirmation(null); }
   }
 
-  function actionRequested(action: "submit" | "approve" | "publish") {
+  function actionRequested(action: "submit" | "approve" | "publish" | "rewrite") {
     if (action === "submit") { void perform(action); return; }
+    if (action === "rewrite") { setConfirmation({ action, scheduledFor: null }); return; }
     try { setConfirmation({ action, scheduledFor: action === "approve" ? scheduleToIso(review.schedule) : null }); }
     catch (problem) { setError(problem instanceof Error ? problem.message : "예약 시각을 확인하세요."); }
   }

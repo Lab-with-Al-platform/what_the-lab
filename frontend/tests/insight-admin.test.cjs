@@ -143,6 +143,13 @@ test("후보 묶음의 형식 오류는 서버로 보내기 전에 이유와 함
   assert.match(helpers.parseImportBatch(JSON.stringify(tooMany)).error, /최대 50건/);
 });
 
+test("작업 회차 상태는 글 상태와 다른 한글 이름이며 게시 승인이 아니다", () => {
+  assert.equal(helpers.RUN_STATUS_LABELS.ready_for_human, "사람 검토 대기");
+  assert.equal(helpers.RUN_STATUS_LABELS.needs_revision, "보완 필요");
+  assert.equal(helpers.STATUS_LABELS.pending_review, "검토 대기");
+  assert.notEqual(helpers.RUN_STATUS_LABELS.ready_for_human, helpers.STATUS_LABELS.approved);
+});
+
 test("인사이트 관리 목록은 통계·설정·편집기를 나중에 받는다", () => {
   const source = fs.readFileSync(
     path.join(__dirname, "../src/components/admin/insight-workspace.tsx"),

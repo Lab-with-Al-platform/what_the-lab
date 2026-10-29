@@ -117,7 +117,7 @@ def row_snapshot(row: AgentRun) -> RunSnapshot:
 
 
 def read_run_for_review(session: Session, run_id: str) -> RunSnapshot | None:
-    """5단계 관리자 연결용 읽기. HTTP·승인 API를 열지 않습니다."""
+    """관리자 연결용 읽기. 원문·인증은 하지 않습니다. HTTP는 agent_review가 감쌉니다."""
     row = session.scalar(select(AgentRun).where(AgentRun.run_id == run_id))
     if row is None:
         return None

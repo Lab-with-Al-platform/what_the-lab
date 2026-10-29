@@ -10,7 +10,7 @@ export const EMPTY_REVIEW: ReviewOptions = { reason: "", editorial: false, right
 
 export function InsightReview({ candidate, draft, dirty, options, busy, onChange, onAction }: {
   candidate: CandidateDetail | null; draft: Draft; dirty: boolean; options: ReviewOptions; busy: boolean;
-  onChange: (value: ReviewOptions) => void; onAction: (action: "submit" | "approve" | "publish") => void;
+  onChange: (value: ReviewOptions) => void; onAction: (action: "submit" | "approve" | "publish" | "rewrite") => void;
 }) {
   const ready = candidate?.approval_check.ready === true && !dirty;
   const future = candidate?.scheduled_for && new Date(candidate.scheduled_for).getTime() > Date.now();
@@ -21,6 +21,7 @@ export function InsightReview({ candidate, draft, dirty, options, busy, onChange
       <h3 className="font-semibold">저장된 판본의 승인 전 검사</h3><p className="mt-1">{label}</p>
       <p className="mt-2 text-xs">조건 통과는 자동 승인이 아닙니다. 편집·권리 확인과 관리자 판단이 별도로 필요합니다.</p>
     </section>
+    <AgentRunPanel candidate={candidate} dirty={dirty} busy={busy} reason={options.reason} onRewrite={() => onAction("rewrite")} />
     <section className="space-y-4">
       <h3 className="text-lg font-semibold">출처 대조용 근거 메모</h3>
       <p className="text-xs leading-6 text-muted">게시용 전체 본문은 오른쪽 미리보기에서 확인합니다. 아래 메모만으로 최종 원고를 대신하지 않습니다.</p>
@@ -61,7 +62,33 @@ export function InsightReview({ candidate, draft, dirty, options, busy, onChange
   </div>;
 }
 
-const ACTION_LABELS: Record<string, string> = { created: "후보 등록", imported: "후보 반입", article_drafted: "수집 메모 보존 · 게시용 원고 작성", revised: "판본 수정", submitted: "검토 요청", approved: "승인", published: "게시", correction_started: "공개본 유지 · 수정 초안 생성", correction_published: "재승인한 수정본을 공개 API에 반영", legacy_imported: "기존 원고 보존 이관" };
+function AgentRunPanel({ candidate, dirty, busy, reason, onRewrite }: {
+  candidate: CandidateDetail | null; dirty: boolean; busy: boolean; reason: string; onRewrite: () => void;
+}) {
+  const run = candidate?.agent_run;
+  if (!candidate) return null;
+  if (!run) {
+    return <section className="rounded-card border border-line bg-page p-4 text-sm leading-6 text-muted">
+      <h3 className="font-semibold text-ink">작업 회차</h3>
+      <p className="mt-1">이 후보에 연결된 수집 회차가 없습니다. 수동 등록·기존 반입 글은 아래 검토만 사용합니다.</p>
+    </section>;
+  }
+  const canRewrite = !dirty && !busy && !run.rewrite_requested && candidate.status !== "published" && reason.trim();
+  return <section className="rounded-card border border-line bg-page p-4 text-sm leading-6">
+    <h3 className="font-semibold text-ink">작업 회차 · 보완 의견</h3>
+    <p className="mt-2"><span className="rounded-button bg-brand-soft px-2 py-1 text-xs font-semibold text-brand">{run.status_label}</span><span className="ml-2 text-xs text-muted">회차 {run.run_id} · 상태 번호 {run.state_version}</span></p>
+    <p className="mt-2 text-xs text-muted">사람 검토 대기는 게시 승인이 아닙니다. 다시 작성 요청도 현재 원고를 덮어쓰지 않습니다.</p>
+    <p className="mt-3 text-xs font-semibold text-ink">근거 연결</p>
+    {run.evidence_ids.length ? <ul className="mt-1 list-inside list-disc text-xs text-muted">{run.evidence_ids.map((id) => <li key={id}>{id}</li>)}</ul> : <p className="mt-1 text-xs text-muted">연결된 근거 ID가 없습니다.</p>}
+    <p className="mt-3 text-xs font-semibold text-ink">보완 사항</p>
+    {run.revision_notes.length ? <ul className="mt-1 list-inside list-disc text-muted">{run.revision_notes.map((note) => <li key={`${note.code}-${note.message}`}>{note.message}</li>)}</ul> : <p className="mt-1 text-xs text-muted">기계 보완 항목은 없습니다. 승인 전 독자 검수는 아래에서 직접 합니다.</p>}
+    <button type="button" disabled={!canRewrite} onClick={onRewrite} className={`${ADMIN_BUTTON} mt-4 bg-white`}>다시 작성 요청</button>
+    {run.rewrite_requested ? <p className="mt-2 text-xs text-muted">다시 작성 요청이 기록되어 있습니다. 자동 재생성으로 본문을 덮지 않습니다.</p> : null}
+    {dirty ? <p className="mt-2 text-xs text-brand">저장하지 않은 수정이 있어 다시 작성 요청을 잠갔습니다.</p> : null}
+  </section>;
+}
+
+const ACTION_LABELS: Record<string, string> = { created: "후보 등록", imported: "후보 반입", article_drafted: "수집 메모 보존 · 게시용 원고 작성", revised: "판본 수정", submitted: "검토 요청", approved: "승인", published: "게시", correction_started: "공개본 유지 · 수정 초안 생성", correction_published: "재승인한 수정본을 공개 API에 반영", legacy_imported: "기존 원고 보존 이관", rewrite_requested: "다시 작성 요청", transfer_staged: "미승인 원고 반입" };
 export function InsightReviewHistory({ candidate }: { candidate: CandidateDetail | null }) {
   return <section className="space-y-4"><h3 className="text-lg font-semibold">검토 이력</h3>
     {!candidate ? <p className="text-sm text-muted">후보를 저장하면 이력이 기록됩니다.</p> : <ol className="space-y-3">{candidate.events.map((event, index) => <li key={index} className="rounded-card border border-line p-4 text-sm [overflow-wrap:anywhere]">
