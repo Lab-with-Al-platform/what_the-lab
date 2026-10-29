@@ -1,7 +1,7 @@
 """협업 상세: 요청(collaboration_task) · 정한 것(collaboration_decision) · 기간 연장/조기 완료 요청(collaboration_change).
 
 collaboration 에는 취소·중단한 사람과 이유, 취소된 협업의 디스코드 채널을 지울 때를 더합니다.
-SQL 본문은 backend/migrations/sql/20261029_18/ 에 동결해 두었습니다. (Docker용 database/init/022 와 같은 테이블)
+SQL 본문은 backend/migrations/sql/20261029_19/ 에 동결해 두었습니다. (Docker용 database/init/023 와 같은 테이블)
 기존 협업·일정은 지우거나 바꾸지 않아요. 새 테이블 세 개는 처음엔 비어 있어요.
 """
 
@@ -9,8 +9,8 @@ from pathlib import Path
 
 from alembic import op
 
-revision = "20261029_18"
-down_revision = "20261028_17"
+revision = "20261029_19"
+down_revision = "20261029_18"
 branch_labels = None
 depends_on = None
 
@@ -27,7 +27,7 @@ API_ROLES = ("anon", "authenticated", "service_role")  # Supabase가 브라우�
 
 def upgrade() -> None:
     # 같은 DB에 동시에 적용하지 않도록 트랜잭션이 끝날 때까지 잠급니다.
-    op.execute("SELECT pg_advisory_xact_lock(20261029, 18)")
+    op.execute("SELECT pg_advisory_xact_lock(20261029, 19)")
     op.execute("SET LOCAL search_path TO public, pg_catalog")
     # 이미 적용된 DB에는 다시 적용하지 않고 멈춥니다.
     op.execute("""

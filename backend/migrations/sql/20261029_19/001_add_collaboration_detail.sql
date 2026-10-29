@@ -1,5 +1,5 @@
-  -- 협업 상세: 요청 · 정한 것 · 기간 연장/조기 완료 요청 + 협업을 끝낸 이유를 공통 Supabase에 추가합니다. (alembic revision 20261029_18)
-  -- Docker용 database/init/022_add_collaboration_detail.sql 과 같은 내용입니다 (Docker 쪽에만 개정 번호 줄이 더 있어요).
+-- 협업 상세: 요청 · 정한 것 · 기간 연장/조기 완료 요청 + 협업을 끝낸 이유를 공통 Supabase에 추가합니다. (alembic revision 20261029_19)
+-- Docker용 database/init/023_add_collaboration_detail.sql 과 같은 내용입니다 (Docker 쪽에만 개정 번호 줄이 더 있어요).
 
 -- 1) 협업을 끝낸 사람과 이유 (진행 전 취소 · 진행 중 중단은 이유 필수, 완료는 비워도 돼요)
 ALTER TABLE collaboration
@@ -122,9 +122,3 @@ CREATE TABLE collaboration_change (
 CREATE UNIQUE INDEX uq_change_one_pending ON collaboration_change (collaboration_id) WHERE status = 'pending';
 CREATE INDEX idx_change_collaboration ON collaboration_change (collaboration_id, created_at);  -- 기간 변경 기록
 CREATE INDEX idx_change_expires ON collaboration_change (expires_at) WHERE status = 'pending';  -- 만료 처리
-
--- 021이 적어 둔 개정 번호를 이 변경까지 포함하도록 올립니다.
--- Alembic SQL에는 넣지 않습니다. Alembic이 책갈피를 직접 바꿉니다.
-UPDATE public.insight_alembic_version
-SET version_num = '20261029_18'
-WHERE version_num = '20261028_17';
