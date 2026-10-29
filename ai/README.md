@@ -13,3 +13,9 @@ AI 추천·실험 코드를 위한 경계입니다.
 - 추천 평가용 오프라인 실험
 
 실험을 시작할 때는 입력 데이터, 기대 출력, 평가 기준, 비용, 개인정보 처리 여부를 먼저 문서화합니다. 생성형 AI가 만든 결과는 사실로 단정하지 않고 사용자가 검토할 수 있게 합니다.
+
+## 인사이트 에이전트 LangGraph 비교 (선택 6단계)
+
+개인화 추천과 다른 칸입니다. `ai/insight-agent-langgraph/`는 가짜 회차를 Python 함수와 비교하는 로컬 실험이며, 앱 실행기를 바꾸지 않습니다. LangGraph는 이 폴더의 가상환경에만 설치하고 `backend/` 기본 의존성에는 넣지 않습니다.
+
+설치·재현·도입 판단은 `ai/insight-agent-langgraph/README.md`와 `docs/qa/INSIGHT_AGENT_PHASE_6_RESULT.md`를 봅니다. AWS·실제 모델·운영 DB 연결은 이 단계에 포함하지 않습니다.
