@@ -8,7 +8,7 @@ import { CollaborationDetail, loadDetail } from "@/lib/workspace-detail";
 import { MySpaceShell } from "@/components/my-space-shell";
 import { DetailHead } from "@/components/workspace-detail-head";
 import { AgendaCard, PartnerCard, PrepCard } from "@/components/workspace-detail-side";
-import { DecisionsCard, TasksCard } from "@/components/workspace-detail-work";
+import { TasksCard } from "@/components/workspace-detail-work";
 import { ScheduleDialog } from "@/components/workspace-schedule-dialog";
 import { ScheduleView } from "@/components/workspace-schedule-view";
 
@@ -17,7 +17,7 @@ type Editor = { mode: "add" } | { mode: "view"; schedule: Schedule } | { mode: "
 /**
  * 협업 상세 (/workspace/[id])
  * 위: 머리(상태·제목·두 사람·디스코드·구글) + 협업 기간 타임라인
- * 왼쪽(넓게): 요청 → 정한 것  /  오른쪽(따라 내려옴): 다가오는 일정 → (시작 전 준비) → 상대 + 합의 내용
+ * 왼쪽(넓게): 요청  /  오른쪽(따라 내려옴): 다가오는 일정 → (시작 전 준비) → 상대 + 합의 내용
  */
 export function WorkspaceDetailPage({ collaborationId }: { collaborationId: number }) {
   const [detail, setDetail] = useState<CollaborationDetail | null>(null);
@@ -64,8 +64,8 @@ export function WorkspaceDetailPage({ collaborationId }: { collaborationId: numb
           </aside>
 
           <div className="grid min-w-0 gap-5 lg:order-1">
-            <TasksCard detail={detail} />
-            <DecisionsCard detail={detail} />
+            <TasksCard detail={detail} editable={editable} onChange={setDetail} />
+            {/* 정한 것(DecisionsCard)은 디스코드 명령어를 붙일 때 다시 넣어요 */}
           </div>
         </div>
       </div>
