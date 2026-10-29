@@ -160,6 +160,13 @@ class VersionInput(StrictModel):
     reason: ShortText
 
 
+class RewriteRequestInput(VersionInput):
+    """다시 작성 요청. 게시 승인이 아니며 현재 원고를 덮어쓰지 않습니다."""
+
+    run_id: Annotated[str, Field(min_length=1, max_length=100)]
+    expected_run_version: Annotated[int, Field(strict=True, ge=1)]
+
+
 class ReadingChecks(StrictModel):
     clear_question: bool = Field(default=False, strict=True)
     input_output: bool = Field(default=False, strict=True)
