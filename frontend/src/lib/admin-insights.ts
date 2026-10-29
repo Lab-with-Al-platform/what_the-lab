@@ -11,6 +11,10 @@ export const SCORE_LABELS = {
   input_data: "입력 데이터 설명", limitations: "한계 설명",
 } as const;
 export const STATUS_LABELS = { draft: "초안", pending_review: "검토 대기", approved: "승인됨", published: "게시됨" } as const;
+export const RUN_STATUS_LABELS = {
+  queued: "대기", researching: "조사 중", drafting: "작성 중", reviewing: "기계 검토 중",
+  ready_for_human: "사람 검토 대기", needs_revision: "보완 필요", held: "보류", failed: "실패", cancelled: "취소",
+} as const;
 export const KIND_LABELS = { case: "협업사례", trend: "AI 트렌드" } as const;
 export const READING_CHECK_LABELS = {
   clear_question: "연구 질문과 독자가 얻는 도움이 분명합니다",
@@ -42,18 +46,25 @@ export type Draft = {
 export type Candidate = { id: string; kind?: "case" | "trend"; status: CandidateStatus; version: number; current_revision: number;
   approved_revision: number | null; scheduled_for: string | null };
 export type CandidateListItem = Candidate & { title: string; summary: string; research_field: string; doi: string | null };
+export type AgentRunSummary = { run_id: string; status: string; status_label: string };
+export type AgentRunReview = AgentRunSummary & {
+  step: string; state_version: number; evidence_ids: string[]; error_code: string | null;
+  revision_notes: { code: string; message: string }[]; rewrite_requested: boolean; publication_approved: false;
+};
 export type CandidateDetail = Candidate & {
   editorial_check?: { stage: string; ready: boolean; issues: string[]; paragraph_count: number; body_characters: number };
   publication_id?: string | null;
   article?: InsightArticle | null; legacy_article?: InsightArticle; review_draft?: Draft | null;
   revisions: { number: number; content: Draft }[];
   approval_check: { ready: boolean; message: string };
+  agent_run?: AgentRunReview | null;
   events: { action: string; actor_discord_id: string; revision: number; reason: string; created_at: string }[];
 };
 export type WorkspaceItem = Candidate & { publication_id: string | null; title: string; summary: string;
   content_stage?: "collection_note" | "article_draft" | "legacy_public";
   research_field: string; keywords: string[]; is_published: boolean; has_correction: boolean;
-  registered_at: string; published_at: string | null; source_title: string; doi: string | null };
+  registered_at: string; published_at: string | null; source_title: string; doi: string | null;
+  agent_run?: AgentRunSummary | null };
 export type WorkspaceResult = { items: WorkspaceItem[]; total: number; page: number;
   counts: { all: number; collected: number; published: number }; categories: string[]; keywords: string[] };
 export const SOURCE_KIND_LABELS = { case: "협업사례", trend: "AI 트렌드" } as const;

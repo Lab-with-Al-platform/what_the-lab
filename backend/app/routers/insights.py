@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
-from app.insights import corrections, editorial, service
+from app.insights import agent_review, corrections, editorial, service
 from app.insights.auth import require_admin, require_enabled, require_trusted_origin
 from app.insights.database import get_session
 from app.insights.importing import import_candidates
@@ -18,6 +18,7 @@ from app.insights.schemas import (
     Draft,
     PublishInput,
     RevisionInput,
+    RewriteRequestInput,
     VersionInput,
 )
 from app.routers.insight_views import admin_router as view_admin_router
@@ -221,6 +222,7 @@ def detail(candidate_id: UUID, session: DB) -> dict:
                 "ready": False,
                 "message": "기존 공개 원고 보존본: 새 승인으로 간주하지 않습니다.",
             },
+            "agent_run": agent_review.review_payload(session, candidate),
             "revisions": [{"number": item.number, "content": item.content} for item in versions],
             "events": [
                 {
@@ -248,6 +250,7 @@ def detail(candidate_id: UUID, session: DB) -> dict:
         "review_draft": versions[-1].content.get("draft"),
         "editorial_check": editorial.editorial_report(versions[-1].content),
         "approval_check": approval_check,
+        "agent_run": agent_review.review_payload(session, candidate),
         "revisions": [{"number": item.number, "content": item.content} for item in versions],
         "events": [
             {
@@ -287,6 +290,27 @@ def submit(candidate_id: UUID, body: VersionInput, session: DB, actor: Admin) ->
             body.reason,
         )
     )
+
+
+@admin_router.post("/candidates/{candidate_id}/rewrite-request", dependencies=[WriteGuard])
+def rewrite_request(
+    candidate_id: UUID, body: RewriteRequestInput, session: DB, actor: Admin
+) -> dict:
+    """다시 작성 의도만 기록합니다. 기존 승인 API를 대체하지 않습니다."""
+    candidate = agent_review.request_rewrite(
+        session,
+        str(candidate_id),
+        body.expected_version,
+        body.run_id,
+        body.expected_run_version,
+        actor,
+        body.reason,
+    )
+    return {
+        **candidate_summary(candidate),
+        "agent_run": agent_review.review_payload(session, candidate),
+        "publication_approved": False,
+    }
 
 
 @admin_router.post("/candidates/{candidate_id}/approve", dependencies=[WriteGuard])

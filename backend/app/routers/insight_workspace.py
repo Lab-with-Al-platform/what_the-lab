@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.insights import corrections, editorial, service
+from app.insights import agent_review, corrections, editorial, service
 from app.insights.auth import require_admin, require_trusted_origin
 from app.insights.collection_policy import recommended_discovery_policy
 from app.insights.collection_sources import recommended_sources
@@ -180,8 +180,12 @@ def workspace(
     if order in {"period", "cumulative"}:
         filtered = _sort_by_views(session, filtered, order, view_preset)
     offset = (page - 1) * page_size
+    page_items = filtered[offset : offset + page_size]
+    runs = agent_review.run_summaries_for(session, [item["id"] for item in page_items])
+    for item in page_items:
+        item["agent_run"] = runs.get(item["id"])
     return {
-        "items": filtered[offset : offset + page_size],
+        "items": page_items,
         "total": len(filtered),
         "page": page,
         "counts": counts,

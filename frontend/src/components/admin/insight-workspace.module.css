@@ -107,6 +107,7 @@ details[open] > .filterSummary::before { transform: rotate(90deg); }
 .draft { background: var(--color-page); color: var(--color-muted); }
 .pending, .correction { background: var(--color-editorial-warning-soft); color: var(--color-editorial-warning); }
 .approved { background: var(--color-brand-soft); color: var(--color-brand); }
+.run { background: var(--color-brand-soft); color: var(--color-ink); }
 .kind { font-size: 11px; color: var(--color-brand); }
 .trend { color: var(--color-muted); }
 .keywords { display: flex; align-items: center; gap: 4px; min-width: 0; overflow: hidden; }

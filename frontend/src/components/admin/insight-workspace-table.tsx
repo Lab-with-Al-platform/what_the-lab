@@ -61,6 +61,7 @@ export function InsightWorkspaceTable({ items, loading, onSelect, views, statHre
           <td><div className={styles.badges}>
             <span className={`${styles.badge} ${item.is_published ? styles.published : item.status === "approved" ? styles.approved : item.status === "pending_review" ? styles.pending : styles.draft}`}>{item.is_published ? "게시 중" : item.status === "draft" ? item.content_stage === "collection_note" ? "수집 메모" : "게시용 초안" : STATUS_LABELS[item.status]}</span>
             {item.has_correction ? <span className={`${styles.badge} ${styles.correction}`} title={`공개본 유지 · 수정본 ${STATUS_LABELS[item.status]}`}>수정 {STATUS_LABELS[item.status]}</span> : null}
+            {item.agent_run ? <span className={`${styles.badge} ${item.agent_run.status === "needs_revision" || item.agent_run.status === "held" || item.agent_run.status === "failed" ? styles.pending : styles.run}`} title={`작업 회차 ${item.agent_run.run_id}`}>{item.agent_run.status_label}</span> : null}
           </div></td>
           <td><span className={`${styles.kind} ${item.kind === "trend" ? styles.trend : ""}`}>{KIND_LABELS[item.kind ?? "case"]}</span></td>
           <td><span className={styles.ellipsis} title={item.research_field}>{item.research_field}</span></td>
