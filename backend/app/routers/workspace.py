@@ -13,6 +13,7 @@ from app import workspace_rules as rules
 from app.db import transaction
 from app.google_calendar import event_id
 from app.security import get_current_user_id
+from app.workspace_detail import load_detail
 from app.workspace_store import check_ongoing, find_collaboration, load_workspace
 
 router = APIRouter(prefix="/api/v1/workspace", tags=["workspace"])
@@ -36,6 +37,11 @@ def google_status(collab: dict) -> str:
 def get_workspace(user_id: int = Depends(get_current_user_id)) -> dict:
     """내 협업 전부(진행 중·시작 전·완료) + 진행 중 협업의 일정."""
     return load_workspace(user_id)
+
+@router.get("/{collaboration_id}")
+def get_collaboration_detail(collaboration_id: int, user_id: int = Depends(get_current_user_id)) -> dict:
+    """협업 상세: 머리 · 일정 · 요청 · 정한 것 · 기간 변경 요청 · 합의 내용. 남의 협업이면 404."""
+    return load_detail(user_id, collaboration_id)
 
 
 @router.post("/{collaboration_id}/open")

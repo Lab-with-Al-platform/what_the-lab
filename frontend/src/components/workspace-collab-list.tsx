@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { photoOrDefault, shortPeriod } from "@/lib/collab-requests";
 import { Collaboration, ddayText, progress, toneOf } from "@/lib/workspace";
 import { Avatar, StatusBadge } from "@/components/request-parts";
@@ -81,7 +82,9 @@ function Row({
       {/* 넓은 화면: 한 줄로 [제목 | 상태 | D-day | 버튼] / 모바일: 제목 아래에 [D-day ... 버튼] */}
       <div className="min-w-0 flex-1 sm:flex sm:items-center sm:gap-4">
         <div className="min-w-0 flex-1">
-          <p className={`truncate text-sm font-bold ${off ? "text-faint" : ""}`}>{collab.research.title}</p>
+            <Link href={`/workspace/${collab.collaboration_id}`} className={`block truncate text-sm font-bold hover:text-brand hover:underline ${off ? "text-faint" : ""}`}>
+            {collab.research.title}
+          </Link>
           <p className="mt-0.5 flex items-center gap-1.5 truncate text-xs text-muted">
             <Avatar src={photoOrDefault(collab.partner.user_photo, collab.partner.role)} size={16} />
             {collab.partner.nickname} 님과 1:1 · {shortPeriod(collab.start_date, collab.end_date)}
@@ -104,7 +107,9 @@ function Row({
 
         <div className="mt-2 flex items-center justify-between gap-3 sm:mt-0 sm:justify-end">
           <span className={`text-[13px] font-bold sm:w-16 sm:text-right ${tone.text}`}>{ddayText(collab, today)}</span>
-          {/* TODO(협업 상세): [상세 ›] 링크 */}
+          <Link href={`/workspace/${collab.collaboration_id}`} className="hidden h-8 items-center rounded-button border border-line px-3 text-[13px] font-semibold text-muted hover:bg-page hover:text-ink sm:inline-flex">
+            상세 ›
+          </Link>
           <div className="sm:w-[104px] sm:text-right">
             {collab.discord_channel_url ? (
               <a
