@@ -8,14 +8,23 @@ from pathlib import Path
 import pytest
 from fastapi import HTTPException
 from sqlalchemy import event, func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.insights import editorial, service
 from app.insights.database import Base, build_engine
-from app.insights.models import Candidate, Publication, ReviewEvent, Revision, Source
+from app.insights.models import (
+    Candidate,
+    Publication,
+    ReviewEvent,
+    Revision,
+    Source,
+    TransferReceipt,
+    TransferReceiptItem,
+)
 from app.insights.schemas import Draft
 from app.insights.transfer_contract import TransferError
-from app.insights.transfer_staging import stage_transfer_candidates
+from app.insights.transfer_staging import LOCAL_VIRTUAL_TRUST_SCOPE, stage_transfer_candidates
 
 FIXTURE = Path(__file__).parent / "fixtures" / "insight-transfer-v1.json"
 ACTOR = "fictional-local-reviewer"
@@ -63,12 +72,16 @@ def add_second_item(payload: dict) -> None:
     payload["items"].append(item)
 
 
+STORED = (Source, Candidate, Revision, ReviewEvent, Publication, TransferReceipt, TransferReceiptItem)
+
+
 def test_default_preview_stores_nothing(engine, payload):
     with Session(engine) as session, session.begin():
         result = stage_transfer_candidates(session, raw(payload), ACTOR)
         assert result["dry_run"] is True
         assert result["would_create"] == 1
-        for model in (Source, Candidate, Revision, ReviewEvent, Publication):
+        assert "receipt_outcome" not in result
+        for model in STORED:
             assert count(session, model) == 0
 
 
@@ -104,28 +117,43 @@ def test_creates_full_unapproved_manuscript_and_clears_external_claims(engine, p
         assert candidate.scheduled_for is None
         assert count(session, Publication) == 0
         assert result["publication_approved"] is False
+        assert result["receipt_outcome"] == "imported"
+        assert result["trust_scope"] == LOCAL_VIRTUAL_TRUST_SCOPE
+        assert result["trust_scope"] != ACTOR
+        assert result["mappings"][0]["revision_number"] == 2
+        assert count(session, TransferReceipt) == 1
 
 
-def test_same_file_and_changed_submission_preserve_admin_work(engine, payload):
+def test_same_file_replays_first_mapping_after_admin_edit(engine, payload):
     with Session(engine) as session, session.begin():
         first = stage_transfer_candidates(session, raw(payload), ACTOR, dry_run=False)
         candidate = session.get(Candidate, first["items"][0]["candidate_id"])
-        revision = editorial.current_revision(session, candidate)
-        revision.content = {**revision.content, "admin_note": "관리자 수정 보존"}
+        first_revision = first["mappings"][0]["revision_number"]
+        previous = editorial.current_revision(session, candidate)
+        edited = {**previous.content, "admin_note": "보존"}
+        candidate.current_revision += 1
+        candidate.version += 1
+        session.add(
+            Revision(
+                candidate_id=candidate.id,
+                number=candidate.current_revision,
+                created_by=ACTOR,
+                content=edited,
+            )
+        )
         session.flush()
-        snapshot = deepcopy(revision.content)
         events_before = count(session, ReviewEvent)
-        for change in (False, True):
-            if change:
-                for part in (payload["items"][0]["draft"], payload["items"][0]["article"]):
-                    part["title"] = "같은 출처의 새로운 제목 제안"
-            repeated = stage_transfer_candidates(session, raw(payload), ACTOR, dry_run=False)
-            assert repeated["existing_preserved"] == 1
-            assert repeated["created"] == 0
-            assert editorial.current_revision(session, candidate).content == snapshot
-            assert count(session, ReviewEvent) == events_before
+        repeated = stage_transfer_candidates(session, raw(payload), ACTOR, dry_run=False)
+        assert repeated["receipt_outcome"] == "replayed"
+        assert repeated["first_outcome"] == "imported"
+        assert repeated["created"] == 0
+        assert repeated["mappings"] == first["mappings"]
+        assert repeated["mappings"][0]["revision_number"] == first_revision
+        assert candidate.current_revision == first_revision + 1
+        assert count(session, ReviewEvent) == events_before
+        assert count(session, TransferReceipt) == 1
         assert count(session, Candidate) == 1
-        assert count(session, Revision) == 2
+        assert count(session, Revision) == 3
 
 
 def test_published_snapshot_and_candidate_state_are_preserved(engine, payload):
@@ -146,6 +174,7 @@ def test_published_snapshot_and_candidate_state_are_preserved(engine, payload):
         session.flush()
         result = stage_transfer_candidates(session, raw(payload), ACTOR, dry_run=False)
         assert result["existing_preserved"] == 1
+        assert result["receipt_outcome"] == "existing_preserved"
         assert existing.status == "published"
         assert existing.current_revision == 1
         assert publication.snapshot == snapshot
@@ -181,10 +210,12 @@ def test_later_article_failure_rolls_back_entire_bundle_but_preserves_outer_work
             stage_transfer_candidates(session, raw(payload), ACTOR, dry_run=False)
         for model, expected in before.items():
             assert count(session, model) == expected
+        assert count(session, TransferReceipt) == 0
         assert session.get(Candidate, preexisting.id).status == "draft"
     with Session(engine) as session:
         assert count(session, Candidate) == 1
         assert count(session, Publication) == 0
+        assert count(session, TransferReceipt) == 0
 
 
 def test_does_not_commit_callers_transaction(engine, payload):
@@ -195,6 +226,7 @@ def test_does_not_commit_callers_transaction(engine, payload):
     with Session(engine) as session:
         assert count(session, Candidate) == 0
         assert count(session, Revision) == 0
+        assert count(session, TransferReceipt) == 0
 
 
 def test_caller_must_own_transaction(engine, payload):
@@ -209,6 +241,7 @@ def test_invalid_later_article_prevents_any_write(engine, payload):
         with pytest.raises(TransferError):
             stage_transfer_candidates(session, raw(payload), ACTOR, dry_run=False)
         assert count(session, Candidate) == 0
+        assert count(session, TransferReceipt) == 0
 
 
 def test_normalized_source_is_used_in_full_article(engine, payload):
@@ -241,6 +274,7 @@ def test_duplicate_source_with_other_kind_creates_two_unapproved_articles(engine
 def test_slug_conflict_keeps_existing_candidate(engine, payload):
     with Session(engine) as session, session.begin():
         first = stage_transfer_candidates(session, raw(payload), ACTOR, dry_run=False)
+        payload["bundle_id"] = "fictional-bundle-slug-conflict"
         payload["items"][0]["draft"]["source"]["url"] = payload["items"][0]["article"][
             "sourceUrl"
         ] = "https://example.org/different"
@@ -248,4 +282,108 @@ def test_slug_conflict_keeps_existing_candidate(engine, payload):
             stage_transfer_candidates(session, raw(payload), ACTOR, dry_run=False)
         assert caught.value.status_code == 409
         assert count(session, Candidate) == 1
+        assert count(session, TransferReceipt) == 1
         assert session.get(Candidate, first["items"][0]["candidate_id"]).current_revision == 2
+
+
+def test_same_id_different_bytes_is_conflict_not_cli_exit(engine, payload):
+    with Session(engine) as session, session.begin():
+        stage_transfer_candidates(session, raw(payload), ACTOR, dry_run=False)
+        spaced = json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8")
+        assert sha256(spaced).hexdigest() != sha256(raw(payload)).hexdigest()
+        with pytest.raises(HTTPException) as caught:
+            stage_transfer_candidates(session, spaced, ACTOR, dry_run=False)
+        assert caught.value.status_code == 409
+        assert "다른 원본" in str(caught.value.detail)
+        assert not isinstance(caught.value, TransferError)
+        assert count(session, Candidate) == 1
+        assert count(session, TransferReceipt) == 1
+        assert count(session, Revision) == 2
+
+
+def test_different_bundle_same_source_preserves_existing(engine, payload):
+    with Session(engine) as session, session.begin():
+        first = stage_transfer_candidates(session, raw(payload), ACTOR, dry_run=False)
+        payload["bundle_id"] = "fictional-bundle-002"
+        for part in (payload["items"][0]["draft"], payload["items"][0]["article"]):
+            part["title"] = "같은 출처의 새로운 제목 제안"
+        repeated = stage_transfer_candidates(session, raw(payload), ACTOR, dry_run=False)
+        assert repeated["receipt_outcome"] == "existing_preserved"
+        assert repeated["created"] == 0
+        assert repeated["existing_preserved"] == 1
+        assert count(session, Candidate) == 1
+        assert count(session, TransferReceipt) == 2
+        assert session.get(Candidate, first["items"][0]["candidate_id"]).current_revision == 2
+
+
+def test_all_existing_bundle_still_writes_receipt(engine, payload):
+    with Session(engine) as session, session.begin():
+        existing = service.create_candidate(
+            session, Draft.model_validate(payload["items"][0]["draft"]), ACTOR
+        )
+        result = stage_transfer_candidates(session, raw(payload), ACTOR, dry_run=False)
+        assert result["receipt_outcome"] == "existing_preserved"
+        assert result["created"] == 0
+        assert existing.current_revision == 1
+        assert count(session, TransferReceipt) == 1
+        assert count(session, Revision) == 1
+
+
+def test_same_run_allows_two_bundle_ids(engine, payload):
+    with Session(engine) as session, session.begin():
+        first = stage_transfer_candidates(session, raw(payload), ACTOR, dry_run=False)
+        payload["bundle_id"] = "fictional-bundle-002"
+        payload["items"][0]["draft"]["slug"] = payload["items"][0]["article"]["slug"] = (
+            "fictional-second-run"
+        )
+        payload["items"][0]["draft"]["source"]["url"] = payload["items"][0]["article"][
+            "sourceUrl"
+        ] = "https://example.org/second-run"
+        second = stage_transfer_candidates(session, raw(payload), ACTOR, dry_run=False)
+        assert first["receipt_outcome"] == second["receipt_outcome"] == "imported"
+        receipts = session.scalars(select(TransferReceipt)).all()
+        assert {row.run_id for row in receipts} == {payload["run_id"]}
+        assert {row.bundle_id for row in receipts} == {
+            "fictional-bundle-001",
+            "fictional-bundle-002",
+        }
+
+
+def test_different_trust_scopes_do_not_collide(engine, payload):
+    with Session(engine) as session, session.begin():
+        first = stage_transfer_candidates(session, raw(payload), ACTOR, dry_run=False)
+        second = stage_transfer_candidates(
+            session, raw(payload), ACTOR, dry_run=False, trust_scope="local-other"
+        )
+        assert first["trust_scope"] == LOCAL_VIRTUAL_TRUST_SCOPE
+        assert second["trust_scope"] == "local-other"
+        assert second["receipt_outcome"] == "existing_preserved"
+        assert count(session, TransferReceipt) == 2
+        assert count(session, Candidate) == 1
+
+
+def test_json_cannot_choose_trust_scope(engine, payload):
+    payload["trust_scope"] = "claimed-admin"
+    payload["actor"] = "claimed-admin"
+    with Session(engine) as session, session.begin():
+        with pytest.raises(TransferError):
+            stage_transfer_candidates(session, raw(payload), ACTOR, dry_run=False)
+        assert count(session, TransferReceipt) == 0
+
+
+def test_receipt_unique_constraint_is_enforced(engine, payload):
+    with Session(engine) as session, session.begin():
+        stage_transfer_candidates(session, raw(payload), ACTOR, dry_run=False)
+        with pytest.raises(IntegrityError), session.begin_nested():
+            session.add(
+                TransferReceipt(
+                    trust_scope=LOCAL_VIRTUAL_TRUST_SCOPE,
+                    bundle_id=payload["bundle_id"],
+                    run_id=payload["run_id"],
+                    sha256="0" * 64,
+                    outcome="imported",
+                    first_result={},
+                )
+            )
+            session.flush()
+

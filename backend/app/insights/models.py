@@ -149,3 +149,49 @@ class InsightPageViewDaily(Base):
     )
     view_date: Mapped[date] = mapped_column(Date, primary_key=True)
     page_views: Mapped[int] = mapped_column(Integer)
+
+
+class TransferReceipt(Base):
+    """한 신뢰 범위에서 받은 전송 묶음의 최초 접수. 후보 상태 enum과 섞지 않습니다."""
+
+    __tablename__ = "transfer_receipts"
+    __table_args__ = (
+        UniqueConstraint("trust_scope", "bundle_id", name="uq_transfer_receipt_scope_bundle"),
+        CheckConstraint(
+            "outcome IN ('imported','existing_preserved')",
+            name="ck_transfer_receipt_outcome",
+        ),
+        {"schema": SCHEMA},
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    # 서버/호출자가 정한 범위입니다. 외부 JSON이나 actor 문자열로 고르지 않습니다.
+    trust_scope: Mapped[str] = mapped_column(String(64))
+    bundle_id: Mapped[str] = mapped_column(String(100))
+    # 한 회차에 여러 묶음이 있을 수 있어 run_id는 유일하지 않습니다.
+    run_id: Mapped[str] = mapped_column(String(100))
+    sha256: Mapped[str] = mapped_column(String(64))
+    outcome: Mapped[str] = mapped_column(String(30))
+    first_result: Mapped[dict] = mapped_column(JSON)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+
+
+class TransferReceiptItem(Base):
+    """최초 접수 당시의 후보·판본 매핑. replay 때 현재 판본으로 바꾸지 않습니다."""
+
+    __tablename__ = "transfer_receipt_items"
+    __table_args__ = (
+        UniqueConstraint("receipt_id", "item_index", name="uq_transfer_receipt_item_index"),
+        CheckConstraint(
+            "action IN ('created','existing_preserved','duplicate_in_batch')",
+            name="ck_transfer_receipt_item_action",
+        ),
+        {"schema": SCHEMA},
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    receipt_id: Mapped[str] = mapped_column(ForeignKey(f"{SCHEMA}.transfer_receipts.id"))
+    item_index: Mapped[int] = mapped_column(Integer)
+    candidate_id: Mapped[str | None] = mapped_column(String(36))
+    revision_number: Mapped[int | None] = mapped_column(Integer)
+    action: Mapped[str] = mapped_column(String(30))
