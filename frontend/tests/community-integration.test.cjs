@@ -24,6 +24,7 @@ function load(relative, params = new URLSearchParams()) {
     if (name === "@/lib/collab-requests") return { photoOrDefault: () => "" };
     if (name === "@/lib/my-research") return { DATA_STATUS_LABELS: {} };
     if (name === "@/lib/expert-search") return load("src/lib/expert-search.ts", params);
+    if (name === "@/lib/related-rank") return load("src/lib/related-rank.ts", params);
     return require(name);
   };
   vm.runInNewContext(outputText, { module, exports: module.exports, require: localRequire, URLSearchParams, Map, Set });

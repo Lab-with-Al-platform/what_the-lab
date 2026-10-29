@@ -6,13 +6,15 @@ import { articlePath, kindLabel, type InsightListItem } from "@/lib/insight-meta
 interface InsightCardProps {
   article: InsightListItem;
   variant?: "default" | "landing" | "editorial";
+  /** 내 키워드와 같을 때만 한 줄 이유를 붙입니다. */
+  reason?: string | null;
 }
 
 /**
  * 홈과 목록에서 같은 크기로 쓰는 인사이트 카드입니다.
  * 저장은 MVP+라서 버튼을 두지 않습니다. 눌러도 아무 일도 없는 아이콘을 완성 기능처럼 보이지 않게 합니다.
  */
-export function InsightCard({ article, variant = "default" }: InsightCardProps) {
+export function InsightCard({ article, variant = "default", reason }: InsightCardProps) {
   const href = articlePath(article);
   const isLanding = variant === "landing";
 
@@ -32,6 +34,7 @@ export function InsightCard({ article, variant = "default" }: InsightCardProps) 
               <span aria-hidden="true" className="text-line">|</span>
               <span className="text-muted">{article.field}</span>
             </p>
+            {reason ? <p className="mt-1 text-xs font-medium text-brand">{reason}</p> : null}
             <h3 className="mt-2 line-clamp-2 text-base leading-snug font-bold tracking-tight text-ink transition-colors group-hover:text-brand md:min-h-[2lh]">{article.title}</h3>
             <p className="mt-3 line-clamp-2 text-sm leading-6 text-muted md:min-h-[2lh]">{article.summary}</p>
             <div className="mt-auto flex items-center justify-between gap-3 pt-5 text-xs text-muted">

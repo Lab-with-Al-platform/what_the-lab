@@ -5,19 +5,11 @@ from fastapi import APIRouter, HTTPException, Query
 from app.db import get_connection
 from app.expert_profile_store import load_profile
 from app.expert_search_store import load_collaborations, load_engagement, search_experts
+from app.related_rank import split_category_ids, split_work_ids
 
 router = APIRouter(prefix="/api/v1/experts", tags=["experts"])
 
 PAGE_SIZE = 6  # 한 번에 보여 줄 카드 수 ([전문가 더 보기]로 이어서)
-
-
-def split_ids(value: str, prefix: str) -> list[str]:
-    """'UG01,UG04' → ['UG01', 'UG04']. 모양이 다른 값은 버립니다."""
-    return [
-        item
-        for item in dict.fromkeys(value.split(","))
-        if item.startswith(prefix) and len(item) <= 10
-    ]
 
 
 @router.get("")
@@ -25,9 +17,19 @@ def list_experts(
     q: str = Query("", max_length=50),  # 검색어
     works: str = Query("", max_length=200),  # 할 수 있는 일 UG ID, 쉼표로 여러 개
     fields: str = Query("", max_length=200),  # 연구 분야 대분류 ID(F01~F10), 쉼표로 여러 개
+    prefer_works: str = Query("", max_length=200),  # 위로 올릴 UG. 목록에서 빼지는 않음
+    prefer_fields: str = Query("", max_length=200),  # 위로 올릴 대분류. 목록에서 빼지는 않음
     offset: int = Query(0, ge=0, le=10_000),  # 몇 번째부터 (더 보기)
 ) -> dict:
-    return search_experts(q, split_ids(works, "UG"), split_ids(fields, "F"), offset, PAGE_SIZE)
+    return search_experts(
+        q,
+        split_work_ids(works),
+        split_category_ids(fields),
+        offset,
+        PAGE_SIZE,
+        prefer_work_ids=split_work_ids(prefer_works),
+        prefer_category_ids=split_category_ids(prefer_fields),
+    )
 
 
 @router.get("/{user_id}")
