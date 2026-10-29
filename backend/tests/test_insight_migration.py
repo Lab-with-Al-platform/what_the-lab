@@ -7,7 +7,8 @@ from alembic import command
 from alembic.config import Config
 
 BACKEND = Path(__file__).resolve().parents[1]
-INIT_SQL = BACKEND.parent / "database" / "init" / "022_add_transfer_receipts.sql"
+INIT_RECEIPTS = BACKEND.parent / "database" / "init" / "022_add_transfer_receipts.sql"
+INIT_RUNS = BACKEND.parent / "database" / "init" / "024_add_agent_runs.sql"
 
 
 def test_offline_upgrade_has_private_tables_and_no_secrets(monkeypatch):
@@ -31,6 +32,7 @@ def test_offline_upgrade_has_private_tables_and_no_secrets(monkeypatch):
         "publications",
         "transfer_receipts",
         "transfer_receipt_items",
+        "agent_runs",
     )
     for table in tables:
         assert f"CREATE TABLE insight_private.{table}" in sql
@@ -38,9 +40,15 @@ def test_offline_upgrade_has_private_tables_and_no_secrets(monkeypatch):
     assert "REVOKE ALL ON SCHEMA insight_private FROM PUBLIC" in sql
     assert "UNIQUE (idempotency_key)" in sql
     assert "UNIQUE (trust_scope, bundle_id)" in sql
+    assert "UNIQUE (run_id)" in sql
     assert marker not in sql
-    init_sql = INIT_SQL.read_text(encoding="utf-8")
+    init_sql = INIT_RECEIPTS.read_text(encoding="utf-8")
     assert "CREATE TABLE insight_private.transfer_receipts" in init_sql
     assert "UNIQUE (trust_scope, bundle_id)" in init_sql
     assert "version_num = '20261029_18'" in init_sql
     assert "WHERE version_num = '20261028_17'" in init_sql
+    run_sql = INIT_RUNS.read_text(encoding="utf-8")
+    assert "CREATE TABLE insight_private.agent_runs" in run_sql
+    assert "UNIQUE (run_id)" in run_sql
+    assert "version_num = '20261029_20'" in run_sql
+    assert "WHERE version_num = '20261029_19'" in run_sql

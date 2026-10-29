@@ -195,3 +195,44 @@ class TransferReceiptItem(Base):
     candidate_id: Mapped[str | None] = mapped_column(String(36))
     revision_number: Mapped[int | None] = mapped_column(Integer)
     action: Mapped[str] = mapped_column(String(30))
+
+
+class AgentRun(Base):
+    """수집 회차의 진행 저장. 후보 상태·접수 이력과 칸을 섞지 않습니다."""
+
+    __tablename__ = "agent_runs"
+    __table_args__ = (
+        UniqueConstraint("run_id", name="uq_agent_run_id"),
+        CheckConstraint("state_version >= 1", name="ck_agent_run_state_version"),
+        CheckConstraint("attempt_count >= 0", name="ck_agent_run_attempt_count"),
+        CheckConstraint(
+            "step IN ('queued','researching','drafting','reviewing','ready_for_human')",
+            name="ck_agent_run_step",
+        ),
+        CheckConstraint(
+            "status IN ('queued','researching','drafting','reviewing',"
+            "'ready_for_human','needs_revision','held','failed','cancelled')",
+            name="ck_agent_run_status",
+        ),
+        {"schema": SCHEMA},
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    run_id: Mapped[str] = mapped_column(String(100))
+    step: Mapped[str] = mapped_column(String(30), default="queued")
+    status: Mapped[str] = mapped_column(String(30), default="queued")
+    settings_version: Mapped[str] = mapped_column(String(80))
+    settings_hash: Mapped[str] = mapped_column(String(64))
+    input_hash: Mapped[str] = mapped_column(String(64))
+    manuscript_hash: Mapped[str | None] = mapped_column(String(64))
+    attempt_count: Mapped[int] = mapped_column(Integer, default=0)
+    budget_usage: Mapped[dict] = mapped_column(JSON)
+    error_code: Mapped[str | None] = mapped_column(String(50))
+    evidence_ids: Mapped[list] = mapped_column(JSON)
+    bundle_id: Mapped[str | None] = mapped_column(String(120))
+    lease_owner: Mapped[str | None] = mapped_column(String(80))
+    lease_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # CAS: 저장할 때 이 번호가 같아야만 갱신합니다. 오래된 재개를 덮어쓰지 않습니다.
+    state_version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
