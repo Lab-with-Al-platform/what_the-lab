@@ -161,3 +161,21 @@ export function dueText(task: CollabTask, today: string): { text: string; soon: 
   const tail = left < 0 ? ` · ${-left}일 지남` : left === 0 ? " · 오늘" : ` · D-${left}`;
   return { text: `~${month}.${day}${tail}`, soon: left <= 2 };
 }
+
+export const TASK_LIMIT = 300; // 백엔드 MAX_TASK 와 같은 글자 수
+
+/** [＋ 요청 남기기]: 상대에게 요청 보내기 (기한은 선택) */
+export async function addTask(collaborationId: number, input: { content: string; due_date: string | null }): Promise<CollaborationDetail> {
+  return requestApi<CollaborationDetail>(`/workspace/${collaborationId}/tasks`, { method: "POST", body: JSON.stringify(input) });
+}
+
+/** 받은 요청 [완료] */
+export async function completeTask(taskId: number): Promise<CollaborationDetail> {
+  return requestApi<CollaborationDetail>(`/workspace/tasks/${taskId}/done`, { method: "POST" });
+}
+
+/** 보낸 요청 [취소] */
+export async function cancelTask(taskId: number): Promise<CollaborationDetail> {
+  return requestApi<CollaborationDetail>(`/workspace/tasks/${taskId}/cancel`, { method: "POST" });
+}
+

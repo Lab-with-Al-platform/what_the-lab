@@ -32,6 +32,7 @@ from app.routers import (
     taxonomy,
     verification,
     workspace,
+    workspace_tasks,
 )
 
 
@@ -111,3 +112,4 @@ app.include_router(profile_photo.router)
 app.include_router(workspace.router)
 app.include_router(google.router)
 app.include_router(community.router)
+app.include_router(workspace_tasks.router)
