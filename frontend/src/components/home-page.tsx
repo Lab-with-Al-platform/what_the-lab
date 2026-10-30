@@ -3,6 +3,7 @@ import Link from "next/link";
 import { InsightCard } from "@/components/insight-card";
 import { PageContainer } from "@/components/page-container";
 import { InterviewPanel } from "@/components/interview-panel";
+import { HomeHero } from "@/components/home-hero";
 import { landingInsights } from "@/lib/insights";
 
 function topicHref(path: string, key: string, value: string): string {
@@ -62,31 +63,7 @@ export function HomePage() {
 
   return (
     <div className="bg-white">
-      <section>
-        {/* 이미지와 그라데이션도 아래 카드 목록과 같은 최대 폭 안에 둡니다. */}
-        <PageContainer className="relative grid min-h-[378px] items-center gap-6 overflow-hidden bg-[linear-gradient(90deg,#ffffff_0%,#ffffff_44%,#f4f6fb_100%)] py-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:py-0">
-          <div className="relative z-10 lg:pl-12">
-            <p className="text-[11px] font-semibold tracking-[0.22em] text-faint">RESEARCH × AI × COLLABORATION</p>
-            <h1 className="mt-5 text-[34px] leading-[1.16] font-bold tracking-[-0.035em] text-ink md:text-[50px]">
-              연구의 질문이
-              <br />
-              AI와 만나는 곳, <span className="text-brand">LabBridge</span>
-            </h1>
-            <p className="mt-5 max-w-[520px] text-[15px] leading-7 text-ink/80">
-              실제 연구사례와 최신 기술 동향을 통해
-              <br className="hidden sm:block" />
-              내 연구에 맞는 AI 아이디어를 발견하고, 함께할 AI 전문가를 찾아보세요.
-            </p>
-            <Link href="#paths" className="mt-5 inline-flex h-11 items-center gap-3 rounded-button bg-brand px-6 text-sm font-medium text-white shadow-[0_8px_20px_rgb(80_54_244_/_0.18)] transition hover:-translate-y-0.5 hover:bg-brand-hover">
-              지금 시작하기
-              <span aria-hidden="true">→</span>
-            </Link>
-          </div>
-          <HeroCollage />
-          {/* 사진 끝이 카드와 만나며 생기던 가로선을 흰색으로 녹입니다. */}
-          <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-16 bg-gradient-to-b from-white/0 to-white" />
-        </PageContainer>
-      </section>
+      <HomeHero introVisual={<HeroCollage />} />
 
       <PageContainer id="paths" className="grid gap-4 py-0 lg:grid-cols-3">
         {ENTRY_CARDS.map((card) => (

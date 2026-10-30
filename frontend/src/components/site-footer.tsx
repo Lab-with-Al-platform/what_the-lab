@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { BrandMark } from "@/components/brand-mark";
+import { BrandWordmark } from "@/components/brand-wordmark";
 import { PageContainer } from "@/components/page-container";
 
 export function SiteFooter() {
@@ -6,7 +8,10 @@ export function SiteFooter() {
     <footer className="mt-16 border-t border-line bg-white">
       <PageContainer className="flex flex-col gap-6 py-10 text-sm text-muted md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="font-semibold text-ink">LabBridge</p>
+          <div className="flex items-center gap-2">
+            <BrandMark size={28} />
+            <BrandWordmark height={24} />
+          </div>
           <p className="mt-1 max-w-md">연구의 질문과 AI 전문가가 만나는 협업 플랫폼의 공개 화면 시안입니다.</p>
         </div>
         <nav className="flex flex-wrap gap-4" aria-label="바닥 메뉴">
