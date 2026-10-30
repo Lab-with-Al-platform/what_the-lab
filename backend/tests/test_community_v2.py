@@ -253,8 +253,12 @@ def test_existing_oauth_cookie_is_secure_in_https_deployment(board, monkeypatch,
         auth, "DISCORD_REDIRECT_URI", ("https" if https else "http") + "://api.example/callback"
     )
     response = client.get("/api/v1/auth/discord/login", follow_redirects=False)
-    assert ("Secure" in response.headers["set-cookie"]) == https
+    cookie = response.headers["set-cookie"]
+    assert ("Secure" in cookie) == https
+    # 버셀과 API 주소가 다르면 Lax는 디스코드 왕복에서 확인 쿠키를 떨어뜨립니다.
+    assert ("samesite=none" in cookie.lower()) == https
+    assert ("samesite=lax" in cookie.lower()) == (not https)
     assert (
-        "HttpOnly" in response.headers["set-cookie"]
+        "HttpOnly" in cookie
         and "no-store" in response.headers["cache-control"]
     )
