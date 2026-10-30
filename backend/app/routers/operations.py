@@ -1,4 +1,4 @@
-"""운영자용 읽기 전용 API. 회원 상태와 연구 본문은 바꾸지 않습니다."""
+"""운영자용 API. 회원 정지·공통 관리자 부여는 서버가 다시 검사하고, 연구 본문은 바꾸지 않습니다."""
 
 from datetime import date, datetime, time, timedelta
 from typing import Annotated, Literal
@@ -15,6 +15,7 @@ from app.operations.account_actions import (
     AccountActionError,
     MemoryAccountStore,
     PostgresAccountStore,
+    parse_admin_change,
     parse_change,
 )
 from app.operations.auth import require_operations_reader
@@ -52,6 +53,14 @@ router = APIRouter(prefix="/api/v1/admin/operations", tags=["operations"])
 class StatusBody(BaseModel):
     expected_status: Literal["active", "suspended"]
     next_status: Literal["active", "suspended"]
+    reason: str = Field(min_length=1, max_length=200)
+    notice: str = Field(default="", max_length=200)
+    idempotency_key: str
+
+
+class AdminBody(BaseModel):
+    expected_is_admin: bool
+    next_is_admin: bool
     reason: str = Field(min_length=1, max_length=200)
     notice: str = Field(default="", max_length=200)
     idempotency_key: str
@@ -217,7 +226,6 @@ def one_member(
     records: Annotated[OperationsSnapshot | None, Depends(get_record_set)],
     store: Annotated[PostgresAccountStore | MemoryAccountStore, Depends(get_account_store)],
 ) -> dict:
-    del reader
     if records is None:
         member = fetch_member(user_id)
         body = None if member is None else member_detail_from(member, fetch_researches_of(user_id))
@@ -225,6 +233,12 @@ def one_member(
         body = member_detail(records, user_id)
     if body is None:
         raise HTTPException(404, "회원을 찾을 수 없습니다.")
+    body["admin_actions"] = _admin_action(
+        is_admin=body["is_admin"],
+        status=body["status"],
+        actor_id=reader["user_id"],
+        target_id=user_id,
+    )
     body["audit"] = _audit_body(store, user_id)
     return body
 
@@ -246,6 +260,28 @@ def change_status(
         "user_id": user_id,
         "status": result["after_status"],
         "previous_status": result["before_status"],
+        "replayed": result["replayed"],
+        "action": result["action"],
+    }
+
+
+@router.post("/members/{user_id}/admin", dependencies=[Depends(require_trusted_origin)])
+def change_admin(
+    user_id: int,
+    body: AdminBody,
+    reader: Reader,
+    store: Annotated[PostgresAccountStore | MemoryAccountStore, Depends(get_account_store)],
+) -> dict:
+    """공통 관리자 표시만 바꿉니다. 환경 변수 허용 목록은 고치지 않습니다."""
+    try:
+        change = parse_admin_change(body.model_dump())
+        result = store.change_admin(reader["user_id"], user_id, change)
+    except AccountActionError as error:
+        raise HTTPException(error.status_code, error.detail) from error
+    return {
+        "user_id": user_id,
+        "is_admin": result["after_status"] == "admin",
+        "previous_is_admin": result["before_status"] == "admin",
         "replayed": result["replayed"],
         "action": result["action"],
     }
@@ -318,7 +354,7 @@ def _audit_body(store: PostgresAccountStore | MemoryAccountStore, user_id: int) 
         return {"status": "not_collected", "note": error.detail, "items": []}
     return {
         "status": "ready",
-        "note": "성공한 정지·해제만 보여 줍니다. 화면에서 고치거나 지우지 않습니다.",
+        "note": "성공한 정지·해제·관리자 변경만 보여 줍니다. 화면에서 고치거나 지우지 않습니다.",
         "items": [
             {
                 "actor_user_id": row["actor_user_id"],
@@ -331,6 +367,33 @@ def _audit_body(store: PostgresAccountStore | MemoryAccountStore, user_id: int) 
             }
             for row in rows
         ],
+    }
+
+
+def _admin_action(*, is_admin: bool, status: str, actor_id: int, target_id: int) -> dict:
+    """버튼 표시용입니다. 실제 부여는 POST에서 다시 검사합니다."""
+    if actor_id == target_id:
+        return {
+            "status": "not_available",
+            "next_is_admin": None,
+            "note": "본인 권한은 이 화면에서 바꾸지 않습니다. 다른 관리자에게 요청하세요.",
+        }
+    if status != "active":
+        return {
+            "status": "not_available",
+            "next_is_admin": None,
+            "note": "정상 계정에만 공통 관리자를 주거나 해제합니다.",
+        }
+    if is_admin:
+        return {
+            "status": "ready",
+            "next_is_admin": False,
+            "note": "공통 관리자를 해제하면 운영·인사이트·게시판 관리가 함께 닫힙니다. 마지막 관리자는 해제할 수 없습니다.",
+        }
+    return {
+        "status": "ready",
+        "next_is_admin": True,
+        "note": "공통 관리자를 부여하면 운영·인사이트·게시판 관리가 함께 열립니다. Discord 환경 변수 목록은 바꾸지 않습니다.",
     }
 
 

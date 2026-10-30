@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { ApiError, requestApi } from "@/lib/api";
-import { MemberDetail, MemberItem, PageResult, Summary, formatWhen } from "@/lib/operations-admin";
+import { MemberDetail, MemberItem, PageResult, Summary, auditActionLabel, formatWhen } from "@/lib/operations-admin";
 import { demoMemberDetail, demoMembers, demoSummary } from "@/lib/admin-demo";
 import { ADMIN_BUTTON, ADMIN_FIELD } from "./admin-ui";
 import { adminHref, useAdminDemo } from "./admin-shell";
@@ -127,7 +127,7 @@ export function MemberDetailScreen({ userId }: { userId: string }) {
   }, [userId, demo]);
 
   return (
-    <OperationsFrame title="회원 상세" description="공개에 필요한 계정 정보와 연구 제목만 봅니다. 정지는 로그인만 막고 연구 기록은 지우지 않습니다.">
+    <OperationsFrame title="회원 상세" description="공개에 필요한 계정 정보와 연구 제목만 봅니다. 정지와 관리자 부여는 서버가 다시 검사하고, 연구 기록은 지우지 않습니다.">
       <Link href={adminHref("/admin/members", demo)} className="mb-4 inline-flex min-h-11 items-center text-sm font-semibold text-brand underline">회원 목록</Link>
       {error ? <p role="alert" className="text-sm text-danger">{error}</p> : null}
       {data ? (
@@ -146,16 +146,20 @@ export function MemberDetailScreen({ userId }: { userId: string }) {
           {data.actions.status === "ready" && data.actions.next_status && !demo ? (
             <MemberStatusDialog userId={data.user_id} nickname={data.nickname} current={data.status} nextStatus={data.actions.next_status} onChanged={setData} />
           ) : null}
+          {data.admin_actions ? <p className="mt-4 text-xs leading-5 text-muted">{data.admin_actions.note}</p> : null}
+          {data.admin_actions?.status === "ready" && data.admin_actions.next_is_admin !== undefined && data.admin_actions.next_is_admin !== null && !demo ? (
+            <MemberAdminDialog userId={data.user_id} nickname={data.nickname} current={data.is_admin} nextIsAdmin={data.admin_actions.next_is_admin} onChanged={setData} />
+          ) : null}
           <h2 className="mt-6 text-base font-bold">운영 이력</h2>
           <p className="mt-1 text-xs text-muted">{data.audit.note}</p>
           {data.audit.items?.length ? (
             <div className="mt-3 overflow-x-auto">
               <table className="w-full min-w-[640px] text-left text-sm">
                 <thead><tr className="text-xs text-muted"><th className="py-2">시각</th><th>작업</th><th>이전</th><th>이후</th><th>내부 사유</th><th>사용자 안내</th></tr></thead>
-                <tbody>{data.audit.items.map((item) => <tr key={item.created_at + item.action} className="border-t border-line"><td className="py-2">{formatWhen(item.created_at)}</td><td>{item.action === "suspend" ? "정지" : "해제"}</td><td>{item.before_status}</td><td>{item.after_status}</td><td>{item.reason}</td><td>{item.notice || "—"}</td></tr>)}</tbody>
+                <tbody>{data.audit.items.map((item) => <tr key={item.created_at + item.action} className="border-t border-line"><td className="py-2">{formatWhen(item.created_at)}</td><td>{auditActionLabel(item.action)}</td><td>{item.before_status}</td><td>{item.after_status}</td><td>{item.reason}</td><td>{item.notice || "—"}</td></tr>)}</tbody>
               </table>
             </div>
-          ) : <p className="mt-2 text-sm text-muted">기록된 정지·해제가 없습니다.</p>}
+          ) : <p className="mt-2 text-sm text-muted">기록된 정지·해제·권한 변경이 없습니다.</p>}
           <h2 className="mt-6 text-base font-bold">연구 등록</h2>
           <ul className="mt-2 space-y-2 text-sm">
             {data.researches.length ? data.researches.map((item) => (
@@ -213,6 +217,55 @@ function MemberStatusDialog({ userId, nickname, current, nextStatus, onChanged }
     <form role="dialog" aria-modal="true" aria-labelledby="member-status-title" className="w-full max-w-lg rounded-card bg-white p-5 shadow-card" onSubmit={submit}>
       <h2 id="member-status-title" className="text-lg font-bold">{stopping ? "계정을 정지할까요?" : "정지를 해제할까요?"}</h2>
       <p className="mt-2 text-sm leading-6 text-muted">대상 {nickname} · 회원 번호 {userId} · {current} → {nextStatus}. {stopping ? "기존 로그인 쿠키로도 들어갈 수 없게 됩니다. 연구 등록과 협업 기록은 지우거나 취소하지 않고, 안내 문자는 알림으로 보내지 않습니다." : "다시 로그인할 수 있게 됩니다. 다른 기록은 바꾸지 않습니다."}</p>
+      <label className="mt-4 block text-sm font-semibold">내부 사유<textarea required maxLength={200} className={ADMIN_FIELD} value={reason} onChange={(event) => setReason(event.target.value)} /></label>
+      <label className="mt-3 block text-sm font-semibold">사용자 안내 · 저장만 하고 보내지 않음<textarea maxLength={200} className={ADMIN_FIELD} value={notice} onChange={(event) => setNotice(event.target.value)} /></label>
+      {error ? <p role="alert" className="mt-3 text-sm text-danger">{error}</p> : null}
+      <div className="mt-4 flex justify-end gap-2">
+        <button type="button" className={`${ADMIN_BUTTON} bg-white`} disabled={busy} onClick={() => setOpen(false)}>취소</button>
+        <button className={`${ADMIN_BUTTON} bg-ink text-white`} disabled={busy || !reason.trim()}>{busy ? "저장 중" : "확인"}</button>
+      </div>
+    </form>
+  </div>;
+}
+
+function MemberAdminDialog({ userId, nickname, current, nextIsAdmin, onChanged }: {
+  userId: number; nickname: string; current: boolean; nextIsAdmin: boolean; onChanged: (detail: MemberDetail) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState("");
+  const [notice, setNotice] = useState("");
+  const [key, setKey] = useState("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const granting = nextIsAdmin === true;
+  async function submit(event: FormEvent) {
+    event.preventDefault();
+    setBusy(true); setError("");
+    try {
+      // 같은 키로 다시 보내면 서버가 이력을 한 번만 남깁니다. 화면 표시만으로 권한을 주지 않습니다.
+      await requestApi(`/admin/operations/members/${userId}/admin`, {
+        method: "POST",
+        body: JSON.stringify({ expected_is_admin: current, next_is_admin: nextIsAdmin, reason, notice, idempotency_key: key }),
+      });
+      onChanged(await requestApi<MemberDetail>(`/admin/operations/members/${userId}`));
+      setOpen(false);
+    } catch (problem: unknown) {
+      const message = problem instanceof ApiError ? problem.message : "권한을 바꾸지 못했습니다.";
+      setError(message);
+      if (problem instanceof ApiError && problem.status === 409) {
+        requestApi<MemberDetail>(`/admin/operations/members/${userId}`).then(onChanged).catch(() => undefined);
+      }
+    } finally {
+      setBusy(false);
+    }
+  }
+  if (!open) {
+    return <button type="button" className={`${ADMIN_BUTTON} mt-4 ${granting ? "bg-ink text-white" : "bg-white"}`} onClick={() => { setKey(crypto.randomUUID()); setReason(""); setNotice(""); setError(""); setOpen(true); }}>{granting ? "관리자 권한 부여" : "관리자 권한 해제"}</button>;
+  }
+  return <div className="fixed inset-0 z-30 grid place-items-center bg-ink/40 p-4" role="presentation" onKeyDown={(event) => { if (event.key === "Escape" && !busy) setOpen(false); }}>
+    <form role="dialog" aria-modal="true" aria-labelledby="member-admin-title" className="w-full max-w-lg rounded-card bg-white p-5 shadow-card" onSubmit={submit}>
+      <h2 id="member-admin-title" className="text-lg font-bold">{granting ? "공통 관리자를 부여할까요?" : "공통 관리자를 해제할까요?"}</h2>
+      <p className="mt-2 text-sm leading-6 text-muted">대상 {nickname} · 회원 번호 {userId}. {granting ? "운영 조회, 인사이트 관리, 게시판 운영이 함께 열립니다. Discord 환경 변수 목록은 바꾸지 않습니다." : "운영·인사이트·게시판 관리가 함께 닫힙니다. 마지막 관리자는 서버가 막습니다."}</p>
       <label className="mt-4 block text-sm font-semibold">내부 사유<textarea required maxLength={200} className={ADMIN_FIELD} value={reason} onChange={(event) => setReason(event.target.value)} /></label>
       <label className="mt-3 block text-sm font-semibold">사용자 안내 · 저장만 하고 보내지 않음<textarea maxLength={200} className={ADMIN_FIELD} value={notice} onChange={(event) => setNotice(event.target.value)} /></label>
       {error ? <p role="alert" className="mt-3 text-sm text-danger">{error}</p> : null}

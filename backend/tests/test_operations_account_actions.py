@@ -142,3 +142,66 @@ def test_permissions_and_existing_cookie_follow_the_new_status(client, monkeypat
         path="/",
     )
     assert client.get(ME).status_code == 200
+
+
+ADMIN = "/api/v1/admin/operations/members/{user_id}/admin"
+
+
+def admin_payload(expected: bool, nxt: bool, reason: str = "가상 권한 사유", key: str | None = None) -> dict:
+    return {
+        "expected_is_admin": expected,
+        "next_is_admin": nxt,
+        "reason": reason,
+        "notice": "가상 안내. 발송하지 않습니다.",
+        "idempotency_key": key or str(uuid4()),
+    }
+
+
+def test_grant_admin_and_replay_keep_one_history(client, monkeypatch):
+    monkeypatch.setenv("OPERATIONS_ADMIN_DISCORD_IDS", "300000000000000003")
+    actor = login_ops(client)
+    target = MemberAccount(50, "active", False)
+    other_admin = MemberAccount(51, "active", True)
+    store = MemoryAccountStore(
+        {
+            50: target,
+            51: other_admin,
+            actor["user_id"]: MemberAccount(actor["user_id"], "active", False),
+        }
+    )
+    bind(store)
+    key = str(uuid4())
+    first = client.post(ADMIN.format(user_id=50), json=admin_payload(False, True, key=key), headers=ORIGIN)
+    second = client.post(ADMIN.format(user_id=50), json=admin_payload(False, True, key=key), headers=ORIGIN)
+    assert first.status_code == 200, first.text
+    assert first.json()["replayed"] is False
+    assert first.json()["is_admin"] is True
+    assert second.json()["replayed"] is True
+    assert target.is_admin is True
+    assert len(store.rows) == 1
+    assert store.rows[0]["action"] == "grant_admin"
+    detail = client.get("/api/v1/admin/operations/members/2").json()
+    assert detail["admin_actions"]["status"] == "ready"
+    assert detail["admin_actions"]["next_is_admin"] is True
+    assert "discord_id" not in str(detail)
+
+
+def test_ops_reader_cannot_revoke_last_admin_or_self_or_without_origin(client, monkeypatch):
+    monkeypatch.setenv("OPERATIONS_ADMIN_DISCORD_IDS", "300000000000000003")
+    actor = login_ops(client)
+    only_admin = MemberAccount(51, "active", True)
+    store = MemoryAccountStore(
+        {51: only_admin, actor["user_id"]: MemberAccount(actor["user_id"], "active", False)}
+    )
+    bind(store)
+    last = client.post(ADMIN.format(user_id=51), json=admin_payload(True, False), headers=ORIGIN)
+    assert last.status_code == 409 and only_admin.is_admin is True
+    self_change = client.post(
+        ADMIN.format(user_id=actor["user_id"]), json=admin_payload(False, True), headers=ORIGIN
+    )
+    assert self_change.status_code == 409
+    missing_origin = client.post(ADMIN.format(user_id=51), json=admin_payload(True, False))
+    assert missing_origin.status_code == 403
+    login(client)
+    forbidden = client.post(ADMIN.format(user_id=51), json=admin_payload(True, False), headers=ORIGIN)
+    assert forbidden.status_code == 403 and only_admin.is_admin is True
