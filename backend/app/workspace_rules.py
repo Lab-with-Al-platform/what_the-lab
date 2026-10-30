@@ -77,13 +77,23 @@ class TaskInput(BaseModel):
     due_date: date | None = None  # 기한 (선택)
 
 
-def clean_task(body: TaskInput, period: tuple[date, date], today: date) -> dict:
-    """요청 입력 정리. 기한은 오늘 ~ 협업 종료일 사이만 (지난 날짜로 요청할 수는 없어요)."""
-    content = required_text(body.content, MAX_TASK, "요청 내용")
-    due = body.due_date
+class DueInput(BaseModel):
+    """[기한 변경]: 새 기한. 비우면(None) 기한 없음"""
+
+    due_date: date | None = None
+
+
+def check_due(due: date | None, period: tuple[date, date], today: date) -> date | None:
+    """기한은 오늘 ~ 협업 종료일 사이만 (지난 날짜로 정할 수는 없어요). 비어 있으면 그대로 None."""
     if due is not None and (due < today or due > period[1]):
         raise bad_request(f"기한은 오늘부터 협업 종료일({fmt(period[1])}) 사이로 골라 주세요")
-    return {"content": content, "due_date": due}
+    return due
+
+
+def clean_task(body: TaskInput, period: tuple[date, date], today: date) -> dict:
+    """요청 입력 정리: 내용(필수, 300자) + 기한(선택, check_due 규칙)"""
+    content = required_text(body.content, MAX_TASK, "요청 내용")
+    return {"content": content, "due_date": check_due(body.due_date, period, today)}
 
 
 def schedule_period(start: date, end: date, confirmed_on: date) -> tuple[date, date]:

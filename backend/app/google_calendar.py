@@ -128,15 +128,38 @@ def event_body(schedule: dict) -> dict:
 
 
 def upsert_event(calendar_id: str, schedule: dict) -> None:
-    """일정을 구글에 넣거나 고쳐요. 이미 있으면 고치고(PUT), 없으면 새로 넣어요(POST)."""
-    eid = event_id(schedule["schedule_id"])
-    body = event_body(schedule)
+    """일정을 구글에 넣거나 고쳐요."""
+    put_event(calendar_id, event_id(schedule["schedule_id"]), event_body(schedule))
+
+
+def put_event(calendar_id: str, eid: str, body: dict) -> None:
+    """구글 일정 하나를 넣거나 고쳐요. 이미 있으면 고치고(PUT), 없으면 새로 넣어요(POST)."""
     url = f"{CALENDAR_API}/calendars/{calendar_id}/events"
     response = httpx.put(f"{url}/{eid}", headers=headers(), json=body, timeout=TIMEOUT)
     if response.status_code == 404:
         response = httpx.post(url, headers=headers(), json={"id": eid, **body}, timeout=TIMEOUT)
     response.raise_for_status()
 
+
+# ---------- 요청 (기한 있는 요청만) ----------
+def task_event_id(task_id: int) -> str:
+    """요청의 구글 일정 번호: lbt00012 (일정 lbs 와 겹치지 않게 t). 저장하지 않아도 요청 번호로 찾아요."""
+    return f"lbt{task_id:05d}"
+
+
+def task_event_body(task: dict) -> dict:
+    """우리 요청 → 구글 하루 종일 일정 (기한 날). 완료한 요청은 제목 앞에 ✅"""
+    due = task["due_date"]
+    link = f"{FRONTEND_URL}/workspace/{task['collaboration_id']}"  # 누르면 LabBridge 협업 상세
+    return {
+        "summary": f"{'✅ ' if task['status'] == 'done' else ''}[요청] {task['content'][:60]}",
+        "description": (
+            f"{task['requested_by_nickname']} → {task['assignee_nickname']}\n\n{task['content']}"
+            f"\n\n※ LabBridge에서 관리하는 요청이에요. 완료·기한 변경은 여기서 → {link}"
+        ),
+        "start": {"date": str(due)},
+        "end": {"date": str(due + timedelta(days=1))},  # 하루 종일 일정은 다음 날을 적어요 (구글 규칙)
+    }
 
 def delete_event(calendar_id: str, eid: str) -> None:
     """구글에서 일정을 지워요. 이미 없으면(404·410) 지운 것으로 봐요."""
