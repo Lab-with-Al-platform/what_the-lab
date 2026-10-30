@@ -3,6 +3,7 @@ import Link from "next/link";
 import { InsightCard } from "@/components/insight-card";
 import { PageContainer } from "@/components/page-container";
 import { InterviewPanel } from "@/components/interview-panel";
+import { BrandWordmark } from "@/components/brand-wordmark";
 import { landingInsights } from "@/lib/insights";
 
 function topicHref(path: string, key: string, value: string): string {
@@ -70,7 +71,10 @@ export function HomePage() {
             <h1 className="mt-5 text-[34px] leading-[1.16] font-bold tracking-[-0.035em] text-ink md:text-[50px]">
               연구의 질문이
               <br />
-              AI와 만나는 곳, <span className="text-brand">LabBridge</span>
+              AI와 만나는 곳,
+              <span className="mt-3 block">
+                <BrandWordmark variant="hero" height={56} priority className="h-10 w-auto md:h-14" />
+              </span>
             </h1>
             <p className="mt-5 max-w-[520px] text-[15px] leading-7 text-ink/80">
               실제 연구사례와 최신 기술 동향을 통해
