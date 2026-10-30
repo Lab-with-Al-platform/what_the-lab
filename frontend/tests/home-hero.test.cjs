@@ -19,6 +19,7 @@ function loadModule(relativePath) {
   function localRequire(request) {
     if (request.endsWith(".css")) return {};
     if (request === "next/link") return { default: ({ children, ...props }) => React.createElement("a", props, children) };
+    if (request === "next/image") return { default: (props) => React.createElement("img", props) };
     if (request === "@/components/page-container") return { PageContainer: ({ children, className }) => React.createElement("div", { className: `page-container ${className}` }, children) };
     if (request.startsWith("@/")) return loadModule(`src/${request.slice(2)}.tsx`);
     return require(request);
@@ -32,6 +33,7 @@ test("홈은 기존 소개와 두 안내 화면을 같은 프레임에 표시한
   const html = renderToStaticMarkup(React.createElement(HomeHero, { introVisual: React.createElement("div", null, "기존 연구 이미지") }));
   assert.equal((html.match(/data-home-slide=/g) ?? []).length, 3);
   assert.match(html, /기존 연구 이미지/);
+  assert.match(html, /labbridge-wordmark-hero/);
   assert.match(html, /플랫폼 이용 안내/);
   assert.match(html, /Discord 이용 안내/);
   assert.equal((html.match(/<h1[ >]/g) ?? []).length, 1);

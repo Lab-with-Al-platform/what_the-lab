@@ -14,7 +14,7 @@
 | `/cases` | 공통 헤더라 같은 심볼 |
 | 홈 링크 | 심볼+이름 클릭 시 홈으로 이동 |
 
-푸터에도 같은 마크를 28px로 넣었다. 브라우저 탭 아이콘은 모서리 흰 여백을 투명 처리한 `/brand/labbridge-favicon.png`와 `frontend/src/app/icon.png`를 쓴다. 헤더·애플 아이콘은 기존 마크를 유지한다.
+푸터에도 같은 마크를 28px로 넣었다. 헤더·푸터 글자는 단일 아치 워드마크, 홈 제목의 LabBridge는 이중 아치 워드마크다. 원본은 `shorts_assets/logo_proposals/wordmark_refinement_v5/`. 브라우저 탭 아이콘은 모서리 흰 여백을 투명 처리한 `/brand/labbridge-favicon.png`와 `frontend/src/app/icon.png`를 쓴다. 헤더·애플 아이콘은 기존 마크를 유지한다.
 
 ## 하지 않은 것
 

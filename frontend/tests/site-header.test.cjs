@@ -27,6 +27,17 @@ test("헤더는 승인된 글래스 브릿지 마크를 쓴다", () => {
   assert.equal(fs.existsSync(mark), true);
 });
 
+test("헤더는 승인된 v5 워드마크 글자를 쓴다", () => {
+  assert.match(source, /BrandWordmark/);
+  assert.match(source, /from "@\/components\/brand-wordmark"/);
+  const headerMark = path.join(__dirname, "../public/brand/labbridge-wordmark-header.png");
+  const heroMark = path.join(__dirname, "../public/brand/labbridge-wordmark-hero.png");
+  assert.equal(fs.existsSync(headerMark), true);
+  assert.equal(fs.existsSync(heroMark), true);
+  const home = fs.readFileSync(path.join(__dirname, "../src/components/home-hero.tsx"), "utf8");
+  assert.match(home, /variant="hero"/);
+});
+
 test("브라우저 탭 아이콘은 흰 여백을 투명하게 둔다", () => {
   const layout = fs.readFileSync(path.join(__dirname, "../src/app/layout.tsx"), "utf8");
   assert.match(layout, /\/brand\/labbridge-favicon\.png/);
