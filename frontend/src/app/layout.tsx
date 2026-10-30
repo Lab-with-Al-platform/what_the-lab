@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   },
   description: "연구의 질문이 AI와 만나는 곳. 연구 사례와 기술 동향을 보고 함께할 AI 전문가를 찾습니다.",
   icons: {
-    icon: [{ url: "/brand/labbridge-mark.png", type: "image/png" }],
+    icon: [{ url: "/brand/labbridge-favicon.png", type: "image/png" }],
     apple: "/brand/labbridge-mark.png",
   },
 };

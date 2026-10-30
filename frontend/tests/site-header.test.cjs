@@ -27,6 +27,15 @@ test("헤더는 승인된 글래스 브릿지 마크를 쓴다", () => {
   assert.equal(fs.existsSync(mark), true);
 });
 
+test("브라우저 탭 아이콘은 흰 여백을 투명하게 둔다", () => {
+  const layout = fs.readFileSync(path.join(__dirname, "../src/app/layout.tsx"), "utf8");
+  assert.match(layout, /\/brand\/labbridge-favicon\.png/);
+  assert.doesNotMatch(layout, /icon: \[\{ url: "\/brand\/labbridge-mark\.png"/);
+  const favicon = path.join(__dirname, "../public/brand/labbridge-favicon.png");
+  const bytes = fs.readFileSync(favicon);
+  assert.equal(bytes[25], 6);
+});
+
 test("헤더 기본 프로필은 next/image로 32px만 받는다", () => {
   assert.match(source, /from "next\/image"/);
   assert.match(source, /width=\{32\}/);
