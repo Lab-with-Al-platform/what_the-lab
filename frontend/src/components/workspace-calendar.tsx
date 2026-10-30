@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { KeyboardEvent, useState } from "react";
-import { coversDay, monthWeeks, Schedule, toneOf } from "@/lib/workspace";
+import { coversDay, monthWeeks, Schedule, taskDay, toneOf, WorkspaceTask } from "@/lib/workspace";
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 const MAX_IN_CELL = 3; // 한 칸에 보여 줄 일정 수 (넘으면 "+n개")
@@ -9,15 +10,18 @@ const KIND_ORDER = { work: 0, due: 1, meeting: 2, etc: 3 } as const; // 작업 �
 
 /**
  * 진행 중 협업들의 일정을 한 달력에. (협업별로 끄고 켜기는 위 "내 협업" 목록에서 해요)
+ * 열린 요청은 기한 날에 📌 로 (기한이 없거나 지났으면 오늘 칸). 누르면 그 협업 상세로 가요. 
  * onAdd(날짜?) = 일정 추가 창 열기 (날짜 숫자를 누르면 그 날짜로) / onPick(일정) = 일정 보기 창
  */
 export function WorkspaceCalendar({
   schedules,
+  tasks,
   today,
   onAdd,
   onPick,
 }: {
   schedules: Schedule[];
+  tasks: WorkspaceTask[];
   today: string;
   onAdd: (date?: string) => void;
   onPick: (schedule: Schedule) => void;
@@ -80,6 +84,7 @@ export function WorkspaceCalendar({
               inMonth={Number(day.slice(5, 7)) === month.month}
               today={today}
               items={schedules.filter((item) => coversDay(item, day))}
+              tasks={tasks.filter((task) => taskDay(task, today) === day)}
               onAdd={onAdd}
               onPick={onPick}
             />
@@ -96,6 +101,7 @@ function DayCell({
   inMonth,
   today,
   items,
+  tasks,
   onAdd,
   onPick,
 }: {
@@ -104,6 +110,7 @@ function DayCell({
   inMonth: boolean;
   today: string;
   items: Schedule[];
+  tasks: WorkspaceTask[]; // 이날 보여 줄 열린 요청
   onAdd: (date: string) => void;
   onPick: (schedule: Schedule) => void;
 }) {
@@ -116,7 +123,8 @@ function DayCell({
       a.schedule_id - b.schedule_id,
   );
   const visible = sorted.slice(0, MAX_IN_CELL);
-  const more = sorted.length - visible.length;
+  const shownTasks = tasks.slice(0, Math.max(0, MAX_IN_CELL - visible.length)); // 일정을 먼저, 남는 자리에 요청
+  const more = sorted.length - visible.length + tasks.length - shownTasks.length;
   const numberColor = !inMonth ? "text-line" : index === 0 ? "text-danger" : index === 6 ? "text-researcher" : "text-ink";
 
   return (
@@ -132,6 +140,9 @@ function DayCell({
       <div className="mt-0.5 space-y-0.5">
         {visible.map((item) => (
           <Chip key={item.schedule_id} item={item} day={day} weekStart={index === 0} weekEnd={index === 6} onPick={onPick} />
+        ))}
+        {shownTasks.map((task) => (
+          <TaskChip key={`t${task.task_id}`} task={task} today={today} />
         ))}
         {more > 0 && <p className="px-1 text-[10px] font-semibold text-faint sm:px-2 sm:text-[11px]">+{more}개</p>}
       </div>
@@ -185,6 +196,24 @@ function Chip({ item, day, weekStart, weekEnd, onPick }: { item: Schedule; day: 
   );
 }
 
+/** 달력 칸 안의 요청 한 줄 (📌). 누르면 그 협업 상세의 요청 카드로 가요. */
+function TaskChip({ task, today }: { task: WorkspaceTask; today: string }) {
+  const tone = toneOf(task.collaboration_id);
+  const late = task.due_date !== null && task.due_date < today;
+  const who = task.direction === "in" ? `${task.requested_by_nickname} → 나` : `나 → ${task.assignee_nickname}`;
+  const when = task.due_date === null ? "기한 없음" : late ? `기한 ${task.due_date} 지남` : `기한 ${task.due_date}`;
+  return (
+    <Link
+      href={`/workspace/${task.collaboration_id}`}
+      title={`요청 · ${task.content} (${who} · ${when})`}
+      className={`mx-1 flex h-5 items-center gap-1 truncate rounded px-0.5 text-[11px] hover:bg-page ${late ? "text-danger" : tone.text}`}
+    >
+      <span aria-hidden="true">📌</span>
+      <span className="hidden truncate sm:inline">{task.content}</span>
+    </Link>
+  );
+}
+
 function Legend() {
   return (
     <div className="mt-3 flex justify-end gap-3 text-[11px] text-muted">
@@ -197,6 +226,7 @@ function Legend() {
         작업 기간
       </span>
       <span>⚑ 마감</span>
+      <span>📌 요청</span>
     </div>
   );
 }

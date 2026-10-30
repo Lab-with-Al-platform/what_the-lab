@@ -7,7 +7,7 @@ import { Collaboration, Schedule } from "@/lib/workspace";
 import { CollaborationDetail, loadDetail } from "@/lib/workspace-detail";
 import { MySpaceShell } from "@/components/my-space-shell";
 import { DetailHead } from "@/components/workspace-detail-head";
-import { AgendaCard, PartnerCard, PrepCard } from "@/components/workspace-detail-side";
+import { AgendaCard, PartnerCard } from "@/components/workspace-detail-side";
 import { TasksCard } from "@/components/workspace-detail-work";
 import { ScheduleDialog } from "@/components/workspace-schedule-dialog";
 import { ScheduleView } from "@/components/workspace-schedule-view";
@@ -57,13 +57,12 @@ export function WorkspaceDetailPage({ collaborationId }: { collaborationId: numb
 
         <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
           {/* 오른쪽 칸: 넓은 화면에서는 스크롤해도 따라 내려오고, 좁은 화면에서는 맨 위로 */}
-          <aside className="grid gap-5 lg:sticky lg:top-6 lg:order-2">
+          <aside className="flex min-w-0 flex-col gap-5 lg:sticky lg:top-6 lg:order-2">
             <AgendaCard detail={detail} editable={editable} onAdd={() => setEditor({ mode: "add" })} onPick={(schedule) => setEditor({ mode: "view", schedule })} />
-            {collab.status === "waiting" && <PrepCard detail={detail} onAddMeeting={() => setEditor({ mode: "add" })} />}
             <PartnerCard detail={detail} />
           </aside>
 
-          <div className="grid min-w-0 gap-5 lg:order-1">
+          <div className="flex min-w-0 flex-col gap-5 lg:order-1">
             <TasksCard detail={detail} editable={editable} onChange={setDetail} />
             {/* 정한 것(DecisionsCard)은 디스코드 명령어를 붙일 때 다시 넣어요 */}
           </div>

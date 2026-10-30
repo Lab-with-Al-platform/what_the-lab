@@ -143,7 +143,24 @@ export function monthWeeks(year: number, month: number): string[][] {
 // 협업 시작일·종료일은 일정 테이블에 저장하지 않고, 화면에서 달력에 자동으로 넣어 보여 줘요.
 // ---------------------------------------------------------------------------
 
-export type WorkspaceData = { collaborations: Collaboration[]; schedules: Schedule[] };
+/** 진행 중 협업의 열린 요청 (협업 목록 달력 · 다가오는 일정에 보여요) */
+export type WorkspaceTask = {
+  task_id: number;
+  collaboration_id: number;
+  content: string;
+  due_date: string | null; // 기한 없음이면 null
+  created_at: string; // 남긴 때 (최신순 정렬)
+  direction: "in" | "out"; // in = 내가 받은 요청, out = 내가 보낸 요청
+  requested_by_nickname: string;
+  assignee_nickname: string;
+};
+
+export type WorkspaceData = { collaborations: Collaboration[]; schedules: Schedule[]; tasks: WorkspaceTask[] };
+
+/** 요청을 보여 줄 날: 기한이 오늘 뒤면 그날, 기한이 없거나 오늘·지났으면 오늘 (끝날 때까지 매일 오늘 칸에) */
+export function taskDay(task: { due_date: string | null }, today: string): string {
+  return task.due_date && task.due_date > today ? task.due_date : today;
+}
 
 /** 협업 목록 + 내가 볼 수 있는 일정 */
 export async function loadWorkspace(): Promise<WorkspaceData> {
@@ -191,5 +208,5 @@ function withAutoItems(data: WorkspaceData): WorkspaceData {
       auto(collab, -collab.collaboration_id * 2, "etc", "협업 시작", collab.start_date, "이날부터 협업이 시작돼요"),
       auto(collab, -collab.collaboration_id * 2 - 1, "due", "협업 종료일", collab.end_date, "이날이 지나면 완료로 넘어가요"),
     ]);
-  return { ...data, schedules: [...data.schedules, ...extra] };
+  return { ...data, schedules: [...data.schedules, ...extra], tasks: data.tasks ?? [] };
 }
