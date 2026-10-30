@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { BrandMark } from "@/components/brand-mark";
+import { BrandWordmark } from "@/components/brand-wordmark";
 import { NotificationBell } from "@/components/notification-bell";
 import { PageContainer } from "@/components/page-container";
 import { apiAsset, requestApi } from "@/lib/api";
@@ -142,9 +143,9 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-line/80 bg-white/95 backdrop-blur">
       <PageContainer className="flex h-[var(--header-height)] items-center gap-6">
-        <Link href="/" className="flex items-center gap-2.5 text-[20px] font-bold tracking-tight text-ink">
+        <Link href="/" className="flex items-center gap-2" aria-label="LabBridge">
           <BrandMark priority />
-          LabBridge
+          <BrandWordmark height={28} priority alt="" />
         </Link>
 
         <nav className="hidden items-center gap-5 whitespace-nowrap text-sm text-ink xl:flex" aria-label="주요 메뉴">

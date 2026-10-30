@@ -44,7 +44,7 @@
 **헤더**
 - 좌측 심볼과 `LabBridge` 워드마크, 탐색 `홈 / AI 연구 협업 사례 / AI 트렌드 / AI 전문가 찾기`, 우측 검색 아이콘과 회원가입·로그인.
 - 흰색 단일 행. 활성 메뉴는 텍스트 색과 가는 하단 보라 선으로 구분. 메뉴 글씨를 H1처럼 키우지 않는다.
-- 헤더 심볼은 승인된 글래스 브릿지 마크 `frontend/public/brand/labbridge-mark.png`를 쓴다. 브라우저 탭 아이콘은 흰 여백을 뺀 `frontend/public/brand/labbridge-favicon.png`를 쓴다. 랜딩 시안 PNG에서 로고를 잘라 확대하지 않는다.
+- 헤더 심볼은 승인된 글래스 브릿지 마크 `frontend/public/brand/labbridge-mark.png`를 쓴다. 옆 글자는 헤더용 단일 아치 워드마크 `frontend/public/brand/labbridge-wordmark-header.png`를 쓴다. 홈 제목의 LabBridge는 대표용 이중 아치 `frontend/public/brand/labbridge-wordmark-hero.png`를 쓴다. 브라우저 탭 아이콘은 흰 여백을 뺀 `frontend/public/brand/labbridge-favicon.png`를 쓴다. 랜딩 시안 PNG에서 로고를 잘라 확대하지 않는다.
 
 **히어로**
 - 상단 작은 대문자 `RESEARCH × AI × COLLABORATION`, 좌측 2행 제목 `연구의 질문이 / AI와 만나는 곳, LabBridge`와 짧은 설명, 보라 CTA.

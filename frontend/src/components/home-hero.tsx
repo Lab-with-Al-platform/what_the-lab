@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { useEffect, useState, type CSSProperties, type FocusEvent, type PointerEvent, type ReactNode } from "react";
+import { BrandWordmark } from "@/components/brand-wordmark";
 import { PageContainer } from "@/components/page-container";
 import { DiscordGuideVisual, PlatformGuideVisual } from "@/components/home-guide-visuals";
 import "./home-hero.css";
 
 const SLIDE_DURATION_MS = 9000;
 const HOME_SLIDES = [
-  { id: "intro", label: "LabBridge 소개", eyebrow: "RESEARCH × AI × COLLABORATION", firstLine: "연구의 질문이", secondLine: "AI와 만나는 곳, ", accent: "LabBridge", body: "실제 연구사례와 최신 기술 동향을 통해 내 연구에 맞는 AI 아이디어를 발견하고, 함께할 AI 전문가를 찾아보세요." },
+  { id: "intro", label: "LabBridge 소개", eyebrow: "RESEARCH × AI × COLLABORATION", firstLine: "연구의 질문이", secondLine: "AI와 만나는 곳,", accent: "", body: "실제 연구사례와 최신 기술 동향을 통해 내 연구에 맞는 AI 아이디어를 발견하고, 함께할 AI 전문가를 찾아보세요." },
   { id: "platform", label: "플랫폼 이용 안내", eyebrow: "GET STARTED WITH LABBRIDGE", firstLine: "연구의 시작부터", secondLine: "협업의 완성까지", accent: "", body: "인사이트에서 가능성을 발견하고, 내 연구에 맞는 전문가와 연결되세요. 함께할 팀을 만나 프로젝트를 이어갑니다." },
   { id: "discord", label: "Discord 이용 안내", eyebrow: "YOUR COLLABORATION SPACE", firstLine: "함께하는 연구의 현장,", secondLine: "Discord로 이어집니다.", accent: "", body: "프로젝트의 대화와 협업이 이어지는 공간. 챗봇과 Google Calendar의 연결로 연구 논의와 일정이 한 흐름으로 이어집니다." },
 ] as const;
@@ -60,7 +61,7 @@ export function HomeHero({ introVisual }: { introVisual: ReactNode }) {
             <div key={slide.id} className="home-hero__slide" data-home-slide={slide.id} data-active={activeIndex === index} role="group" aria-roledescription="slide" aria-label={`${index + 1} / ${HOME_SLIDES.length}: ${slide.label}`} aria-hidden={activeIndex !== index} inert={activeIndex !== index}>
               <div className="home-hero__copy">
                 <p className="home-hero__eyebrow">{slide.eyebrow}</p>
-                <h2 className="home-hero__title">{slide.firstLine}<br /><span className={slide.id === "intro" ? undefined : "text-brand"}>{slide.secondLine}</span>{slide.accent ? <span className="text-brand">{slide.accent}</span> : null}</h2>
+                <h2 className="home-hero__title">{slide.firstLine}<br /><span className={slide.id === "intro" ? undefined : "text-brand"}>{slide.secondLine}</span>{slide.id === "intro" ? <span className="mt-3 block"><BrandWordmark variant="hero" height={56} priority className="h-10 w-auto md:h-14" /></span> : slide.accent ? <span className="text-brand">{slide.accent}</span> : null}</h2>
                 <p className="home-hero__description">{slide.body}</p>
                 {slide.id === "intro" ? (
                   <Link href="#paths" className="home-hero__cta">지금 시작하기 <span aria-hidden="true">→</span></Link>
