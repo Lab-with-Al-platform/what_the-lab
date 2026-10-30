@@ -11,7 +11,9 @@ import { CollabList } from "@/components/workspace-collab-list";
 import { ScheduleDialog } from "@/components/workspace-schedule-dialog";
 import { ScheduleView } from "@/components/workspace-schedule-view";
 import { TodoBox, TodoItem } from "@/components/workspace-todo";
+import { RequestList } from "@/components/workspace-requests";
 import { UpcomingList } from "@/components/workspace-upcoming";
+
 
 type Tab = "ongoing" | "finished";
 // 일정 창: 새로 추가(협업·날짜를 골라 둘 수 있음) / 보기 / 수정
@@ -44,6 +46,7 @@ export function WorkspaceHome({ role }: { role: "researcher" | "expert" }) {
   // 달력에는 진행 중 협업의 일정을 모두, 색 네모로 끈 협업만 빼고 보여요
   const shownIds = new Set(ongoing.filter((collab) => !hidden.includes(collab.collaboration_id)).map((collab) => collab.collaboration_id));
   const schedules = data.schedules.filter((item) => shownIds.has(item.collaboration_id));
+    const tasks = data.tasks.filter((item) => shownIds.has(item.collaboration_id));
   const todos = buildTodos(ongoing, data.schedules, (collabId) => setEditor({ mode: "add", collabId })).filter((item) => !dismissed.includes(item.key));
   const pick = (schedule: Schedule) => schedule.schedule_id > 0 && setEditor({ mode: "view", schedule }); // 자동으로 넣은 시작·종료일은 안 열려요
   const saved = (next: WorkspaceData) => {
@@ -81,12 +84,13 @@ export function WorkspaceHome({ role }: { role: "researcher" | "expert" }) {
             onToggle={(id) => setHidden((list) => (list.includes(id) ? list.filter((item) => item !== id) : [...list, id]))}
           />
 
-          {/* 가운데: 달력 / 오른쪽: 지금 할 일 + 다가오는 일정 (모바일에서는 할 일·일정이 달력보다 먼저) */}
+          {/* 가운데: 달력 / 오른쪽: 지금 할 일 · 요청(최신 5개) · 다가오는 일정 (모바일에서는 오른쪽 칸이 달력보다 먼저) */}
           <div className="mt-5 grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
-            <WorkspaceCalendar schedules={schedules} today={today} onAdd={(date) => setEditor({ mode: "add", date })} onPick={pick} />
-            <div className="order-first space-y-5 lg:order-none">
+            <WorkspaceCalendar schedules={schedules} tasks={tasks} today={today} onAdd={(date) => setEditor({ mode: "add", date })} onPick={pick} />
+            <div className="order-first flex min-w-0 flex-col gap-5 lg:order-none">
               <TodoBox items={todos.map((item) => (item.dismissible ? { ...item, onDismiss: () => setDismissed((list) => [...list, item.key]) } : item))} />
-              <UpcomingList collabs={ongoing} schedules={schedules} today={today} onPick={pick} />
+              <RequestList collabs={ongoing} tasks={tasks} today={today} />
+              <UpcomingList collabs={ongoing} schedules={schedules} tasks={tasks} today={today} onPick={pick} />
             </div>
           </div>
         </>

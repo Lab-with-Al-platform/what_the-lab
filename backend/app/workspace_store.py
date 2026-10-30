@@ -152,15 +152,15 @@ def load_workspace(user_id: int) -> dict:
         )
         schedules = cursor.fetchall()
 
-                # 열린 요청 (협업 목록 달력 · 다가오는 일정에 보여요. 기한 없거나 지난 요청은 화면에서 오늘 칸에)
+        # 열린 요청 (최신순). 협업 목록의 요청 목록 · 달력 · 다가오는 일정에 보여요
         cursor.execute(
-            "SELECT t.task_id, t.collaboration_id, t.content, t.due_date,"
+            "SELECT t.task_id, t.collaboration_id, t.content, t.due_date, t.created_at,"
             " CASE WHEN t.assignee = %s THEN 'in' ELSE 'out' END AS direction,"
             " rq.nickname AS requested_by_nickname, asg.nickname AS assignee_nickname"
             " FROM collaboration_task t"
             " JOIN users rq ON rq.user_id = t.requested_by JOIN users asg ON asg.user_id = t.assignee"
             " WHERE t.collaboration_id = ANY(%s) AND t.status = 'open'"
-            " ORDER BY t.due_date NULLS FIRST, t.task_id",
+            " ORDER BY t.created_at DESC, t.task_id DESC",
             (user_id, ongoing_ids),
         )
         tasks = cursor.fetchall()

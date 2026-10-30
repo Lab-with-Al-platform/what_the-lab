@@ -15,10 +15,18 @@ import {
 } from "@/lib/workspace-detail";
 import { FieldTitle, INPUT_CLASS, Modal, ModalActions, useSaving } from "@/components/modal";
 
-type Filter = "in" | "out" | "done";
+type Filter = "all" | "in" | "out" | "done";
+
+// 줄 오른쪽 끝 띠의 색: 받은(주황) · 보낸(보라) · 완료(초록 + ✓)
+const EDGE = {
+  in: "bg-editorial-warning-soft shadow-[inset_3px_0_0_#f0a13a]",
+  out: "bg-brand-soft shadow-[inset_3px_0_0_var(--color-brand)]",
+  done: "bg-success-soft text-success shadow-[inset_3px_0_0_var(--color-success)]",
+} as const;
+const TAB_DOT = { in: "bg-[#f0a13a]", out: "bg-brand", done: "bg-success" } as const;
 
 // ---------------------------------------------------------------------------
-// 요청: [받은 · 보낸 · 끝난] 으로 나눠 보여요. 받은 요청은 [완료], 보낸 요청은 [취소]
+// 요청: [전체 · 받은 · 보낸 · 완료]. 줄은 흰색, 오른쪽 끝 띠 색으로 상태를 보여요. 취소한 요청은 목록에서 빠져요
 // ---------------------------------------------------------------------------
 
 export function TasksCard({
@@ -31,16 +39,21 @@ export function TasksCard({
   onChange: (next: CollaborationDetail) => void; // 저장한 뒤 받은 최신 상세
 }) {
   const { tasks, collaboration: collab } = detail;
-  const open = tasks.filter((task) => task.status === "open");
+  const [filter, setFilter] = useState<Filter>("all");
+  const [adding, setAdding] = useState(false);
+  // 진행 중: 받은 → 보낸, 같은 쪽은 기한 가까운 순 (기한 없음은 뒤) / 완료는 아래에 따로
+  const open = tasks
+    .filter((task) => task.status === "open")
+    .sort((a, b) => Number(a.direction === "out") - Number(b.direction === "out") || (a.due_date ?? "9999").localeCompare(b.due_date ?? "9999"));
+  const done = tasks.filter((task) => task.status === "done");
   const counts = {
     in: open.filter((task) => task.direction === "in").length,
     out: open.filter((task) => task.direction === "out").length,
-    done: tasks.length - open.length,
+    done: done.length,
   };
-  // 처음 보이는 칸: 받은 요청이 있으면 받은, 없고 보낸 게 있으면 보낸
-  const [filter, setFilter] = useState<Filter>(counts.in || !counts.out ? "in" : "out");
-  const [adding, setAdding] = useState(false);
-  const shown = filter === "done" ? tasks.filter((task) => task.status !== "open") : open.filter((task) => task.direction === filter);
+  const shownOpen = filter === "all" ? open : filter === "done" ? [] : open.filter((task) => task.direction === filter);
+  const shownDone = filter === "all" || filter === "done" ? done : [];
+  const item = (task: CollabTask) => <TaskItem key={task.task_id} task={task} today={collab.today} endDate={collab.end_date} editable={editable} onChange={onChange} />;
 
   return (
     <section className="rounded-card bg-card p-5 shadow-card sm:px-6">
@@ -49,41 +62,45 @@ export function TasksCard({
         <div className="inline-flex gap-0.5 rounded-button bg-page p-1" role="group" aria-label="요청 나눠 보기">
           {(
             [
-              ["in", "받은"],
-              ["out", "보낸"],
-              ["done", "끝난"],
-            ] as [Filter, string][]
-          ).map(([key, label]) => (
+              ["all", "전체", counts.in + counts.out + counts.done],
+              ["in", "받은", counts.in],
+              ["out", "보낸", counts.out],
+              ["done", "완료", counts.done],
+            ] as [Filter, string, number][]
+          ).map(([key, label, count]) => (
             <button
               key={key}
               type="button"
               aria-pressed={filter === key}
               onClick={() => setFilter(key)}
-              className={`h-7 rounded-[7px] px-3 text-xs font-semibold ${filter === key ? "bg-card text-ink shadow-sm" : "text-muted"}`}
+              className={`inline-flex h-7 items-center gap-1.5 rounded-[7px] px-3 text-xs font-semibold ${filter === key ? "bg-card text-ink shadow-sm" : "text-muted"}`}
             >
+              {key !== "all" && <span className={`h-[7px] w-[7px] rounded-full ${TAB_DOT[key]}`} aria-hidden="true" />}
               {label}
-              {counts[key] > 0 && <span className={`ml-1 ${filter === key ? "text-brand" : "text-faint"}`}>{counts[key]}</span>}
+              <span className={filter === key ? "text-ink" : "text-faint"}>{count}</span>
             </button>
           ))}
         </div>
       </div>
       <p className="mt-1 text-xs text-faint">대화하다 나온 &ldquo;이것 좀 해 주세요&rdquo;를 남겨 두면 위로 찾아 올라가지 않아도 돼요.</p>
 
-      {shown.length === 0 ? (
+      {shownOpen.length + shownDone.length === 0 ? (
         <p className="py-8 text-center text-[13px] text-faint">{EMPTY[filter]}</p>
       ) : (
-        <ul className="mt-3">
-          {shown.map((task) => (
-            <TaskItem key={task.task_id} task={task} today={collab.today} endDate={collab.end_date} editable={editable} onChange={onChange} />
-          ))}
-        </ul>
+        <div className="mt-4 grid gap-2.5">
+          {shownOpen.map(item)}
+          {shownDone.length > 0 && filter === "all" && shownOpen.length > 0 && (
+            <p className="mt-1 flex items-center gap-2.5 text-[11.5px] font-semibold text-faint after:h-px after:flex-1 after:bg-line">완료 {shownDone.length}</p>
+          )}
+          {shownDone.map(item)}
+        </div>
       )}
 
       {editable && (
         <button
           type="button"
           onClick={() => setAdding(true)}
-          className="mt-2 flex w-full items-center gap-2 rounded-button border border-dashed border-line px-3 py-2.5 text-left text-[13px] text-muted hover:border-brand hover:text-brand"
+          className="mt-4 flex w-full items-center gap-2 rounded-card border border-dashed border-line px-4 py-3 text-left text-[13px] text-muted hover:border-brand hover:text-brand"
         >
           ＋ {collab.partner.nickname} 님에게 요청 남기기
         </button>
@@ -94,7 +111,7 @@ export function TasksCard({
           onClose={() => setAdding(false)}
           onSaved={(next) => {
             setAdding(false);
-            setFilter("out"); // 방금 남긴 요청이 보이게
+            setFilter("all"); // 방금 남긴 요청이 보이게
             onChange(next);
           }}
         />
@@ -104,11 +121,13 @@ export function TasksCard({
 }
 
 const EMPTY: Record<Filter, string> = {
+  all: "아직 요청이 없어요.",
   in: "받은 요청이 없어요.",
   out: "보낸 요청이 없어요.",
-  done: "끝난 요청이 없어요.",
+  done: "완료한 요청이 없어요.",
 };
 
+/** 요청 한 줄: 흰 바탕 + 오른쪽 끝 띠(받은 주황 · 보낸 보라 · 완료 초록 ✓) */
 function TaskItem({
   task,
   today,
@@ -125,49 +144,28 @@ function TaskItem({
   const [confirming, setConfirming] = useState(false); // [취소] 한 번 더 확인
   const [changingDue, setChangingDue] = useState(false); // [기한 변경] 창
   const { saving, error, run } = useSaving();
-  const due = dueText(task, today);
-  const closed = task.status !== "open";
-  const canComplete = editable && !closed && task.direction === "in";
-  const canCancel = editable && !closed && task.direction === "out";
-  // 되돌리기: 완료는 받은 사람(in)이, 취소는 보낸 사람(out)이
-  const canReopen = editable && ((task.status === "done" && task.direction === "in") || (task.status === "canceled" && task.direction === "out"));
+  const isDone = task.status === "done";
+  const kind = isDone ? "done" : task.direction;
+  const canComplete = editable && !isDone && task.direction === "in";
+  const canEdit = editable && !isDone && task.direction === "out"; // 기한 변경 · 취소
+  const canReopen = editable && isDone && task.direction === "in"; // 완료는 받은 사람이 되돌려요
   const who = task.direction === "in" ? `${task.requested_by_nickname} → 나` : `나 → ${task.assignee_nickname}`;
 
   return (
-    <li className="grid grid-cols-[22px_minmax(0,1fr)_auto] items-start gap-x-3 border-t border-line py-3.5 first:border-t-0 first:pt-1">
-      {canComplete ? (
-        <button
-          type="button"
-          onClick={() => run(async () => onChange(await completeTask(task.task_id)))}
-          disabled={saving}
-          title="완료로 표시"
-          aria-label="완료로 표시"
-          className="group mt-0.5 grid h-[22px] w-[22px] place-items-center rounded-full border-2 border-line text-[11px] text-success hover:border-success disabled:opacity-50"
-        >
-          <span className="opacity-0 group-hover:opacity-70">✓</span>
-        </button>
-      ) : (
-        <span
-          className={`mt-0.5 grid h-[22px] w-[22px] place-items-center rounded-full border-2 text-[11px] ${
-            task.status === "done" ? "border-success bg-success text-white" : task.direction === "out" ? "border-dashed border-line" : "border-line"
-          }`}
-          aria-hidden="true"
-        >
-          {task.status === "done" ? "✓" : ""}
-        </span>
-      )}
-
-      <div className="min-w-0">
-        <p className={`whitespace-pre-line font-semibold leading-snug ${closed ? "text-muted line-through decoration-faint" : ""}`}>{task.content}</p>
-        <p className="mt-1 flex flex-wrap items-center gap-x-1.5 text-xs text-muted">
+    <div className="grid min-h-[72px] grid-cols-[minmax(0,1fr)_26px] overflow-hidden rounded-card border border-line bg-card transition-shadow hover:shadow-[0_4px_14px_rgba(16,28,60,0.07)] sm:grid-cols-[minmax(0,1fr)_auto_26px]">
+      <div className="min-w-0 py-3.5 pl-[18px] pr-1">
+        <p className={`whitespace-pre-line font-semibold leading-snug ${isDone ? "text-muted" : ""}`}>{task.content}</p>
+        <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted">
+          <DueLabel task={task} today={today} />
+          <Dot />
           <span>{who}</span>
-          <span className="text-faint">·</span>
-          <span className="text-faint">{task.source === "discord" ? "디스코드" : "웹"}</span>
+          <Dot />
+          <span>{task.source === "discord" ? "디스코드" : "웹"}</span>
         </p>
         {error && <p className="mt-1 text-xs text-danger">{error}</p>}
         {confirming && (
           <p className="mt-2 flex flex-wrap items-center gap-2 text-xs">
-            <span className="font-semibold text-danger">이 요청을 취소할까요? 나중에 되돌릴 수 있어요.</span>
+            <span className="font-semibold text-danger">이 요청을 취소할까요?</span>
             <button type="button" onClick={() => setConfirming(false)} disabled={saving} className="h-7 rounded-button border border-line px-2.5 font-semibold text-muted hover:bg-page">
               아니요
             </button>
@@ -183,42 +181,53 @@ function TaskItem({
         )}
       </div>
 
-      <div className="flex flex-col items-end gap-1 text-right">
-        <span className={`whitespace-nowrap text-xs font-bold ${due.soon ? "text-danger" : task.due_date ? "text-muted" : "font-medium text-faint"}`}>{due.text}</span>
-        {task.status === "canceled" && <span className="text-[11px] text-faint">취소됨</span>}
-        {canReopen && (
-          <button
-            type="button"
-            onClick={() => run(async () => onChange(await reopenTask(task.task_id)))}
-            disabled={saving}
-            title={task.status === "done" ? "완료를 잘못 눌렀다면 다시 진행 중으로" : "취소를 잘못 눌렀다면 다시 진행 중으로"}
-            className="text-[11px] font-semibold text-muted hover:text-brand disabled:opacity-50"
-          >
-            {saving ? "되돌리는 중…" : "↩ 되돌리기"}
-          </button>
-        )}
+      {/* 버튼: 넓은 화면은 오른쪽, 좁은 화면은 내용 아래 */}
+      <div className="col-start-1 row-start-2 flex items-center gap-3 px-[18px] pb-3 empty:hidden sm:col-start-2 sm:row-start-1 sm:px-4 sm:pb-0">
         {canComplete && (
           <button
             type="button"
             onClick={() => run(async () => onChange(await completeTask(task.task_id)))}
             disabled={saving}
-            className="h-7 rounded-button bg-brand px-2.5 text-xs font-semibold text-white hover:bg-brand-hover disabled:opacity-60"
+            className="text-xs font-semibold text-faint hover:text-success disabled:opacity-50"
           >
-            {saving ? "…" : "완료"}
+            {saving ? "완료하는 중…" : "완료"}
           </button>
         )}
-        {!closed && task.direction === "out" && <span className="rounded bg-brand-soft px-1.5 py-px text-[11px] font-semibold text-brand">상대 진행 중</span>}
-        {canCancel && !confirming && (
-          <span className="flex gap-2 text-[11px] font-semibold">
-            <button type="button" onClick={() => setChangingDue(true)} className="text-muted hover:text-brand">
+        {canEdit && !confirming && (
+          <>
+            <button type="button" onClick={() => setChangingDue(true)} className="text-xs font-semibold text-faint hover:text-brand">
               기한 변경
             </button>
-            <button type="button" onClick={() => setConfirming(true)} className="text-faint hover:text-danger">
+            <button type="button" onClick={() => setConfirming(true)} className="text-xs font-semibold text-faint hover:text-danger">
               취소
             </button>
-          </span>
+          </>
+        )}
+        {canReopen && (
+          <button
+            type="button"
+            onClick={() => run(async () => onChange(await reopenTask(task.task_id)))}
+            disabled={saving}
+            title="완료를 잘못 눌렀다면 다시 진행 중으로"
+            className="text-xs font-semibold text-faint hover:text-brand disabled:opacity-50"
+          >
+            {saving ? "되돌리는 중…" : "↩ 되돌리기"}
+          </button>
         )}
       </div>
+
+      {/* 오른쪽 끝 띠: 색으로 상태, 완료만 ✓ */}
+      <span
+        className={`col-start-2 row-span-2 row-start-1 flex items-center justify-center sm:col-start-3 sm:row-span-1 ${EDGE[kind]}`}
+        title={{ in: "받은 요청", out: "보낸 요청", done: "완료" }[kind]}
+      >
+        {isDone && (
+          <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="m3 8.5 3 3 7-7" />
+          </svg>
+        )}
+      </span>
+
       {changingDue && (
         <DueDialog
           task={task}
@@ -231,8 +240,23 @@ function TaskItem({
           }}
         />
       )}
-    </li>
+    </div>
   );
+}
+
+/** 기한 글자: "~11.6 · D-6" (2일 이내 · 지남은 빨강) / "기한 없음" / 완료면 "11.8 완료" */
+function DueLabel({ task, today }: { task: CollabTask; today: string }) {
+  if (task.status === "done" && task.closed_at) {
+    const day = new Date(task.closed_at);
+    return <span className="font-semibold">{`${day.getMonth() + 1}.${day.getDate()} 완료`}</span>;
+  }
+  if (!task.due_date) return <span className="text-faint">기한 없음</span>;
+  const due = dueText(task, today);
+  return <span className={`font-bold ${due.soon ? "text-danger" : "text-ink"}`}>{due.text}</span>;
+}
+
+function Dot() {
+  return <span className="h-[3px] w-[3px] rounded-full bg-[#c6cddd]" aria-hidden="true" />;
 }
 
 /** 보낸 사람의 [기한 변경] 창: 오늘 ~ 협업 종료일, 비우면 기한 없음 */
