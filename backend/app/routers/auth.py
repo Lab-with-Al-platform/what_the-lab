@@ -44,6 +44,15 @@ def cookie_secure() -> bool:
     return DISCORD_REDIRECT_URI.startswith("https://")
 
 
+def cookie_samesite() -> str:
+    """로컬은 Lax, HTTPS 배포는 None입니다.
+
+    화면(버셀)과 API(Render) 주소가 다르면 Lax 쿠키는 디스코드 왕복과
+    /auth/me 요청에 붙지 않아 로그인이 실패한 것처럼 보입니다.
+    """
+    return "none" if cookie_secure() else "lax"
+
+
 @router.get("/discord/login")
 def discord_login(access_token: str | None = Cookie(default=None)) -> RedirectResponse:
     """① 이미 로그인했으면 가입 단계 화면으로, 아니면 디스코드 승인 화면으로 보냅니다."""
@@ -63,7 +72,7 @@ def discord_connect(user: Annotated[dict, Depends(get_current_user)]) -> Redirec
     """
     ensure_active_user(user)
     response = discord_authorize()
-    response.set_cookie(NEXT_COOKIE, "settings", max_age=600, httponly=True, samesite="lax", secure=cookie_secure())
+    response.set_cookie(NEXT_COOKIE, "settings", max_age=600, httponly=True, samesite=cookie_samesite(), secure=cookie_secure())
     return response
 
 
@@ -78,7 +87,7 @@ def discord_authorize() -> RedirectResponse:
         "state": state,
     }
     response = RedirectResponse(f"{DISCORD_AUTHORIZE_URL}?{urlencode(params)}")
-    response.set_cookie(STATE_COOKIE, state, max_age=600, httponly=True, samesite="lax", secure=cookie_secure())
+    response.set_cookie(STATE_COOKIE, state, max_age=600, httponly=True, samesite=cookie_samesite(), secure=cookie_secure())
     response.headers["Cache-Control"] = "private, no-store"
     return response
 
@@ -118,11 +127,11 @@ def discord_callback(
         create_access_token(user["user_id"], user["discord_id"]),
         max_age=TOKEN_MAX_AGE,
         httponly=True,
-        samesite="lax",
+        samesite=cookie_samesite(),
         secure=cookie_secure(),
     )
-    response.delete_cookie(STATE_COOKIE, httponly=True, samesite="lax", secure=cookie_secure())
-    response.delete_cookie(NEXT_COOKIE, httponly=True, samesite="lax", secure=cookie_secure())
+    response.delete_cookie(STATE_COOKIE, httponly=True, samesite=cookie_samesite(), secure=cookie_secure())
+    response.delete_cookie(NEXT_COOKIE, httponly=True, samesite=cookie_samesite(), secure=cookie_secure())
     response.headers["Cache-Control"] = "private, no-store"
     return response
 
@@ -155,7 +164,7 @@ def me(user: Annotated[dict, Depends(get_current_user)], response: Response) -> 
 def logout() -> Response:
     """④ 로그인 쿠키(JWT)를 지워서 로그아웃합니다."""
     response = Response(status_code=204)
-    response.delete_cookie(TOKEN_COOKIE, httponly=True, samesite="lax", secure=cookie_secure())
+    response.delete_cookie(TOKEN_COOKIE, httponly=True, samesite=cookie_samesite(), secure=cookie_secure())
     response.headers["Cache-Control"] = "private, no-store"
     return response
 
