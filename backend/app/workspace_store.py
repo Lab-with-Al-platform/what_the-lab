@@ -152,6 +152,19 @@ def load_workspace(user_id: int) -> dict:
         )
         schedules = cursor.fetchall()
 
+                # 열린 요청 (협업 목록 달력 · 다가오는 일정에 보여요. 기한 없거나 지난 요청은 화면에서 오늘 칸에)
+        cursor.execute(
+            "SELECT t.task_id, t.collaboration_id, t.content, t.due_date,"
+            " CASE WHEN t.assignee = %s THEN 'in' ELSE 'out' END AS direction,"
+            " rq.nickname AS requested_by_nickname, asg.nickname AS assignee_nickname"
+            " FROM collaboration_task t"
+            " JOIN users rq ON rq.user_id = t.requested_by JOIN users asg ON asg.user_id = t.assignee"
+            " WHERE t.collaboration_id = ANY(%s) AND t.status = 'open'"
+            " ORDER BY t.due_date NULLS FIRST, t.task_id",
+            (user_id, ongoing_ids),
+        )
+        tasks = cursor.fetchall()
+
     partner_role = "expert" if role == "researcher" else "researcher"
     collaborations = [
         {
@@ -173,8 +186,12 @@ def load_workspace(user_id: int) -> dict:
         for row in rows
     ]
     # google_enabled: 서버에 구글 연동 설정이 있는지 (없으면 화면에서 구글 버튼을 숨겨요)
-    return {"collaborations": collaborations, "schedules": schedules, "google_enabled": google_login_ready()}
-
+    return {
+        "collaborations": collaborations,
+        "schedules": schedules,
+        "tasks": tasks,  # 진행 중 협업의 열린 요청 (direction: in=받은 · out=보낸)
+        "google_enabled": google_login_ready(),
+    }
 
 def google_login_ready() -> bool:
     """서비스 계정 키 + 구글 로그인 앱 값이 다 있는지 (화면의 구글 버튼을 보여 줄지)"""

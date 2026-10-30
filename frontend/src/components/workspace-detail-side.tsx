@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode, useState } from "react";
-import { photoOrDefault } from "@/lib/collab-requests";
+import { daysBetween, photoOrDefault } from "@/lib/collab-requests";
 import { DATA_STATUS_LABELS, DATA_TYPE_LABELS, MEETING_LABELS, OUTPUT_LABELS, REWARD_LABELS, SHARE_LABELS } from "@/lib/my-research";
 import { ableWorkName, fieldName } from "@/lib/taxonomy-options";
 import { Schedule } from "@/lib/workspace";
@@ -39,12 +39,15 @@ export function AgendaCard({
 }) {
   const [all, setAll] = useState(false);
   const today = detail.collaboration.today;
-  // 진행 전·진행 중: 오늘 이후 일정 + 기한 있는 요청 / 끝난 협업: 지난 일정 전부 (기록)
+  // 진행 전·진행 중: 오늘 이후 일정 + 열린 요청 / 끝난 협업: 지난 일정 전부 (기록)
+  // 열린 요청: 기한이 있으면 그날, 기한이 없거나 지났으면 오늘 칸 (끝날 때까지 매일 보여요)
   const items: AgendaItem[] = editable
     ? [
         // 오늘 걸쳐 있는 작업 기간도 보여요 (끝나는 날이 오늘 이후면)
         ...detail.schedules.filter((item) => item.end_date >= today).map((schedule): AgendaItem => ({ day: schedule.start_date < today ? today : schedule.start_date, schedule })),
-        ...detail.tasks.filter((task) => task.status === "open" && task.due_date && task.due_date >= today).map((task): AgendaItem => ({ day: task.due_date as string, task })),
+        ...detail.tasks
+          .filter((task) => task.status === "open")
+          .map((task): AgendaItem => ({ day: task.due_date && task.due_date > today ? task.due_date : today, task })),
       ]
     : detail.schedules.map((schedule): AgendaItem => ({ day: schedule.start_date, schedule }));
   items.sort((a, b) => a.day.localeCompare(b.day) || (a.schedule?.start_time ?? "").localeCompare(b.schedule?.start_time ?? ""));
@@ -79,7 +82,7 @@ export function AgendaCard({
                   </span>
                 </div>
                 <div className="flex min-w-0 flex-col justify-center gap-1">
-                  {rows.map((row) => (row.schedule ? <ScheduleRow key={`s${row.schedule.schedule_id}`} schedule={row.schedule} onPick={onPick} /> : <TaskRow key={`t${row.task!.task_id}`} task={row.task!} />))}
+                  {rows.map((row) => (row.schedule ? <ScheduleRow key={`s${row.schedule.schedule_id}`} schedule={row.schedule} onPick={onPick} /> : <TaskRow key={`t${row.task!.task_id}`} task={row.task!} today={today} />))}
                 </div>
               </li>
             );
@@ -107,11 +110,17 @@ function ScheduleRow({ schedule, onPick }: { schedule: Schedule; onPick: (schedu
   );
 }
 
-function TaskRow({ task }: { task: CollabTask }) {
+function TaskRow({ task, today }: { task: CollabTask; today: string }) {
+  // 오늘 칸에 올라온 이유: 기한 없음 / 기한 지남
+  const late = task.due_date && task.due_date < today ? daysBetween(task.due_date, today) : 0;
   return (
     <div className="flex min-w-0 items-center gap-2 text-[13px] text-muted">
       <span className="h-4 w-[3px] shrink-0 rounded bg-line" />
-      <span className="min-w-0 flex-1 truncate">요청 · {task.content}</span>
+      <span className="min-w-0 flex-1 truncate">
+        요청 · {task.content}
+        {!task.due_date && <span className="ml-1 text-faint">· 기한 없음</span>}
+        {late > 0 && <span className="ml-1 font-semibold text-danger">· {late}일 지남</span>}
+      </span>
       {task.direction === "in" ? (
         <span className="shrink-0 rounded bg-danger-soft px-1.5 py-px text-[10px] font-bold text-danger">내가 할 일</span>
       ) : (

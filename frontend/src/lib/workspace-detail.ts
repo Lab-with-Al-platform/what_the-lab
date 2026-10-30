@@ -174,6 +174,16 @@ export async function completeTask(taskId: number): Promise<CollaborationDetail>
   return requestApi<CollaborationDetail>(`/workspace/tasks/${taskId}/done`, { method: "POST" });
 }
 
+/** 보낸 요청 [기한 변경]: 비우면(null) 기한 없음 */
+export async function changeTaskDue(taskId: number, dueDate: string | null): Promise<CollaborationDetail> {
+  return requestApi<CollaborationDetail>(`/workspace/tasks/${taskId}/due`, { method: "POST", body: JSON.stringify({ due_date: dueDate }) });
+}
+
+/** 끝난 요청 [되돌리기]: 완료는 받은 사람이, 취소는 보낸 사람이 다시 진행 중으로 */
+export async function reopenTask(taskId: number): Promise<CollaborationDetail> {
+  return requestApi<CollaborationDetail>(`/workspace/tasks/${taskId}/reopen`, { method: "POST" });
+}
+
 /** 보낸 요청 [취소] */
 export async function cancelTask(taskId: number): Promise<CollaborationDetail> {
   return requestApi<CollaborationDetail>(`/workspace/tasks/${taskId}/cancel`, { method: "POST" });
