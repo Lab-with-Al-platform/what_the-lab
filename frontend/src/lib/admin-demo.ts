@@ -114,7 +114,7 @@ export function demoResearches(params: URLSearchParams): PageResult<ResearchItem
 export function demoMemberDetail(id: string): MemberDetail | undefined {
   const member = DEMO_MEMBERS.find(item => item.user_id === Number(id));
   if (!member) return undefined;
-  return { ...member, is_admin: false, researches: DEMO_RESEARCHES.filter(item => item.user_id === member.user_id), actions: { status: "not_available", note: "데모는 읽기 전용이며 상태를 변경하지 않습니다." }, audit: { status: "not_collected", note: "조치 이력 없음" } };
+  return { ...member, is_admin: false, researches: DEMO_RESEARCHES.filter(item => item.user_id === member.user_id), actions: { status: "not_available", note: "데모는 읽기 전용이며 상태를 변경하지 않습니다." }, admin_actions: { status: "not_available", note: "데모는 읽기 전용이며 권한을 변경하지 않습니다." }, audit: { status: "not_collected", note: "조치 이력 없음" } };
 }
 
 export function demoResearchDetail(id: string): ResearchDetail | undefined {

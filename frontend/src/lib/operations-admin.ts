@@ -62,12 +62,21 @@ export type MemberDetail = MemberItem & {
   is_admin: boolean;
   researches: { research_id: number; title: string; status: string; status_label: string; created_at: string }[];
   actions: { status: string; next_status?: string | null; note: string };
+  admin_actions?: { status: string; next_is_admin?: boolean | null; note: string };
   audit: {
     status: string;
     note: string;
     items?: { actor_user_id: number; action: string; before_status: string; after_status: string; reason: string; notice: string; created_at: string }[];
   };
 };
+
+export function auditActionLabel(action: string): string {
+  if (action === "suspend") return "정지";
+  if (action === "restore") return "해제";
+  if (action === "grant_admin") return "관리자 부여";
+  if (action === "revoke_admin") return "관리자 해제";
+  return action;
+}
 
 export type ResearchItem = {
   research_id: number;
