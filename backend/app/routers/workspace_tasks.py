@@ -3,6 +3,7 @@
 - 요청은 항상 상대에게 보내요 (협업은 두 사람). 받은 사람만 [완료], 보낸 사람만 [취소]
 - 끝난 협업(완료·중단·취소)에서는 바꿀 수 없어요 (409)
 - 저장한 뒤 협업 상세 전체(load_detail)를 돌려줘요. 화면은 받은 값으로 다시 그려요
+- create_task 는 디스코드 봇(app/discord_gateway.py)도 같이 써요. 규칙이 한 곳에만 있게
 입력 규칙은 app/workspace_rules.py (TaskInput · clean_task)
 """
 
@@ -57,9 +58,11 @@ def find_task(cursor, user_id: int, task_id: int) -> dict:
     return task
 
 
-@router.post("/{collaboration_id}/tasks")
-def add_task(collaboration_id: int, body: rules.TaskInput, user_id: int = Depends(get_current_user_id)) -> dict:
-    """[＋ 요청 남기기]: 상대에게 맡길 일. 기한은 선택 (오늘 ~ 협업 종료일)."""
+def create_task(user_id: int, collaboration_id: int, body: rules.TaskInput, source: str = "web") -> int:
+    """요청 한 줄 저장 (웹 · 디스코드 공통). 새 요청 번호를 돌려줘요.
+
+    source: 어디서 남겼나 — "web"(웹 화면) / "discord"(/요청 명령어)
+    """
     with transaction() as cursor:
         collab = find_collaboration(cursor, user_id, collaboration_id, lock=True)
         check_open_collab(collab)
@@ -67,15 +70,24 @@ def add_task(collaboration_id: int, body: rules.TaskInput, user_id: int = Depend
         cursor.execute(
             """
             INSERT INTO collaboration_task (collaboration_id, requested_by, assignee, content, due_date, source)
-            VALUES (%(collaboration_id)s, %(requested_by)s, %(assignee)s, %(content)s, %(due_date)s, 'web')
+            VALUES (%(collaboration_id)s, %(requested_by)s, %(assignee)s, %(content)s, %(due_date)s, %(source)s)
+            RETURNING task_id
             """,
             {
                 **values,
                 "collaboration_id": collaboration_id,
                 "requested_by": user_id,
                 "assignee": partner_id(cursor, collaboration_id, collab["my_side"]),
+                "source": source,
             },
         )
+        return cursor.fetchone()["task_id"]
+
+
+@router.post("/{collaboration_id}/tasks")
+def add_task(collaboration_id: int, body: rules.TaskInput, user_id: int = Depends(get_current_user_id)) -> dict:
+    """[＋ 요청 남기기]: 상대에게 맡길 일. 기한은 선택 (오늘 ~ 협업 종료일)."""
+    create_task(user_id, collaboration_id, body)
     return load_detail(user_id, collaboration_id)
 
 

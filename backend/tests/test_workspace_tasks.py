@@ -26,6 +26,8 @@ class FakeCursor:
 
     def fetchone(self) -> dict | None:
         last = self.sql[-1][0]
+        if "RETURNING task_id" in last:
+            return {"task_id": 11}
         if "FROM collaboration_task" in last:
             return self.task
         return {"researcher_id": RESEARCHER, "expert_id": EXPERT}  # partner_id
@@ -73,8 +75,16 @@ def test_add_task_goes_to_partner(monkeypatch):
     result = tasks.add_task(7, rules.TaskInput(content="표 정리", due_date=TODAY), user_id=RESEARCHER)
     saved = next(params for sql, params in cursor.sql if "INSERT INTO collaboration_task" in sql)
     assert saved["requested_by"] == RESEARCHER and saved["assignee"] == EXPERT  # 연구회원 → 전문가
+    assert saved["source"] == "web"
     assert result == {"user": RESEARCHER, "collab": 7}
 
+
+def test_create_task_from_discord(monkeypatch):
+    cursor = FakeCursor()
+    use(monkeypatch, cursor)
+    assert tasks.create_task(EXPERT, 7, rules.TaskInput(content="데이터 폴더 공유"), source="discord") == 11  # 새 요청 번호
+    saved = next(params for sql, params in cursor.sql if "INSERT INTO collaboration_task" in sql)
+    assert saved["source"] == "discord" and saved["assignee"] == EXPERT  # FakeCursor 의 partner_id 는 늘 같은 줄을 돌려줘요
 
 def test_add_task_on_ended_collab_is_409(monkeypatch):
     use(monkeypatch, FakeCursor(), {**COLLAB, "status": "done"})
