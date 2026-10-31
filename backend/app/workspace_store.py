@@ -125,7 +125,7 @@ def load_workspace(user_id: int) -> dict:
     - status: waiting(시작 전) / active(진행 중) / done / ended_early / canceled
     - opened: 내 쪽에서 [협업 공간 열기]를 했는지
     """
-    with get_connection() as conn, conn.cursor() as cursor:
+    with get_connection() as conn, conn.transaction(), conn.cursor() as cursor:
         complete_ended_collaborations(cursor)
         role = user_role(cursor, user_id)
         mine = "rs.user_id = %s" if role == "researcher" else "c.expert_id = %s"
