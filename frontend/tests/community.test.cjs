@@ -25,6 +25,7 @@ function load(relative, extraRequire) {
         ApiError: class ApiError extends Error {},
       };
     if (name === "@/lib/community") return load("src/lib/community.ts");
+    if (name === "@/lib/community-navigation") return load("src/lib/community-navigation.ts");
     if (name.endsWith(".module.css"))
       return new Proxy({}, { get: (_, key) => key });
     if (name.startsWith("."))
