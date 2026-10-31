@@ -255,7 +255,7 @@ function WorkTab({ collaborations, names }: { collaborations: ExpertCollaboratio
                 <p className="pt-0.5 text-[12px] leading-6 text-faint">{periodLabel(item)}</p>
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="text-[14px] font-bold leading-6 text-ink">{item.private ? "완료한 협업 연구" : item.title}</h3>
+                    <h3 className="text-[14px] font-bold leading-6 text-ink">완료한 협업 연구</h3>
                     <span className="rounded-md bg-[#eaf6f1] px-2 py-1 text-[10px] font-semibold text-[#238464]">완료</span>
                     {item.category_ids.map((id) => (
                       <span key={id} className="rounded-md bg-[#eaf6f8] px-2 py-1 text-[10px] text-[#167d8c]">
@@ -264,7 +264,7 @@ function WorkTab({ collaborations, names }: { collaborations: ExpertCollaboratio
                     ))}
                   </div>
                   <p className="mt-1.5 text-[12px] leading-5 text-faint">
-                    {item.private ? "연구 제목과 참여자 정보는 당사자 보호를 위해 공개되지 않습니다." : item.partner_nickname ? `${item.partner_nickname} 님과 함께` : "함께한 연구"}
+                    연구 제목과 참여자 정보는 당사자 보호를 위해 공개되지 않습니다.
                   </p>
                   {item.able_work_ids.length > 0 && (
                     <dl className="mt-3 grid gap-2 text-xs sm:grid-cols-[68px_minmax(0,1fr)]">
@@ -375,9 +375,9 @@ function FieldSummary({ finished, names }: { finished: ExpertCollaboration[]; na
       <div className="flex gap-2.5 rounded-xl bg-[#f5f7fc] p-4 text-xs leading-[18px] text-[#6b7285]">
         <InfoIcon />
         <p>
-          아직 이 서비스에서 마친 협업이 없어요
+          완료된 협업 분야 정보가 없어요
           <br />
-          협업이 끝나면 분야가 여기에 쌓여요
+          협업을 마치면 이곳에 기록됩니다.
         </p>
       </div>
     );
@@ -386,6 +386,7 @@ function FieldSummary({ finished, names }: { finished: ExpertCollaboration[]; na
   const works = [...new Set(finished.flatMap((item) => item.able_work_ids))].map((id) => names.works.get(id)).filter(Boolean);
   return (
     <div className="rounded-xl bg-[#f5f7fc] p-4">
+      <p className="mb-3 text-[11px] font-semibold text-[#7483a2]">최근 완료한 연구 분야 · 최대 50건 기준</p>
       <div className="flex items-center gap-5">
         <Donut total={finished.length} counts={counts.map((item) => item.count)} />
         <ul className="grid flex-1 gap-2 text-xs leading-[18px]">
