@@ -27,7 +27,7 @@ MAX_ATTEMPTS = 3  # 디스코드가 잠깐 안 될 때 다시 시도하는 횟�
 FRESH_MINUTES = 60
 # "협업 시작" DM은 채널이 만들어질 때까지 이만큼 기다려요. 넘으면 링크 없이 보내요.
 WAIT_CHANNEL_MINUTES = 3
-WORKSPACE_TYPES: set[str] = set()  # 협업공간 알림 종류 (협업공간 기능 때 추가)
+WORKSPACE_TYPES: set[str] = {'review_ready'}  # Review reminders respect workspace notification preferences.
 
 PENDING_SQL = """
     SELECT n.notification_id, n.user_id, n.type, n.discord_attempts,
@@ -41,7 +41,7 @@ PENDING_SQL = """
            a.nickname AS actor_nickname, r.title AS research_title,
            cr.reject_reason, cr.expert_id, cr.status AS request_status,
            cr.is_urgent, cr.expires_at, cr.accepted_start_date, cr.cancel_reason, cr.responded_at,
-           c.discord_status AS channel_status, c.discord_channel_id
+           c.discord_status AS channel_status, c.discord_channel_id,c.collaboration_id
     FROM notification n
     JOIN users u ON u.user_id = n.user_id
     LEFT JOIN notification_setting s ON s.user_id = n.user_id
@@ -78,6 +78,10 @@ def waiting_for_channel(row: dict) -> bool:
 def dm_text(row: dict) -> str:
     """DM 글: 제목(굵게) + 설명 + 사이트 주소. "협업 시작"은 채널 링크와 협업 공간 주소를 넣어요."""
     title, detail = build_message(row, row["user_id"])
+    if row["type"] == "review_ready":
+        collaboration_id = row.get("collaboration_id")
+        link = f"{FRONTEND_URL}/workspace/{collaboration_id}#review" if collaboration_id else f"{FRONTEND_URL}/workspace"
+        return f"**{title}**\n{detail}\n{link}"
     if row["type"] != "collab_started":
         return f"**{title}**\n{detail}\n{FRONTEND_URL}/requests"
     lines = [f"**{title}**", detail]
