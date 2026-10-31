@@ -639,9 +639,7 @@ function ExpertCard({ expert, names, interest, returnHref, reputation }: { exper
             {[expert.affiliation, expert.current_job ? JOB_LABELS[expert.current_job] : null].filter(Boolean).join(" · ") || "AI 전문가"}
           </p>
         </div>
-      </div>
-      <div className="mt-3">
-        <LabTrustIndicator snapshot={reputation} demoPreview={getLocalDemoFlaskPreview(expert)} />
+        <LabTrustIndicator snapshot={reputation} variant="card" demoPreview={getLocalDemoFlaskPreview(expert)} />
       </div>
       <p className="mt-3 line-clamp-2 min-h-[40px] text-[12px] leading-5 text-muted">{expert.introduce || "프로필에서 연구 및 개발 경험을 확인해보세요."}</p>
       {reason && <p className="mt-2 line-clamp-1 text-[11px] font-semibold text-brand">{reason}</p>}
