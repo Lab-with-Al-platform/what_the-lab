@@ -67,13 +67,25 @@ test("개인 활동 링크 3개는 서버의 기존 scope와 정확히 일치", 
 
 test("카테고리 이동은 검색·정렬을 유지하되 private/admin scope와 페이지·이전 태그를 제거", () => {
   const query = "scope=inbox&page=8&tag=old&q=RAG&order=helpful&status=open&unanswered=1";
+  assert.equal(navigation.communityCategoryHref(query, "question"), "/community?category=question");
   assert.equal(
-    navigation.communityCategoryHref(query, "question"),
+    navigation.communityCategoryHref("page=8&tag=old&q=RAG&order=helpful&status=open&unanswered=1", "question"),
     "/community?q=RAG&order=helpful&status=open&unanswered=1&category=question",
   );
   assert.equal(navigation.communityCategoryLabel("question"), "질문·도움");
   assert.equal(navigation.communityCategoryLabel("bad-category"), "전체 대화");
   assert.equal(navigation.communityCategoryHref("scope=mine&page=3", null), "/community");
+});
+
+test("개인·관리자 비공개 검색어는 공개 주소나 로그에 옮겨지지 않음", () => {
+  for (const scope of ["mine", "saved", "notifications", "inbox", "moderation"]) {
+    const href = navigation.communityCategoryHref(
+      "scope=" + scope + "&q=비밀연구명&status=resolved&unanswered=1&tag=내부문서",
+      "story",
+    );
+    assert.equal(href, "/community?category=story");
+    assert.ok(!href.includes("비밀연구명") && !href.includes("내부문서"));
+  }
 });
 
 test("모든 카테고리 링크는 공개 목록만 가리키며 타인의 비공개 목록으로 이동할 수 없음", () => {
@@ -101,7 +113,7 @@ const ui = loadModule("src/components/community/community-ui.tsx", {
 test("데스크톱 세로 목록과 모바일 접기식 카테고리는 같은 공개 URL을 사용", () => {
   const html = renderToStaticMarkup(React.createElement(ui.CommunitySidebar, {
     active: "public", category: "idea", member: null,
-    queryString: "q=LLM&page=7&scope=mine",
+    queryString: "q=LLM&page=7&scope=public",
   }));
   assert.match(html, /aria-label="글 카테고리"/);
   assert.match(html, /aria-label="글 카테고리 모바일"/);
