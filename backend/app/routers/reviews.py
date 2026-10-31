@@ -5,10 +5,11 @@ The server derives reviewer/reviewee from collaboration ownership (never client 
 """
 from typing import Annotated, Literal
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 
 from app.config import CORS_ORIGINS, FRONTEND_URL
+from app.reputation_store import expert_reputation, reputations_for_experts
 from app.review_store import (
     edit_review, eligible_reviews, moderation_queue, moderate_report,
     public_expert_reviews, report_review, review_context, submit_review,
@@ -52,6 +53,29 @@ def require_review_moderator(user: Annotated[dict, Depends(get_current_user)]) -
 def my_review_opportunities(user_id: int = Depends(get_current_user_id)) -> list[dict]:
     """My completed collaborations, review state, and submission window."""
     return eligible_reviews(user_id)
+
+
+@router.get("/reputation")
+def list_public_reputation(
+    ids: str = Query("", max_length=700),
+) -> dict[str, dict]:
+    """Batched public reputation snapshots for cards (no per-card N+1)."""
+    if not ids:
+        return {}
+    values = ids.split(",")
+    if len(values) > 60 or any(not value.isascii() or not value.isdecimal() for value in values):
+        raise HTTPException(422, "전문가 ID는 최대 60개의 양의 정수로 입력해 주세요.")
+    try:
+        found = reputations_for_experts([int(value) for value in values])
+    except ValueError:
+        raise HTTPException(422, "전문가 ID가 올바르지 않습니다.") from None
+    return {str(key): value for key, value in found.items()}
+
+
+@router.get("/experts/{expert_id}/reputation")
+def get_expert_reputation(expert_id: int) -> dict:
+    """Public LAB TRUST; never substitute the 5-star raw review average."""
+    return expert_reputation(expert_id)
 
 
 @router.get("/experts/{expert_id}/summary")
