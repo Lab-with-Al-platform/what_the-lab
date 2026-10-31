@@ -95,7 +95,7 @@ const ui = loadModule("src/components/community/community-ui.tsx", {
     STATUSES: { open: "대화 중", resolved: "해결됨" },
   },
   "@/lib/community-navigation": navigation,
-  "./community.module.css": new Proxy({}, { get: (_, key) => String(key) }),
+  "./community.module.css": { __esModule: true, default: new Proxy({}, { get: (_, key) => String(key) }) },
 });
 
 test("데스크톱 세로 목록과 모바일 접기식 카테고리는 같은 공개 URL을 사용", () => {
