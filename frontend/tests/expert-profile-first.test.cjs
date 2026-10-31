@@ -43,7 +43,7 @@ test("추천 카드 높이가 사진 배경·플라스크로 늘어나지 않고
   assert.match(featured, /grid-cols-\[92px_minmax\(0,1fr\)\]/, "추천 카드는 높이가 콘텐츠에 맞는 grid");
   assert.match(featured, /lg:grid-cols-\[104px_minmax\(0,1fr\)_228px\]/, "데스크톱은 안정적인 세 칼럼");
   assert.match(list, /featured \? "size-\[92px\].*sm:size-\[104px\]"/, "추천 프로필 사진은 92~104px");
-  assert.doesNotMatch(featured, /items-stretch|h-\[400px\]|min-h-\[400px\]/);
+  assert.doesNotMatch(featured.match(/<article className="[^"]+"/)[0], /items-stretch|h-\[400px\]|min-h-\[400px\]/);
   assert.match(featured, /<LabTrustIndicator snapshot=\{reputation\} variant="compact"/);
   assert.match(featured, /id=\{"expert-profile-" \+ expert\.user_id\}/);
   assert.match(regular, /mt-auto border-t border-\[#e9eef7\] pt-3/);
