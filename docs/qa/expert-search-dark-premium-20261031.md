@@ -61,3 +61,26 @@ npm run build
 
 ## 출시·병합 정책
 이 브랜치는 기존 `develop`을 기반으로 필요한 화면 파일만 수정했다. **직접 develop에 쓰지 않으며 팀의 PR 검토·CI·승인 후 병합한다.**
+
+
+## B안 원본 시안 대비 시각적 충실도 보정 (2026-10-31 추가)
+실제 로컬 화면에서 사용자가 시안과 다르다고 확인해, 기존 '해석한 디자인'을 다음과 같이 교정했습니다.
+- 메인 제목: `AI 전문가 매칭`으로 원본 시안과 통일
+- 검색창: 히어로 하단의 별도 흰색 카드를 폐기하고 다크 히어로 내부의 글래스 검색 바 배치
+- 검색 보조: 원본의 기능 안내 3개를 간결한 카드로 표현, 구현하지 않은 추천/평판 기능은 표시하지 않음
+- 화이트 결과 패널: 히어로와 연속되는 구조로 변경
+- 필터: 실 API에 존재하는 AI 기술·연구 분야·내 연구로 찾기만 표시
+- 목록: 컴팩트 가로 행과 유일한 `프로필 자세히 보기` CTA 유지
+- 플라스크: 기존 장식 SVG의 입체감과 빛, 웨이브를 개선. 실제 레벨/평점으로 오해할 수 있는 UI는 배제
+- 글로벌 `SiteHeader`는 다른 페이지의 브랜드·내비게이션 계약을 위해 변경하지 않음
+
+### '전문가 0명'에서 시연 데이터 넣기 (로컬 Docker 전용)
+추가 파일 `docs/qa/expert-search-demo-local.sql`은 선택적으로만 실행하는 가상 전문가 4명 데이터입니다.
+공용 Supabase, 실제 사용자 DB, 배포 서버에는 절대 적용하지 않습니다.
+프로젝트 루트 PowerShell에서:
+```powershell
+docker cp .\docs\qa\expert-search-demo-local.sql labbridge-postgres:/tmp/expert-search-demo-local.sql
+docker compose exec postgres psql -v ON_ERROR_STOP=1 -U admin -d labbridge -f /tmp/expert-search-demo-local.sql
+```
+모든 데모 계정은 닉네임에 `[데모]`가 포함됩니다. 실제 전문가가 아니라 UI 테스트용입니다.
+전문가 카드, 필터, 상세·복귀 동작은 데모 DB로 확인하고 실제 협업 요청 송신 테스트는 하지 않습니다.
