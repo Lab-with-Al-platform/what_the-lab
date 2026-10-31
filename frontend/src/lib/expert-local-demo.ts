@@ -14,6 +14,8 @@ export type DemoReview = {
 
 type DemoDetails = {
   affiliation: string;
+  condition: NonNullable<ExpertPublicProfile["collaboration"]>;
+  engagedUntil: string | null;
   skills: string[];
   portfolioTitles: [string, string];
   portfolioRoles: [string, string];
@@ -32,6 +34,8 @@ type DemoDetails = {
 const EXAMPLES: Record<string, DemoDetails> = {
   "[데모] LLM 전문가": {
     affiliation: "시연용 AI 연구실",
+    condition: { meeting_type: "offline_ok", face_to_area: "서울·경기", available_time: "5_10", rewards: ["research_fund", "authorship"] },
+    engagedUntil: null,
     skills: ["Python", "LangChain", "RAG", "LLM 평가", "FastAPI"],
     portfolioTitles: ["시연용 논문 검색 AI 어시스턴트", "시연용 지식베이스 RAG 챗봇"],
     portfolioRoles: ["문서 청킹·임베딩·검색 정확도 검증", "LLM 검색 파이프라인 설계 및 평가"],
@@ -52,6 +56,8 @@ const EXAMPLES: Record<string, DemoDetails> = {
   },
   "[데모] 의료 AI 전문가": {
     affiliation: "시연용 의료 AI 랩",
+    condition: { meeting_type: "online", face_to_area: null, available_time: "5_10", rewards: ["undecided"] },
+    engagedUntil: "2026-11-28",
     skills: ["PyTorch", "MONAI", "DICOM", "영상 분할", "의료 멀티모달"],
     portfolioTitles: ["시연용 의료영상 병변 탐지", "시연용 임상 데이터 멀티모달 분석"],
     portfolioRoles: ["데이터 전처리·모델 성능 비교", "영상·정형 데이터 융합 모델 검토"],
@@ -72,6 +78,8 @@ const EXAMPLES: Record<string, DemoDetails> = {
   },
   "[데모] 비전 전문가": {
     affiliation: "시연용 비전 연구팀",
+    condition: { meeting_type: "offline_ok", face_to_area: "서울·인천", available_time: "gt10", rewards: ["authorship"] },
+    engagedUntil: null,
     skills: ["OpenCV", "YOLO", "PyTorch", "Segmentation", "MLOps"],
     portfolioTitles: ["시연용 객체 탐지 모델 최적화", "시연용 시각 품질 검사 자동화"],
     portfolioRoles: ["객체 탐지 추론 최적화", "이미지 분할 및 성능 테스트"],
@@ -92,6 +100,8 @@ const EXAMPLES: Record<string, DemoDetails> = {
   },
   "[데모] 데이터 전문가": {
     affiliation: "시연용 데이터 스튜디오",
+    condition: { meeting_type: "online", face_to_area: null, available_time: "lt5", rewards: ["research_fund"] },
+    engagedUntil: null,
     skills: ["Pandas", "Scikit-learn", "SQL", "데이터 품질", "예측 분석"],
     portfolioTitles: ["시연용 이상 거래 탐지 모델", "시연용 시계열 수요 예측"],
     portfolioRoles: ["피처 엔지니어링과 데이터 품질 점검", "모형 검증·지표 설계·시각화"],
@@ -176,7 +186,7 @@ export function getLocalExpertDemo(profile: ExpertPublicProfile): { profile: Exp
     })),
   };
   return {
-    profile: { ...profile, portfolios, careers, educations, certificates, collaborations },
+    profile: { ...profile, portfolios, careers, educations, certificates, collaborations, collaboration: sample.condition, engaged: Boolean(sample.engagedUntil), engaged_until: sample.engagedUntil },
     reviews,
   };
 }
