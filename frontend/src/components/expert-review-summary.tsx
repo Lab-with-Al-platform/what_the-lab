@@ -1,9 +1,7 @@
 /**
- * Evaluation UI for the adopted B expert profile.
- *
- * The service has not launched a verified, bilateral review datastore.
- * Never generate sample scores or infer ratings from a collaboration's dates.
- * This component intentionally exposes a clear and polished empty state.
+ * Published, participant-verified post-collaboration review UI.
+ * 5-star average and the Bayesian LAB TRUST index are separate measures.
+ * Demo fixtures are local-only and labeled as such.
  */
 "use client";
 
@@ -72,7 +70,7 @@ export function ExpertReviewSummary({ completedCount, demo, verified }: { comple
           ))}
         </ul>
         <div className="rounded-xl border border-[#e2e8f4] bg-[#f7f9fd] p-3 text-[11px] text-[#64718a]">
-          실제 평점·리뷰는 평가 시스템 구축 후 검증된 데이터만 표시됩니다.
+          실제 평점·LAB TRUST 신뢰 지수에는 이 가상 데이터가 반영되지 않습니다.
         </div>
       </section>
     );
@@ -91,7 +89,7 @@ export function ExpertReviewSummary({ completedCount, demo, verified }: { comple
           </p>
           <h2 id="expert-review-summary" className="mt-3 text-[19px] font-bold tracking-tight text-[#3d4150]">아직 공개된 평가가 없어요</h2>
           <p className="mt-2 text-xs leading-6 text-[#7b7e8b]">
-            현재 공개 요약에 포함된 완료 협업은 {completedCount}건(최근 최대 50건)입니다. 협업 기록과 평가는 서로 다른 정보이며, 평점은 검증된 평가가 도입된 후 표시됩니다.
+            현재 공개 요약에 포함된 완료 협업은 {completedCount}건(최근 최대 50건)입니다. 협업 기록과 평가는 서로 다른 정보이며, 실제 종료된 협업에서 연구회원이 평가를 제출하고 공개 대기 기간이 지나면 점수가 표시됩니다.
           </p>
           <span className="mt-3 w-fit rounded-full border border-[#e7dbc6] bg-white/75 px-3 py-1.5 text-[11px] font-semibold text-[#96784e]">평가 점수 미제공</span>
         </div>
