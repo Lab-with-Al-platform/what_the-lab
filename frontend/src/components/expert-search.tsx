@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { CollabRequestDialog } from "@/components/collab-request-dialog";
+import { ExpertSearchHero } from "@/components/expert-search-hero";
 import { PageContainer } from "@/components/page-container";
+import { expertListHref, restoredExpertCount } from "@/lib/expert-search-navigation";
 import { Avatar } from "@/components/request-parts";
 import { ApiError, requestApi } from "@/lib/api";
 import { photoOrDefault } from "@/lib/collab-requests";
@@ -16,7 +17,7 @@ import { expertReason, interestFromExpert, interestFromResearch, type Interest }
 type Panel = "works" | "fields" | "research" | null;
 type Role = "researcher" | "expert" | null; // null = 로그인 안 했거나 유형 미선택
 
-/** AI 전문가 찾기. 공개한 전문가를 검색어·맡길 일·분야·내 연구로 찾고, 카드에서 바로 협업을 요청해요. */
+/** AI 전문가 찾기. 공개 전문가를 탐색하고 상세 프로필을 검토한 뒤 협업을 요청합니다. */
 export function ExpertSearch() {
   const searchParams = useSearchParams();
   const incomingQuery = (searchParams.get("q") ?? searchParams.get("skill") ?? "").slice(0, 50);
@@ -41,7 +42,7 @@ export function ExpertSearch() {
   const [loadingMore, setLoadingMore] = useState(false);
   const searchGeneration = useRef(0);
   const [error, setError] = useState("");
-  const [requesting, setRequesting] = useState<ExpertCardData | null>(null); // 협업 요청 창을 연 전문가
+  const restoredFocus = useRef<number | null>(null);
 
   useEffect(() => {
     setDraft(incomingQuery);
@@ -49,6 +50,14 @@ export function ExpertSearch() {
     setWorks(splitTaxonomyIds(incomingWorksKey, "work"));
     setFields(splitTaxonomyIds(incomingFieldsKey, "category"));
   }, [incomingQuery, incomingWorksKey, incomingFieldsKey]);
+
+  // Return links only preserve the selected research label if it belongs to this researcher.
+  useEffect(() => {
+    const rawId = searchParams.get("research");
+    if (role !== "researcher" || !researches || !rawId || !/^\\d+$/.test(rawId)) return;
+    const research = researches.find((item) => item.research_id === Number(rawId));
+    if (research) setApplied((current) => current ?? research);
+  }, [researches, role, searchParams]);
 
   // 처음 한 번: 보기 목록(맡길 일·분야)과 로그인 정보
   useEffect(() => {
@@ -94,20 +103,41 @@ export function ExpertSearch() {
     [fields, preferFieldsKey, preferWorksKey, query, works],
   );
 
-  // 조건이 바뀌면 처음부터 다시 찾아요.
+  // Returning from a profile restores the filters and previously expanded result pages (up to 60).
+  const sameFilters = query === incomingQuery &&
+    works.join(",") === incomingWorks.join(",") &&
+    fields.join(",") === incomingFields.join(",");
+  const restoreCount = sameFilters ? restoredExpertCount(searchParams.get("shown")) : 6;
+
   useEffect(() => {
     let alive = true;
     searchGeneration.current += 1;
     setLoadingMore(false);
     setResult(null);
-    search(0)
-      .then((data) => alive && (setResult(data), setError("")))
-      .catch((caught) => alive && setError(caught instanceof ApiError ? caught.message : "잠시 후 다시 시도해 주세요"));
+    async function run() {
+      try {
+        const first = await search(0);
+        const items = [...first.items];
+        const target = Math.min(first.total, restoreCount);
+        while (alive && items.length < target) {
+          const next = await search(items.length);
+          if (!next.items.length) break;
+          items.push(...next.items);
+        }
+        if (alive) {
+          setResult({ ...first, items });
+          setError("");
+        }
+      } catch (caught) {
+        if (alive) setError(caught instanceof ApiError ? caught.message : "잠시 후 다시 시도해 주세요");
+      }
+    }
+    void run();
     return () => {
       alive = false;
       searchGeneration.current += 1;
     };
-  }, [search]);
+  }, [search, restoreCount]);
 
   async function loadMore() {
     if (!result || loadingMore) return;
@@ -123,6 +153,19 @@ export function ExpertSearch() {
       if (generation === searchGeneration.current) setLoadingMore(false);
     }
   }
+
+  // The focused expert is highlighted and scrolled into view after asynchronous list restoration.
+  useEffect(() => {
+    const focus = Number(searchParams.get("focus"));
+    if (!result || !Number.isSafeInteger(focus) || focus <= 0 || restoredFocus.current === focus) return;
+    const link = document.getElementById(`expert-profile-${focus}`);
+    if (!link) return;
+    restoredFocus.current = focus;
+    window.requestAnimationFrame(() => {
+      link.scrollIntoView({ block: "center", behavior: "auto" });
+      link.focus({ preventScroll: true });
+    });
+  }, [result, searchParams]);
 
   function onSearch(event: FormEvent) {
     event.preventDefault();
@@ -156,10 +199,9 @@ export function ExpertSearch() {
 
   return (
     <PageContainer className="pt-10 pb-20 md:pt-14">
-      <h1 className="text-[28px] font-bold tracking-tight md:text-[34px]">AI 전문가 찾기</h1>
-      <p className="mt-2 text-sm text-muted">AI에게 맡기고 싶은 일과 내 연구 분야로 함께할 전문가를 찾아보세요.</p>
+      <ExpertSearchHero />
 
-      <section className="mt-6 rounded-card border border-line bg-card p-4 shadow-card md:p-5" aria-label="전문가 검색">
+      <section className="relative z-10 -mt-7 rounded-2xl border border-line bg-card p-4 shadow-[0_16px_46px_rgba(16,28,60,0.09)] md:mx-5 md:p-6" aria-label="전문가 검색">
         <form className="flex flex-col gap-2 sm:flex-row" onSubmit={onSearch}>
           <label className="sr-only" htmlFor="expert-query">
             찾고 싶은 일이나 분야
@@ -234,7 +276,7 @@ export function ExpertSearch() {
         )}
       </section>
 
-      <div className="mt-8 flex flex-wrap items-end justify-between gap-2">
+      <div className="mt-9 flex flex-wrap items-end justify-between gap-2">
         <h2 className="text-lg font-bold">
           전문가 <span className="text-brand">{result ? `${result.total}명` : ""}</span>
         </h2>
@@ -245,7 +287,8 @@ export function ExpertSearch() {
         </p>
       </div>
 
-      {error && <p className="mt-4 text-sm text-danger">{error}</p>}
+      <p className="mt-2 text-xs leading-5 text-muted">프로필에서 수행 경험과 협업 조건을 확인한 후 요청할 수 있어요.</p>
+      {error && <p className="mt-4 text-sm text-danger" role="alert">{error}</p>}
       {!result ? (
         <p className="py-16 text-center text-sm text-faint">불러오는 중…</p>
       ) : result.items.length === 0 ? (
@@ -267,10 +310,11 @@ export function ExpertSearch() {
         </div>
       ) : (
         <>
-          <ul className="mt-5 grid items-stretch gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <ul className="mt-5 grid gap-3">
             {result.items.map((expert) => (
               <li key={expert.user_id}>
-                <ExpertCard expert={expert} names={names} interest={preferWorksKey || preferFieldsKey ? interest : null} onRequest={() => setRequesting(expert)} />
+                <ExpertCard expert={expert} names={names} interest={preferWorksKey || preferFieldsKey ? interest : null}
+                  returnHref={expertListHref({ query, works, fields, shown: result.items.length, focus: expert.user_id, researchId: applied?.research_id })} />
               </li>
             ))}
           </ul>
@@ -284,7 +328,6 @@ export function ExpertSearch() {
         </>
       )}
 
-      {requesting && <CollabRequestDialog expert={requesting} role={role} names={names} onClose={() => setRequesting(null)} />}
     </PageContainer>
   );
 }
@@ -385,39 +428,41 @@ function ResearchPicker({ role, researches, names, onPick }: { role: Role; resea
   );
 }
 
-function ExpertCard({ expert, names, interest, onRequest }: { expert: ExpertCardData; names: Names; interest: Interest | null; onRequest: () => void }) {
+function ExpertCard({ expert, names, interest, returnHref }: { expert: ExpertCardData; names: Names; interest: Interest | null; returnHref: string }) {
   const tags = [...expert.domain_ids.map((id) => names.fields.get(id) ?? id), ...expert.able_work_ids.map((id) => names.works.get(id) ?? id)];
   const { shown, rest } = headAndRest(tags);
   const engaged = engagedLabel(expert);
   const reason = interest ? expertReason(expert, interest, names) : null;
+  const detailUrl = `/experts/${expert.user_id}?from=${encodeURIComponent(returnHref)}`;
 
   return (
-    <article className="flex h-full flex-col rounded-card border border-line bg-card p-5 shadow-card">
-      <div className="flex items-center gap-3">
-        <Avatar src={photoOrDefault(expert.user_photo, "expert")} size={40} />
-        <div className="min-w-0">
-          <h3 className="truncate text-base font-bold">{expert.nickname}</h3>
-          {engaged && <p className="text-xs font-semibold text-trend">● {engaged}</p>}
+    <article className="group flex h-full flex-col gap-4 rounded-2xl border border-line bg-card p-5 shadow-card transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-[0_16px_35px_rgba(16,28,60,0.08)] sm:flex-row sm:items-center sm:gap-5 md:p-6">
+      <div className="flex min-w-0 flex-1 items-start gap-4">
+        <div className="shrink-0 rounded-xl bg-page p-1">
+          <Avatar src={photoOrDefault(expert.user_photo, "expert")} size={56} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <h3 className="text-[17px] font-bold tracking-tight text-ink">{expert.nickname}</h3>
+            {engaged && <span className="rounded-full bg-trend-soft px-2 py-1 text-[11px] font-semibold text-trend">{engaged}</span>}
+          </div>
+          {reason && <p className="mt-1.5 text-xs font-semibold text-brand">{reason}</p>}
+          <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted">{expert.introduce || "아직 소개를 적지 않았어요"}</p>
+          <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="전문 분야 및 수행 기술">
+            {shown.map((tag) => (
+              <li key={tag} className="rounded-full bg-brand-soft px-2.5 py-1 text-xs font-medium text-brand">{tag}</li>
+            ))}
+            {rest > 0 && <li className="rounded-full bg-page px-2.5 py-1 text-xs text-muted">+{rest}</li>}
+          </ul>
         </div>
       </div>
-      {reason ? <p className="mt-3 text-xs font-medium text-brand">{reason}</p> : null}
-      <p className={`line-clamp-2 min-h-[2lh] text-sm leading-6 ${reason ? "mt-2" : "mt-3"}`}>{expert.introduce || "아직 소개를 적지 않았어요"}</p>
-      <ul className="mt-3 flex flex-wrap gap-1.5">
-        {shown.map((tag) => (
-          <li key={tag} className="rounded-full bg-brand-soft px-2.5 py-1 text-xs font-medium text-brand">
-            {tag}
-          </li>
-        ))}
-        {rest > 0 && <li className="rounded-full bg-page px-2.5 py-1 text-xs text-muted">+{rest}</li>}
-      </ul>
-      <div className="mt-auto grid grid-cols-2 gap-2 pt-4">
-        <Link href={`/experts/${expert.user_id}`} className="inline-flex h-11 items-center justify-center rounded-button border border-line text-sm font-semibold hover:bg-page">
-          프로필 보기
-        </Link>
-        <button type="button" onClick={onRequest} className="h-11 rounded-button bg-brand text-sm font-semibold text-white hover:bg-brand-hover">
-          협업 요청
-        </button>
-      </div>
+      <Link
+        id={`expert-profile-${expert.user_id}`}
+        href={detailUrl}
+        className="inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-xl border border-brand/20 bg-brand-soft px-4 text-sm font-semibold text-brand transition-colors hover:border-brand hover:bg-brand hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand sm:w-[178px]"
+      >
+        프로필 자세히 보기 <span aria-hidden="true">→</span>
+      </Link>
     </article>
   );
 }
