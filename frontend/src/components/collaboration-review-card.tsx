@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { ApiError } from "@/lib/api";
-import { EMPTY_SCORES, REVIEW_LABELS, getReviewContext, submitReview, type ReviewContext, type ReviewScores } from "@/lib/reviews";
+import { EMPTY_SCORES, REVIEW_LABELS, getReviewContext, submitReview, reportPublicReview, type ReviewContext, type ReviewScores } from "@/lib/reviews";
 
-type ScoreKey = "expertise" | "communication" | "timeliness" | "quality";
 
 function ScorePicker({ title, hint, value, onChange, disabled }: {
   title: string; hint: string; value: number; onChange: (score: number) => void; disabled: boolean;
@@ -43,6 +42,11 @@ export function CollaborationReviewCard({ collaborationId }: { collaborationId: 
   const [loadError, setLoadError] = useState("");
   const [saveError, setSaveError] = useState("");
   const [success, setSuccess] = useState("");
+  const [reporting, setReporting] = useState(false);
+  const [reportReason, setReportReason] = useState("privacy");
+  const [reportComment, setReportComment] = useState("");
+  const [reportBusy, setReportBusy] = useState(false);
+  const [reportDone, setReportDone] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -78,6 +82,17 @@ export function CollaborationReviewCard({ collaborationId }: { collaborationId: 
     } finally {
       setBusy(false);
     }
+  }
+
+  async function reportReceived() {
+    if (!context?.received_review || reportBusy) return;
+    setReportBusy(true); setSaveError("");
+    try {
+      await reportPublicReview(context.received_review.review_id, reportReason, reportComment);
+      setReportDone(true); setReporting(false);
+    } catch (error) {
+      setSaveError(error instanceof ApiError ? error.message : "신고 접수에 실패했습니다.");
+    } finally { setReportBusy(false); }
   }
 
   if (loadError) return (
@@ -139,6 +154,47 @@ export function CollaborationReviewCard({ collaborationId }: { collaborationId: 
             {existing.comment && <p className="whitespace-pre-wrap break-words rounded-xl bg-[#f7f9fd] px-4 py-3 text-[13px] leading-6 text-ink">{existing.comment}</p>}
             <p className="text-xs text-[#78849b]">{existing.visibility === "hidden" ? "이 후기는 운영 검토에 따라 공개되지 않습니다." : "평가가 저장됐습니다. 공개 정책에 따라 표시됩니다."}</p>
           </div>
+        )}
+        {context.received_review && (
+          <section aria-labelledby="received-review-title" className="space-y-3 rounded-2xl border border-[#e1e8f4] bg-[#f8faff] p-4 sm:p-5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 id="received-review-title" className="text-[15px] font-bold text-[#30446f]">상대방이 나에게 남긴 협업 평가</h3>
+              <span className="rounded-full bg-[#e6ecfb] px-2.5 py-1 text-[10px] font-bold text-[#536cb0]">7일 공개 대기 후 · 당사자만</span>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {REVIEW_LABELS[context.received_review.reviewer_side].map((item) => (
+                <div key={item.key} className="flex justify-between gap-3 rounded-lg bg-white px-3 py-2.5 text-[12px]">
+                  <span className="text-muted">{item.label}</span>
+                  <b className="text-[#3e54a0]">★ {context.received_review?.[item.key]} / 5</b>
+                </div>
+              ))}
+            </div>
+            {context.received_review.comment ? (
+              <p className="whitespace-pre-wrap break-words rounded-xl bg-white p-4 text-[12px] leading-6 text-[#516079]">{context.received_review.comment}</p>
+            ) : <p className="text-xs text-muted">상대가 점수만 남겼습니다.</p>}
+            <p className="text-[11px] leading-5 text-muted">이 피드백은 협업 당사자에게만 제공됩니다. 연구회원에 대한 평점은 공개 전문가 평점에 합산되지 않습니다.</p>
+            {reportDone ? <p role="status" className="text-[12px] font-semibold text-[#27714b]">신고가 접수되었습니다.</p>
+              : <button type="button" onClick={() => setReporting(!reporting)} className="min-h-9 rounded-lg border border-[#cdd6e7] bg-white px-3 text-xs font-semibold text-[#6d748d]">이 평가 신고하기</button>}
+            {reporting && !reportDone && (
+              <div className="space-y-3 rounded-xl border border-[#dce4f1] bg-white p-4">
+                <label className="block text-[12px] font-bold text-ink">신고 사유
+                  <select value={reportReason} onChange={(event)=>setReportReason(event.target.value)} className="mt-2 h-10 w-full rounded-lg border border-line bg-white px-3 text-xs">
+                    <option value="privacy">개인정보·연구 비밀</option>
+                    <option value="abuse">욕설·비방</option>
+                    <option value="false_claim">허위 사실</option>
+                    <option value="other">기타</option>
+                  </select>
+                </label>
+                <label className="block text-[12px] font-bold text-ink">신고 내용 (선택)
+                  <textarea rows={2} maxLength={300} value={reportComment} onChange={(event)=>setReportComment(event.target.value)} className="mt-2 w-full rounded-lg border border-line p-3 text-xs" />
+                </label>
+                {saveError && <p role="alert" className="text-xs font-semibold text-danger">{saveError}</p>}
+                <button type="button" disabled={reportBusy} onClick={() => void reportReceived()} className="min-h-10 rounded-lg bg-[#5142d8] px-4 text-xs font-bold text-white disabled:opacity-50">
+                  {reportBusy ? "신고 중…" : "신고 제출"}
+                </button>
+              </div>
+            )}
+          </section>
         )}
         {showForm && (
           <div className="space-y-4">
