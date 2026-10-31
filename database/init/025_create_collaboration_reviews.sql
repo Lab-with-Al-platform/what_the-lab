@@ -1,3 +1,15 @@
+-- ACID-atomic install for a fresh Docker volume OR a carefully reviewed existing
+-- local volume. The previous baseline must be 20261029_20. Never run on live Supabase.
+BEGIN;
+DO $version_guard$ BEGIN
+  IF (SELECT version_num FROM public.insight_alembic_version LIMIT 1) IS DISTINCT FROM '20261029_20' THEN
+    RAISE EXCEPTION 'Expected local schema baseline 20261029_20; abort review migration.';
+  END IF;
+  IF to_regclass('public.collaboration_review') IS NOT NULL THEN
+    RAISE EXCEPTION 'Review table already exists; do not reapply.';
+  END IF;
+END $version_guard$;
+
 -- WHAT THE LAB: verified collaboration-completion reviews.
 -- Do not run against shared/production databases without a reviewed migration plan.
 -- One review per side for each collaboration; no public client direct table access.
@@ -70,3 +82,5 @@ END $permissions$;
 -- Local Docker bootstrap follows earlier init scripts; Alembic owns remote migrations.
 UPDATE public.insight_alembic_version SET version_num = '20261031_21'
 WHERE version_num = '20261029_20';
+
+COMMIT;
