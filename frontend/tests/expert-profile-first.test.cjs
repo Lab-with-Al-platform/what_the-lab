@@ -36,6 +36,22 @@ test("사용자가 선택한 2번 시안: 밝은 헤더, 왼쪽 필터, 추천, 
   assert.match(list, /expert-filter-sidebar/);
 });
 
+test("추천 카드 높이가 사진 배경·플라스크로 늘어나지 않고 일반 카드 CTA가 자연스럽게 이어진다", () => {
+  const list = read("expert-search.tsx");
+  const featured = list.slice(list.indexOf("function FeaturedExpert({"), list.indexOf("function ExpertCard({"));
+  const regular = list.slice(list.indexOf("function ExpertCard({"));
+  assert.match(featured, /grid-cols-\[92px_minmax\(0,1fr\)\]/, "추천 카드는 높이가 콘텐츠에 맞는 grid");
+  assert.match(featured, /lg:grid-cols-\[104px_minmax\(0,1fr\)_228px\]/, "데스크톱은 안정적인 세 칼럼");
+  assert.match(list, /featured \? "size-\[92px\].*sm:size-\[104px\]"/, "추천 프로필 사진은 92~104px");
+  assert.doesNotMatch(featured, /items-stretch|h-\[400px\]|min-h-\[400px\]/);
+  assert.match(featured, /<LabTrustIndicator snapshot=\{reputation\} variant="compact"/);
+  assert.match(featured, /id=\{"expert-profile-" \+ expert\.user_id\}/);
+  assert.match(regular, /mt-auto border-t border-\[#e9eef7\] pt-3/);
+  assert.match(regular, /ml-auto inline-flex min-h-9 items-center gap-2/);
+  assert.doesNotMatch(regular, /pt-2 text-\[12px\] font-semibold text-\[#263f79\]/);
+  assert.match(regular, /id=\{"expert-profile-" \+ expert\.user_id\}/);
+});
+
 test("검색 목록에는 프로필 CTA만 있고 협업 요청은 상세에 있다", () => {
   const list = read("expert-search.tsx");
   const detail = read("expert-profile-view.tsx");
