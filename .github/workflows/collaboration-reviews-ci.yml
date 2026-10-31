@@ -1,0 +1,63 @@
+name: Collaboration review regression
+
+on:
+  pull_request:
+    paths:
+      - "frontend/**"
+      - "backend/**"
+      - "database/init/**"
+      - ".github/workflows/collaboration-reviews-ci.yml"
+  push:
+    branches:
+      - feature/expert-search-dark-profile-first-20261031
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npx tsc --noEmit
+      - run: npm run lint
+      - run: npm run build
+
+  backend-unit:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      DISCORD_CLIENT_ID: "ci-placeholder"
+      DISCORD_CLIENT_SECRET: "ci-placeholder"
+      DISCORD_REDIRECT_URI: "http://localhost:8000/api/v1/auth/discord/callback"
+      JWT_SECRET: "ci-not-a-real-token-review-tests-only"
+      NEXT_PUBLIC_APP_URL: "http://localhost:3000"
+      CORS_ORIGINS: "http://localhost:3000"
+      DATABASE_URL: ""
+      DB_HOST: "127.0.0.1"
+      DB_PORT: "5433"
+      DB_NAME: "labbridge"
+      DB_USER: "admin"
+      DB_PASSWORD: "ci-placeholder"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "latest"
+          enable-cache: true
+      - run: uv python install 3.13
+      - run: uv sync --locked
+      - run: uv run pytest -q tests/test_collaboration_reviews.py tests/test_expert_public_profile.py tests/test_expert_search_facets.py tests/test_notification_messages.py
+      - run: uv run python -m compileall -q app/routers/reviews.py app/review_store.py
