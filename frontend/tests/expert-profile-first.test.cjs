@@ -176,7 +176,7 @@ test("데모 평가·연구·이력은 UI에서 명확히 구분하고 실제 �
   assert.match(detail, /getLocalExpertDemo\(liveProfile\)/);
   assert.match(detail, /setDemoReviews\(sample\?\.reviews \?\? null\)/);
   assert.match(detail, /requesting && !demoReviews/);
-  assert.match(detail, /데모 전문가/);
+  assert.match(detail, /화면 검수용 가상 전문가/);
   assert.match(reviews, /DEMO · 가상 평가/);
   assert.match(reviews, /demo\.scores\.map/);
   assert.match(reviews, /demo\.entries\.map/);
