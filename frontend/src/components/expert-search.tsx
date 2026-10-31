@@ -162,6 +162,9 @@ export function ExpertSearch() {
   // Ignore stale responses when a search/next page changes the visible IDs.
   const reputationIds = result?.items.map((item) => item.user_id).join(",") ?? "";
   useEffect(() => {
+    // An old result must never flash as the rating for a new search/pagination.
+    setReputations({});
+    setReputationFailed(false);
     if (!reputationIds) {
       return;
     }
