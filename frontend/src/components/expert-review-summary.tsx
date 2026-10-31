@@ -20,7 +20,7 @@ export function ExpertReviewSummary({ completedCount }: { completedCount: number
           </p>
           <h2 id="expert-review-summary" className="mt-3 text-[19px] font-bold tracking-tight text-[#3d4150]">아직 공개된 평가가 없어요</h2>
           <p className="mt-2 text-xs leading-6 text-[#7b7e8b]">
-            실제 완료 협업은 {completedCount}건입니다. 협업 기록과 평가는 서로 다른 정보이며, 평점은 검증된 평가가 도입된 후 표시됩니다.
+            현재 공개 요약에 포함된 완료 협업은 {completedCount}건(최근 최대 50건)입니다. 협업 기록과 평가는 서로 다른 정보이며, 평점은 검증된 평가가 도입된 후 표시됩니다.
           </p>
           <span className="mt-3 w-fit rounded-full border border-[#e7dbc6] bg-white/75 px-3 py-1.5 text-[11px] font-semibold text-[#96784e]">평가 점수 미제공</span>
         </div>
