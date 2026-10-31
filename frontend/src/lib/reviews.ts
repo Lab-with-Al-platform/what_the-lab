@@ -32,6 +32,7 @@ export type ReviewContext = {
   research_title: string;
   public_policy: string;
   my_review: CollaborationReview | null;
+  received_review: (Pick<CollaborationReview, "review_id" | "collaboration_id" | "reviewer_side" | "expertise" | "communication" | "timeliness" | "quality" | "comment" | "created_at">) | null;
   can_edit: boolean;
   can_submit: boolean;
 };
