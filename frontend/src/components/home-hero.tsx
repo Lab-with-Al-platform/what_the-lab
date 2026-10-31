@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, type CSSProperties, type FocusEvent, type PointerEvent, type ReactNode } from "react";
+import { useEffect, useState, type CSSProperties, type FocusEvent, type ReactNode } from "react";
 import { BrandWordmark } from "@/components/brand-wordmark";
-import { PageContainer } from "@/components/page-container";
 import { DiscordGuideVisual, PlatformGuideVisual } from "@/components/home-guide-visuals";
+import { HomeIntroVideo } from "@/components/home-intro-video";
+import { PageContainer } from "@/components/page-container";
+import { decideDailyHomeVideoFromBrowser, seoulDateKey } from "@/lib/home-intro-video-policy";
 import "./home-hero.css";
 
 const SLIDE_DURATION_MS = 9000;
@@ -14,51 +16,96 @@ const HOME_SLIDES = [
   { id: "discord", label: "Discord 이용 안내", eyebrow: "YOUR COLLABORATION SPACE", firstLine: "함께하는 연구의 현장,", secondLine: "Discord로 이어집니다.", accent: "", body: "프로젝트의 대화와 협업이 이어지는 공간. 챗봇과 Google Calendar의 연결로 연구 논의와 일정이 한 흐름으로 이어집니다." },
 ] as const;
 
-/** 홈의 전환만 담당합니다. 기존 연구 이미지는 서버에서 만든 ReactNode로 전달받습니다. */
+function slideVisual(slideId: (typeof HOME_SLIDES)[number]["id"], introVisual: ReactNode): ReactNode {
+  if (slideId === "intro") return introVisual;
+  if (slideId === "platform") return <PlatformGuideVisual />;
+  return <DiscordGuideVisual />;
+}
+
+/** 홈의 전환만 담당합니다. 소개 사진은 서버에서 만든 ReactNode로 전달받습니다. */
 export function HomeHero({ introVisual }: { introVisual: ReactNode }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [userPaused, setUserPaused] = useState(false);
-  const [hovering, setHovering] = useState(false);
   const [tabHidden, setTabHidden] = useState(false);
-  const [reduceMotion, setReduceMotion] = useState(false);
-  const isRunning = !userPaused && !hovering && !tabHidden && !reduceMotion;
+  const [showVideo, setShowVideo] = useState(false);
+  const [videoSession, setVideoSession] = useState(0);
+  const [autoplayVideo, setAutoplayVideo] = useState(false);
+  const [entryDate, setEntryDate] = useState("");
+  // 영상이 켜져 있으면 9초 배너 타이머는 멈춥니다. 페이지를 연 시각의 날짜만 사용합니다.
+  const isRunning = !showVideo && !userPaused && !tabHidden;
 
   useEffect(() => {
-    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const syncMotion = () => setReduceMotion(motion.matches);
     const syncVisibility = () => setTabHidden(document.hidden);
-    syncMotion();
     syncVisibility();
-    motion.addEventListener("change", syncMotion);
     document.addEventListener("visibilitychange", syncVisibility);
-    return () => {
-      motion.removeEventListener("change", syncMotion);
-      document.removeEventListener("visibilitychange", syncVisibility);
-    };
+    return () => document.removeEventListener("visibilitychange", syncVisibility);
   }, []);
 
+  useEffect(() => {
+    const decision = decideDailyHomeVideoFromBrowser();
+    setEntryDate(decision.today);
+    if (!decision.show) return undefined;
+    const openDailyVideo = () => {
+      setAutoplayVideo(true);
+      setShowVideo(true);
+    };
+    if (document.hidden) {
+      const onVisible = () => {
+        if (document.hidden) return;
+        document.removeEventListener("visibilitychange", onVisible);
+        openDailyVideo();
+      };
+      document.addEventListener("visibilitychange", onVisible);
+      return () => document.removeEventListener("visibilitychange", onVisible);
+    }
+    openDailyVideo();
+    return undefined;
+  }, []);
+
+  // 진행 막대는 장식입니다. 실제 전환은 타이머가 맡아서, 마우스가 배너 위에 있어도 넘어갑니다.
+  useEffect(() => {
+    if (!isRunning) return undefined;
+    const timer = window.setTimeout(() => {
+      setActiveIndex((current) => (current + 1) % HOME_SLIDES.length);
+    }, SLIDE_DURATION_MS);
+    return () => window.clearTimeout(timer);
+  }, [activeIndex, isRunning]);
+
   function selectSlide(index: number): void {
+    setShowVideo(false);
+    setAutoplayVideo(false);
     setActiveIndex((index + HOME_SLIDES.length) % HOME_SLIDES.length);
   }
 
-  function handlePointer(event: PointerEvent<HTMLElement>, entering: boolean): void {
-    // 터치 뒤 남는 가상 hover 때문에 자동 넘김이 멈추지 않게 합니다.
-    if (event.pointerType === "mouse") setHovering(entering);
+  function openVideo(): void {
+    setEntryDate((current) => current || seoulDateKey(new Date()));
+    setVideoSession((current) => current + 1);
+    setAutoplayVideo(true);
+    setShowVideo(true);
+  }
+
+  function finishVideo(): void {
+    setShowVideo(false);
+    setAutoplayVideo(false);
+    setActiveIndex(0);
   }
 
   function handleFocus(event: FocusEvent<HTMLElement>): void {
     const cameFromOutside = !event.currentTarget.contains(event.relatedTarget as Node | null);
-    if (cameFromOutside && event.target.matches(":focus-visible")) setUserPaused(true);
+    if (cameFromOutside && event.target instanceof Element && event.target.matches(":focus-visible")) setUserPaused(true);
   }
 
   return (
-    <section aria-label="LabBridge 소개와 이용 안내" aria-roledescription="carousel" onPointerEnter={(event) => handlePointer(event, true)} onPointerLeave={(event) => handlePointer(event, false)} onFocus={handleFocus}>
+    <section aria-label="LabBridge 소개와 이용 안내" aria-roledescription="carousel" onFocus={handleFocus}>
       <h1 className="sr-only">LabBridge · 연구의 질문이 AI와 만나는 곳</h1>
       <PageContainer className="home-hero">
-        {/* 같은 그리드 칸을 공유하면 가장 긴 화면에 높이가 맞춰져 아래 카드가 흔들리지 않습니다. */}
+        {/* 영상은 순환 밖입니다. 끝나거나 건너뛰면 소개 화면부터 세 배너만 다시 돕니다. */}
+        {showVideo ? (
+          <HomeIntroVideo key={videoSession} playedOn={entryDate} autoplay={autoplayVideo} onFinish={finishVideo} />
+        ) : (
         <div className="home-hero__slides" aria-live={isRunning ? "off" : "polite"}>
           {HOME_SLIDES.map((slide, index) => (
-            <div key={slide.id} className="home-hero__slide" data-home-slide={slide.id} data-active={activeIndex === index} role="group" aria-roledescription="slide" aria-label={`${index + 1} / ${HOME_SLIDES.length}: ${slide.label}`} aria-hidden={activeIndex !== index} inert={activeIndex !== index}>
+            <div key={slide.id} className="home-hero__slide" data-home-slide={slide.id} data-active={activeIndex === index} role="group" aria-roledescription="slide" aria-label={`${index + 1} / ${HOME_SLIDES.length}: ${slide.label}`} aria-hidden={activeIndex !== index}>
               <div className="home-hero__copy">
                 <p className="home-hero__eyebrow">{slide.eyebrow}</p>
                 <h2 className="home-hero__title">{slide.firstLine}<br /><span className={slide.id === "intro" ? undefined : "text-brand"}>{slide.secondLine}</span>{slide.id === "intro" ? <span className="mt-3 block"><BrandWordmark variant="hero" height={56} priority className="h-10 w-auto md:h-14" /></span> : slide.accent ? <span className="text-brand">{slide.accent}</span> : null}</h2>
@@ -70,29 +117,30 @@ export function HomeHero({ introVisual }: { introVisual: ReactNode }) {
                   <p className="home-hero__manual"><span>상세 매뉴얼 준비 중</span> 자세한 이용 방법은 FAQ에서 만나요.</p>
                 )}
               </div>
-              {slide.id === "intro" ? (
-                <div className="home-hero__intro-art">
-                  {introVisual}
-                  <div className="home-hero__intro-mobile" aria-hidden="true"><span>RESEARCH × AI</span><strong>서로 다른 전문성이<br />새로운 가능성으로.</strong><p>생명과학 <i>·</i> 의료 <i>·</i> 기후·환경</p></div>
-                </div>
-              ) : slide.id === "platform" ? <PlatformGuideVisual /> : <DiscordGuideVisual />}
+              <div className="home-hero__intro-art">
+                {slideVisual(slide.id, introVisual)}
+              </div>
             </div>
           ))}
         </div>
+        )}
         <div className="home-hero__controls">
           <div className="home-hero__choices" role="group" aria-label="홈 소개 화면 선택">
+            <button type="button" onClick={openVideo} aria-current={showVideo ? "true" : undefined} className="home-hero__choice">
+              <span>영상</span>
+            </button>
             {HOME_SLIDES.map((slide, index) => (
-              <button key={slide.id} type="button" onClick={() => selectSlide(index)} aria-current={activeIndex === index ? "true" : undefined} className="home-hero__choice">
+              <button key={slide.id} type="button" onClick={() => selectSlide(index)} aria-current={!showVideo && activeIndex === index ? "true" : undefined} className="home-hero__choice">
                 <span className="home-hero__choice-number">0{index + 1}</span><span>{slide.label}</span>
-                <span key={activeIndex === index ? `active-${index}` : "idle"} className="home-hero__progress" data-running={isRunning && activeIndex === index} style={{ "--home-slide-duration": `${SLIDE_DURATION_MS}ms` } as CSSProperties} onAnimationEnd={activeIndex === index ? () => selectSlide(activeIndex + 1) : undefined} aria-hidden="true" />
+                <span key={activeIndex === index ? `active-${index}` : "idle"} className="home-hero__progress" data-running={isRunning && activeIndex === index} style={{ "--home-slide-duration": `${SLIDE_DURATION_MS}ms` } as CSSProperties} aria-hidden="true" />
               </button>
             ))}
           </div>
           <div className="home-hero__navigation">
             <button type="button" aria-label="이전 홈 소개" onClick={() => selectSlide(activeIndex - 1)}>←</button>
-            <span className="home-hero__count" aria-hidden="true">0{activeIndex + 1} <i>/</i> 03</span>
+            <span className="home-hero__count" aria-hidden="true">{showVideo ? "영상" : `0${activeIndex + 1}`} <i>/</i> 03</span>
             <button type="button" aria-label="다음 홈 소개" onClick={() => selectSlide(activeIndex + 1)}>→</button>
-            <button type="button" aria-label={userPaused || reduceMotion ? "홈 소개 자동 넘김 재생" : "홈 소개 자동 넘김 일시정지"} disabled={reduceMotion} title={reduceMotion ? "기기의 동작 줄이기 설정으로 자동 넘김을 멈췄습니다." : undefined} onClick={() => setUserPaused((current) => !current)}><span aria-hidden="true">{userPaused || reduceMotion ? "▶" : "Ⅱ"}</span></button>
+            <button type="button" aria-label={userPaused ? "홈 소개 자동 넘김 재생" : "홈 소개 자동 넘김 일시정지"} onClick={() => setUserPaused((current) => !current)}><span aria-hidden="true">{userPaused ? "▶" : "Ⅱ"}</span></button>
           </div>
         </div>
       </PageContainer>
