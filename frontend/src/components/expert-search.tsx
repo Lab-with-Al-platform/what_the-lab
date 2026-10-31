@@ -444,19 +444,19 @@ function ExpertCard({ expert, names, interest, returnHref }: { expert: ExpertCar
   const detailUrl = `/experts/${expert.user_id}?from=${encodeURIComponent(returnHref)}`;
 
   return (
-    <article className="group flex h-full flex-col gap-4 rounded-2xl border border-line bg-card p-5 shadow-card transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-[0_16px_35px_rgba(16,28,60,0.08)] sm:flex-row sm:items-center sm:gap-5 md:p-6">
+    <article className="group flex flex-col gap-4 bg-white px-4 py-4 transition-colors hover:bg-[#faf9ff] sm:flex-row sm:items-center sm:gap-5 sm:px-5 sm:py-5">
       <div className="flex min-w-0 flex-1 items-start gap-4">
-        <div className="shrink-0 rounded-xl bg-page p-1">
-          <Avatar src={photoOrDefault(expert.user_photo, "expert")} size={56} />
+        <div className="shrink-0 rounded-full bg-page p-0.5">
+          <Avatar src={photoOrDefault(expert.user_photo, "expert")} size={52} />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <h3 className="text-[17px] font-bold tracking-tight text-ink">{expert.nickname}</h3>
+            <h3 className="text-[16px] font-bold tracking-tight text-ink">{expert.nickname}</h3>
             {engaged && <span className="rounded-full bg-trend-soft px-2 py-1 text-[11px] font-semibold text-trend">{engaged}</span>}
           </div>
           {reason && <p className="mt-1.5 text-xs font-semibold text-brand">{reason}</p>}
-          <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted">{expert.introduce || "아직 소개를 적지 않았어요"}</p>
-          <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="전문 분야 및 수행 기술">
+          <p className="mt-1.5 line-clamp-2 text-[13px] leading-5 text-muted">{expert.introduce || "아직 소개를 적지 않았어요"}</p>
+          <ul className="mt-2.5 flex flex-wrap gap-1.5" aria-label="전문 분야 및 수행 기술">
             {shown.map((tag) => (
               <li key={tag} className="rounded-full bg-brand-soft px-2.5 py-1 text-xs font-medium text-brand">{tag}</li>
             ))}
@@ -467,7 +467,7 @@ function ExpertCard({ expert, names, interest, returnHref }: { expert: ExpertCar
       <Link
         id={`expert-profile-${expert.user_id}`}
         href={detailUrl}
-        className="inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-xl border border-brand/20 bg-brand-soft px-4 text-sm font-semibold text-brand transition-colors hover:border-brand hover:bg-brand hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand sm:w-[178px]"
+        className="inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-brand px-4 text-[13px] font-semibold text-white shadow-[0_5px_13px_rgba(80,54,244,0.15)] transition-colors hover:bg-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand sm:w-[175px]"
       >
         프로필 자세히 보기 <span aria-hidden="true">→</span>
       </Link>
