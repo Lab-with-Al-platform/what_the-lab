@@ -87,7 +87,7 @@ CHANGES_SQL = """
 
 def load_detail(user_id: int, collaboration_id: int) -> dict:
     """협업 상세 화면 한 장. 내 협업이 아니면 404 (find_collaboration)."""
-    with get_connection() as conn, conn.cursor() as cursor:
+    with get_connection() as conn, conn.transaction(), conn.cursor() as cursor:
         complete_ended_collaborations(cursor)
         side = find_collaboration(cursor, user_id, collaboration_id)["my_side"]
         cursor.execute(COLLAB_SQL, (collaboration_id,))
