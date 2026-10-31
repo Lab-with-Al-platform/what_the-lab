@@ -1,0 +1,120 @@
+name: Collaboration review regression
+
+on:
+  pull_request:
+    paths:
+      - "frontend/**"
+      - "backend/**"
+      - "database/init/**"
+      - ".github/workflows/collaboration-reviews-ci.yml"
+  push:
+    branches:
+      - feature/expert-search-dark-profile-first-20261031
+
+permissions:
+  contents: read
+
+concurrency:
+  group: collaboration-reviews-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npx tsc --noEmit
+      - run: npm run lint
+      - run: npm run build
+
+
+  review-ui-contract:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - name: Review feature and directly integrated UI tests
+        run: node --test tests/collaboration-reviews.test.cjs tests/lab-trust.test.cjs tests/expert-profile-first.test.cjs tests/expert-local-demo.test.cjs tests/community-integration.test.cjs tests/community-navigation.test.cjs
+      - run: npx tsc --noEmit
+      - run: npm run lint
+      - run: npm run build
+
+  review-postgres-schema:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci-review-test-only
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      PGPASSWORD: ci-review-test-only
+    steps:
+      - uses: actions/checkout@v4
+      - name: PostgreSQL schema fixture
+        run: psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f backend/tests/sql/review_schema_smoke.sql
+      - name: Execute production review DDL in PostgreSQL 17
+        run: psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f backend/migrations/sql/20261031_21/001_create_collaboration_reviews.sql
+      - name: Verify integrity, unique reviewer and immutable RLS boundaries
+        run: psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f backend/tests/sql/review_schema_assertions.sql
+      - name: Seed legitimate and adversarial reputation examples
+        run: psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f backend/tests/sql/reputation_scoring_seed.sql
+      - name: Verify production LAB TRUST SQL, reviewer cap, private/early/hidden exclusions
+        run: |
+          python3 backend/tests/build_reputation_ci_query.py /tmp/lab-trust-ci-query.sql
+          psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f /tmp/lab-trust-ci-query.sql
+
+  backend-unit:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      DISCORD_CLIENT_ID: "ci-placeholder"
+      DISCORD_CLIENT_SECRET: "ci-placeholder"
+      DISCORD_REDIRECT_URI: "http://localhost:8000/api/v1/auth/discord/callback"
+      JWT_SECRET: "ci-not-a-real-token-review-tests-only"
+      NEXT_PUBLIC_APP_URL: "http://localhost:3000"
+      CORS_ORIGINS: "http://localhost:3000"
+      DATABASE_URL: ""
+      DB_HOST: "127.0.0.1"
+      DB_PORT: "5433"
+      DB_NAME: "labbridge"
+      DB_USER: "admin"
+      DB_PASSWORD: "ci-placeholder"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "latest"
+          enable-cache: true
+      - run: uv python install 3.13
+      - run: uv sync --locked
+      - run: uv run pytest -q tests/test_collaboration_reviews.py tests/test_reputation_store.py tests/test_expert_public_profile.py tests/test_expert_search_facets.py tests/test_notification_messages.py
+      - run: uv run python -m compileall -q app/routers/reviews.py app/review_store.py app/reputation_store.py

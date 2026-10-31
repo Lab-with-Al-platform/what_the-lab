@@ -21,6 +21,7 @@ from app.routers import (
     expert_history,
     expert_portfolio,
     expert_profile,
+    reviews,
     experts,
     google,
     insights,
@@ -103,6 +104,7 @@ app.include_router(expert_profile.router)
 app.include_router(expert_portfolio.router)
 app.include_router(expert_history.router)
 app.include_router(experts.router)
+app.include_router(reviews.router)
 app.include_router(taxonomy.router)
 app.include_router(researcher_research.router)
 app.include_router(collab_requests.researcher_router)

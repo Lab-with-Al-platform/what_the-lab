@@ -16,7 +16,7 @@ LIST_LIMIT = 50  # 한 번에 보여 줄 최대 개수
 # 받는 사람이 누구인지에 따라 나눈 알림 종류
 TO_EXPERT = {"request_received", "request_canceled"}  # 연구회원이 한 일 → 전문가에게
 TO_RESEARCHER = {"request_accepted", "request_rejected", "request_withdrawn"}  # 전문가가 한 일 → 연구회원에게
-TO_BOTH = {"request_expired", "collab_started"}  # 둘 다에게 (서로가 상대방)
+TO_BOTH = {"request_expired", "collab_started", "review_ready"}  # 둘 다에게 (서로가 상대방)
 
 # 거절 사유 (프론트 REJECT_REASON_LABELS와 같은 문구)
 REJECT_LABELS = {
@@ -114,6 +114,8 @@ def build_message(row: dict, user_id: int) -> tuple[str, str]:
         return f"{actor} 님에게 보낸 요청이 답이 없어 만료됐어요", title
     if kind == "collab_started":
         return f"{actor} 님과 협업을 시작했어요", title
+    if kind == "review_ready":
+        return "협업이 완료됐어요 · 평가 작성하기", f"{title} · 종료 후 30일 이내에 서로의 협업을 평가할 수 있어요."
     return "새 알림이 있어요", title
 
 
@@ -136,11 +138,12 @@ def load_notifications(user_id: int) -> list[dict]:
                    a.nickname AS actor_nickname, r.title AS research_title,
                    cr.reject_reason, cr.expert_id, cr.status AS request_status,
                    cr.is_urgent, cr.expires_at, cr.accepted_start_date, cr.cancel_reason,
-                   cr.responded_at
+                   cr.responded_at, c.collaboration_id
             FROM notification n
             LEFT JOIN users a ON a.user_id = n.actor_id
             LEFT JOIN collaboration_request cr ON cr.request_id = n.request_id
             LEFT JOIN research r ON r.research_id = cr.research_id
+            LEFT JOIN collaboration c ON c.request_id = n.request_id
             WHERE n.user_id = %s AND n.created_at >= now() - make_interval(days => %s)
             ORDER BY n.created_at DESC, n.notification_id DESC
             LIMIT %s
@@ -158,7 +161,11 @@ def load_notifications(user_id: int) -> list[dict]:
                 "type": row["type"],
                 "title": title,
                 "detail": detail,
-                "link": "/requests",  # 지금은 모두 요청관리. 협업공간이 생기면 collab_started는 그쪽으로
+                "link": (
+                    f"/workspace/{row['collaboration_id']}#review"
+                    if row["type"] == "review_ready" and row["collaboration_id"]
+                    else "/requests"
+                ),
                 "read": row["read_at"] is not None,
                 "created_at": row["created_at"],
             }

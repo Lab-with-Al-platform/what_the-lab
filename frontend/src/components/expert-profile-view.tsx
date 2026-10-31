@@ -1,23 +1,31 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { safeExpertBackHref } from "@/lib/expert-search-navigation";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { CollabRequestDialog } from "@/components/collab-request-dialog";
+import { ExpertReviewSummary } from "@/components/expert-review-summary";
+import { LabTrustIndicator } from "@/components/lab-trust-indicator";
+import { getLocalExpertDemo, type DemoReview } from "@/lib/expert-local-demo";
+import { getPublicExpertReviews, type PublicExpertRating } from "@/lib/reviews";
+import { Modal } from "@/components/modal";
 import { PageContainer } from "@/components/page-container";
 import { Avatar } from "@/components/request-parts";
 import { ApiError, requestApi } from "@/lib/api";
 import { photoOrDefault } from "@/lib/collab-requests";
-import { buildNames, countByCategory, dayAfter, monthDay, periodLabel, type ExpertCollaboration, type ExpertPublicProfile, type Names } from "@/lib/expert-search";
+import { buildNames, countByCategory, monthDay, periodLabel, type ExpertCollaboration, type ExpertPublicProfile, type Names } from "@/lib/expert-search";
 import { CAREER_LABELS, formatMonth, MEETING_LABELS, REWARD_LABELS, TIME_LABELS, type AbleWorkOption, type FieldCategory } from "@/lib/my-career";
 
 type Role = "researcher" | "expert" | null; // null = 로그인 안 했거나 유형 미선택
-type Tab = "work" | "history";
+type Tab = "work" | "portfolio" | "history";
 
 const DONUT_COLORS = ["#4f7bea", "#22a699", "#f5a524", "#c2508a", "#8c94ab"]; // 도넛·범례 색 (분야 순서대로)
-const PARTNER_COLORS = ["#e08a2e", "#c2508a", "#4f7bea", "#22a699"]; // 함께한 연구회원 첫 글자 동그라미 색
 
-/** AI 전문가 상세. 탭은 [연구 · 평가 · 포트폴리오] / [경력 · 학력 · 자격증] 두 개예요. */
+/** 공개 전문가 상세. 협업·평가 / 포트폴리오 / 경력 탭과 요청 CTA를 제공합니다. */
 export function ExpertProfileView({ expertId }: { expertId: string }) {
+  const searchParams = useSearchParams();
+  const backHref = safeExpertBackHref(searchParams.get("from"));
   const [profile, setProfile] = useState<ExpertPublicProfile | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState("");
@@ -27,6 +35,10 @@ export function ExpertProfileView({ expertId }: { expertId: string }) {
   const [tab, setTab] = useState<Tab>("work");
   const [requesting, setRequesting] = useState(false); // 협업 요청 창
   const [copied, setCopied] = useState(false);
+  const [demoReviews, setDemoReviews] = useState<DemoReview | null>(null);
+  const [verifiedReviews, setVerifiedReviews] = useState<PublicExpertRating | null>(null);
+  const [reviewApiError, setReviewApiError] = useState("");
+  const [demoRequestInfo, setDemoRequestInfo] = useState(false);
 
   useEffect(() => {
     if (!/^\d+$/.test(expertId)) {
@@ -34,7 +46,19 @@ export function ExpertProfileView({ expertId }: { expertId: string }) {
       return;
     }
     requestApi<ExpertPublicProfile>(`/experts/${expertId}`)
-      .then(setProfile)
+      .then((liveProfile) => {
+        const sample = getLocalExpertDemo(liveProfile);
+        setProfile(sample?.profile ?? liveProfile);
+        setDemoReviews(sample?.reviews ?? null);
+        if (!sample) {
+          getPublicExpertReviews(liveProfile.user_id)
+            .then((real) => { setVerifiedReviews(real); setReviewApiError(""); })
+            .catch(() => setReviewApiError("실제 평가 데이터를 불러오지 못했습니다. 평가용 DB 마이그레이션이 적용됐는지 확인해 주세요."));
+        } else {
+          setVerifiedReviews(null);
+          setReviewApiError("");
+        }
+      })
       .catch((caught) => {
         if (caught instanceof ApiError && caught.status === 404) setNotFound(true);
         else setError(caught instanceof ApiError ? caught.message : "잠시 후 다시 시도해 주세요");
@@ -54,7 +78,8 @@ export function ExpertProfileView({ expertId }: { expertId: string }) {
 
   async function copyLink() {
     try {
-      await navigator.clipboard.writeText(window.location.href);
+      // A shareable profile URL must not include the researcher's filters or research_id.
+      await navigator.clipboard.writeText(new URL(`/experts/${profile?.user_id ?? expertId}`, window.location.origin).href);
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -66,7 +91,7 @@ export function ExpertProfileView({ expertId }: { expertId: string }) {
     return (
       <PageContainer className="pt-6 pb-20">
         <div className="mx-auto max-w-[1120px]">
-          <BackLink />
+          <BackLink href={backHref} />
           {notFound || error ? (
             <div className="mt-6 rounded-2xl border border-[#e6e3f6] bg-card p-10 text-center">
               <p className="text-base font-bold">{notFound ? "공개된 전문가를 찾을 수 없어요" : "프로필을 불러오지 못했어요"}</p>
@@ -81,20 +106,35 @@ export function ExpertProfileView({ expertId }: { expertId: string }) {
   }
 
   const collaborations = profile.collaborations ?? []; // 백엔드가 옛 버전이어도 화면은 열려요
-  const finished = collaborations.filter((item) => !item.ongoing); // 마친 연구 (도넛에 씀)
+  const finished = collaborations.filter((item) => !item.ongoing); // 서버가 완료된 협업만 공개합니다.
   const hasHistory = profile.careers.length + profile.educations.length + profile.certificates.length > 0;
-  const isNew = collaborations.length === 0;
+  const hasNoCompletedHistory = finished.length === 0;
   const meta = [profile.affiliation, `AI 경력 ${CAREER_LABELS[profile.ai_career] ?? profile.ai_career}`].filter(Boolean).join(" · ");
-  const startLabel = profile.engaged ? (profile.engaged_until ? `${monthDay(dayAfter(profile.engaged_until))}부터` : "협업 종료 후") : "바로";
+  const availabilityNote = profile.engaged
+    ? (profile.engaged_until ? `${monthDay(profile.engaged_until)} 종료 예정 · 새 일정 협의 필요` : "진행 중 · 새 일정 협의 필요")
+    : "진행 중인 협업 없음 · 일정 협의 필요";
   const rewards = profile.collaboration ? profile.collaboration.rewards.map((code) => REWARD_LABELS[code]).join(", ") : "";
-  const currentTab: Tab = hasHistory ? tab : "work"; // 경력·학력·자격증을 하나도 안 적었으면 그 탭은 숨겨요
+  const currentTab: Tab = tab === "history" && !hasHistory ? "work" : tab;
+  const openCollaboration = () => {
+    if (demoReviews) setDemoRequestInfo(true);
+    else setRequesting(true);
+  };
 
   return (
     <PageContainer className="pt-6 pb-32 lg:pb-20">
       <div className="mx-auto max-w-[1120px]">
-        <BackLink />
-        <div className="mt-4 grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
-          <article className="lg:rounded-2xl lg:border lg:border-[#e6e3f6] lg:bg-card lg:p-8">
+        <BackLink href={backHref} />
+        {demoReviews && (
+          <div role="status" className="mt-4 flex flex-wrap items-start gap-3 rounded-2xl border border-[#c7d6f6] bg-[#f0f5ff] px-4 py-3 sm:px-5">
+            <span className="shrink-0 rounded-full bg-[#233f89] px-3 py-1 text-[11px] font-bold tracking-[0.07em] text-white">LOCAL DEMO</span>
+            <div className="min-w-0 flex-1 text-[12px] leading-6 text-[#415783]">
+              <strong className="font-bold text-[#263d77]">화면 검수용 가상 프로필</strong>
+              <p>평가·연구 이력·포트폴리오·학력·자격증은 시연을 위한 예시 데이터입니다. 실제 전문가의 검증된 실적이 아니며, 협업 요청도 전송되지 않습니다.</p>
+            </div>
+          </div>
+        )}
+        <div className="mt-4 grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <article className="min-w-0 rounded-[20px] border border-[#e4e8f2] bg-white p-5 shadow-[0_12px_38px_rgba(26,41,77,0.045)] sm:p-7 lg:p-8">
             {/* 머리 */}
             <header className="flex gap-4 lg:gap-[18px]">
               <span className="hidden lg:block">
@@ -104,27 +144,38 @@ export function ExpertProfileView({ expertId }: { expertId: string }) {
                 <Avatar src={photoOrDefault(profile.user_photo, "expert")} size={64} />
               </span>
               <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5">
-                  <h1 className="text-[22px] leading-9 font-medium text-ink lg:text-[26px]">{profile.nickname}</h1>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+                  <h1 className="break-all text-[23px] font-bold leading-9 tracking-[-0.025em] text-ink lg:text-[27px]">{profile.nickname}</h1>
                   {profile.engaged && <EngagedBadge until={profile.engaged_until} />}
-                  {isNew && (
-                    <span className="inline-flex h-6 items-center gap-[5px] rounded-[7px] bg-[#eeedfb] pr-[9px] pl-2 text-xs text-[#3d33b8]">
-                      <i className="size-1.5 rounded-full bg-[#4b3fd6]" />
-                      신규 전문가
+                  {hasNoCompletedHistory && (
+                    <span className="inline-flex min-h-6 items-center rounded-full bg-[#f1f3fa] px-2.5 py-1 text-[11px] font-medium text-[#7a849c]">
+                      완료 협업 이력 없음
                     </span>
                   )}
-                  <button
-                    type="button"
-                    onClick={copyLink}
-                    className="ml-auto hidden h-[30px] items-center gap-1.5 rounded-lg border border-[#e1e2ea] bg-white px-2.5 text-xs text-[#5e6678] hover:bg-page lg:inline-flex"
-                  >
-                    <LinkIcon />
-                    {copied ? "복사했어요" : "링크 복사"}
-                  </button>
+                  <div className="ml-auto flex shrink-0 items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={copyLink}
+                      aria-live="polite"
+                      className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-[#e1e6f0] bg-white px-3 text-xs font-semibold text-muted transition-colors hover:border-brand/40 hover:text-brand"
+                    >
+                      <LinkIcon /> {copied ? "링크 복사됨" : "링크 복사"}
+                    </button>
+                    <Link href="/faq#private-post" className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-[#e1e6f0] bg-white px-3 text-xs font-semibold text-muted transition-colors hover:border-brand/40 hover:text-brand" title="신고 또는 문의는 비공개 문의를 통해 접수할 수 있어요">
+                      신고·문의
+                    </Link>
+                  </div>
                 </div>
                 <p className="mt-0.5 hidden text-[13px] leading-5 text-[#6b7285] lg:block">{meta}</p>
               </div>
             </header>
+            <div className="mt-6">
+              <LabTrustIndicator
+                variant="profile"
+                snapshot={reviewApiError ? null : verifiedReviews?.reputation}
+                demoPreview={demoReviews ? Math.round((demoReviews.average - 1) * 25) : null}
+              />
+            </div>
             <div className="lg:pl-[98px]">
               <p className="mt-3 text-[15px] leading-[23px] text-[#2a3350]">{profile.introduce}</p>
               <p className="mt-2 text-[13px] leading-5 text-[#8c94ab] lg:hidden">{meta}</p>
@@ -134,30 +185,41 @@ export function ExpertProfileView({ expertId }: { expertId: string }) {
               </dl>
             </div>
 
-            {/* 모바일: 오른쪽 카드 내용이 머리 아래로 와요 */}
+            {/* 모바일: 전문가 협업 데이터는 공개 요약만 제공합니다. */}
             <div className="mt-5 grid gap-4 lg:hidden">
               <FieldSummary finished={finished} names={names} />
               <Conditions profile={profile} />
             </div>
 
             {/* 탭 */}
-            <div role="tablist" className="mt-7 flex gap-5 border-b border-[#e6e7ee] lg:gap-7 lg:px-1">
-              <TabButton active={currentTab === "work"} onClick={() => setTab("work")}>
-                연구 · 평가 · 포트폴리오
+            <div role="tablist" aria-label="전문가 프로필 정보" className="mt-8 flex gap-5 overflow-x-auto border-b border-[#e6e9f1] lg:gap-7 lg:px-1">
+              <TabButton active={currentTab === "work"} onClick={() => setTab("work")} panelId="expert-work-tab" tabId="expert-work-button">
+                이 서비스에서 한 연구 · 평가 <span className="ml-1 text-xs text-[#8d9ab4]">{finished.length}</span>
+              </TabButton>
+              <TabButton active={currentTab === "portfolio"} onClick={() => setTab("portfolio")} panelId="expert-portfolio-tab" tabId="expert-portfolio-button">
+                포트폴리오 <span className="ml-1 text-xs text-[#8d9ab4]">{profile.portfolios.length}</span>
               </TabButton>
               {hasHistory && (
-                <TabButton active={currentTab === "history"} onClick={() => setTab("history")}>
+                <TabButton active={currentTab === "history"} onClick={() => setTab("history")} panelId="expert-history-tab" tabId="expert-history-button">
                   경력 · 학력 · 자격증
                 </TabButton>
               )}
             </div>
 
-            <div className="pt-6">{currentTab === "work" ? <WorkTab profile={profile} collaborations={collaborations} names={names} /> : <HistoryTab profile={profile} />}</div>
+            <div id="expert-work-tab" role="tabpanel" aria-labelledby="expert-work-button" hidden={currentTab !== "work"} className="pt-6">
+              {currentTab === "work" && <WorkTab collaborations={finished} names={names} demoReviews={demoReviews} verifiedReviews={verifiedReviews} reviewApiError={reviewApiError} />}
+            </div>
+            <div id="expert-portfolio-tab" role="tabpanel" aria-labelledby="expert-portfolio-button" hidden={currentTab !== "portfolio"} className="pt-6">
+              {currentTab === "portfolio" && <PortfolioTab profile={profile} names={names} />}
+            </div>
+            {hasHistory && <div id="expert-history-tab" role="tabpanel" aria-labelledby="expert-history-button" hidden={currentTab !== "history"} className="pt-6">
+              {currentTab === "history" && <HistoryTab profile={profile} />}
+            </div>}
           </article>
 
           {/* 오른쪽 협업 카드 (데스크톱) */}
-          <aside className="hidden rounded-2xl border border-[#e6e3f6] bg-card p-[25px] shadow-[0_14px_36px_rgba(75,63,214,0.08)] lg:sticky lg:top-24 lg:block">
-            <h2 className="text-[17px] leading-[25px] text-ink">{profile.nickname} 님과 협업하기</h2>
+          <aside className="hidden rounded-[20px] border border-[#e3e8f2] bg-white p-[22px] shadow-[0_14px_35px_rgba(26,41,77,0.06)] lg:sticky lg:top-24 lg:block">
+            <h2 className="text-[17px] font-bold leading-[25px] tracking-[-0.02em] text-ink">{profile.nickname} 님과 협업하기</h2>
             <div className="mt-4">
               <FieldSummary finished={finished} names={names} />
             </div>
@@ -168,20 +230,16 @@ export function ExpertProfileView({ expertId }: { expertId: string }) {
               ) : (
                 <dd className="text-success">참여 중인 협업 없음</dd>
               )}
-              {profile.engaged && (
-                <>
-                  <dt className="text-[#8c94ab]">시작 가능</dt>
-                  <dd className="text-ink">{startLabel}</dd>
-                </>
-              )}
+              <dt className="text-[#8c94ab]">새 협업 일정</dt>
+              <dd className="text-ink">요청 시 협의</dd>
             </dl>
             <div className="mt-4">
               <Conditions profile={profile} />
             </div>
             <button
               type="button"
-              onClick={() => setRequesting(true)}
-              className="mt-5 flex h-[50px] w-full items-center justify-center gap-2 rounded-xl bg-[#4b3fd6] text-[15px] text-white hover:bg-[#3d33b8]"
+              onClick={openCollaboration}
+              className="mt-5 flex h-[50px] w-full items-center justify-center gap-2 rounded-xl bg-[#4f42db] text-[15px] font-bold text-white shadow-[0_7px_18px_rgba(79,66,219,0.20)] transition-colors hover:bg-[#3d33b8]"
             >
               <SendIcon />
               협업 요청
@@ -198,102 +256,135 @@ export function ExpertProfileView({ expertId }: { expertId: string }) {
       {/* 모바일: 아래 고정 줄 */}
       <div className="fixed inset-x-0 bottom-0 z-20 flex items-center gap-3 border-t border-[#ecebf4] bg-white px-4 py-4 lg:hidden">
         <div className="min-w-0 flex-1">
-          <p className={`text-[13px] leading-[19px] ${profile.engaged ? "text-[#b26a00]" : "text-success"}`}>{startLabel === "바로" ? "바로 시작 가능" : `${startLabel} 시작 가능`}</p>
+          <p className={`text-[12px] leading-[19px] ${profile.engaged ? "text-[#b26a00]" : "text-success"}`}>{availabilityNote}</p>
           {rewards && <p className="truncate text-xs leading-[18px] text-[#8c94ab]">{rewards}</p>}
         </div>
-        <button type="button" onClick={() => setRequesting(true)} className="h-12 w-[150px] shrink-0 rounded-xl bg-[#4b3fd6] text-[15px] text-white">
+        <button type="button" onClick={openCollaboration} className="h-12 w-[150px] shrink-0 rounded-xl bg-[#4b3fd6] text-[15px] text-white">
           협업 요청
         </button>
       </div>
 
-      {requesting && <CollabRequestDialog expert={{ user_id: profile.user_id, nickname: profile.nickname }} role={role} names={names} onClose={() => setRequesting(false)} />}
+      {demoRequestInfo && (
+        <Modal
+          title="시연용 협업 요청"
+          description="LOCAL DEMO · 실제 요청은 전송되지 않습니다"
+          onClose={() => setDemoRequestInfo(false)}
+          footer={
+            <button type="button" onClick={() => setDemoRequestInfo(false)} className="min-h-11 rounded-lg bg-brand px-6 text-sm font-semibold text-white">
+              확인
+            </button>
+          }
+        >
+          <div className="rounded-xl border border-[#d8e1f7] bg-[#f4f7ff] p-4 text-[13px] leading-6 text-[#526487]">
+            <p className="font-semibold text-ink">이 프로필은 화면 검수용 가상 전문가입니다.</p>
+            <p className="mt-2">실제 Discord 계정이나 협업 대상자가 없기 때문에 서버로 요청을 보내지 않습니다. 실제 전문가에서는 기존 협업 요청 모달이 정상 동작합니다.</p>
+          </div>
+        </Modal>
+      )}
+      {requesting && !demoReviews && <CollabRequestDialog expert={{ user_id: profile.user_id, nickname: profile.nickname }} role={role} names={names} onClose={() => setRequesting(false)} />}
     </PageContainer>
   );
 }
 
 /* ---------- 탭 내용 ---------- */
 
-function WorkTab({ profile, collaborations, names }: { profile: ExpertPublicProfile; collaborations: ExpertCollaboration[]; names: Names }) {
+function WorkTab({ collaborations, names, demoReviews, verifiedReviews, reviewApiError }: {
+  collaborations: ExpertCollaboration[]; names: Names; demoReviews?: DemoReview | null;
+  verifiedReviews?: PublicExpertRating | null; reviewApiError?: string;
+}) {
   return (
-    <>
+    <div className="space-y-5">
+      {reviewApiError && !demoReviews && <div role="alert" className="rounded-xl border border-[#f1d9c9] bg-[#fffbf4] px-4 py-3 text-[12px] leading-5 text-[#9b683f]">{reviewApiError}</div>}
+      <ExpertReviewSummary completedCount={collaborations.length} demo={demoReviews} verified={verifiedReviews} />
       {collaborations.length === 0 ? (
-        <div className="flex items-start gap-2.5 rounded-xl bg-[#f6f6fa] px-[18px] py-4 text-[13px] leading-[19px] text-[#6b7285]">
+        <div className="flex items-start gap-3 rounded-2xl border border-[#e5eaf3] bg-[#f8faff] px-5 py-5 text-[13px] leading-6 text-muted">
           <InfoIcon />
-          아직 이 서비스에서 마친 협업이 없어요. 아래 포트폴리오에서 경험을 확인해 보세요.
+          <div>
+            <p className="font-semibold text-ink">아직 완료된 협업 기록이 없어요</p>
+            <p className="mt-1">포트폴리오 탭에서 전문가가 등록한 프로젝트 경험을 확인할 수 있습니다.</p>
+          </div>
         </div>
       ) : (
-        <>
-          {/* 평가 요약: 평가 기능이 생기면 평균 평점·항목별 막대가 이 자리에 들어가요 */}
-          <div className="flex items-center gap-2 rounded-xl border border-[#f6e7c4] bg-[#fffbf1] px-6 py-5 text-[13px] text-[#3a4256]">
-            <StarIcon size={16} />
-            아직 받은 평가가 없어요
+        <section aria-labelledby="completed-expert-projects">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 id="completed-expert-projects" className="text-base font-bold text-ink">완료한 협업 {collaborations.length}건</h2>
+            <span className="text-[11px] text-faint">{demoReviews ? "시연용 가상 이력" : "완료된 협업 최근 최대 50건"}</span>
           </div>
-          <p className="mt-2.5 text-xs leading-[18px] text-[#8c94ab]">평가는 함께한 연구자가 협업이 끝난 뒤 남겨요</p>
-          <ul className="mt-2">
+          <ul className="mt-2 divide-y divide-[#edf0f5]">
             {collaborations.map((item, index) => (
-              <li key={index} className="grid gap-y-1 border-b border-[#eeeff4] py-6 last:border-b-0 lg:grid-cols-[140px_1fr]">
-                <p className="text-[13px] leading-6 text-[#8c94ab]">{periodLabel(item)}</p>
-                <div>
+              <li key={index} className="grid gap-y-2 py-5 first:pt-3 sm:grid-cols-[118px_minmax(0,1fr)] sm:gap-4">
+                <p className="pt-0.5 text-[12px] leading-6 text-faint">{periodLabel(item)}</p>
+                <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="text-base leading-6 text-ink">{item.title}</h3>
+                    <h3 className="text-[14px] font-bold leading-6 text-ink">완료한 협업 연구</h3>
+                    <span className="rounded-md bg-[#eaf6f1] px-2 py-1 text-[10px] font-semibold text-[#238464]">완료</span>
                     {item.category_ids.map((id) => (
-                      <span key={id} className="rounded-[5px] bg-[#e3f4f6] px-[7px] py-[3px] text-[11px] leading-4 text-[#0f7c8c]">
-                        {names.categories.get(id)}
+                      <span key={id} className="rounded-md bg-[#eaf6f8] px-2 py-1 text-[10px] text-[#167d8c]">
+                        {names.categories.get(id) ?? "기타 분야"}
                       </span>
                     ))}
                   </div>
-                  <p className="mt-1.5 flex items-center gap-1.5 text-[13px] leading-[19px] text-[#5e6678]">
-                    <Initial name={item.partner_nickname} />
-                    {item.partner_nickname} 님과 함께
+                  <p className="mt-1.5 text-[12px] leading-5 text-faint">
+                    {demoReviews ? "LOCAL DEMO · 협업 이력·분야·기간 모두 가상의 시연 데이터입니다." : "연구 제목과 참여자 정보는 당사자 보호를 위해 공개되지 않습니다."}
                   </p>
-                  <dl className="mt-2 grid grid-cols-[76px_1fr] text-[13px] leading-5">
-                    <dt className="pt-0.5 text-[#8c94ab]">AI로 한 일</dt>
-                    <dd>
-                      <Chips items={item.able_work_ids.map((id) => names.works.get(id) ?? "")} tone="brand" />
-                    </dd>
-                  </dl>
+                  {item.able_work_ids.length > 0 && (
+                    <dl className="mt-3 grid gap-2 text-xs sm:grid-cols-[68px_minmax(0,1fr)]">
+                      <dt className="pt-1 text-faint">AI로 한 일</dt>
+                      <dd><Chips items={item.able_work_ids.map((id) => names.works.get(id) ?? "")} tone="brand" /></dd>
+                    </dl>
+                  )}
                 </div>
               </li>
             ))}
           </ul>
-        </>
+        </section>
       )}
+    </div>
+  );
+}
 
-      <div className="mt-10 flex items-baseline gap-2">
-        <h3 className="text-base leading-6 text-ink">포트폴리오 {profile.portfolios.length}</h3>
-        <span className="text-xs text-[#8c94ab]">서비스 밖에서 해 온 일</span>
+function PortfolioTab({ profile, names }: { profile: ExpertPublicProfile; names: Names }) {
+  return (
+    <section aria-labelledby="expert-portfolios">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 id="expert-portfolios" className="text-[17px] font-bold text-ink">포트폴리오 {profile.portfolios.length}건</h2>
+        <span className="text-xs text-faint">전문가 등록 정보 또는 LOCAL DEMO 시연 데이터</span>
       </div>
-      <ul className="mt-2">
-        {profile.portfolios.map((item, index) => (
-          <li key={item.portfolio_id} className="grid gap-y-1 border-b border-[#eeeff4] py-5 last:border-b-0 lg:grid-cols-[140px_1fr]">
-            <p className="text-[13px] leading-6 text-[#8c94ab]">포트폴리오 {index + 1}</p>
-            <div>
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <h3 className="text-base leading-6 text-ink">{item.title}</h3>
-                <span className={`flex items-center gap-1.5 text-[13px] ${item.has_pdf ? "text-[#4b3fd6]" : "text-[#a0a6b8]"}`}>
-                  <FileIcon />
-                  {item.has_pdf ? "PDF 있음" : "PDF 없음"}
-                </span>
+      {profile.portfolios.length === 0 ? (
+        <p className="mt-4 rounded-xl bg-page p-5 text-sm text-muted">아직 등록된 포트폴리오가 없습니다.</p>
+      ) : (
+        <ul className="mt-3 divide-y divide-[#edf0f5]">
+          {profile.portfolios.map((item, index) => (
+            <li key={item.portfolio_id} className="grid gap-y-2 py-5 first:pt-2 sm:grid-cols-[118px_minmax(0,1fr)] sm:gap-4">
+              <p className="pt-0.5 text-xs leading-6 text-faint">프로젝트 {index + 1}</p>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3 className="break-words text-[15px] font-bold leading-6 text-ink">{item.title}</h3>
+                  {item.has_pdf && (
+                    <span title="PDF는 현재 소유자만 열람할 수 있습니다." className="inline-flex items-center gap-1 rounded-md bg-page px-2 py-1 text-[11px] text-muted">
+                      <FileIcon /> PDF 보유 · 비공개
+                    </span>
+                  )}
+                </div>
+                <dl className="mt-3 grid gap-x-3 gap-y-2.5 text-[13px] leading-5 sm:grid-cols-[70px_minmax(0,1fr)]">
+                  <dt className="text-faint">AI로 한 일</dt>
+                  <dd><Chips items={item.able_work_ids.map((id) => names.works.get(id) ?? "")} tone="brand" /></dd>
+                  {item.skills.length > 0 && (
+                    <>
+                      <dt className="text-faint">사용 기술</dt>
+                      <dd className="break-words text-ink">{item.skills.join(" · ")}</dd>
+                    </>
+                  )}
+                  <dt className="text-faint">담당 역할</dt>
+                  <dd className="break-words text-ink">{item.role}</dd>
+                </dl>
               </div>
-              <dl className="mt-2 grid grid-cols-[76px_1fr] gap-y-2 text-[13px] leading-5">
-                <dt className="pt-0.5 text-[#8c94ab]">AI로 한 일</dt>
-                <dd>
-                  <Chips items={item.able_work_ids.map((id) => names.works.get(id) ?? "")} tone="brand" />
-                </dd>
-                {item.skills.length > 0 && (
-                  <>
-                    <dt className="text-[#8c94ab]">사용 기술</dt>
-                    <dd className="text-[#2a3350]">{item.skills.join(", ")}</dd>
-                  </>
-                )}
-                <dt className="text-[#8c94ab]">내 역할</dt>
-                <dd className="break-words text-[#2a3350]">{item.role}</dd>
-              </dl>
-            </div>
-          </li>
-        ))}
-      </ul>
-    </>
+            </li>
+          ))}
+        </ul>
+      )}
+      <p className="mt-4 text-[11px] leading-5 text-faint">포트폴리오는 전문가의 직접 등록 정보이며, LOCAL DEMO에서는 가상 포트폴리오도 포함됩니다. 완료 협업 이력이나 검증된 평가와 구분해 확인하세요.</p>
+    </section>
   );
 }
 
@@ -345,9 +436,9 @@ function FieldSummary({ finished, names }: { finished: ExpertCollaboration[]; na
       <div className="flex gap-2.5 rounded-xl bg-[#f5f7fc] p-4 text-xs leading-[18px] text-[#6b7285]">
         <InfoIcon />
         <p>
-          아직 이 서비스에서 마친 협업이 없어요
+          완료된 협업 분야 정보가 없어요
           <br />
-          협업이 끝나면 분야가 여기에 쌓여요
+          협업을 마치면 이곳에 기록됩니다.
         </p>
       </div>
     );
@@ -356,6 +447,7 @@ function FieldSummary({ finished, names }: { finished: ExpertCollaboration[]; na
   const works = [...new Set(finished.flatMap((item) => item.able_work_ids))].map((id) => names.works.get(id)).filter(Boolean);
   return (
     <div className="rounded-xl bg-[#f5f7fc] p-4">
+      <p className="mb-3 text-[11px] font-semibold text-[#7483a2]">최근 완료한 연구 분야 · 최대 50건 기준</p>
       <div className="flex items-center gap-5">
         <Donut total={finished.length} counts={counts.map((item) => item.count)} />
         <ul className="grid flex-1 gap-2 text-xs leading-[18px]">
@@ -385,7 +477,7 @@ function Donut({ total, counts }: { total: number; counts: number[] }) {
   const sum = counts.reduce((a, b) => a + b, 0) || 1;
   let offset = 0;
   return (
-    <div className="relative size-[104px] shrink-0">
+    <div role="img" aria-label={`완료 협업 ${total}건의 연구 분야별 구성`} className="relative size-[104px] shrink-0">
       <svg viewBox="0 0 104 104" className="size-full -rotate-90">
         {counts.map((count, index) => {
           const part = (count / sum) * length;
@@ -427,9 +519,9 @@ function Conditions({ profile }: { profile: ExpertPublicProfile }) {
 
 /* ---------- 작은 조각 ---------- */
 
-function BackLink() {
+function BackLink({ href }: { href: string }) {
   return (
-    <Link href="/experts" className="inline-flex items-center gap-1 text-[13px] leading-5 text-[#5e6678] hover:text-ink">
+    <Link href={href} className="inline-flex items-center gap-1 text-[13px] leading-5 text-[#5e6678] hover:text-ink">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
         <path d="M10 4 6 8l4 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
@@ -447,14 +539,28 @@ function EngagedBadge({ until }: { until: string | null }) {
   );
 }
 
-function TabButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: ReactNode }) {
+function TabButton({ active, onClick, children, panelId, tabId }: { active: boolean; onClick: () => void; children: ReactNode; panelId: string; tabId: string }) {
   return (
     <button
       type="button"
       role="tab"
+      id={tabId}
+      aria-controls={panelId}
       aria-selected={active}
+      tabIndex={active ? 0 : -1}
       onClick={onClick}
-      className={`-mb-px border-b-2 pb-3 text-[13px] leading-5 lg:text-[15px] lg:leading-[22px] ${active ? "border-[#4b3fd6] text-[#3d33b8]" : "border-transparent text-[#8c94ab] hover:text-[#5e6678]"}`}
+      onKeyDown={(event) => {
+        if (!["ArrowRight", "ArrowLeft", "Home", "End"].includes(event.key)) return;
+        const tabs = Array.from(event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]') ?? []);
+        if (!tabs.length) return;
+        const index = tabs.indexOf(event.currentTarget);
+        const next = event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1
+          : (index + (event.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length;
+        event.preventDefault();
+        tabs[next]?.focus();
+        tabs[next]?.click();
+      }}
+      className={`-mb-px shrink-0 border-b-2 px-1 pb-3 text-[13px] leading-5 transition-colors lg:text-[14px] lg:leading-[22px] ${active ? "border-[#4b3fd6] font-bold text-[#3d33b8]" : "border-transparent font-medium text-[#8c94ab] hover:text-[#5e6678]"}`}
     >
       {children}
     </button>
@@ -483,16 +589,6 @@ function ChipRow({ label, items, tone }: { label: string; items: string[]; tone:
         <Chips items={items} tone={tone} />
       </dd>
     </div>
-  );
-}
-
-/** 함께한 연구회원 첫 글자 동그라미 */
-function Initial({ name }: { name: string }) {
-  const color = PARTNER_COLORS[[...name].reduce((sum, char) => sum + char.charCodeAt(0), 0) % PARTNER_COLORS.length];
-  return (
-    <span className="inline-flex size-[18px] items-center justify-center rounded-full text-[8px] text-white" style={{ background: color }}>
-      {name.charAt(0).toUpperCase()}
-    </span>
   );
 }
 
@@ -529,10 +625,3 @@ function FileIcon() {
   );
 }
 
-function StarIcon({ size = 12 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 16 16" aria-hidden>
-      <path d="m8 1.5 1.9 4 4.4.5-3.3 3 .9 4.4L8 11.2l-3.9 2.2.9-4.4-3.3-3 4.4-.5L8 1.5Z" fill="#f5a524" />
-    </svg>
-  );
-}

@@ -3,20 +3,26 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { CollabRequestDialog } from "@/components/collab-request-dialog";
+import { ExpertSearchHero } from "@/components/expert-search-hero";
+import { LabTrustIndicator } from "@/components/lab-trust-indicator";
+import { getLocalDemoFlaskPreview } from "@/lib/expert-local-demo";
+import { getExpertReputations, type ReputationSnapshot } from "@/lib/reviews";
 import { PageContainer } from "@/components/page-container";
-import { Avatar } from "@/components/request-parts";
+import { expertListHref, restoredExpertCount } from "@/lib/expert-search-navigation";
+
 import { ApiError, requestApi } from "@/lib/api";
 import { photoOrDefault } from "@/lib/collab-requests";
 import { buildNames, categoryNames, engagedLabel, headAndRest, splitTaxonomyIds, type ExpertCardData, type ExpertSearchResult, type Names } from "@/lib/expert-search";
-import type { AbleWorkOption, CareerProfile, FieldCategory } from "@/lib/my-career";
+import { CAREER_LABELS, JOB_LABELS, type AbleWorkOption, type CareerProfile, type FieldCategory } from "@/lib/my-career";
 import { DATA_STATUS_LABELS, type Research } from "@/lib/my-research";
 import { expertReason, interestFromExpert, interestFromResearch, type Interest } from "@/lib/related-rank";
 
-type Panel = "works" | "fields" | "research" | null;
+type Panel = "research" | null;
+type Engagement = "all" | "idle" | "engaged";
+type SortOrder = "relevance" | "newest";
 type Role = "researcher" | "expert" | null; // null = 로그인 안 했거나 유형 미선택
 
-/** AI 전문가 찾기. 공개한 전문가를 검색어·맡길 일·분야·내 연구로 찾고, 카드에서 바로 협업을 요청해요. */
+/** AI 전문가 찾기. 공개 전문가를 탐색하고 상세 프로필을 검토한 뒤 협업을 요청합니다. */
 export function ExpertSearch() {
   const searchParams = useSearchParams();
   const incomingQuery = (searchParams.get("q") ?? searchParams.get("skill") ?? "").slice(0, 50);
@@ -24,6 +30,9 @@ export function ExpertSearch() {
   const incomingFieldsKey = searchParams.get("fields") ?? "";
   const incomingWorks = splitTaxonomyIds(incomingWorksKey, "work");
   const incomingFields = splitTaxonomyIds(incomingFieldsKey, "category");
+  const incomingEngagementRaw = searchParams.get("engagement");
+  const incomingEngagement: Engagement = incomingEngagementRaw === "idle" || incomingEngagementRaw === "engaged" ? incomingEngagementRaw : "all";
+  const incomingSort: SortOrder = searchParams.get("sort") === "newest" ? "newest" : "relevance";
   const [ableWorks, setAbleWorks] = useState<AbleWorkOption[]>([]);
   const [categories, setCategories] = useState<FieldCategory[]>([]);
   const [role, setRole] = useState<Role>(null);
@@ -36,19 +45,36 @@ export function ExpertSearch() {
   const [fields, setFields] = useState<string[]>(incomingFields); // 대분류 ID
   const [applied, setApplied] = useState<Research | null>(null); // [내 연구로 찾기]로 고른 연구
   const [panel, setPanel] = useState<Panel>(null);
+  const [engagement, setEngagement] = useState<Engagement>(incomingEngagement);
+  const [sort, setSort] = useState<SortOrder>(incomingSort);
+  const [fieldKeyword, setFieldKeyword] = useState("");
+  const [expandedWorks, setExpandedWorks] = useState(false);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const [result, setResult] = useState<ExpertSearchResult | null>(null);
+  const [reputations, setReputations] = useState<Record<string, ReputationSnapshot>>({});
+  const [reputationFailed, setReputationFailed] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const searchGeneration = useRef(0);
   const [error, setError] = useState("");
-  const [requesting, setRequesting] = useState<ExpertCardData | null>(null); // 협업 요청 창을 연 전문가
+  const restoredFocus = useRef<number | null>(null);
 
   useEffect(() => {
     setDraft(incomingQuery);
     setQuery(incomingQuery);
     setWorks(splitTaxonomyIds(incomingWorksKey, "work"));
     setFields(splitTaxonomyIds(incomingFieldsKey, "category"));
-  }, [incomingQuery, incomingWorksKey, incomingFieldsKey]);
+    setEngagement(incomingEngagement);
+    setSort(incomingSort);
+  }, [incomingQuery, incomingWorksKey, incomingFieldsKey, incomingEngagement, incomingSort]);
+
+  // Return links only preserve the selected research label if it belongs to this researcher.
+  useEffect(() => {
+    const rawId = searchParams.get("research");
+    if (role !== "researcher" || !researches || !rawId || !/^\d+$/.test(rawId)) return;
+    const research = researches.find((item) => item.research_id === Number(rawId));
+    if (research) setApplied((current) => current ?? research);
+  }, [researches, role, searchParams]);
 
   // 처음 한 번: 보기 목록(맡길 일·분야)과 로그인 정보
   useEffect(() => {
@@ -86,28 +112,76 @@ export function ExpertSearch() {
 
   const search = useCallback(
     async (offset: number) => {
-      const params = new URLSearchParams({ q: query, works: works.join(","), fields: fields.join(","), offset: String(offset) });
+      const params = new URLSearchParams({ q: query, works: works.join(","), fields: fields.join(","), engagement, sort, offset: String(offset) });
       if (preferWorksKey) params.set("prefer_works", preferWorksKey);
       if (preferFieldsKey) params.set("prefer_fields", preferFieldsKey);
       return requestApi<ExpertSearchResult>(`/experts?${params}`);
     },
-    [fields, preferFieldsKey, preferWorksKey, query, works],
+    [engagement, fields, preferFieldsKey, preferWorksKey, query, sort, works],
   );
 
-  // 조건이 바뀌면 처음부터 다시 찾아요.
+  // Returning from a profile restores the filters and previously expanded result pages (up to 60).
+  const sameFilters = query === incomingQuery &&
+    works.join(",") === incomingWorks.join(",") &&
+    fields.join(",") === incomingFields.join(",") &&
+    engagement === incomingEngagement &&
+    sort === incomingSort;
+  const restoreCount = sameFilters ? restoredExpertCount(searchParams.get("shown")) : 6;
+
   useEffect(() => {
     let alive = true;
     searchGeneration.current += 1;
     setLoadingMore(false);
     setResult(null);
-    search(0)
-      .then((data) => alive && (setResult(data), setError("")))
-      .catch((caught) => alive && setError(caught instanceof ApiError ? caught.message : "잠시 후 다시 시도해 주세요"));
+    async function run() {
+      try {
+        const first = await search(0);
+        const items = [...first.items];
+        const target = Math.min(first.total, restoreCount);
+        while (alive && items.length < target) {
+          const next = await search(items.length);
+          if (!next.items.length) break;
+          items.push(...next.items);
+        }
+        if (alive) {
+          setResult({ ...first, items });
+          setError("");
+        }
+      } catch (caught) {
+        if (alive) setError(caught instanceof ApiError ? caught.message : "잠시 후 다시 시도해 주세요");
+      }
+    }
+    void run();
     return () => {
       alive = false;
       searchGeneration.current += 1;
     };
-  }, [search]);
+  }, [search, restoreCount]);
+
+  // A single bounded API call computes all visible cards; never ask once per card.
+  // Ignore stale responses when a search/next page changes the visible IDs.
+  const reputationIds = result?.items.map((item) => item.user_id).join(",") ?? "";
+  useEffect(() => {
+    // An old result must never flash as the rating for a new search/pagination.
+    setReputations({});
+    setReputationFailed(false);
+    if (!reputationIds) {
+      return;
+    }
+    let alive = true;
+    getExpertReputations(reputationIds.split(",").map(Number))
+      .then((next) => {
+        if (!alive) return;
+        setReputations(next);
+        setReputationFailed(false);
+      })
+      .catch(() => {
+        if (!alive) return;
+        setReputations({});
+        setReputationFailed(true);
+      });
+    return () => { alive = false; };
+  }, [reputationIds]);
 
   async function loadMore() {
     if (!result || loadingMore) return;
@@ -123,6 +197,19 @@ export function ExpertSearch() {
       if (generation === searchGeneration.current) setLoadingMore(false);
     }
   }
+
+  // The focused expert is highlighted and scrolled into view after asynchronous list restoration.
+  useEffect(() => {
+    const focus = Number(searchParams.get("focus"));
+    if (!result || !Number.isSafeInteger(focus) || focus <= 0 || restoredFocus.current === focus) return;
+    const link = document.getElementById(`expert-profile-${focus}`);
+    if (!link) return;
+    restoredFocus.current = focus;
+    window.requestAnimationFrame(() => {
+      link.scrollIntoView({ block: "center", behavior: "auto" });
+      link.focus({ preventScroll: true });
+    });
+  }, [result, searchParams]);
 
   function onSearch(event: FormEvent) {
     event.preventDefault();
@@ -144,193 +231,274 @@ export function ExpertSearch() {
     setWorks([]);
     setFields([]);
     setApplied(null);
+    setEngagement("all");
+  }
+
+  function resetSearch() {
+    clearAll();
+    setDraft("");
+    setQuery("");
+    setSort("relevance");
+    setFieldKeyword("");
+  }
+
+  function toggleWork(id: string) {
+    setApplied(null);
+    toggle(works, id, setWorks);
+  }
+
+  function toggleField(id: string) {
+    setApplied(null);
+    toggle(fields, id, setFields);
   }
 
   const chips = [
-    ...works.map((id) => ({ key: id, label: names.works.get(id) ?? id, remove: () => toggle(works, id, setWorks) })),
-    ...fields.map((id) => ({ key: id, label: names.categories.get(id) ?? id, remove: () => toggle(fields, id, setFields) })),
+    ...works.map((id) => ({ key: id, label: names.works.get(id) ?? id, remove: () => toggleWork(id) })),
+    ...fields.map((id) => ({ key: id, label: names.categories.get(id) ?? id, remove: () => toggleField(id) })),
   ];
   const matchedNames = result
     ? [...result.matched.able_work_ids.map((id) => names.works.get(id)), ...result.matched.field_ids.map((id) => names.fields.get(id))].filter(Boolean)
     : [];
 
-  return (
-    <PageContainer className="pt-10 pb-20 md:pt-14">
-      <h1 className="text-[28px] font-bold tracking-tight md:text-[34px]">AI 전문가 찾기</h1>
-      <p className="mt-2 text-sm text-muted">AI에게 맡기고 싶은 일과 내 연구 분야로 함께할 전문가를 찾아보세요.</p>
+  const visibleWorks = ableWorks.filter((item) => expandedWorks || item.show_default || works.includes(item.able_work_id));
+  const visibleFields = categories.filter((item) => item.name.toLowerCase().includes(fieldKeyword.trim().toLowerCase()));
+  const featured = result?.items[0] ?? null;
+  const listed = result?.items.slice(1) ?? [];
+  const hasFilters = chips.length > 0 || query.length > 0 || engagement !== "all";
+  const personalized = Boolean(preferWorksKey || preferFieldsKey);
 
-      <section className="mt-6 rounded-card border border-line bg-card p-4 shadow-card md:p-5" aria-label="전문가 검색">
-        <form className="flex flex-col gap-2 sm:flex-row" onSubmit={onSearch}>
-          <label className="sr-only" htmlFor="expert-query">
-            찾고 싶은 일이나 분야
+  function returnHrefFor(expert: ExpertCardData) {
+    return expertListHref({
+      query, works, fields, shown: result?.items.length ?? 6,
+      focus: expert.user_id, researchId: applied?.research_id, engagement, sort,
+    });
+  }
+
+  const filterSidebar = (
+    <aside aria-label="전문가 검색 필터" className="overflow-hidden rounded-2xl border border-line bg-white shadow-[0_8px_30px_rgba(18,32,75,0.035)]">
+      <div className="px-4 pb-5 pt-5 sm:px-5">
+        <div className="flex items-center justify-between">
+          <h2 className="text-[15px] font-bold text-ink">무엇을 맡길까요?</h2>
+          <span className="text-[11px] font-medium text-faint">{works.length}개 선택</span>
+        </div>
+        <fieldset className="mt-3 space-y-1.5">
+          <legend className="sr-only">수행 기술 필터</legend>
+          <label className={"flex min-h-9 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] transition-colors " + (works.length === 0 ? "bg-[#eef1ff] font-semibold text-[#354d9e]" : "text-muted hover:bg-page")}>
+            <input
+              type="checkbox"
+              checked={works.length === 0}
+              onChange={() => { setWorks([]); setApplied(null); }}
+              aria-label="모든 수행 기술 보기 (필터 해제)"
+              className="size-4 shrink-0 accent-[#405dc3]"
+            />
+            <span>전체 기술</span>
+            <span className="ml-auto text-[10px] text-faint">전체 보기</span>
           </label>
-          <input
-            id="expert-query"
-            value={draft}
-            onChange={(event) => setDraft(event.target.value)}
-            maxLength={50}
-            placeholder="찾고 싶은 일이나 분야를 검색해 보세요 (예: 세포, 데이터 정리)"
-            className="h-11 flex-1 rounded-button border border-line px-4 text-sm"
-          />
-          <button type="submit" className="h-11 rounded-button bg-brand px-5 text-sm font-semibold text-white hover:bg-brand-hover">
-            검색
+          {visibleWorks.map((item) => (
+            <label key={item.able_work_id} className={"flex min-h-9 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] transition-colors " + (works.includes(item.able_work_id) ? "bg-[#eef1ff] font-semibold text-[#354d9e]" : "text-muted hover:bg-page")}>
+              <input type="checkbox" checked={works.includes(item.able_work_id)} onChange={() => toggleWork(item.able_work_id)} className="size-4 shrink-0 accent-[#405dc3]" />
+              <span className="min-w-0 leading-5">{item.name}</span>
+            </label>
+          ))}
+          {ableWorks.length === 0 && <p className="px-2 text-xs text-faint">기술 항목을 불러오는 중입니다.</p>}
+        </fieldset>
+        {ableWorks.some((item) => !item.show_default && !works.includes(item.able_work_id)) && (
+          <button type="button" className="mt-2 min-h-9 px-2 text-[12px] font-semibold text-brand hover:underline" onClick={() => setExpandedWorks((current) => !current)}>
+            {expandedWorks ? "기본 항목만 보기 −" : "기술 항목 더 보기 +"}
           </button>
-          {role !== "expert" && (
-            <button
-              type="button"
-              aria-expanded={panel === "research"}
-              onClick={() => (applied ? clearAll() : setPanel(panel === "research" ? null : "research"))}
-              className={`h-11 rounded-button border px-4 text-sm font-semibold ${applied ? "border-brand bg-brand-soft text-brand" : "border-line bg-white"}`}
-            >
-              {applied ? "내 연구 적용 중 ✕" : "내 연구로 찾기"}
-            </button>
-          )}
-        </form>
-
-        <div className="mt-3 flex flex-wrap gap-2">
-          <PanelButton label="무엇을 맡길까요?" count={works.length} open={panel === "works"} onClick={() => setPanel(panel === "works" ? null : "works")} />
-          <PanelButton label="어떤 분야인가요?" count={fields.length} open={panel === "fields"} onClick={() => setPanel(panel === "fields" ? null : "fields")} />
-        </div>
-
-        {panel === "works" && (
-          <ChoicePanel title="무엇을 맡길까요?" options={ableWorks.map((item) => ({ id: item.able_work_id, label: item.name }))} selected={works} onToggle={(id) => toggle(works, id, setWorks)} />
         )}
-        {panel === "fields" && (
-          <ChoicePanel title="어떤 분야인가요?" options={categories.map((item) => ({ id: item.field_category_id, label: item.name }))} selected={fields} onToggle={(id) => toggle(fields, id, setFields)} />
-        )}
-        {panel === "research" && <ResearchPicker role={role} researches={researches} names={names} onPick={applyResearch} />}
-
-        {chips.length > 0 && (
-          <ul className="mt-3 flex flex-wrap items-center gap-2">
-            {chips.map((chip) => (
-              <li key={chip.key}>
-                <button type="button" onClick={chip.remove} className="inline-flex min-h-9 items-center gap-1 rounded-full bg-brand-soft px-3 text-xs font-semibold text-brand">
-                  {chip.label} <span aria-hidden="true">✕</span>
-                  <span className="sr-only">조건 빼기</span>
-                </button>
-              </li>
-            ))}
-            <li>
-              <button type="button" onClick={clearAll} className="min-h-9 px-2 text-xs text-muted underline-offset-2 hover:underline">
-                전체 해제
-              </button>
-            </li>
-          </ul>
-        )}
-        {applied && (
-          <p className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-button bg-page px-4 py-3 text-xs text-muted">
-            <span>
-              내 연구 「{applied.title}」의 맡길 일과 분야로 찾고 있어요. 필터는 자유롭게 바꿀 수 있어요.
-            </span>
-            <button type="button" onClick={clearAll} className="font-semibold text-brand">
-              해제
-            </button>
-          </p>
-        )}
-        {query && matchedNames.length > 0 && (
-          <p className="mt-3 rounded-button bg-page px-4 py-3 text-xs text-muted">
-            &lsquo;{query}&rsquo;는 &lsquo;{matchedNames.slice(0, 3).join("·")}{matchedNames.length > 3 ? " 등" : ""}&rsquo;과 같은 뜻으로 함께 찾았어요. 소개글에 &lsquo;{query}&rsquo;가 들어간 전문가도 포함돼요.
-          </p>
-        )}
-      </section>
-
-      <div className="mt-8 flex flex-wrap items-end justify-between gap-2">
-        <h2 className="text-lg font-bold">
-          전문가 <span className="text-brand">{result ? `${result.total}명` : ""}</span>
-        </h2>
-        <p className="text-xs text-faint">
-          {preferWorksKey || preferFieldsKey
-            ? "나와 같은 키워드의 전문가를 위에 두었어요. 나머지 전문가도 이어서 보여요"
-            : "새로 가입한 순 · 참여 중인 전문가는 뒤에 보여요"}
-        </p>
       </div>
-
-      {error && <p className="mt-4 text-sm text-danger">{error}</p>}
-      {!result ? (
-        <p className="py-16 text-center text-sm text-faint">불러오는 중…</p>
-      ) : result.items.length === 0 ? (
-        <div className="mt-5 rounded-card border border-dashed border-line px-5 py-12 text-center text-sm text-muted">
-          조건에 맞는 전문가가 없어요.
-          {(chips.length > 0 || query) && (
-            <button
-              type="button"
-              className="ml-2 font-semibold text-brand"
-              onClick={() => {
-                clearAll();
-                setDraft("");
-                setQuery("");
-              }}
-            >
-              조건 지우기
-            </button>
-          )}
+      <div className="border-t border-line px-4 pb-5 pt-5 sm:px-5">
+        <div className="flex items-center justify-between">
+          <h2 className="text-[15px] font-bold text-ink">연구 분야</h2>
+          <span className="text-[11px] font-medium text-faint">{fields.length}개 선택</span>
         </div>
-      ) : (
-        <>
-          <ul className="mt-5 grid items-stretch gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {result.items.map((expert) => (
-              <li key={expert.user_id}>
-                <ExpertCard expert={expert} names={names} interest={preferWorksKey || preferFieldsKey ? interest : null} onRequest={() => setRequesting(expert)} />
-              </li>
-            ))}
-          </ul>
-          {result.items.length < result.total && (
-            <div className="mt-8 text-center">
-              <button type="button" onClick={loadMore} disabled={loadingMore} className="h-11 rounded-button border border-line bg-white px-6 text-sm font-semibold disabled:opacity-60">
-                {loadingMore ? "불러오는 중…" : "전문가 더 보기"}
-              </button>
+        <label className="relative mt-3 block">
+          <span className="sr-only">연구 분야 목록에서 검색</span>
+          <input value={fieldKeyword} onChange={(event) => setFieldKeyword(event.target.value)} placeholder="연구 분야 검색하기" className="h-10 w-full rounded-lg border border-line bg-page px-3 pr-9 text-[12px] text-ink placeholder:text-faint focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/10" />
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="absolute right-3 top-3 size-4 text-faint"><circle cx="11" cy="11" r="7"/><path d="m16 16 4 4"/></svg>
+        </label>
+        <fieldset className="mt-3 space-y-1.5">
+          <legend className="sr-only">연구 분야 대분류 필터</legend>
+          {!fieldKeyword && (
+            <label className={"flex min-h-9 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] " + (fields.length === 0 ? "bg-[#eef1ff] font-semibold text-[#354d9e]" : "text-muted hover:bg-page")}>
+              <input type="checkbox" checked={fields.length === 0} onChange={() => { setFields([]); setApplied(null); }} className="size-4 accent-[#405dc3]" />
+              <span>전체 분야</span>
+            </label>
+          )}
+          {visibleFields.map((item) => (
+            <label key={item.field_category_id} className={"flex min-h-9 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] " + (fields.includes(item.field_category_id) ? "bg-[#eef1ff] font-semibold text-[#354d9e]" : "text-muted hover:bg-page")}>
+              <input type="checkbox" checked={fields.includes(item.field_category_id)} onChange={() => toggleField(item.field_category_id)} className="size-4 shrink-0 accent-[#405dc3]" />
+              <span className="leading-5">{item.name}</span>
+            </label>
+          ))}
+          {categories.length > 0 && visibleFields.length === 0 && <p className="px-2 py-2 text-xs text-muted">일치하는 분야가 없어요.</p>}
+        </fieldset>
+      </div>
+      <div className="border-t border-line px-4 pb-5 pt-5 sm:px-5">
+        <h2 className="text-[15px] font-bold text-ink">참여 상태</h2>
+        <p className="mt-1 text-[11px] leading-5 text-faint">진행 중인 협업 여부를 기준으로 표시합니다.</p>
+        <fieldset className="mt-3 space-y-1.5">
+          <legend className="sr-only">참여 상태 필터</legend>
+          {([
+            { value: "all", label: "전체 전문가" },
+            { value: "idle", label: "진행 중인 협업 없음" },
+            { value: "engaged", label: "현재 협업 중" },
+          ] as const).map((option) => (
+            <label key={option.value} className={"flex min-h-9 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] " + (engagement === option.value ? "bg-[#eef1ff] font-semibold text-[#354d9e]" : "text-muted hover:bg-page")}>
+              <input type="radio" name="expert-engagement" checked={engagement === option.value} onChange={() => setEngagement(option.value)} className="size-4 shrink-0 accent-[#405dc3]" />
+              <span>{option.label}</span>
+            </label>
+          ))}
+        </fieldset>
+      </div>
+      {role !== "expert" && (
+        <div className="border-t border-line bg-[#f5f7ff] p-4 sm:p-5">
+          <div className="flex items-center justify-between">
+            <span className="rounded-full bg-[#e6ebff] px-2 py-0.5 text-[10px] font-bold uppercase text-[#4563bf]">MY RESEARCH</span>
+            <span aria-hidden="true" className="text-brand">↗</span>
+          </div>
+          <h2 className="mt-2 text-[14px] font-bold text-ink">내 연구로 찾기</h2>
+          <p className="mt-1 text-[11px] leading-5 text-muted">등록한 연구에 맞는 전문가를 더 빠르게 찾아보세요.</p>
+          <button type="button" onClick={() => { if (applied) clearAll(); else setPanel(panel === "research" ? null : "research"); }} aria-expanded={panel === "research"} className="mt-3 inline-flex min-h-10 w-full items-center justify-center rounded-lg border border-[#ccd6ff] bg-white px-3 text-xs font-semibold text-[#3659ae] transition-colors hover:bg-[#eff2ff]">
+            {applied ? "내 연구 적용 해제" : "내 연구 전문가 찾기"} <span aria-hidden="true" className="ml-2">→</span>
+          </button>
+          {panel === "research" && <ResearchPicker role={role} researches={researches} names={names} onPick={(research) => {applyResearch(research);setMobileFiltersOpen(false);}} />}
+          {applied && <p className="mt-2 break-words text-[11px] font-semibold text-[#4563bf]">적용 중 · {applied.title}</p>}
+        </div>
+      )}
+    </aside>
+  );
+
+  return (
+    <PageContainer className="pb-20 pt-5 md:pt-7">
+      <ExpertSearchHero />
+      <div className="mb-3 flex items-center justify-between gap-3 md:hidden">
+        <span className="text-sm font-semibold text-ink">AI 전문가 탐색</span>
+        <button type="button" aria-expanded={mobileFiltersOpen} aria-controls="expert-filter-sidebar" onClick={() => setMobileFiltersOpen((value) => !value)} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-line bg-white px-4 text-sm font-semibold text-ink">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M4 7h16M7 12h10M10 17h4"/></svg>
+          필터 {works.length + fields.length + (engagement === "all" ? 0 : 1) > 0 ? "(" + (works.length + fields.length + (engagement === "all" ? 0 : 1)) + ")" : ""}
+        </button>
+      </div>
+      <div className="grid items-start gap-5 md:grid-cols-[210px_minmax(0,1fr)] lg:grid-cols-[245px_minmax(0,1fr)] lg:gap-6">
+        <div id="expert-filter-sidebar" className={(mobileFiltersOpen ? "block " : "hidden ") + "md:sticky md:top-24 md:block"}>
+          {filterSidebar}
+        </div>
+        <main className="min-w-0">
+          <section aria-label="전문가 키워드 검색" className="rounded-2xl border border-line bg-white p-3 shadow-[0_7px_26px_rgba(18,32,75,0.04)] sm:p-4">
+            <form onSubmit={onSearch} className="flex flex-col gap-2 sm:flex-row">
+              <label htmlFor="expert-query" className="flex min-w-0 flex-1 items-center gap-3 rounded-xl border border-line bg-[#fcfdff] px-4 focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/10">
+                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" stroke="#97a6c5" strokeWidth="1.8" fill="none"><circle cx="11" cy="11" r="7"/><path d="m16 16 4 4"/></svg>
+                <span className="sr-only">전문가 이름, 소속, 연구 키워드</span>
+                <input id="expert-query" value={draft} onChange={(event) => setDraft(event.target.value)} maxLength={50} placeholder="전문가 이름, 소속, 연구 키워드를 검색해보세요." className="h-11 min-w-0 w-full flex-1 bg-transparent text-[13px] text-ink outline-none placeholder:text-faint" />
+              </label>
+              <button type="submit" className="min-h-11 rounded-xl bg-[#152b59] px-7 text-sm font-semibold text-white transition-colors hover:bg-[#273e72] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand">검색</button>
+            </form>
+            {hasFilters && (
+              <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                {query && (
+                  <button type="button" onClick={() => {setQuery("");setDraft("");}} className="rounded-full bg-[#eef1ff] px-3 py-1.5 text-xs font-semibold text-[#435cac]">
+                    {query} <span aria-hidden="true">×</span><span className="sr-only"> 검색어 해제</span>
+                  </button>
+                )}
+                {chips.map((chip) => (
+                  <button key={chip.key} type="button" onClick={chip.remove} className="rounded-full bg-[#eef1ff] px-3 py-1.5 text-xs font-semibold text-[#435cac]">
+                    {chip.label} <span aria-hidden="true">×</span><span className="sr-only"> 조건 해제</span>
+                  </button>
+                ))}
+                {engagement !== "all" && (
+                  <button type="button" onClick={() => setEngagement("all")} className="rounded-full bg-[#eef1ff] px-3 py-1.5 text-xs font-semibold text-[#435cac]">
+                    {engagement === "idle" ? "진행 중 협업 없음" : "현재 협업 중"} <span aria-hidden="true">×</span>
+                  </button>
+                )}
+                <button type="button" onClick={resetSearch} className="ml-1 min-h-8 px-2 text-xs font-medium text-muted underline-offset-4 hover:underline">필터 초기화 ↻</button>
+              </div>
+            )}
+            {!hasFilters && <p className="mt-3 px-1 text-[11px] text-faint">키워드와 왼쪽 필터를 조합해 적합한 전문가를 찾아보세요.</p>}
+          </section>
+
+          {applied && (
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#d9e2ff] bg-[#f3f6ff] px-4 py-3 text-xs text-[#475b84]">
+              <span>내 연구 <strong>「{applied.title}」</strong> 기준으로 검색 중입니다. 필터는 언제든 변경할 수 있어요.</span>
+              <button type="button" onClick={clearAll} className="font-semibold text-[#405ac2]">적용 해제</button>
             </div>
           )}
-        </>
-      )}
+          {query && matchedNames.length > 0 && (
+            <p className="mt-3 rounded-xl bg-[#f3f6ff] px-4 py-3 text-[12px] text-[#51607d]">
+              &lsquo;{query}&rsquo;와 관련된 기술·연구 분야도 함께 검색합니다: {matchedNames.slice(0,3).join(" · ")}{matchedNames.length > 3 ? " 외" : ""}
+            </p>
+          )}
 
-      {requesting && <CollabRequestDialog expert={requesting} role={role} names={names} onClose={() => setRequesting(null)} />}
+          {result && featured && (
+            <section aria-labelledby="featured-expert-heading" className="mt-5 rounded-2xl border border-[#e1e8fb] bg-[#f5f7ff] p-3 shadow-[0_8px_26px_rgba(18,32,75,0.04)] sm:p-4">
+              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span aria-hidden="true" className="text-[#506be2]">✦</span>
+                  <h2 id="featured-expert-heading" className="text-[15px] font-bold text-[#263e7d]">추천 전문가</h2>
+                  <span className="text-[11px] text-faint">현재 검색 조건에서 먼저 표시되는 전문가입니다.</span>
+                </div>
+                <span className="text-[11px] text-[#7a8aac]">실제 등록 프로필 기준</span>
+              </div>
+              <FeaturedExpert expert={featured} names={names} interest={personalized ? interest : null} returnHref={returnHrefFor(featured)} reputation={reputationFailed ? null : reputations[String(featured.user_id)]} />
+            </section>
+          )}
+
+          <section aria-labelledby="expert-results-heading" className="mt-6">
+            <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <h2 id="expert-results-heading" className="text-[18px] font-bold text-ink">전문가 <span className="text-[#385dc5]">{result ? result.total : "—"}명</span></h2>
+                <p className="mt-1 text-[12px] text-muted">선택한 조건에 맞는 전문가 목록입니다.</p>
+              </div>
+              <label className="inline-flex items-center gap-2 text-xs text-muted">
+                <span>정렬</span>
+                <select aria-label="전문가 목록 정렬" value={sort} onChange={(event) => setSort(event.target.value as SortOrder)} className="min-h-10 rounded-lg border border-line bg-white px-3 font-semibold text-ink focus-visible:outline-2 focus-visible:outline-brand">
+                  <option value="relevance">{personalized ? "맞춤 우선순" : "기본순"}</option>
+                  <option value="newest">최신 등록순</option>
+                </select>
+              </label>
+            </div>
+
+            {error && <div role="alert" className="mb-3 rounded-xl border border-danger/20 bg-danger-soft p-4 text-sm text-danger">{error}</div>}
+            {!result && !error && <div role="status" className="rounded-xl border border-line bg-white px-5 py-16 text-center text-sm text-muted">전문가를 불러오는 중입니다…</div>}
+            {result && result.items.length === 0 && (
+              <div className="rounded-2xl border border-dashed border-[#d6dfef] bg-white px-6 py-14 text-center">
+                <div aria-hidden="true" className="mx-auto grid size-12 place-items-center rounded-full bg-[#f0f3fb] text-[#8b9cbd]">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><circle cx="10.5" cy="10.5" r="7"/><path d="m16 16 5 5M8 10h5"/></svg>
+                </div>
+                <h3 className="mt-4 text-base font-bold text-ink">{hasFilters ? "조건에 맞는 전문가가 없어요." : "아직 공개된 전문가가 없어요."}</h3>
+                <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-muted">{hasFilters ? "키워드 또는 필터를 조정하면 다른 전문가를 찾을 수 있습니다." : "전문가가 프로필을 공개하면 이곳에 목록이 표시됩니다."}</p>
+                {hasFilters && <button type="button" onClick={resetSearch} className="mt-4 min-h-10 rounded-lg border border-line px-4 text-sm font-semibold text-brand">전체 조건 초기화</button>}
+              </div>
+            )}
+            {result && result.items.length > 0 && (
+              <>
+                {listed.length > 0 && (
+                  <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                    {listed.map((expert) => (
+                      <li key={expert.user_id} className="h-full">
+                        <ExpertCard expert={expert} names={names} interest={personalized ? interest : null} returnHref={returnHrefFor(expert)} reputation={reputationFailed ? null : reputations[String(expert.user_id)]} />
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {listed.length === 0 && <p className="rounded-xl border border-line bg-white px-5 py-5 text-sm text-muted">현재 검색 결과가 1명입니다. 위 추천 전문가의 프로필을 확인해보세요.</p>}
+                {result.items.length < result.total && (
+                  <div className="mt-6 text-center">
+                    <button type="button" onClick={loadMore} disabled={loadingMore} className="min-h-11 rounded-xl border border-[#c9d4e9] bg-white px-7 text-sm font-semibold text-[#304a85] shadow-sm transition-colors hover:bg-[#f5f7ff] disabled:opacity-50">
+                      {loadingMore ? "불러오는 중…" : "전문가 더 보기"}
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+            <p className="mt-4 text-[11px] leading-5 text-faint">전문가의 수행 경험과 협업 조건을 상세 프로필에서 확인한 후 협업을 요청할 수 있습니다. ‘진행 중인 협업 없음’은 즉시 협업 가능을 보장하지 않습니다.</p>
+          </section>
+        </main>
+      </div>
     </PageContainer>
   );
 }
 
-function PanelButton({ label, count, open, onClick }: { label: string; count: number; open: boolean; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      aria-expanded={open}
-      onClick={onClick}
-      className={`inline-flex h-11 items-center gap-2 rounded-button border px-3 text-sm ${open || count > 0 ? "border-brand text-brand" : "border-line bg-white"}`}
-    >
-      {label}
-      {count > 0 && <span className="grid h-5 min-w-5 place-items-center rounded-full bg-brand px-1 text-[11px] font-bold text-white">{count}</span>}
-      <span aria-hidden="true">{open ? "▴" : "▾"}</span>
-    </button>
-  );
-}
-
-function ChoicePanel({ title, options, selected, onToggle }: { title: string; options: { id: string; label: string }[]; selected: string[]; onToggle: (id: string) => void }) {
-  return (
-    <div className="mt-3 rounded-card border border-line bg-page p-4">
-      <p className="text-sm font-semibold">{title}</p>
-      <p className="mt-0.5 text-xs text-muted">여러 개 고를 수 있어요. 고르면 아래 목록에 바로 반영돼요.</p>
-      <ul className="mt-3 flex flex-wrap gap-2">
-        {options.map((option) => {
-          const on = selected.includes(option.id);
-          return (
-            <li key={option.id}>
-              <button
-                type="button"
-                aria-pressed={on}
-                onClick={() => onToggle(option.id)}
-                className={`min-h-10 rounded-full px-3 text-sm ${on ? "bg-brand text-white" : "border border-line bg-white"}`}
-              >
-                {option.label}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
-    </div>
-  );
-}
-
-/** [내 연구로 찾기]: 등록한 연구를 고르면 그 연구의 맡길 일·분야로 필터를 채워요. */
 function ResearchPicker({ role, researches, names, onPick }: { role: Role; researches: Research[] | null; names: Names; onPick: (research: Research) => void }) {
   if (role !== "researcher") {
     return (
@@ -385,38 +553,109 @@ function ResearchPicker({ role, researches, names, onPick }: { role: Role; resea
   );
 }
 
-function ExpertCard({ expert, names, interest, onRequest }: { expert: ExpertCardData; names: Names; interest: Interest | null; onRequest: () => void }) {
-  const tags = [...expert.domain_ids.map((id) => names.fields.get(id) ?? id), ...expert.able_work_ids.map((id) => names.works.get(id) ?? id)];
-  const { shown, rest } = headAndRest(tags);
-  const engaged = engagedLabel(expert);
-  const reason = interest ? expertReason(expert, interest, names) : null;
 
+function ProfilePortrait({ expert, featured = false }: { expert: ExpertCardData; featured?: boolean }) {
   return (
-    <article className="flex h-full flex-col rounded-card border border-line bg-card p-5 shadow-card">
-      <div className="flex items-center gap-3">
-        <Avatar src={photoOrDefault(expert.user_photo, "expert")} size={40} />
-        <div className="min-w-0">
-          <h3 className="truncate text-base font-bold">{expert.nickname}</h3>
-          {engaged && <p className="text-xs font-semibold text-trend">● {engaged}</p>}
-        </div>
+    // eslint-disable-next-line @next/next/no-img-element -- Same dynamic Discord/default profile image strategy as the existing Avatar.
+    <img
+      src={photoOrDefault(expert.user_photo, "expert")}
+      alt=""
+      loading="lazy"
+      className={featured ? "size-[92px] shrink-0 rounded-xl bg-page object-cover sm:size-[104px]" : "size-[65px] rounded-xl bg-page object-cover"}
+    />
+  );
+}
+
+function EngagementBadge({ engaged }: { engaged: boolean }) {
+  return (
+    <span className={"inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold " + (engaged ? "bg-[#fff4e5] text-[#af761e]" : "bg-[#eaf7ef] text-[#20804e]")}>
+      <span aria-hidden="true" className={"size-1.5 rounded-full " + (engaged ? "bg-[#e8a548]" : "bg-[#25ad69]")} />
+      {engaged ? "현재 협업 중" : "진행 중 협업 없음"}
+    </span>
+  );
+}
+
+function FeaturedExpert({ expert, names, interest, returnHref, reputation }: { expert: ExpertCardData; names: Names; interest: Interest | null; returnHref: string; reputation?: ReputationSnapshot | null }) {
+  const tags = [...expert.domain_ids.map((id) => names.fields.get(id) ?? id), ...expert.able_work_ids.map((id) => names.works.get(id) ?? id)];
+  const { shown, rest } = headAndRest(tags, 5);
+  const reason = interest ? expertReason(expert, interest, names) : null;
+  const href = "/experts/" + expert.user_id + "?from=" + encodeURIComponent(returnHref);
+  return (
+    <article className="grid grid-cols-[92px_minmax(0,1fr)] items-start gap-x-3 gap-y-3 rounded-xl border border-[#e1e6f4] bg-white p-3 shadow-[0_4px_18px_rgba(20,43,89,0.06)] sm:grid-cols-[104px_minmax(0,1fr)] sm:gap-4 sm:p-3.5 lg:grid-cols-[104px_minmax(0,1fr)_228px] lg:items-center">
+      <div className="relative self-start overflow-hidden rounded-xl bg-[#f1f4fb] lg:self-center">
+        <ProfilePortrait expert={expert} featured />
+        <span className="absolute left-1.5 top-1.5 rounded-full bg-[#4f6ed1] px-2 py-1 text-[10px] font-bold text-white shadow-sm">추천</span>
       </div>
-      {reason ? <p className="mt-3 text-xs font-medium text-brand">{reason}</p> : null}
-      <p className={`line-clamp-2 min-h-[2lh] text-sm leading-6 ${reason ? "mt-2" : "mt-3"}`}>{expert.introduce || "아직 소개를 적지 않았어요"}</p>
-      <ul className="mt-3 flex flex-wrap gap-1.5">
-        {shown.map((tag) => (
-          <li key={tag} className="rounded-full bg-brand-soft px-2.5 py-1 text-xs font-medium text-brand">
-            {tag}
-          </li>
-        ))}
-        {rest > 0 && <li className="rounded-full bg-page px-2.5 py-1 text-xs text-muted">+{rest}</li>}
-      </ul>
-      <div className="mt-auto grid grid-cols-2 gap-2 pt-4">
-        <Link href={`/experts/${expert.user_id}`} className="inline-flex h-11 items-center justify-center rounded-button border border-line text-sm font-semibold hover:bg-page">
+      <div className="min-w-0 self-center lg:pr-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <h3 className="text-[16px] font-bold text-ink">{expert.nickname}</h3>
+          <EngagementBadge engaged={expert.engaged} />
+        </div>
+        <p className="mt-1 text-[12px] font-medium leading-5 text-[#687b9c]">
+          {[expert.affiliation, expert.current_job ? JOB_LABELS[expert.current_job] : null, expert.ai_career ? "AI 경력 " + (CAREER_LABELS[expert.ai_career] ?? expert.ai_career) : null].filter(Boolean).join(" · ") || "AI 전문가"}
+        </p>
+        <p className="mt-1.5 line-clamp-2 text-[12px] leading-5 text-muted">{expert.introduce || "프로필 소개를 확인해보세요."}</p>
+        {reason && <p className="mt-1 line-clamp-2 text-[11px] font-semibold text-[#4966b8]">{reason}</p>}
+        <ul aria-label="전문 분야 및 수행 기술" className="mt-2 flex flex-wrap gap-1.5">
+          {shown.map((tag, i) => <li key={tag + i} className="rounded-full bg-[#eef2ff] px-2.5 py-1 text-[10px] font-semibold text-[#506ba5]">{tag}</li>)}
+          {rest > 0 && <li className="rounded-full bg-page px-2.5 py-1 text-[10px] text-muted">+{rest}</li>}
+        </ul>
+      </div>
+      <div className="col-span-2 grid min-w-0 grid-cols-1 gap-2 rounded-xl border border-[#e7edf8] bg-[#f7f9fe] p-2.5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center lg:col-span-1 lg:flex lg:flex-col lg:items-stretch">
+        <div className="min-w-0">
+          <LabTrustIndicator snapshot={reputation} variant="compact" demoPreview={getLocalDemoFlaskPreview(expert)} />
+          <p className="mt-1.5 text-[11px] leading-4 text-[#617393]">
+            <span className="font-bold text-[#4d648c]">현재 참여</span>
+            <span className="mx-1 text-[#a5b2c5]" aria-hidden="true">·</span>
+            {engagedLabel(expert) || "진행 중 협업 없음"}
+          </p>
+        </div>
+        <Link
+          id={"expert-profile-" + expert.user_id}
+          href={href}
+          className="group inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-lg bg-[#253e75] px-3.5 py-2 text-[12px] font-bold text-white transition-colors hover:bg-[#365695] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+        >
           프로필 보기
+          <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">→</span>
         </Link>
-        <button type="button" onClick={onRequest} className="h-11 rounded-button bg-brand text-sm font-semibold text-white hover:bg-brand-hover">
-          협업 요청
-        </button>
+      </div>
+    </article>
+  );
+}
+
+function ExpertCard({ expert, names, interest, returnHref, reputation }: { expert: ExpertCardData; names: Names; interest: Interest | null; returnHref: string; reputation?: ReputationSnapshot | null }) {
+  const tags = [...expert.domain_ids.map((id) => names.fields.get(id) ?? id), ...expert.able_work_ids.map((id) => names.works.get(id) ?? id)];
+  const { shown, rest } = headAndRest(tags, 3);
+  const reason = interest ? expertReason(expert, interest, names) : null;
+  const href = "/experts/" + expert.user_id + "?from=" + encodeURIComponent(returnHref);
+  return (
+    <article className="flex h-full flex-col rounded-2xl border border-[#e2e8f2] bg-white p-4 shadow-[0_4px_18px_rgba(18,32,75,0.035)] transition-[box-shadow,border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-[#b8c7e5] hover:shadow-[0_12px_25px_rgba(18,32,75,0.08)]">
+      <div className="flex items-start gap-3">
+        <ProfilePortrait expert={expert} />
+        <div className="min-w-0 flex-1">
+          <EngagementBadge engaged={expert.engaged} />
+          <h3 className="mt-1.5 truncate text-[15px] font-bold text-ink">{expert.nickname}</h3>
+          <p className="mt-0.5 line-clamp-2 text-[11px] leading-4 text-[#73809b]">
+            {[expert.affiliation, expert.current_job ? JOB_LABELS[expert.current_job] : null].filter(Boolean).join(" · ") || "AI 전문가"}
+          </p>
+        </div>
+        <LabTrustIndicator snapshot={reputation} variant="card" demoPreview={getLocalDemoFlaskPreview(expert)} />
+      </div>
+      <p className="mt-3 line-clamp-2 min-h-[40px] text-[12px] leading-5 text-muted">{expert.introduce || "프로필에서 연구 및 개발 경험을 확인해보세요."}</p>
+      {reason && <p className="mt-2 line-clamp-1 text-[11px] font-semibold text-brand">{reason}</p>}
+      <ul aria-label="전문 기술" className="mt-3 flex min-h-[25px] flex-wrap content-start gap-1.5">
+        {shown.map((tag, i) => <li key={tag + i} className="rounded-md bg-[#f1f4fa] px-2 py-1 text-[10px] font-medium text-[#60759d]">{tag}</li>)}
+        {rest > 0 && <li className="rounded-md bg-page px-2 py-1 text-[10px] text-muted">+{rest}</li>}
+      </ul>
+      <div className="mt-auto border-t border-[#e9eef7] pt-3">
+        <Link
+          id={"expert-profile-" + expert.user_id}
+          href={href}
+          className="group ml-auto inline-flex min-h-9 items-center gap-2 rounded-lg px-2.5 py-1 text-[12px] font-bold text-[#325184] transition-colors hover:bg-[#f1f5fc] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+        >
+          프로필 보기
+          <span aria-hidden="true" className="grid size-7 shrink-0 place-items-center rounded-full bg-[#ebf1fb] text-[#4969a3] transition-transform group-hover:translate-x-0.5">→</span>
+        </Link>
       </div>
     </article>
   );

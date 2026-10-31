@@ -10,6 +10,7 @@ import { NotificationBell } from "@/components/notification-bell";
 import { PageContainer } from "@/components/page-container";
 import { apiAsset, requestApi } from "@/lib/api";
 import { adminHomeHref } from "@/lib/admin-nav";
+import { COMMUNITY_ACTIVITY_LINKS, COMMUNITY_ADMIN_LINKS } from "@/lib/community-navigation";
 import { ME_CHANGED_EVENT } from "@/lib/profile-settings";
 
 const NAV_ITEMS = [
@@ -28,9 +29,10 @@ type Me = {
   signup_step: string;
   can_manage_insights?: boolean;
   can_read_operations?: boolean;
+  is_admin?: boolean;
 };
 
-// 프로필 드롭다운 메뉴 (주소는 임시, 페이지 만들 때 팀과 맞추기)
+// 기존 역할별 메뉴는 유지하고, 게시판 개인 활동은 모든 가입 완료 회원에게 공통 노출.
 const RESEARCHER_MENU = [
   { href: "/requests", label: "요청관리" },
   { href: "/workspace", label: "협업공간" },
@@ -211,7 +213,7 @@ export function SiteHeader() {
               </button>
 
               {profileOpen ? (
-                <nav id="account-navigation" aria-label="계정 메뉴" className="absolute right-0 top-full mt-2 w-52 rounded-button border border-line bg-white py-2 shadow-card">
+                <nav id="account-navigation" aria-label="계정 메뉴" className="absolute right-0 top-full mt-2 max-h-[min(76vh,620px)] w-60 overflow-y-auto rounded-xl border border-line bg-white py-2 shadow-card">
                   {(me.signup_step !== "done" ? [{ href: "/signup", label: "가입 이어하기" }]
                     : me.user_role === "expert" ? EXPERT_MENU : RESEARCHER_MENU).map((item) => (
                     <Link
@@ -223,6 +225,37 @@ export function SiteHeader() {
                       {item.label}
                     </Link>
                   ))}
+
+                  {me.signup_step === "done" && (
+                    <div className="my-2 border-y border-line py-2" aria-label="내 게시판 활동">
+                      <p className="px-4 pb-1 text-[10px] font-bold tracking-[0.1em] text-[#8490a8]">MY COMMUNITY</p>
+                      {COMMUNITY_ACTIVITY_LINKS.map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className="flex min-h-10 items-center rounded-md px-4 text-[13px] text-ink transition-colors hover:bg-[#f3f4ff] hover:text-brand"
+                          onClick={() => setProfileOpen(false)}
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                  {me.signup_step === "done" && me.is_admin === true && (
+                    <div className="pb-2" aria-label="게시판 관리자 도구">
+                      <p className="px-4 pb-1 text-[10px] font-bold tracking-[0.1em] text-[#8490a8]">COMMUNITY ADMIN</p>
+                      {COMMUNITY_ADMIN_LINKS.map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className="flex min-h-10 items-center px-4 text-[13px] text-ink hover:bg-page"
+                          onClick={() => setProfileOpen(false)}
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
 
                   {adminHome ? (
                     <Link href={adminHome} className="flex min-h-11 items-center px-4 text-sm font-semibold text-brand hover:bg-brand-soft" onClick={() => setProfileOpen(false)}>
@@ -314,6 +347,34 @@ export function SiteHeader() {
                     {item.label}
                   </Link>
                 ))}
+                <div className="mt-2 border-t border-line pt-2" aria-label="내 게시판 활동">
+                  <p className="px-3 py-1 text-[10px] font-bold tracking-[0.1em] text-[#8490a8]">MY COMMUNITY</p>
+                  {COMMUNITY_ACTIVITY_LINKS.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="flex min-h-11 items-center rounded-button px-3 text-sm font-medium hover:bg-[#f3f4ff]"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+                {me.is_admin === true && (
+                  <div className="mt-2 border-t border-line pt-2" aria-label="게시판 관리자 도구">
+                    <p className="px-3 py-1 text-[10px] font-bold tracking-[0.1em] text-[#8490a8]">COMMUNITY ADMIN</p>
+                    {COMMUNITY_ADMIN_LINKS.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className="flex min-h-11 items-center rounded-button px-3 text-sm font-medium hover:bg-page"
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
                 {adminHome ? (
                   <Link href={adminHome} className="flex min-h-11 items-center rounded-button px-3 text-sm font-semibold text-brand hover:bg-brand-soft" onClick={() => setMenuOpen(false)}>
                     관리자
