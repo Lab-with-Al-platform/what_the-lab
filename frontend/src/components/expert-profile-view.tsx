@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { CollabRequestDialog } from "@/components/collab-request-dialog";
 import { ExpertReviewSummary } from "@/components/expert-review-summary";
 import { getLocalExpertDemo, type DemoReview } from "@/lib/expert-local-demo";
+import { getPublicExpertReviews, type PublicExpertRating } from "@/lib/reviews";
 import { Modal } from "@/components/modal";
 import { PageContainer } from "@/components/page-container";
 import { Avatar } from "@/components/request-parts";
@@ -34,6 +35,8 @@ export function ExpertProfileView({ expertId }: { expertId: string }) {
   const [requesting, setRequesting] = useState(false); // 협업 요청 창
   const [copied, setCopied] = useState(false);
   const [demoReviews, setDemoReviews] = useState<DemoReview | null>(null);
+  const [verifiedReviews, setVerifiedReviews] = useState<PublicExpertRating | null>(null);
+  const [reviewApiError, setReviewApiError] = useState("");
   const [demoRequestInfo, setDemoRequestInfo] = useState(false);
 
   useEffect(() => {
@@ -46,6 +49,14 @@ export function ExpertProfileView({ expertId }: { expertId: string }) {
         const sample = getLocalExpertDemo(liveProfile);
         setProfile(sample?.profile ?? liveProfile);
         setDemoReviews(sample?.reviews ?? null);
+        if (!sample) {
+          getPublicExpertReviews(liveProfile.user_id)
+            .then((real) => { setVerifiedReviews(real); setReviewApiError(""); })
+            .catch(() => setReviewApiError("실제 평가 데이터를 불러오지 못했습니다. 평가용 DB 마이그레이션이 적용됐는지 확인해 주세요."));
+        } else {
+          setVerifiedReviews(null);
+          setReviewApiError("");
+        }
       })
       .catch((caught) => {
         if (caught instanceof ApiError && caught.status === 404) setNotFound(true);
@@ -188,7 +199,7 @@ export function ExpertProfileView({ expertId }: { expertId: string }) {
             </div>
 
             <div id="expert-work-tab" role="tabpanel" aria-labelledby="expert-work-button" hidden={currentTab !== "work"} className="pt-6">
-              {currentTab === "work" && <WorkTab collaborations={finished} names={names} demoReviews={demoReviews} />}
+              {currentTab === "work" && <WorkTab collaborations={finished} names={names} demoReviews={demoReviews} verifiedReviews={verifiedReviews} reviewApiError={reviewApiError} />}
             </div>
             <div id="expert-portfolio-tab" role="tabpanel" aria-labelledby="expert-portfolio-button" hidden={currentTab !== "portfolio"} className="pt-6">
               {currentTab === "portfolio" && <PortfolioTab profile={profile} names={names} />}
@@ -269,10 +280,14 @@ export function ExpertProfileView({ expertId }: { expertId: string }) {
 
 /* ---------- 탭 내용 ---------- */
 
-function WorkTab({ collaborations, names, demoReviews }: { collaborations: ExpertCollaboration[]; names: Names; demoReviews?: DemoReview | null }) {
+function WorkTab({ collaborations, names, demoReviews, verifiedReviews, reviewApiError }: {
+  collaborations: ExpertCollaboration[]; names: Names; demoReviews?: DemoReview | null;
+  verifiedReviews?: PublicExpertRating | null; reviewApiError?: string;
+}) {
   return (
     <div className="space-y-5">
-      <ExpertReviewSummary completedCount={collaborations.length} demo={demoReviews} />
+      {reviewApiError && !demoReviews && <div role="alert" className="rounded-xl border border-[#f1d9c9] bg-[#fffbf4] px-4 py-3 text-[12px] leading-5 text-[#9b683f]">{reviewApiError}</div>}
+      <ExpertReviewSummary completedCount={collaborations.length} demo={demoReviews} verified={verifiedReviews} />
       {collaborations.length === 0 ? (
         <div className="flex items-start gap-3 rounded-2xl border border-[#e5eaf3] bg-[#f8faff] px-5 py-5 text-[13px] leading-6 text-muted">
           <InfoIcon />
