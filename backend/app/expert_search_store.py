@@ -114,7 +114,7 @@ def search_experts(
         like = "%" + re.sub(r"([%_\\])", r"\\\1", query.strip()) + "%"
         conditions.append(
             """(
-            u.nickname ILIKE %s OR e.introduce ILIKE %s
+            u.nickname ILIKE %s OR e.introduce ILIKE %s OR e.affiliation ILIKE %s
             OR EXISTS (SELECT 1 FROM expert_able_work w JOIN able_work a ON a.able_work_id = w.able_work_id
                        WHERE w.user_id = e.user_id AND (a.name ILIKE %s OR w.able_work_id = ANY(%s)))
             OR EXISTS (SELECT 1 FROM expert_domain d
@@ -125,7 +125,7 @@ def search_experts(
             OR EXISTS (SELECT 1 FROM portfolio p WHERE p.user_id = e.user_id AND p.title ILIKE %s)
             )"""
         )
-        params += [like, like, like, group_ids, like, like, field_ids, like]
+        params += [like, like, like, like, group_ids, like, like, field_ids, like]
 
     base = f"""
         FROM expert e
