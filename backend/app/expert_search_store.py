@@ -79,6 +79,8 @@ def search_experts(
     limit: int,
     prefer_work_ids: list[str] | None = None,
     prefer_category_ids: list[str] | None = None,
+    engagement: str = "all",
+    sort: str = "relevance",
 ) -> dict:
     """공개 전문가 목록.
 
@@ -101,6 +103,12 @@ def search_experts(
             " WHERE d.user_id = e.user_id AND f.field_category_id = ANY(%s))"
         )
         params.append(category_ids)
+    # Filter in SQL so the total and every pagination page remain consistent.
+    if engagement == "idle":
+        conditions.append("g.expert_id IS NULL")
+    elif engagement == "engaged":
+        conditions.append("g.expert_id IS NOT NULL")
+
     if query.strip():
         # %, _ 는 LIKE에서 특별한 뜻이라, 글자 그대로 찾도록 앞에 역슬래시를 붙입니다.
         like = "%" + re.sub(r"([%_\\])", r"\\\1", query.strip()) + "%"
@@ -128,7 +136,7 @@ def search_experts(
     with get_connection() as conn, conn.cursor() as cursor:
         cursor.execute(f"SELECT COUNT(*) AS total {base}", params)
         total = cursor.fetchone()["total"]
-        order_sql = "engaged, g.engaged_until NULLS LAST, e.created_at DESC, e.user_id DESC"
+        order_sql = "g.expert_id IS NOT NULL, g.engaged_until NULLS LAST, e.created_at DESC, e.user_id DESC" if sort == "relevance" else "e.created_at DESC, e.user_id DESC"
         order_params: list = []
         prefer_works = prefer_work_ids or []
         prefer_fields = prefer_category_ids or []
@@ -145,11 +153,14 @@ def search_experts(
                 " WHERE d.user_id = e.user_id AND f.field_category_id = ANY(%s))"
             )
             order_params.append(prefer_fields)
-        if related_checks:
+        if related_checks and sort == "relevance":
             order_sql = f"CASE WHEN {' OR '.join(related_checks)} THEN 0 ELSE 1 END, " + order_sql
+        elif sort == "newest":
+            order_params = []
         cursor.execute(
             f"""
             SELECT e.user_id, u.nickname, u.user_photo, e.introduce,
+                   e.affiliation, e.current_job, e.ai_career,
                    g.expert_id IS NOT NULL AS engaged, g.engaged_until
             {base}
             ORDER BY {order_sql}
