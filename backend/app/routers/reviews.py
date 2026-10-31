@@ -92,6 +92,11 @@ def report_public_review(
     return report_review(user_id, review_id, body.reason, body.description)
 
 
+@router.get("/moderation/access")
+def review_moderator_access(_: Annotated[dict, Depends(require_review_moderator)]) -> dict:
+    return {"can_moderate_reviews": True}
+
+
 @router.get("/moderation/reports")
 def list_review_reports(_: Annotated[dict, Depends(require_review_moderator)]) -> list[dict]:
     return moderation_queue()
