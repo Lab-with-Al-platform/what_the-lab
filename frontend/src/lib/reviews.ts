@@ -50,6 +50,27 @@ export type ReviewOpportunity = {
   visibility: "visible" | "hidden" | null;
 };
 
+/**
+ * LAB TRUST is not the raw 5-star average. null score means insufficient
+ * evidence (not a zero rating), and undefined UI state means still loading.
+ */
+export type ReputationSnapshot = {
+  state: "gathering" | "established";
+  score: number | null;
+  level: string;
+  review_count: number;
+  reviewer_count: number;
+  minimum_reviews: number;
+  minimum_reviewers: number;
+  max_per_reviewer: number;
+};
+
+export function getExpertReputations(ids: number[]): Promise<Record<string, ReputationSnapshot>> {
+  const clean = [...new Set(ids.filter((id) => Number.isSafeInteger(id) && id > 0))].slice(0, 60);
+  if (clean.length === 0) return Promise.resolve({});
+  return requestApi<Record<string, ReputationSnapshot>>(`/reviews/reputation?ids=${clean.join(",")}`);
+}
+
 export type PublicExpertReview = {
   review_id: number;
   created_at: string;
@@ -62,6 +83,7 @@ export type PublicExpertReview = {
   author: string;
 };
 export type PublicExpertRating = {
+  reputation: ReputationSnapshot;
   count: number;
   average: number | null;
   criteria: { expertise: number | null; communication: number | null; timeliness: number | null; quality: number | null };
