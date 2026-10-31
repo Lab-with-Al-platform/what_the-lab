@@ -143,7 +143,13 @@
 
 ### D. LAB TRUST — 실제 협업 경험을 담는 플라스크 신뢰 지수 (2026-10-31)
 
-[**LAB TRUST 제품·계량·운영 전략**](docs/qa/lab-trust-strategy-20261031.md) · [**100개 연쇄 검토 질문**](docs/qa/lab-trust-100-questions-20261031.md)
+**처음 읽는 팀원에게 추천하는 입문 자료**
+- [**LAB TRUST 초보자 완전이해 가이드 — HTML (직접 계산해 보는 인터랙티브 버전)**](docs/qa/lab-trust-beginners-guide-20261031.html)
+- [**LAB TRUST 초보자 완전이해 가이드 — PDF (회의·오프라인 공유용, 21페이지)**](docs/qa/lab-trust-beginners-guide-20261031.pdf)
+
+두 문서는 서비스 전체 평가 흐름부터 **35%·30%·20%·15% 가중치의 이유, 최소 3건·연구자 2명, 3.8점·5건 보정, 최종 100점 환산**까지 일상적 비유와 숫자 예시로 설명합니다. **실제 데이터가 아닌 설명용 계산 사례**임을 구분했습니다.
+
+더 깊은 설계 근거: [**LAB TRUST 제품·계량·운영 전략**](docs/qa/lab-trust-strategy-20261031.md) · [**100개 연쇄 검토 질문**](docs/qa/lab-trust-100-questions-20261031.md)
 
 이번 브랜치에서 **당근 매너온도의 직관적인 신뢰 표현**을 연구 협업에 맞게 재설계했습니다. 전문가 목록의 강조 카드·일반 카드와 상세 프로필에 **유리 플라스크·액체 수위·숫자·표본 근거**를 연결했습니다. 점수는 실제 서버 데이터로 계산하며 사용자가 임의로 조정할 수 없습니다.
 
@@ -428,6 +434,8 @@ feature/expert-search-dark-profile-first-20261031
 | [전문가 상세 LOCAL DEMO](docs/qa/expert-profile-local-demo-20261031.md) | 로컬 가상 전문가 4명·3개 탭·실제 데이터 분리 |
 | [평가 시스템 배포·DB 안내](docs/qa/verified-collaboration-review-release-20261031.md) | 실제 평가 정책·변경 파일·DB 적용 절차·운영 검토 |
 | [100개 평가 예외·검토 질문](docs/qa/verified-collaboration-reviews-100-questions-20261031.md) | 권한·중복·공개·신고·DB·UI 등 심층 검토 |
+| [LAB TRUST 초보자 HTML 가이드](docs/qa/lab-trust-beginners-guide-20261031.html) | 단계별 산식 설명·가상 예시·직접 조작 가능한 계산기 |
+| [LAB TRUST 초보자 PDF 가이드](docs/qa/lab-trust-beginners-guide-20261031.pdf) | 입문 팀원 교육·회의 공유용 전체 보고서 |
 | [공통 Supabase·Docker DB 가이드](docs/development/SHARED_DATABASE_GUIDE.md) | `DATABASE_URL` 우선순위·데이터 보호·팀 DB 협업 |
 | [Discord 협업 채널 설정](docs/development/SETUP_DISCORD_COLLAB_CHANNEL.md) | 협업 전용 Discord 채널 준비 |
 | [커뮤니티 통합·설치 안내](docs/community/INSTALL_AND_QA.md) | 게시판·FAQ, 공통 API 설정 및 검증 |
