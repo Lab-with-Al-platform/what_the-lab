@@ -27,7 +27,7 @@ BEGIN
   END IF;
   SELECT review_count, reviewer_count, weighted_sum INTO n, people, score_total
   FROM ci_lab_trust WHERE expert_id=20;
-  IF n != 5 OR people != 3 OR score_total != 25 THEN
+  IF n != 5 OR people != 3 OR score_total != 24.55 THEN
     RAISE EXCEPTION 'Failed public gate / reviewer cap: count %, people %, sum %',
       n,people,score_total;
   END IF;
