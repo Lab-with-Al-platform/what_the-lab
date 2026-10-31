@@ -1,86 +1,68 @@
-# B안 전문가 찾기 — 통합 작업 및 QA 인계 (2026-10-31)
+# 선택된 두 번째 B안 전문가 검색 UI 통합 및 QA — 2026-10-31
 
-## 목적
-WHAT THE LAB의 채택 시안 **B. Dark Premium Match**를 실제 `/experts` 검색 화면에 적용한다. 검색 목록에서는 **프로필 자세히 보기**만 제공하고, 협업 요청은 `/experts/[slug]` 상세 화면에서 기존 모달을 통해 진행한다.
+> **기준 이미지**: 사용자가 2026-10-31 대화에서 다시 첨부한 밝은 흰색 전문가 검색 대시보드. 처음에 만든 다크/플라스크 히어로는 다른 시안이었으므로, 이번 수정에서 제거했습니다.
 
-## 무엇이 바뀌는가
-- 딥 네이비·인디고 히어로와 과하지 않은 삼각 플라스크 SVG를 새로 추가.
-- 검색 결과를 3열 작은 카드 대신 시각적 비교가 쉬운 가로형 리스트로 배치.
-- 목록 카드의 직접 협업 요청 동작을 없애고 프로필 CTA 하나로 단순화.
-- 상세의 기존 협업 요청 모달, 일반/긴급 요청 정책, 연구 등록 흐름은 그대로 유지.
-- 상세 프로필에서 검색으로 돌아갈 때 검색어, 기술, 분야, 보이는 결과 수(최대 60), 선택 전문가 위치, 해당 연구를 안전한 내부 링크에 복원.
-- Next 15 클라이언트 search params 사용을 위한 상세 페이지 Suspense 경계 추가.
-- 테스트 계약을 `frontend/tests/expert-profile-first.test.cjs`에 추가.
+## 반드시 유지해야 할 사용자 결정
+1. **화이트/라이트 전문가 찾기 화면**: 공통 LabBridge 헤더 아래 밝은 페이지 헤더 + 우측 추상 리본 그래픽.
+2. 데스크톱 **왼쪽 필터 사이드바**: 수행 기술, 연구 분야 검색·복수 선택, 진행 중인 협업 상태, 내 연구로 찾기.
+3. **오른쪽 결과 영역**: 검색창, 적용된 필터 칩, 실제 검색 결과 첫 번째 전문가 강조 카드, 3열 컴팩트 전문가 카드.
+4. 목록 카드의 주요 행동은 **프로필 보기 하나**. 협업 요청은 실제 전문가 상세 페이지에서 기존 모달로 진행.
+5. 기존 백엔드·인증·협업 요청·알림·공통 내비게이션·요청관리 규칙을 제거하거나 우회하지 않음.
 
-## 변경 파일
-- `frontend/src/components/expert-search.tsx`
-- `frontend/src/components/expert-search-hero.tsx` (신규)
-- `frontend/src/components/expert-profile-view.tsx`
-- `frontend/src/app/experts/[slug]/page.tsx`
-- `frontend/src/lib/expert-search-navigation.ts` (신규)
-- `frontend/tests/expert-profile-first.test.cjs` (신규)
+## 이번 수정의 실제 반영 파일
+| 경로 | 변경 내용 |
+|---|---|
+| frontend/src/components/expert-search-hero.tsx | 다크/플라스크를 제거하고 원본 B안처럼 밝은 상단 헤더, breadcrumb, 우측 그래픽으로 교체 |
+| frontend/src/components/expert-search.tsx | 왼쪽 사이드바/모바일 필터, 오른쪽 검색창/추천/3열 카드, 프로필 보기 단일 CTA |
+| frontend/src/lib/expert-search.ts | 목록용 소속/직업/AI 경력 필드를 선택적 공개 메타로 확장 |
+| frontend/src/lib/expert-search-navigation.ts | 검색어/필터/참여 상태/정렬/확장 개수/선택 프로필 복귀 보존 |
+| backend/app/routers/experts.py | 검증된 \`engagement\` 및 \`sort\` 쿼리 추가(선택 파라미터; 기존 호출 호환) |
+| backend/app/expert_search_store.py | PostgreSQL 필터와 정렬, 실제 소속·직업·AI 경력, 소속 키워드 검색 |
+| frontend/tests/expert-profile-first.test.cjs | 원본 B안 레이아웃·상세 CTA·상태필터·복귀 URL 계약 테스트 |
+| backend/tests/test_expert_search_facets.py | 실 DB 없이 상태 필터·정렬 SQL 계약 테스트 |
+| docs/qa/expert-search-demo-local.sql | 개인 로컬 Docker DB에만 명시적으로 실행하는 가상 전문가 4명 시드 |
 
-## 변경하지 않은 것
-- 모든 기존 백엔드 API, 데이터베이스 스키마, 인증/JWT, Discord DM, 연구 등록, 요청 상태 변경 로직.
-- 플라스크 신뢰도 Lv.1~5는 **아직 실제 평판 시스템이 없으므로 도입하지 않음**. 상단 플라스크는 순수 장식 SVG.
+## 원본 시안 중 바로 표시할 수 없는 내용과 대체
+- 전문가 24명, 각 필터의 12/86명 등 **실제 DB에 없는 결과 수를 화면에 하드코딩하지 않음**. 서버의 \`total\`만 표시.
+- 원본 시안의 '인증 마크', '평점', '응답 시간', '상담 가능'은 현재 DB/API의 검증 근거가 없어 **조작된 수치를 표시하지 않음**.
+- \`engaged=false\`는 '진행 중인 협업 없음'일 뿐 실제 '협업 가능'이라는 계약은 아니므로 구분.
+- 실제 로그인 사용자 맞춤 선호가 있으면 정렬의 우선순위를 활용하고, 첫 번째 검색 결과를 **추천 슬롯**에 표시. 독립적인 AI 추천 엔진이라는 주장 없음.
+- 실 사진이 없는 가상 전문가에는 기존 기본 아바타 적용. 실제 공개 프로필 사진은 기존 필드를 사용.
+- 전세계 'B안 시연'에만 있던 참여 신청/협업 요청 목록 CTA는 사용자 결정대로 제거.
 
-## 점검한 조건
-- 비로그인: 프로필 열람 가능, 요청 클릭 시 로그인 안내.
-- 전문가 회원: 요청 불가 안내.
-- 연구회원·미등록 연구: 연구 등록 안내.
-- 같은 전문가·연구의 반복 요청: 기존 서버/모달 정책 유지.
-- 응답 대기/수락/거절/만료/취소: 기존 `/requests` 유지.
-- 모바일: 목록 1열, 상세 하단 협업 버튼 유지.
-- 검색 결과 0명, API 오류, 더 보기, 프로필 비공개 전환 시 기존 안내 유지.
+## 데이터 / 권한 / 안전
+- 백엔드 공개 검색 API는 \`user_role='expert'\`와 \`is_public=TRUE\` 및 활성 계정만 조회.
+- SQL 파라미터 바인딩을 사용하여 검색어와 필터를 처리.
+- 참여 상태 필터와 정렬은 페이지별 클라이언트 필터가 아니라 DB 쿼리에 적용하여 \`total\`과 \`offset\`을 일치시킴.
+- 기존 요청 모달, 연구회원 권한 확인, 중복·긴급 요청 정책을 유지.
+- 새 DB 스키마·마이그레이션은 없음.
+- 로컬 시드 파일은 Docker DB에서만 사용하며 공용 Supabase에는 실행 금지.
 
-## 검증 세 차례 — 정확한 범위
-1. 정적 UI 계약: 히어로 사용·목록 요청 제거·상세 요청 유지·Suspense·가상 신뢰 지표 배제 **5/5 확인**.
-2. API/보안 소스 계약: 기존 API·연구회원 권한·복귀 URL 제한·페이지 복원 상한·연구 ID 숫자 검증 **6/6 확인**.
-3. 반응형/연결 소스 계약: 반응형 마크업·모바일 상세 CTA·복원 포커스·테스트 파일·대상 파일 조회 **6/6 확인**.
+## QA: 완료/미완료를 구분
+- GitHub 작업 브랜치 코드 반영: 완료.
+- 소스 수준 레이아웃·CTA·API 매핑 검토: 확인.
+- 프론트엔드/백엔드 단위 테스트 코드: 추가.
+- 실제 \`npm.cmd test\`, \`npx.cmd tsc --noEmit\`, \`npm.cmd run build\`, \`uv run pytest\`의 **실행 통과는 아직 확인되지 않음**.
+- 1440/768/390px 브라우저 실측 스크린샷, 화면 리더, 실제 회원·연구 데이터 및 협업 요청 E2E는 팀 검증 필요.
 
-> 주의: 세 차례 모두 **정적 코드 점검**이며, 실제 `npm test`, TypeScript, ESLint, Next build, 브라우저 E2E, DB/Discord 통합 테스트를 실행했다는 뜻이 아닙니다. 현재 환경에서 GitHub 원격을 로컬 clone할 네트워크 접근이 없어 실 실행 검증이 불가능했습니다. 운영 배포 승인 상태가 아닙니다.
-
-## 팀이 PR에서 실행할 것
-```bash
+### 실행 명령어 (프로젝트 루트 PowerShell)
+\`\`\`powershell
 cd frontend
-npm ci
-npm test
-npx tsc --noEmit
-npm run lint
-npm run build
-```
+npm.cmd test
+npx.cmd tsc --noEmit
+npm.cmd run lint
+npm.cmd run build
+cd ..
+cd backend
+uv run pytest -q tests/test_expert_search_facets.py
+\`\`\`
 
-## 수동 QA
-- 데스크톱 1440px, 태블릿 768px, 모바일 390px 검수.
-- 검색어/기술/분야/내 연구 필터 → 더 보기 → 7번째 이후 전문가 상세 → 검색으로 복귀 확인.
-- 로그인 전·연구자·전문가 역할별 상세 요청 확인.
-- 일반 요청, 긴급 요청, 기간·중복·거절·만료·완료 화면 확인.
-- 다양한 연구 데이터 보유 상태, 닉네임 길이, 빈 태그, 없는 프로필 상태 확인.
-- 키보드 탭·ESC 모달·스크린리더·모바일 키보드 동작 점검.
-- CI에서 빌드 통과 후 팀원의 실 UI 시각 검수 및 디자인 최종 승인.
-
-## 출시·병합 정책
-이 브랜치는 기존 `develop`을 기반으로 필요한 화면 파일만 수정했다. **직접 develop에 쓰지 않으며 팀의 PR 검토·CI·승인 후 병합한다.**
-
-
-## B안 원본 시안 대비 시각적 충실도 보정 (2026-10-31 추가)
-실제 로컬 화면에서 사용자가 시안과 다르다고 확인해, 기존 '해석한 디자인'을 다음과 같이 교정했습니다.
-- 메인 제목: `AI 전문가 매칭`으로 원본 시안과 통일
-- 검색창: 히어로 하단의 별도 흰색 카드를 폐기하고 다크 히어로 내부의 글래스 검색 바 배치
-- 검색 보조: 원본의 기능 안내 3개를 간결한 카드로 표현, 구현하지 않은 추천/평판 기능은 표시하지 않음
-- 화이트 결과 패널: 히어로와 연속되는 구조로 변경
-- 필터: 실 API에 존재하는 AI 기술·연구 분야·내 연구로 찾기만 표시
-- 목록: 컴팩트 가로 행과 유일한 `프로필 자세히 보기` CTA 유지
-- 플라스크: 기존 장식 SVG의 입체감과 빛, 웨이브를 개선. 실제 레벨/평점으로 오해할 수 있는 UI는 배제
-- 글로벌 `SiteHeader`는 다른 페이지의 브랜드·내비게이션 계약을 위해 변경하지 않음
-
-### '전문가 0명'에서 시연 데이터 넣기 (로컬 Docker 전용)
-추가 파일 `docs/qa/expert-search-demo-local.sql`은 선택적으로만 실행하는 가상 전문가 4명 데이터입니다.
-공용 Supabase, 실제 사용자 DB, 배포 서버에는 절대 적용하지 않습니다.
-프로젝트 루트 PowerShell에서:
-```powershell
+### 로컬 Docker 가상 전문가 4명 표시(개발 DB 전용)
+\`\`\`powershell
 docker cp .\docs\qa\expert-search-demo-local.sql labbridge-postgres:/tmp/expert-search-demo-local.sql
 docker compose exec postgres psql -v ON_ERROR_STOP=1 -U admin -d labbridge -f /tmp/expert-search-demo-local.sql
-```
-모든 데모 계정은 닉네임에 `[데모]`가 포함됩니다. 실제 전문가가 아니라 UI 테스트용입니다.
-전문가 카드, 필터, 상세·복귀 동작은 데모 DB로 확인하고 실제 협업 요청 송신 테스트는 하지 않습니다.
+\`\`\`
+기존 로컬 DB 볼륨 삭제 금지, Supabase 연결 확인 후 임의 업그레이드 금지.
+
+## 브랜치 / PR
+브랜치 \`feature/expert-search-dark-profile-first-20261031\`은 기존 사용자가 이미 클론한 이름이므로 **이름을 바꾸지 않고** 사용합니다. 브랜치명에 'dark'가 남아 있지만 이제 **실제 B안 라이트 대시보드**가 맞습니다. PR #72는 Draft로 유지하고 CI/실브라우저 확인 후 병합합니다.
