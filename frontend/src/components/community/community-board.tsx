@@ -6,7 +6,6 @@ import { FormEvent, useEffect, useState } from "react";
 import { PageContainer } from "@/components/page-container";
 import { ApiError } from "@/lib/api";
 import {
-  CATEGORIES,
   communityApi,
   communityDate,
   communityPage,
@@ -14,6 +13,7 @@ import {
   PostList,
   roleName,
 } from "@/lib/community";
+import { communityCategoryLabel } from "@/lib/community-navigation";
 import {
   AccessMessage,
   CommunitySidebar,
@@ -193,8 +193,8 @@ export function CommunityBoard() {
         </Link>
       </div>
       <div className={styles.grid}>
-        <CommunitySidebar active={scope} member={member} />
-        <section className={styles.main} aria-label={SCOPE_LABELS[scope]}>
+        <CommunitySidebar active={scope} category={params.get("category")} queryString={queryString} member={member} />
+        <section className={styles.main} aria-label={scope === "public" ? communityCategoryLabel(params.get("category")) : SCOPE_LABELS[scope]}>
           {memberError && (
             <p className={styles.error} role="alert">
               {memberError}
@@ -214,25 +214,6 @@ export function CommunityBoard() {
           )}
           {scope !== "notifications" && (
             <>
-              <div className={styles.tabs} aria-label="글 종류">
-                <button
-                  className={`${styles.tab} ${!params.get("category") ? styles.tabActive : ""}`}
-                  aria-pressed={!params.get("category")}
-                  onClick={() => filter({ category: "" })}
-                >
-                  전체
-                </button>
-                {Object.entries(CATEGORIES).map(([key, label]) => (
-                  <button
-                    key={key}
-                    className={`${styles.tab} ${params.get("category") === key ? styles.tabActive : ""}`}
-                    aria-pressed={params.get("category") === key}
-                    onClick={() => filter({ category: key })}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
               <div className={styles.filters}>
                 <form className={styles.search} onSubmit={search}>
                   <Icon name="search" size={17} />
@@ -324,7 +305,7 @@ export function CommunityBoard() {
           )}
           <div className={styles.panel} aria-busy={loading || memberLoading}>
             <div className={styles.panelHead}>
-              <h2>{SCOPE_LABELS[scope]}</h2>
+              <h2>{scope === "public" ? communityCategoryLabel(params.get("category")) : SCOPE_LABELS[scope]}</h2>
               <span className={styles.count}>
                 {memberLoading || loadedFor !== viewerKey
                   ? ""
