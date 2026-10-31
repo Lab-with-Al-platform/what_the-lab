@@ -26,25 +26,22 @@ export const COMMUNITY_CATEGORIES = Object.entries(CATEGORIES).map(
 
 /** Called only with a fixed UI category, never untrusted API identifiers. */
 export function communityCategoryHref(queryString: string, category: Category | null): string {
-  const params = new URLSearchParams(queryString);
-  // Private/admin views can contain sensitive search terms. Do not carry even
-  // the text of their filters into a shareable/public URL or its analytics.
-  const priorScope = params.get("scope");
-  if (priorScope && priorScope !== "public") {
-    for (const key of ["q", "status", "order", "unanswered"]) params.delete(key);
+  const source = new URLSearchParams(queryString);
+  const next = new URLSearchParams();
+  // Never copy unknown params or personal/admin queries into a public URL.
+  // Only public-search filters approved by the existing backend can survive.
+  if (!source.has("scope") || source.get("scope") === "public") {
+    for (const [key, value] of source.entries()) {
+      if (key === "q" && value.trim()) next.set("q", value.trim().slice(0, 200));
+      if (key === "order" && ["latest", "helpful", "oldest"].includes(value)) next.set(key, value);
+      if (key === "status" && ["open", "in_progress", "resolved"].includes(value)) next.set(key, value);
+      if (key === "unanswered" && value === "1") next.set(key, value);
+    }
   }
-  // Always exit personal/admin scope before entering a public category.
-  params.delete("scope");
-  params.delete("page");
-  // A tag from an unrelated category would otherwise produce confusing zero results.
-  params.delete("tag");
   if (category && Object.prototype.hasOwnProperty.call(CATEGORIES, category)) {
-    params.set("category", category);
-  } else {
-    params.delete("category");
+    next.set("category", category);
   }
-  const next = params.toString();
-  return next ? `/community?${next}` : "/community";
+  return next.size ? `/community?${next}` : "/community";
 }
 
 export function communityCategoryLabel(value: string | null): string {
