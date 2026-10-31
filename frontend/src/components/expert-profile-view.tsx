@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { safeExpertBackHref } from "@/lib/expert-search-navigation";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { CollabRequestDialog } from "@/components/collab-request-dialog";
 import { PageContainer } from "@/components/page-container";
@@ -18,6 +20,8 @@ const PARTNER_COLORS = ["#e08a2e", "#c2508a", "#4f7bea", "#22a699"]; // 함께�
 
 /** AI 전문가 상세. 탭은 [연구 · 평가 · 포트폴리오] / [경력 · 학력 · 자격증] 두 개예요. */
 export function ExpertProfileView({ expertId }: { expertId: string }) {
+  const searchParams = useSearchParams();
+  const backHref = safeExpertBackHref(searchParams.get("from"));
   const [profile, setProfile] = useState<ExpertPublicProfile | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState("");
@@ -66,7 +70,7 @@ export function ExpertProfileView({ expertId }: { expertId: string }) {
     return (
       <PageContainer className="pt-6 pb-20">
         <div className="mx-auto max-w-[1120px]">
-          <BackLink />
+          <BackLink href={backHref} />
           {notFound || error ? (
             <div className="mt-6 rounded-2xl border border-[#e6e3f6] bg-card p-10 text-center">
               <p className="text-base font-bold">{notFound ? "공개된 전문가를 찾을 수 없어요" : "프로필을 불러오지 못했어요"}</p>
@@ -92,7 +96,7 @@ export function ExpertProfileView({ expertId }: { expertId: string }) {
   return (
     <PageContainer className="pt-6 pb-32 lg:pb-20">
       <div className="mx-auto max-w-[1120px]">
-        <BackLink />
+        <BackLink href={backHref} />
         <div className="mt-4 grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
           <article className="lg:rounded-2xl lg:border lg:border-[#e6e3f6] lg:bg-card lg:p-8">
             {/* 머리 */}
@@ -427,9 +431,9 @@ function Conditions({ profile }: { profile: ExpertPublicProfile }) {
 
 /* ---------- 작은 조각 ---------- */
 
-function BackLink() {
+function BackLink({ href }: { href: string }) {
   return (
-    <Link href="/experts" className="inline-flex items-center gap-1 text-[13px] leading-5 text-[#5e6678] hover:text-ink">
+    <Link href={href} className="inline-flex items-center gap-1 text-[13px] leading-5 text-[#5e6678] hover:text-ink">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
         <path d="M10 4 6 8l4 4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
