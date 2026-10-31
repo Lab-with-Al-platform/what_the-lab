@@ -4,6 +4,9 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ExpertSearchHero } from "@/components/expert-search-hero";
+import { LabTrustIndicator } from "@/components/lab-trust-indicator";
+import { getLocalDemoFlaskPreview } from "@/lib/expert-local-demo";
+import { getExpertReputations, type ReputationSnapshot } from "@/lib/reviews";
 import { PageContainer } from "@/components/page-container";
 import { expertListHref, restoredExpertCount } from "@/lib/expert-search-navigation";
 
@@ -49,6 +52,8 @@ export function ExpertSearch() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const [result, setResult] = useState<ExpertSearchResult | null>(null);
+  const [reputations, setReputations] = useState<Record<string, ReputationSnapshot>>({});
+  const [reputationFailed, setReputationFailed] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const searchGeneration = useRef(0);
   const [error, setError] = useState("");
@@ -152,6 +157,28 @@ export function ExpertSearch() {
       searchGeneration.current += 1;
     };
   }, [search, restoreCount]);
+
+  // A single bounded API call computes all visible cards; never ask once per card.
+  // Ignore stale responses when a search/next page changes the visible IDs.
+  const reputationIds = result?.items.map((item) => item.user_id).join(",") ?? "";
+  useEffect(() => {
+    if (!reputationIds) {
+      return;
+    }
+    let alive = true;
+    getExpertReputations(reputationIds.split(",").map(Number))
+      .then((next) => {
+        if (!alive) return;
+        setReputations(next);
+        setReputationFailed(false);
+      })
+      .catch(() => {
+        if (!alive) return;
+        setReputations({});
+        setReputationFailed(true);
+      });
+    return () => { alive = false; };
+  }, [reputationIds]);
 
   async function loadMore() {
     if (!result || loadingMore) return;
@@ -409,7 +436,7 @@ export function ExpertSearch() {
                 </div>
                 <span className="text-[11px] text-[#7a8aac]">실제 등록 프로필 기준</span>
               </div>
-              <FeaturedExpert expert={featured} names={names} interest={personalized ? interest : null} returnHref={returnHrefFor(featured)} />
+              <FeaturedExpert expert={featured} names={names} interest={personalized ? interest : null} returnHref={returnHrefFor(featured)} reputation={reputationFailed ? null : reputations[String(featured.user_id)]} />
             </section>
           )}
 
@@ -446,7 +473,7 @@ export function ExpertSearch() {
                   <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                     {listed.map((expert) => (
                       <li key={expert.user_id} className="h-full">
-                        <ExpertCard expert={expert} names={names} interest={personalized ? interest : null} returnHref={returnHrefFor(expert)} />
+                        <ExpertCard expert={expert} names={names} interest={personalized ? interest : null} returnHref={returnHrefFor(expert)} reputation={reputationFailed ? null : reputations[String(expert.user_id)]} />
                       </li>
                     ))}
                   </ul>
@@ -545,7 +572,7 @@ function EngagementBadge({ engaged }: { engaged: boolean }) {
   );
 }
 
-function FeaturedExpert({ expert, names, interest, returnHref }: { expert: ExpertCardData; names: Names; interest: Interest | null; returnHref: string }) {
+function FeaturedExpert({ expert, names, interest, returnHref, reputation }: { expert: ExpertCardData; names: Names; interest: Interest | null; returnHref: string; reputation?: ReputationSnapshot | null }) {
   const tags = [...expert.domain_ids.map((id) => names.fields.get(id) ?? id), ...expert.able_work_ids.map((id) => names.works.get(id) ?? id)];
   const { shown, rest } = headAndRest(tags, 5);
   const reason = interest ? expertReason(expert, interest, names) : null;
@@ -573,6 +600,7 @@ function FeaturedExpert({ expert, names, interest, returnHref }: { expert: Exper
       </div>
       <div className="flex shrink-0 flex-col justify-between gap-3 rounded-xl bg-[#f6f8fd] p-3 sm:w-[176px]">
         <div>
+          <LabTrustIndicator snapshot={reputation} variant="featured" demoPreview={getLocalDemoFlaskPreview(expert)} />
           <span className="text-[11px] font-semibold text-[#47618f]">현재 참여 상태</span>
           <p className="mt-1 text-[12px] leading-5 text-muted">{engagedLabel(expert) || "진행 중인 협업 없음"}</p>
           <p className="mt-2 text-[11px] leading-5 text-faint">요청 가능 여부는 상세 프로필에서 확인</p>
@@ -585,7 +613,7 @@ function FeaturedExpert({ expert, names, interest, returnHref }: { expert: Exper
   );
 }
 
-function ExpertCard({ expert, names, interest, returnHref }: { expert: ExpertCardData; names: Names; interest: Interest | null; returnHref: string }) {
+function ExpertCard({ expert, names, interest, returnHref, reputation }: { expert: ExpertCardData; names: Names; interest: Interest | null; returnHref: string; reputation?: ReputationSnapshot | null }) {
   const tags = [...expert.domain_ids.map((id) => names.fields.get(id) ?? id), ...expert.able_work_ids.map((id) => names.works.get(id) ?? id)];
   const { shown, rest } = headAndRest(tags, 3);
   const reason = interest ? expertReason(expert, interest, names) : null;
@@ -601,6 +629,9 @@ function ExpertCard({ expert, names, interest, returnHref }: { expert: ExpertCar
             {[expert.affiliation, expert.current_job ? JOB_LABELS[expert.current_job] : null].filter(Boolean).join(" · ") || "AI 전문가"}
           </p>
         </div>
+      </div>
+      <div className="mt-3">
+        <LabTrustIndicator snapshot={reputation} demoPreview={getLocalDemoFlaskPreview(expert)} />
       </div>
       <p className="mt-3 line-clamp-2 min-h-[40px] text-[12px] leading-5 text-muted">{expert.introduce || "프로필에서 연구 및 개발 경험을 확인해보세요."}</p>
       {reason && <p className="mt-2 line-clamp-1 text-[11px] font-semibold text-brand">{reason}</p>}
