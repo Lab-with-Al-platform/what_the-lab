@@ -54,7 +54,7 @@ export function ExpertSearch() {
   // Return links only preserve the selected research label if it belongs to this researcher.
   useEffect(() => {
     const rawId = searchParams.get("research");
-    if (role !== "researcher" || !researches || !rawId || !/^\\d+$/.test(rawId)) return;
+    if (role !== "researcher" || !researches || !rawId || !/^\d+$/.test(rawId)) return;
     const research = researches.find((item) => item.research_id === Number(rawId));
     if (research) setApplied((current) => current ?? research);
   }, [researches, role, searchParams]);
