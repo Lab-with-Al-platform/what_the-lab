@@ -26,7 +26,7 @@ export function ExpertReviewSummary({ completedCount, demo }: { completedCount: 
               <div className="mt-2 flex items-baseline justify-center gap-1">
                 <span aria-hidden="true" className="text-[25px] text-[#eea62f]">★</span>
                 <strong className="text-[43px] font-bold tracking-[-0.055em] text-[#29324c]">{demo.average.toFixed(1)}</strong>
-                <span className="text-xs text-[#9b96a0]">/ 5.0</span>
+                <span className="text-xs text-[#9b96a0]">/ 5</span>
               </div>
               <p className="mt-1 text-[11px] text-[#977d51]">가상 후기 {demo.entries.length}건</p>
             </div>
