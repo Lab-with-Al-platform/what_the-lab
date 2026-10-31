@@ -43,6 +43,15 @@ CREATE TABLE public.collaboration_review_report (
 CREATE INDEX idx_review_reports_pending ON public.collaboration_review_report(created_at DESC)
   WHERE status='pending';
 
+
+-- Existing notifications deliver a first-party reminder as soon as a collaboration
+-- automatically completes. No new route or private request metadata is exposed.
+ALTER TABLE public.notification DROP CONSTRAINT ck_notification_type;
+ALTER TABLE public.notification ADD CONSTRAINT ck_notification_type CHECK (type IN (
+  'request_received','request_accepted','request_rejected','request_canceled',
+  'request_expired','collab_started','review_ready'
+));
+
 -- Explicitly block Supabase/PostgREST direct access. All writes use JWT-checked FastAPI.
 ALTER TABLE public.collaboration_review ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.collaboration_review_report ENABLE ROW LEVEL SECURITY;
