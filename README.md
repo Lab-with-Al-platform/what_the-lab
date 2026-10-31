@@ -141,6 +141,25 @@
 
 **평가 시스템의 설계와 검증 근거:** [100가지 예외·권한·데이터 점검 질문](docs/qa/verified-collaboration-reviews-100-questions-20261031.md) · [DB 적용 및 배포 인계서](docs/qa/verified-collaboration-review-release-20261031.md)
 
+### D. LAB TRUST — 실제 협업 경험을 담는 플라스크 신뢰 지수 (2026-10-31)
+
+[**LAB TRUST 제품·계량·운영 전략**](docs/qa/lab-trust-strategy-20261031.md) · [**100개 연쇄 검토 질문**](docs/qa/lab-trust-100-questions-20261031.md)
+
+이번 브랜치에서 **당근 매너온도의 직관적인 신뢰 표현**을 연구 협업에 맞게 재설계했습니다. 전문가 목록의 강조 카드·일반 카드와 상세 프로필에 **유리 플라스크·액체 수위·숫자·표본 근거**를 연결했습니다. 점수는 실제 서버 데이터로 계산하며 사용자가 임의로 조정할 수 없습니다.
+
+| 상황 | 플라스크 동작 | 의미 |
+|---|---|---|
+| 신규 전문가, 평가 0~2건 | **빈 플라스크 · 평가 축적 중** | 신규 회원이 불리해지지 않도록 임의 기본 점수 없음 |
+| 정상 종료 연구회원 평가 ≥3건 + 서로 다른 연구회원 ≥2명 | **0~100 지수에 비례하여 액체 채움** | 전문성 30%·결과물 35%·소통 20%·일정 15%, 소표본 평활화 |
+| 동일 연구회원과 반복 협업 | **최근 최대 3개 평가만 기여** | 평가 반복으로 무제한 점수 상승 억제 |
+| 중도 종료, 숨김 후기, 종료 7일 미경과 | **계산에서 제외** | 기존 평가 공개·운영 정책 재사용 |
+| 평가 API 오류 | **조회 불가** | 실패를 0점이나 미평가로 조작하지 않음 |
+| 로컬 데모 전문가 | **LAB TRUST · 가상 미리보기** | 프론트엔드 디자인 시연 전용, 실제 신뢰 지수 아님 |
+
+**중요한 한계:** 현재 협업 완료 상태는 일정에 따라 자동 전환될 수 있어 실제 연구 결과물까지 제3자가 증명한 것은 아닙니다. 따라서 LAB TRUST는 **플랫폼상 정상 종료된 협업과 연구회원 평가에 근거한 참고 지표**이며, 신원·학위·실력 인증을 의미하지 않습니다. **검색 순위 가중치로는 사용하지 않습니다.** 향후 양측 완료 확인·가짜 협업 탐지·분쟁 정책은 별도 승인과 개발이 필요합니다.
+
+**구현**: [`reputation_store.py`](backend/app/reputation_store.py) · [`LAB TRUST SVG`](frontend/src/components/lab-trust-indicator.tsx) · [`백엔드 수학/권한 테스트`](backend/tests/test_reputation_store.py) · [`프론트 SVG 테스트`](frontend/tests/lab-trust.test.cjs)
+
 ## 3. 이번 변경 외에 기존 프로젝트에 있는 기능
 
 이번 PR은 **전문가 화면 및 평가 흐름을 기존 서비스에 연결**한 작업입니다. 아래 기능들은 원래 프로젝트에 있던 코드·화면을 계속 사용합니다.
@@ -311,6 +330,7 @@ npm.cmd run dev
 | 내 평가 기회/상태 | `GET /reviews/mine`, `GET /reviews/collaborations/{id}` | [`routers/reviews.py`](backend/app/routers/reviews.py) |
 | 평가 제출/수정 | `POST/PUT /reviews/collaborations/{id}` | [`review_store.py`](backend/app/review_store.py) |
 | 공개 전문가 평점 | `GET /reviews/experts/{id}/summary` | [`review_store.py`](backend/app/review_store.py) |
+| LAB TRUST 지수 (전문가 일괄/단일) | `GET /reviews/reputation?ids=...`, `GET /reviews/experts/{id}/reputation` | [`reputation_store.py`](backend/app/reputation_store.py) |
 | 후기 신고·관리 | `/reviews/{review_id}/reports`, `/reviews/moderation/*` | [`routers/reviews.py`](backend/app/routers/reviews.py) |
 
 ## 7. 테스트 결과와 아직 확인해야 할 것
@@ -323,7 +343,7 @@ npm.cmd run dev
 | PostgreSQL 17에서 평가 SQL 생성·제약·RLS 테스트 | **CI 통과** (격리 테스트 DB) |
 | 평가 관련 프론트 테스트 · TypeScript · ESLint · Next.js 빌드 | **CI 통과** |
 | Vercel 프론트 빌드 | **성공** — 실제 백엔드/DB 운영 검증과 다름 |
-| 프론트엔드 **전체** 테스트 | **118개 중 116개 통과 / 2개 실패**. 기존 인사이트 이미지 개수·반응형 처리 기대값 불일치 |
+| 프론트엔드 **전체** 테스트 | **127개 중 125개 통과 / 2개 실패**. 기존 인사이트 이미지 개수·반응형 처리 기대값 불일치 |
 | 사용자 개인 로컬 Docker DB | 평가 테이블 및 `20261031_21` 적용 확인. **다른 팀원/공용 DB 적용을 뜻하지 않음** |
 | Discord 실제 로그인·요청·종료·평가 저장·조회 전 구간 E2E | **팀 실사용 검증 필요** |
 | 실제 Discord DM·Google Calendar·다양한 화면 크기 실측 | **환경별 검증 필요** |
