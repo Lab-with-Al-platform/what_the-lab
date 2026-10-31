@@ -27,6 +27,9 @@ export function ExpertSearch() {
   const incomingFieldsKey = searchParams.get("fields") ?? "";
   const incomingWorks = splitTaxonomyIds(incomingWorksKey, "work");
   const incomingFields = splitTaxonomyIds(incomingFieldsKey, "category");
+  const incomingEngagementRaw = searchParams.get("engagement");
+  const incomingEngagement: Engagement = incomingEngagementRaw === "idle" || incomingEngagementRaw === "engaged" ? incomingEngagementRaw : "all";
+  const incomingSort: SortOrder = searchParams.get("sort") === "newest" ? "newest" : "relevance";
   const [ableWorks, setAbleWorks] = useState<AbleWorkOption[]>([]);
   const [categories, setCategories] = useState<FieldCategory[]>([]);
   const [role, setRole] = useState<Role>(null);
@@ -39,9 +42,8 @@ export function ExpertSearch() {
   const [fields, setFields] = useState<string[]>(incomingFields); // 대분류 ID
   const [applied, setApplied] = useState<Research | null>(null); // [내 연구로 찾기]로 고른 연구
   const [panel, setPanel] = useState<Panel>(null);
-  const initialEngagement = searchParams.get("engagement");
-  const [engagement, setEngagement] = useState<Engagement>(initialEngagement === "idle" || initialEngagement === "engaged" ? initialEngagement : "all");
-  const [sort, setSort] = useState<SortOrder>(searchParams.get("sort") === "newest" ? "newest" : "relevance");
+  const [engagement, setEngagement] = useState<Engagement>(incomingEngagement);
+  const [sort, setSort] = useState<SortOrder>(incomingSort);
   const [fieldKeyword, setFieldKeyword] = useState("");
   const [expandedWorks, setExpandedWorks] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
@@ -57,10 +59,9 @@ export function ExpertSearch() {
     setQuery(incomingQuery);
     setWorks(splitTaxonomyIds(incomingWorksKey, "work"));
     setFields(splitTaxonomyIds(incomingFieldsKey, "category"));
-    const initialStatus = searchParams.get("engagement");
-    setEngagement(initialStatus === "idle" || initialStatus === "engaged" ? initialStatus : "all");
-    setSort(searchParams.get("sort") === "newest" ? "newest" : "relevance");
-  }, [incomingQuery, incomingWorksKey, incomingFieldsKey, searchParams]);
+    setEngagement(incomingEngagement);
+    setSort(incomingSort);
+  }, [incomingQuery, incomingWorksKey, incomingFieldsKey, incomingEngagement, incomingSort]);
 
   // Return links only preserve the selected research label if it belongs to this researcher.
   useEffect(() => {
@@ -118,8 +119,8 @@ export function ExpertSearch() {
   const sameFilters = query === incomingQuery &&
     works.join(",") === incomingWorks.join(",") &&
     fields.join(",") === incomingFields.join(",") &&
-    engagement === (searchParams.get("engagement") === "idle" || searchParams.get("engagement") === "engaged" ? searchParams.get("engagement") : "all") &&
-    sort === (searchParams.get("sort") === "newest" ? "newest" : "relevance");
+    engagement === incomingEngagement &&
+    sort === incomingSort;
   const restoreCount = sameFilters ? restoredExpertCount(searchParams.get("shown")) : 6;
 
   useEffect(() => {
