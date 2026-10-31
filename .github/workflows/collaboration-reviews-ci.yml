@@ -52,7 +52,7 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
       - name: Review feature and directly integrated UI tests
-        run: node --test tests/collaboration-reviews.test.cjs tests/expert-profile-first.test.cjs tests/expert-local-demo.test.cjs tests/community-integration.test.cjs
+        run: node --test tests/collaboration-reviews.test.cjs tests/lab-trust.test.cjs tests/expert-profile-first.test.cjs tests/expert-local-demo.test.cjs tests/community-integration.test.cjs
       - run: npx tsc --noEmit
       - run: npm run lint
       - run: npm run build
@@ -83,6 +83,12 @@ jobs:
         run: psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f backend/migrations/sql/20261031_21/001_create_collaboration_reviews.sql
       - name: Verify integrity, unique reviewer and immutable RLS boundaries
         run: psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f backend/tests/sql/review_schema_assertions.sql
+      - name: Seed legitimate and adversarial reputation examples
+        run: psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f backend/tests/sql/reputation_scoring_seed.sql
+      - name: Verify production LAB TRUST SQL, reviewer cap, private/early/hidden exclusions
+        run: |
+          python3 backend/tests/build_reputation_ci_query.py /tmp/lab-trust-ci-query.sql
+          psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f /tmp/lab-trust-ci-query.sql
 
   backend-unit:
     runs-on: ubuntu-latest
