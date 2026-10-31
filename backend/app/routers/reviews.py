@@ -62,6 +62,8 @@ def list_public_reputation(
     """Batched public reputation snapshots for cards (no per-card N+1)."""
     if not ids:
         return {}
+    if len(ids) > 700:
+        raise HTTPException(422, "전문가 ID 목록이 너무 깁니다.")
     values = ids.split(",")
     if len(values) > 60 or any(not value.isascii() or not value.isdecimal() for value in values):
         raise HTTPException(422, "전문가 ID는 최대 60개의 양의 정수로 입력해 주세요.")
