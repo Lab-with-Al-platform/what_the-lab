@@ -80,6 +80,19 @@ def review_context(collaboration_id: int, user_id: int) -> dict:
         row = _participant(cursor, collaboration_id, user_id)
         window = review_window(row, user_id)
         own = _my_record(cursor, collaboration_id, user_id)
+        # Release counterpart feedback only after the same seven-day cool-off.
+        received = None
+        if row["status"] in ("done", "ended_early") and row["ended_at"] and row["ended_at"] <= datetime.now(UTC) - timedelta(days=PUBLISH_DAYS):
+            cursor.execute(
+                """
+                SELECT review_id,collaboration_id,reviewer_side,expertise,communication,timeliness,quality,
+                       comment,created_at
+                FROM collaboration_review
+                WHERE collaboration_id=%s AND reviewee_id=%s AND visibility='visible'
+                """,
+                (collaboration_id, user_id),
+            )
+            received = cursor.fetchone()
     now = datetime.now(UTC)
     can_edit = bool(
         own and own["edit_count"] == 0
@@ -87,7 +100,8 @@ def review_context(collaboration_id: int, user_id: int) -> dict:
         and own["visibility"] == "visible"
     )
     return {"collaboration_id": collaboration_id, **window, "my_review": own,
-            "can_edit": can_edit, "can_submit": window["eligible"] and own is None}
+            "received_review": received, "can_edit": can_edit,
+            "can_submit": window["eligible"] and own is None}
 
 
 def eligible_reviews(user_id: int) -> list[dict]:
