@@ -7,6 +7,9 @@ export type ExpertCardData = {
   nickname: string;
   user_photo: string | null;
   introduce: string | null; // 한 줄 소개 (40자)
+  affiliation?: string | null; // 소속 기관 (공개된 값만)
+  current_job?: string | null; // 현재 직업 코드
+  ai_career?: string | null; // AI 경력 코드
   engaged: boolean; // 지금 다른 연구와 협업 중인지
   engaged_until: string | null; // 협업 종료 예정일 YYYY-MM-DD (정하지 않았으면 null)
   able_work_ids: string[]; // 할 수 있는 일 UG ID
