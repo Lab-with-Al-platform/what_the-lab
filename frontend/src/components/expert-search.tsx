@@ -198,40 +198,47 @@ export function ExpertSearch() {
     : [];
 
   return (
-    <PageContainer className="pt-10 pb-20 md:pt-14">
-      <ExpertSearchHero />
-
-      <section className="relative z-10 -mt-7 rounded-2xl border border-line bg-card p-4 shadow-[0_16px_46px_rgba(16,28,60,0.09)] md:mx-5 md:p-6" aria-label="전문가 검색">
-        <form className="flex flex-col gap-2 sm:flex-row" onSubmit={onSearch}>
-          <label className="sr-only" htmlFor="expert-query">
-            찾고 싶은 일이나 분야
-          </label>
-          <input
-            id="expert-query"
-            value={draft}
-            onChange={(event) => setDraft(event.target.value)}
-            maxLength={50}
-            placeholder="찾고 싶은 일이나 분야를 검색해 보세요 (예: 세포, 데이터 정리)"
-            className="h-11 flex-1 rounded-button border border-line px-4 text-sm"
-          />
-          <button type="submit" className="h-11 rounded-button bg-brand px-5 text-sm font-semibold text-white hover:bg-brand-hover">
-            검색
+    <PageContainer className="pb-20 pt-6 md:pt-8">
+      <ExpertSearchHero>
+        <form className="flex flex-col gap-2 rounded-2xl border border-[#b4a7ff]/55 bg-white/[0.1] p-1.5 shadow-[0_0_22px_rgba(115,84,242,0.18)] backdrop-blur-md focus-within:border-[#ddd5ff] focus-within:ring-2 focus-within:ring-[#b4a7ff]/30 sm:flex-row sm:items-center sm:rounded-full" onSubmit={onSearch}>
+          <label className="sr-only" htmlFor="expert-query">찾고 싶은 AI 기술 또는 연구 분야</label>
+          <div className="flex min-w-0 flex-1 items-center gap-3 px-3 sm:px-4">
+            <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dbdafa" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+              <circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>
+            </svg>
+            <input
+              id="expert-query"
+              value={draft}
+              onChange={(event) => setDraft(event.target.value)}
+              maxLength={50}
+              placeholder="예) LLM 기반 논문 요약, 의료 데이터 분석"
+              className="h-11 min-w-0 w-full flex-1 bg-transparent text-sm text-white outline-none placeholder:text-[#c9ccec]"
+            />
+          </div>
+          <button type="submit" className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#ab91ff] px-6 text-sm font-bold text-[#17113d] transition-colors hover:bg-[#c5b6ff] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:rounded-full">
+            전문가 검색 <span aria-hidden="true">→</span>
           </button>
+        </form>
+      </ExpertSearchHero>
+
+      <section className="rounded-b-[22px] border border-t-0 border-line bg-white px-4 pb-8 pt-7 shadow-[0_18px_42px_rgba(16,28,60,0.06)] sm:px-7 sm:pt-8 lg:px-9" aria-label="전문가 검색">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-[21px] font-bold tracking-tight text-ink sm:text-[24px]">전문가 탐색</h2>
+          <span className="border-b-2 border-brand px-1 pb-2 text-sm font-semibold text-brand">전체 전문가</span>
+        </div>
+        <div className="mt-4 flex flex-wrap items-center gap-2 border-b border-line pb-5">
+          <PanelButton label="AI 기술" count={works.length} open={panel === "works"} onClick={() => setPanel(panel === "works" ? null : "works")} />
+          <PanelButton label="연구 분야" count={fields.length} open={panel === "fields"} onClick={() => setPanel(panel === "fields" ? null : "fields")} />
           {role !== "expert" && (
             <button
               type="button"
               aria-expanded={panel === "research"}
               onClick={() => (applied ? clearAll() : setPanel(panel === "research" ? null : "research"))}
-              className={`h-11 rounded-button border px-4 text-sm font-semibold ${applied ? "border-brand bg-brand-soft text-brand" : "border-line bg-white"}`}
+              className={`inline-flex min-h-10 items-center justify-center rounded-button border px-4 text-sm font-semibold transition-colors ${applied ? "border-brand bg-brand-soft text-brand" : "border-line bg-white text-ink hover:border-brand/50"}`}
             >
               {applied ? "내 연구 적용 중 ✕" : "내 연구로 찾기"}
             </button>
           )}
-        </form>
-
-        <div className="mt-3 flex flex-wrap gap-2">
-          <PanelButton label="무엇을 맡길까요?" count={works.length} open={panel === "works"} onClick={() => setPanel(panel === "works" ? null : "works")} />
-          <PanelButton label="어떤 분야인가요?" count={fields.length} open={panel === "fields"} onClick={() => setPanel(panel === "fields" ? null : "fields")} />
         </div>
 
         {panel === "works" && (
@@ -274,11 +281,10 @@ export function ExpertSearch() {
             &lsquo;{query}&rsquo;는 &lsquo;{matchedNames.slice(0, 3).join("·")}{matchedNames.length > 3 ? " 등" : ""}&rsquo;과 같은 뜻으로 함께 찾았어요. 소개글에 &lsquo;{query}&rsquo;가 들어간 전문가도 포함돼요.
           </p>
         )}
-      </section>
-
-      <div className="mt-9 flex flex-wrap items-end justify-between gap-2">
+      
+      <div className="mt-7 flex flex-wrap items-end justify-between gap-2">
         <h2 className="text-lg font-bold">
-          전문가 <span className="text-brand">{result ? `${result.total}명` : ""}</span>
+          검색 결과 <span className="text-brand">{result ? `${result.total}명` : ""}</span>
         </h2>
         <p className="text-xs text-faint">
           {preferWorksKey || preferFieldsKey
@@ -292,8 +298,10 @@ export function ExpertSearch() {
       {!result ? (
         <p className="py-16 text-center text-sm text-faint">불러오는 중…</p>
       ) : result.items.length === 0 ? (
-        <div className="mt-5 rounded-card border border-dashed border-line px-5 py-12 text-center text-sm text-muted">
-          조건에 맞는 전문가가 없어요.
+        <div className="mt-5 flex flex-col items-center rounded-2xl border border-dashed border-line bg-page px-5 py-12 text-center text-sm text-muted">
+          <svg aria-hidden="true" width="35" height="35" viewBox="0 0 24 24" fill="none" stroke="#9993c7" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" className="mb-3"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4M8 11h6"/></svg>
+          <strong className="text-base font-semibold text-ink">{chips.length > 0 || query ? "조건에 맞는 전문가가 없어요." : "아직 공개된 전문가가 없어요."}</strong>
+          <p className="mt-2 text-xs leading-5 text-muted">{chips.length > 0 || query ? "검색어 또는 필터를 변경해서 다시 찾아보세요." : "AI 전문가가 프로필을 공개하면 이곳에 표시됩니다."}</p>
           {(chips.length > 0 || query) && (
             <button
               type="button"
@@ -310,9 +318,9 @@ export function ExpertSearch() {
         </div>
       ) : (
         <>
-          <ul className="mt-5 grid gap-3">
+          <ul className="mt-5 overflow-hidden rounded-2xl border border-line bg-white shadow-[0_2px_18px_rgba(16,28,60,0.035)]">
             {result.items.map((expert) => (
-              <li key={expert.user_id}>
+              <li key={expert.user_id} className="border-b border-line last:border-b-0">
                 <ExpertCard expert={expert} names={names} interest={preferWorksKey || preferFieldsKey ? interest : null}
                   returnHref={expertListHref({ query, works, fields, shown: result.items.length, focus: expert.user_id, researchId: applied?.research_id })} />
               </li>
@@ -327,7 +335,7 @@ export function ExpertSearch() {
           )}
         </>
       )}
-
+      </section>
     </PageContainer>
   );
 }
