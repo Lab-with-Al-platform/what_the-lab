@@ -3,7 +3,8 @@
  *
  * Public categories are *not* personal scopes: selecting any category from
  * a private/admin/saved view must return to the PUBLIC listing first.
- * Keep search, status, unanswered and order; drop scope, page and tag.
+ * Keep public search, status, unanswered and order; drop scope, page and tag.
+ * Never carry sensitive query terms from a private/member/admin scope into public URLs.
  * The result is always a safe same-origin relative URL.
  */
 import { CATEGORIES, type Category } from "@/lib/community";
@@ -26,7 +27,13 @@ export const COMMUNITY_CATEGORIES = Object.entries(CATEGORIES).map(
 /** Called only with a fixed UI category, never untrusted API identifiers. */
 export function communityCategoryHref(queryString: string, category: Category | null): string {
   const params = new URLSearchParams(queryString);
-  // Deliberately prevent a "mine/saved/inbox" scope from leaking into a public category.
+  // Private/admin views can contain sensitive search terms. Do not carry even
+  // the text of their filters into a shareable/public URL or its analytics.
+  const priorScope = params.get("scope");
+  if (priorScope && priorScope !== "public") {
+    for (const key of ["q", "status", "order", "unanswered"]) params.delete(key);
+  }
+  // Always exit personal/admin scope before entering a public category.
   params.delete("scope");
   params.delete("page");
   // A tag from an unrelated category would otherwise produce confusing zero results.
