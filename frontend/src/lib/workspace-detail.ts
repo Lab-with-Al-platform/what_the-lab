@@ -55,6 +55,22 @@ export type CollabTask = {
   requested_by_nickname: string;
   assignee_nickname: string;
   direction: "in" | "out";
+  events: TaskEvent[]; // 기록 (오래된 것부터)
+  talk: TaskEvent | null; // 답을 기다리는 [기한 얘기하기] (그 뒤로 기한이 안 바뀜). 진행 중일 때만
+  returned: TaskEvent | null; // 아직 다시 완료하지 않은 [다시 요청]. 진행 중일 때만
+};
+
+/** 요청 기록 한 줄: 누가(actor) · 언제 · 무엇을(kind) · 웹/디스코드. 협업 종료로 마감(ended)은 누른 사람이 없어요 */
+export type TaskEvent = {
+  event_id: number;
+  task_id: number;
+  actor_id: number | null;
+  actor_nickname: string | null;
+  kind: "created" | "done" | "canceled" | "reopened" | "due" | "due_talk" | "due_kept" | "returned" | "ended";  old_due: string | null; // 바꾸기 전 기한
+  new_due: string | null; // 바꾼 기한 · 원하는 기한(기한 얘기하기, 없으면 "어려워요")
+  note: string | null; // 이유 (기한 얘기하기 · 다시 요청)
+  source: "web" | "discord";
+  created_at: string;
 };
 
 /** 정한 것: 제안 → 상대 동의로 확정. mine = 내가 제안했는지 */
@@ -187,5 +203,68 @@ export async function reopenTask(taskId: number): Promise<CollaborationDetail> {
 /** 보낸 요청 [취소] */
 export async function cancelTask(taskId: number): Promise<CollaborationDetail> {
   return requestApi<CollaborationDetail>(`/workspace/tasks/${taskId}/cancel`, { method: "POST" });
+}
+
+
+export const TASK_NOTE_LIMIT = 200; // 백엔드 MAX_TASK_NOTE 와 같은 글자 수
+
+/** 받은 요청 [기한 얘기하기]: 원하는 기한(비우면 "지금 기한으로는 어려워요") + 이유. 기한은 그대로예요 */
+export async function talkTaskDue(taskId: number, input: { due_date: string | null; note: string }): Promise<CollaborationDetail> {
+  return requestApi<CollaborationDetail>(`/workspace/tasks/${taskId}/due-talk`, { method: "POST", body: JSON.stringify(input) });
+}
+
+/** 기한 수정 요청에 보낸 사람이 [지금 기한 유지]로 답해요 (이유는 선택) */
+export async function keepTaskDue(taskId: number, note: string | null): Promise<CollaborationDetail> {
+  return requestApi<CollaborationDetail>(`/workspace/tasks/${taskId}/keep-due`, { method: "POST", body: JSON.stringify({ note }) });
+}
+
+/** 완료된 보낸 요청 [다시 요청]: 부족한 점 + 새 기한(비우면 원래 기한) → 다시 진행 중 */
+export async function returnTask(taskId: number, input: { note: string; due_date: string | null }): Promise<CollaborationDetail> {
+  return requestApi<CollaborationDetail>(`/workspace/tasks/${taskId}/return`, { method: "POST", body: JSON.stringify(input) });
+}
+
+/** 기한 → "11.10" (없으면 "기한 없음") */
+export function dayText(due: string | null): string {
+  if (!due) return "기한 없음";
+  const [, month, day] = due.split("-").map(Number);
+  return `${month}.${day}`;
+}
+
+/** 기록 한 줄 글자: "기한 변경 11.10 → 11.14" (누가 · 언제는 화면이 따로 붙여요) */
+export function eventText(event: TaskEvent): string {
+  switch (event.kind) {
+    case "created":
+      return event.new_due ? `요청 남김 · 기한 ${dayText(event.new_due)}` : "요청 남김 · 기한 없음";
+    case "done":
+      return "완료";
+    case "canceled":
+      return "취소";
+    case "reopened":
+      return "되돌림 (다시 진행 중)";
+    case "due":
+      return `기한 변경 ${dayText(event.old_due)} → ${dayText(event.new_due)}`;
+    case "due_talk":
+      return event.new_due ? `기한 수정 요청 · ${dayText(event.new_due)}로 바꿔 달라고 함` : "기한 수정 요청 · 지금 기한으로는 어렵다고 함";
+    case "due_kept":
+      return `지금 기한 유지 (${dayText(event.new_due)})`;
+    case "ended":
+      return "협업 종료로 마감 (미완료)";
+    case "returned":
+      return event.new_due !== event.old_due ? `다시 요청 · 기한 ${dayText(event.old_due)} → ${dayText(event.new_due)}` : "다시 요청";
+  }
+}
+
+/** 기록 시각 → "10.31 14:05" (한국 시간) */
+export function eventTime(iso: string): string {
+  const parts = new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    month: "numeric",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(new Date(iso));
+  const get = (type: string) => parts.find((part) => part.type === type)?.value ?? "";
+  return `${get("month")}.${get("day")} ${get("hour")}:${get("minute")}`;
 }
 

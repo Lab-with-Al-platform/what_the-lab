@@ -98,3 +98,26 @@ def test_detail_route_is_registered(monkeypatch):
     assert workspace.get_collaboration_detail(7, user_id=RESEARCHER) == {"id": 7, "user": RESEARCHER}
     paths = {route.path for route in workspace.router.routes}
     assert "/api/v1/workspace/{collaboration_id}" in paths
+
+
+
+def event(event_id, kind, **fields):
+    return {"event_id": event_id, "task_id": 1, "kind": kind, "old_due": None, "new_due": None, "note": None, **fields}
+
+
+@pytest.mark.parametrize(
+    ("status", "kinds", "talk", "returned"),
+    [
+        ("open", ["created", "due_talk"], 2, None),  # 기한 얘기 → 보낸 사람 답 기다림
+        ("open", ["created", "due_talk", "due"], None, None),  # 기한을 바꾸면 끝
+        ("open", ["created", "done", "returned"], None, 3),  # 다시 요청됨
+        ("open", ["created", "done", "returned", "due_talk"], 4, 3),  # 둘 다
+        ("done", ["created", "due_talk", "done"], None, None),  # 끝난 요청은 표시 없음
+        ("open", ["created", "done", "returned", "done", "reopened"], None, None),  # 다시 완료 후 되돌림
+    ],
+)
+def test_task_marks(status, kinds, talk, returned):
+    events = [event(number, kind) for number, kind in enumerate(kinds, start=1)]
+    marks = detail.task_marks({"status": status}, events)
+    assert (marks["talk"] or {}).get("event_id") == talk
+    assert (marks["returned"] or {}).get("event_id") == returned
