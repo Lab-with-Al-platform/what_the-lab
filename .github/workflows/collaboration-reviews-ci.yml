@@ -52,7 +52,7 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
       - name: Review feature and directly integrated UI tests
-        run: node --test tests/collaboration-reviews.test.cjs tests/lab-trust.test.cjs tests/expert-profile-first.test.cjs tests/expert-local-demo.test.cjs tests/community-integration.test.cjs
+        run: node --test tests/collaboration-reviews.test.cjs tests/lab-trust.test.cjs tests/expert-profile-first.test.cjs tests/expert-local-demo.test.cjs tests/community-integration.test.cjs tests/community-navigation.test.cjs
       - run: npx tsc --noEmit
       - run: npm run lint
       - run: npm run build
