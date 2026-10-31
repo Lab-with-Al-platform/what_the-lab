@@ -120,7 +120,7 @@ export function CollaborationReviewCard({ collaborationId }: { collaborationId: 
           <h2 id="review-heading" className="text-[19px] font-extrabold tracking-[-0.025em] text-[#25314e]">
             {context.partner} 님과의 협업 평가
           </h2>
-          <p className="mt-1.5 text-[12px] leading-5 text-muted">프로젝트가 종료된 뒤 실제 참여자만 평가할 수 있어요.</p>
+          <p className="mt-1.5 text-[12px] leading-5 text-muted">프로젝트가 종료된 뒤 30일 이내에 실제 참여자만 평가할 수 있어요.</p>
         </div>
         <span className={"rounded-full px-3 py-1.5 text-[11px] font-bold " + (existing ? "bg-[#e9f7ed] text-[#26794b]" : context.eligible ? "bg-[#eef1ff] text-[#475abb]" : "bg-[#f3f4f7] text-[#747c90]")}>
           {existing ? "제출 완료" : context.eligible ? "평가 작성 가능" : "작성 기간 종료"}
