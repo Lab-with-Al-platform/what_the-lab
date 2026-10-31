@@ -23,6 +23,7 @@ from app.db import get_connection
 MIN_REVIEWS = 3
 MIN_REVIEWERS = 2
 MAX_REVIEWS_PER_REVIEWER = 3
+MAX_EXPERT_ID = 9_223_372_036_854_775_807  # PostgreSQL BIGINT
 PRIOR_RATING = Decimal("3.8")
 PRIOR_WEIGHT = Decimal("5")
 WEIGHTS = {
@@ -117,8 +118,8 @@ def reputations_for_experts(expert_ids: list[int]) -> dict[int, dict]:
     ids = list(dict.fromkeys(int(value) for value in expert_ids))
     if not ids:
         return {}
-    if len(ids) > 60 or any(value <= 0 for value in ids):
-        raise ValueError("Only 1 to 60 distinct positive expert IDs are permitted")
+    if len(ids) > 60 or any(value <= 0 or value > MAX_EXPERT_ID for value in ids):
+        raise ValueError("Only 1 to 60 valid PostgreSQL BIGINT expert IDs are permitted")
 
     with get_connection() as conn, conn.cursor() as cursor:
         cursor.execute(REPUTATION_SQL, (ids,))
@@ -141,6 +142,8 @@ def reputations_for_experts(expert_ids: list[int]) -> dict[int, dict]:
 def expert_reputation(expert_id: int) -> dict:
     from fastapi import HTTPException
 
+    if expert_id <= 0 or expert_id > MAX_EXPERT_ID:
+        raise HTTPException(404, "공개된 전문가를 찾을 수 없습니다")
     found = reputations_for_experts([expert_id])
     if expert_id not in found:
         raise HTTPException(404, "공개된 전문가를 찾을 수 없습니다")
