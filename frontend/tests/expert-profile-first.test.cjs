@@ -42,7 +42,9 @@ test("검색 목록에는 프로필 CTA만 있고 협업 요청은 상세에 있
   assert.match(list, /프로필 보기/);
   assert.doesNotMatch(list, /CollabRequestDialog|onRequest=|setRequesting/);
   assert.match(detail, /<CollabRequestDialog/);
-  assert.match(detail, /onClick=\{\(\) => setRequesting\(true\)\}/);
+  assert.match(detail, /onClick=\{openCollaboration\}/);
+  assert.match(detail, /if \(demoReviews\) setDemoRequestInfo\(true\)/);
+  assert.match(detail, /else setRequesting\(true\)/);
   assert.match(detail, /safeExpertBackHref/);
 });
 
@@ -152,4 +154,33 @@ test("공개 완료 이력은 연구명·상대방 닉네임을 기본적으로 
   assert.match(backend, /"private": True/);
   assert.match(backend, /c\.status = 'done'/);
   assert.doesNotMatch(backend.split("def load_collaborations(")[1], /u\.nickname AS partner_nickname|r\.title/);
+});
+
+test("로컬 시연 데이터는 정확한 4개 데모 계정과 localhost+development에서만 동작한다", () => {
+  const fixture = fs.readFileSync(path.join(__dirname, "../src/lib/expert-local-demo.ts"), "utf8");
+  for (const name of ["[데모] LLM 전문가", "[데모] 의료 AI 전문가", "[데모] 비전 전문가", "[데모] 데이터 전문가"]) {
+    assert.match(fixture, new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+  assert.match(fixture, /process\.env\.NODE_ENV !== "development"/);
+  assert.match(fixture, /\["localhost", "127\.0\.0\.1"\]/);
+  assert.match(fixture, /profile\.affiliation !== sample\.affiliation/);
+  assert.match(fixture, /collaborations: ExpertCollaboration\[\]/);
+  assert.match(fixture, /private: true/);
+});
+
+test("데모 평가·연구·이력은 UI에서 명확히 구분하고 실제 요청은 전송하지 않는다", () => {
+  const detail = read("expert-profile-view.tsx");
+  const reviews = read("expert-review-summary.tsx");
+  const fixture = fs.readFileSync(path.join(__dirname, "../src/lib/expert-local-demo.ts"), "utf8");
+  assert.match(detail, /LOCAL DEMO/);
+  assert.match(detail, /getLocalExpertDemo\(liveProfile\)/);
+  assert.match(detail, /setDemoReviews\(sample\?\.reviews \?\? null\)/);
+  assert.match(detail, /requesting && !demoReviews/);
+  assert.match(detail, /데모 전문가/);
+  assert.match(reviews, /DEMO · 가상 평가/);
+  assert.match(reviews, /demo\.scores\.map/);
+  assert.match(reviews, /demo\.entries\.map/);
+  assert.match(fixture, /portfolioTitles/);
+  assert.match(fixture, /educations: Education\[\]/);
+  assert.match(fixture, /certificates: Certificate\[\]/);
 });
