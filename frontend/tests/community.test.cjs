@@ -55,8 +55,10 @@ const community = load("src/lib/community.ts");
 const ui = load("src/components/community/community-ui.tsx");
 
 test("FAQ는 최신 요청관리·공개 전문가 기능과 연결하고 공개 범위를 구분한다", () => {
-  assert.equal(faq.FAQS.length, 18);
-  assert.equal(new Set(faq.FAQS.map((f) => f.id)).size, 18);
+  assert.ok(faq.FAQS.length >= 18, "기존 FAQ가 제거되면 안 됩니다");
+  assert.equal(new Set(faq.FAQS.map((f) => f.id)).size, faq.FAQS.length);
+  assert.ok(faq.FAQS.some((f) => f.id === "lab-trust"));
+  assert.ok(faq.FAQS.some((f) => f.id === "review-after-completion"));
   assert.ok(
     faq.FAQS.find((f) => f.id === "request-boundary")
       .answer.join(" ")
