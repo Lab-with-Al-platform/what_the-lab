@@ -103,3 +103,53 @@ test("선택식 시연 데이터는 별도 로컬 전용 파일로 둔다", () =
   assert.match(sql, /BEGIN;/);
   assert.match(sql, /COMMIT;/);
 });
+
+test("수행 기술에도 전체 보기를 제공하고, 전체 선택은 기존 필터 해제로 동작한다", () => {
+  const list = read("expert-search.tsx");
+  assert.match(list, /수행 기술 필터/);
+  assert.match(list, /전체 기술/);
+  assert.match(list, /모든 수행 기술 보기 \(필터 해제\)/);
+  assert.match(list, /checked=\{works\.length === 0\}/);
+  assert.match(list, /setWorks\(\[\]\); setApplied\(null\)/);
+  assert.match(list, /전체 분야/);
+  assert.match(list, /checked=\{fields\.length === 0\}/);
+});
+
+test("전문가 상세는 기준 이미지의 3탭과 실제 협업 데이터 기반 도넛 및 요청 CTA를 갖는다", () => {
+  const detail = read("expert-profile-view.tsx");
+  assert.match(detail, /type Tab = "work" \| "portfolio" \| "history"/);
+  assert.match(detail, /이 서비스에서 한 연구 · 평가/);
+  assert.match(detail, /포트폴리오/);
+  assert.match(detail, /경력 · 학력 · 자격증/);
+  assert.match(detail, /role="tabpanel"/);
+  assert.match(detail, /<FieldSummary finished=\{finished\} names=\{names\} \/>/);
+  assert.match(detail, /<Conditions profile=\{profile\} \/>/);
+  assert.match(detail, /<CollabRequestDialog/);
+  assert.match(detail, /lg:sticky/);
+  assert.match(detail, /lg:hidden/);
+});
+
+test("평점이 없을 때 가상 점수 대신 명확한 미평가 상태를 표시한다", () => {
+  const review = read("expert-review-summary.tsx");
+  assert.match(review, /아직 공개된 평가가 없어요/);
+  assert.match(review, /REVIEW_CRITERIA/);
+  assert.match(review, /전문성/);
+  assert.match(review, /결과물 품질/);
+  assert.doesNotMatch(review, /4\.8|4\.9|5\.0/);
+});
+
+test("프로필 공유 시 검색 맥락을 제거하고, 등록되지 않은 신고 경로를 만들지 않는다", () => {
+  const detail = read("expert-profile-view.tsx");
+  assert.match(detail, /new URL\(`\/experts\/\$\{profile\?\.user_id \?\? expertId\}`, window\.location\.origin\)/);
+  assert.match(detail, /href="\/faq#private-post"/);
+  assert.doesNotMatch(detail, /\/api\/v1\/experts\/.*\/report/);
+});
+
+test("공개 완료 이력은 연구명·상대방 닉네임을 기본적으로 숨긴다", () => {
+  const detail = read("expert-profile-view.tsx");
+  const backend = fs.readFileSync(path.join(__dirname, "../../backend/app/expert_search_store.py"), "utf8");
+  assert.match(detail, /연구 제목과 참여자 정보는 당사자 보호를 위해 공개되지 않습니다/);
+  assert.match(backend, /"private": True/);
+  assert.match(backend, /c\.status = 'done'/);
+  assert.doesNotMatch(backend.split("def load_collaborations(")[1], /u\.nickname AS partner_nickname|r\.title/);
+});
