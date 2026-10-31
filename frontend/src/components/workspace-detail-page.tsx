@@ -7,6 +7,7 @@ import { Collaboration, Schedule } from "@/lib/workspace";
 import { CollaborationDetail, loadDetail } from "@/lib/workspace-detail";
 import { MySpaceShell } from "@/components/my-space-shell";
 import { DetailHead } from "@/components/workspace-detail-head";
+import { CollaborationReviewCard } from "@/components/collaboration-review-card";
 import { AgendaCard, PartnerCard } from "@/components/workspace-detail-side";
 import { TasksCard } from "@/components/workspace-detail-work";
 import { ScheduleDialog } from "@/components/workspace-schedule-dialog";
@@ -54,6 +55,9 @@ export function WorkspaceDetailPage({ collaborationId }: { collaborationId: numb
 
       <div className="mt-3 grid gap-5">
         <DetailHead detail={detail} />
+        {(collab.status === "done" || collab.status === "ended_early") && (
+          <CollaborationReviewCard collaborationId={collab.collaboration_id} />
+        )}
 
         <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
           {/* 오른쪽 칸: 넓은 화면에서는 스크롤해도 따라 내려오고, 좁은 화면에서는 맨 위로 */}
