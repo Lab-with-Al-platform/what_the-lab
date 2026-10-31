@@ -163,7 +163,7 @@ test("로컬 시연 데이터는 정확한 4개 데모 계정과 localhost+devel
   }
   assert.match(fixture, /process\.env\.NODE_ENV !== "development"/);
   assert.match(fixture, /\["localhost", "127\.0\.0\.1"\]/);
-  assert.match(fixture, /profile\.affiliation !== sample\.affiliation/);
+  assert.match(fixture, /profile\.affiliation === sample\.affiliation/);
   assert.match(fixture, /collaborations: ExpertCollaboration\[\]/);
   assert.match(fixture, /private: true/);
 });
