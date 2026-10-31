@@ -6,6 +6,7 @@ import { safeExpertBackHref } from "@/lib/expert-search-navigation";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { CollabRequestDialog } from "@/components/collab-request-dialog";
 import { ExpertReviewSummary } from "@/components/expert-review-summary";
+import { LabTrustIndicator } from "@/components/lab-trust-indicator";
 import { getLocalExpertDemo, type DemoReview } from "@/lib/expert-local-demo";
 import { getPublicExpertReviews, type PublicExpertRating } from "@/lib/reviews";
 import { Modal } from "@/components/modal";
@@ -168,6 +169,13 @@ export function ExpertProfileView({ expertId }: { expertId: string }) {
                 <p className="mt-0.5 hidden text-[13px] leading-5 text-[#6b7285] lg:block">{meta}</p>
               </div>
             </header>
+            <div className="mt-6">
+              <LabTrustIndicator
+                variant="profile"
+                snapshot={reviewApiError ? null : verifiedReviews?.reputation}
+                demoPreview={demoReviews ? Math.round((demoReviews.average - 1) * 25) : null}
+              />
+            </div>
             <div className="lg:pl-[98px]">
               <p className="mt-3 text-[15px] leading-[23px] text-[#2a3350]">{profile.introduce}</p>
               <p className="mt-2 text-[13px] leading-5 text-[#8c94ab] lg:hidden">{meta}</p>
