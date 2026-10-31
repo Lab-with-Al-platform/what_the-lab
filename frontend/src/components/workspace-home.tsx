@@ -173,7 +173,12 @@ function FinishedList({ collabs }: { collabs: Collaboration[] }) {
                 {collab.partner.nickname} 님과 1:1 · {formatPeriod(collab.start_date, collab.end_date)}
               </p>
             </div>
-            {/* TODO(협업 상세): 기록 보기 · 평가 */}
+            <div className="flex shrink-0 flex-wrap items-center gap-2">
+              <Link href={`/workspace/${collab.collaboration_id}`} className="inline-flex min-h-11 items-center rounded-xl border border-line bg-white px-4 text-[13px] font-semibold text-ink transition-colors hover:border-brand/30 hover:bg-[#f6f7fe]">협업 기록 보기</Link>
+              {(collab.status === "done" || collab.status === "ended_early") && (
+                <Link href={`/workspace/${collab.collaboration_id}#review`} className="inline-flex min-h-11 items-center rounded-xl bg-[#5142d8] px-4 text-[13px] font-bold text-white transition-colors hover:bg-[#4132bb]">협업 평가하기 →</Link>
+              )}
+            </div>
           </li>
         ))}
       </ul>
