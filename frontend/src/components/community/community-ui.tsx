@@ -10,6 +10,13 @@ import {
   STATUSES,
   CommunityPost,
 } from "@/lib/community";
+import {
+  COMMUNITY_ADMIN_LINKS,
+  COMMUNITY_CATEGORIES,
+  communityCategoryHref,
+  communityCategoryLabel,
+} from "@/lib/community-navigation";
+import type { Category } from "@/lib/community";
 import styles from "./community.module.css";
 
 export function useCommunityMember() {
@@ -150,52 +157,87 @@ export function PostBadges({ post }: { post: CommunityPost }) {
 
 export function CommunitySidebar({
   active = "public",
+  category = null,
+  queryString = "",
   member,
   children,
 }: {
   active?: string;
+  category?: string | null;
+  queryString?: string;
   member: Member | null;
   children?: ReactNode;
 }) {
-  const items = [
-    { key: "public", label: "전체 대화", href: "/community" },
-    { key: "mine", label: "내가 쓴 글·문의", href: "/community?scope=mine" },
-    { key: "saved", label: "저장한 글", href: "/community?scope=saved" },
-    {
-      key: "notifications",
-      label: "내 글의 새 답변",
-      href: "/community?scope=notifications",
-    },
+  const current = category && Object.prototype.hasOwnProperty.call(CATEGORIES, category)
+    ? (category as Category) : null;
+  const categories: { key: Category | null; label: string; icon: "chat" | "heart" | "plus" | "lock" | "bell" }[] = [
+    { key: null, label: "전체 대화", icon: "chat" },
+    ...COMMUNITY_CATEGORIES.map((item) => ({
+      ...item,
+      icon: ({
+        question: "chat", story: "heart", idea: "plus",
+        support: "lock", chat: "chat", notice: "bell",
+      } as const)[item.key],
+    })),
   ];
-  if (member?.is_admin)
-    items.push(
-      {
-        key: "inbox",
-        label: "관리자 · 비공개 문의",
-        href: "/community?scope=inbox",
-      },
-      {
-        key: "moderation",
-        label: "관리자 · 신고·숨김",
-        href: "/community?scope=moderation",
-      },
+
+  const links = () => categories.map((item) => {
+    const isSelected = active === "public" && current === item.key;
+    return (
+      <Link
+        key={item.key ?? "all"}
+        href={communityCategoryHref(queryString, item.key)}
+        aria-current={isSelected ? "page" : undefined}
+        className={`${styles.sideLink} ${isSelected ? styles.sideActive : ""}`}
+      >
+        <span className={styles.sideLinkLabel}>
+          <span className={styles.sideLinkIcon}><Icon name={item.icon} size={17} /></span>
+          {item.label}
+        </span>
+        {isSelected && <span className={styles.sideIndicator} aria-hidden="true" />}
+      </Link>
     );
+  });
+
   return (
-    <aside className={styles.sidebar} aria-label="게시판 탐색">
-      <div className={styles.sideTitle}>COMMUNITY</div>
-      <nav>
-        {items.map((item) => (
-          <Link
-            key={item.key}
-            href={item.href}
-            aria-current={active === item.key ? "page" : undefined}
-            className={`${styles.sideLink} ${active === item.key ? styles.sideActive : ""}`}
-          >
-            {item.label}
-            <span aria-hidden="true">{active === item.key ? "●" : ""}</span>
-          </Link>
-        ))}
-      </nav>
+    <aside className={styles.sidebar} aria-label="게시판 카테고리 탐색">
+      <div className={styles.desktopCategoryLinks}>
+        <div className={styles.sideTitle}>COMMUNITY <span>글 카테고리</span></div>
+        <nav aria-label="글 카테고리">
+          {links()}
+        </nav>
+      </div>
+      <details className={styles.mobileCategoryDetails}>
+        <summary className={styles.mobileCategorySummary}>
+          <span>글 카테고리</span>
+          <strong>{active === "public" ? communityCategoryLabel(category) : "전체 대화로 이동"}</strong>
+          <span className={styles.mobileCategoryChevron} aria-hidden="true">⌄</span>
+        </summary>
+        <nav className={styles.mobileCategoryLinks} aria-label="글 카테고리 모바일">
+          {links()}
+        </nav>
+      </details>
+      {member?.is_admin && (
+        <div className={styles.sideAdmin}>
+          <div className={styles.sideTitle}>MANAGEMENT <span>게시판 관리</span></div>
+          <nav aria-label="관리자 게시판">
+            {COMMUNITY_ADMIN_LINKS.map((item) => {
+              const isSelected = active === (item.href.endsWith("inbox") ? "inbox" : "moderation");
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={isSelected ? "page" : undefined}
+                  className={`${styles.sideLink} ${isSelected ? styles.sideActive : ""}`}
+                >
+                  <span className={styles.sideLinkLabel}><Icon name="lock" size={16} />{item.label}</span>
+                  {isSelected && <span className={styles.sideIndicator} aria-hidden="true" />}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+      )}
       <div className={styles.sideCard}>
         <span className={styles.smallEyebrow}>작은 도움, 함께 나누기</span>
         <h3>답을 아는 질문이 있나요?</h3>
