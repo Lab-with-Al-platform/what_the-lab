@@ -120,6 +120,8 @@ def test_batch_caps_sixty_experts_and_skips_invisible_experts():
             trust.reputations_for_experts(list(range(1, 62)))
         with pytest.raises(ValueError):
             trust.reputations_for_experts([0])
+        with pytest.raises(ValueError):
+            trust.reputations_for_experts([2**63])
         with pytest.raises(HTTPException) as err:
             trust.expert_reputation(8)
         assert err.value.status_code == 404
@@ -127,7 +129,7 @@ def test_batch_caps_sixty_experts_and_skips_invisible_experts():
         trust.get_connection = original
 
 
-@pytest.mark.parametrize("ids", ["1,a", "1,,2", "-1", "0", "1" * 701])
+@pytest.mark.parametrize("ids", ["1,a", "1,,2", "-1", "0", "1" * 1301, "9223372036854775808"])
 def test_api_rejects_non_id_and_excessive_user_input(ids):
     with pytest.raises(HTTPException) as e:
         reviews.list_public_reputation(ids=ids)
