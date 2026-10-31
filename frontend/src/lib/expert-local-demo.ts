@@ -130,12 +130,23 @@ const DEMO_PERIODS = [
 
 const CRITERIA = ["전문성", "소통", "일정 준수", "결과물 품질"] as const;
 
-export function getLocalExpertDemo(profile: ExpertPublicProfile): { profile: ExpertPublicProfile; reviews: DemoReview } | null {
-  // Do not enable this fixture on Vercel or any shared environment, even with a crafted URL.
+function localDemoSample(profile: { nickname: string; affiliation?: string | null }): DemoDetails | null {
   if (process.env.NODE_ENV !== "development") return null;
   if (typeof window === "undefined" || !["localhost", "127.0.0.1"].includes(window.location.hostname)) return null;
   const sample = EXAMPLES[profile.nickname];
-  if (!sample || profile.affiliation !== sample.affiliation) return null;
+  return sample && profile.affiliation === sample.affiliation ? sample : null;
+}
+
+/** Flask fill preview only; never use this in a real reputation API or database. */
+export function getLocalDemoFlaskPreview(profile: { nickname: string; affiliation?: string | null }): number | null {
+  const sample = localDemoSample(profile);
+  return sample ? Math.round((sample.rating - 1) * 25) : null;
+}
+
+export function getLocalExpertDemo(profile: ExpertPublicProfile): { profile: ExpertPublicProfile; reviews: DemoReview } | null {
+  // Same strict local-demo identity gate as the flask preview on search cards.
+  const sample = localDemoSample(profile);
+  if (!sample) return null;
 
   const portfolios: Portfolio[] = [
     ...profile.portfolios, // Keep the real local-DB demo portfolio so the UI also exercises real API fields.
