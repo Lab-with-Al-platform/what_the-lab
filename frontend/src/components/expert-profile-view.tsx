@@ -6,6 +6,8 @@ import { safeExpertBackHref } from "@/lib/expert-search-navigation";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { CollabRequestDialog } from "@/components/collab-request-dialog";
 import { ExpertReviewSummary } from "@/components/expert-review-summary";
+import { getLocalExpertDemo, type DemoReview } from "@/lib/expert-local-demo";
+import { Modal } from "@/components/modal";
 import { PageContainer } from "@/components/page-container";
 import { Avatar } from "@/components/request-parts";
 import { ApiError, requestApi } from "@/lib/api";
@@ -31,6 +33,8 @@ export function ExpertProfileView({ expertId }: { expertId: string }) {
   const [tab, setTab] = useState<Tab>("work");
   const [requesting, setRequesting] = useState(false); // 협업 요청 창
   const [copied, setCopied] = useState(false);
+  const [demoReviews, setDemoReviews] = useState<DemoReview | null>(null);
+  const [demoRequestInfo, setDemoRequestInfo] = useState(false);
 
   useEffect(() => {
     if (!/^\d+$/.test(expertId)) {
@@ -38,7 +42,11 @@ export function ExpertProfileView({ expertId }: { expertId: string }) {
       return;
     }
     requestApi<ExpertPublicProfile>(`/experts/${expertId}`)
-      .then(setProfile)
+      .then((liveProfile) => {
+        const sample = getLocalExpertDemo(liveProfile);
+        setProfile(sample?.profile ?? liveProfile);
+        setDemoReviews(sample?.reviews ?? null);
+      })
       .catch((caught) => {
         if (caught instanceof ApiError && caught.status === 404) setNotFound(true);
         else setError(caught instanceof ApiError ? caught.message : "잠시 후 다시 시도해 주세요");
@@ -95,11 +103,24 @@ export function ExpertProfileView({ expertId }: { expertId: string }) {
     : "진행 중인 협업 없음 · 일정 협의 필요";
   const rewards = profile.collaboration ? profile.collaboration.rewards.map((code) => REWARD_LABELS[code]).join(", ") : "";
   const currentTab: Tab = tab === "history" && !hasHistory ? "work" : tab;
+  const openCollaboration = () => {
+    if (demoReviews) setDemoRequestInfo(true);
+    else setRequesting(true);
+  };
 
   return (
     <PageContainer className="pt-6 pb-32 lg:pb-20">
       <div className="mx-auto max-w-[1120px]">
         <BackLink href={backHref} />
+        {demoReviews && (
+          <div role="status" className="mt-4 flex flex-wrap items-start gap-3 rounded-2xl border border-[#c7d6f6] bg-[#f0f5ff] px-4 py-3 sm:px-5">
+            <span className="shrink-0 rounded-full bg-[#233f89] px-3 py-1 text-[11px] font-bold tracking-[0.07em] text-white">LOCAL DEMO</span>
+            <div className="min-w-0 flex-1 text-[12px] leading-6 text-[#415783]">
+              <strong className="font-bold text-[#263d77]">화면 검수용 가상 프로필</strong>
+              <p>평가·연구 이력·포트폴리오·학력·자격증은 시연을 위한 예시 데이터입니다. 실제 전문가의 검증된 실적이 아니며, 협업 요청도 전송되지 않습니다.</p>
+            </div>
+          </div>
+        )}
         <div className="mt-4 grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
           <article className="min-w-0 rounded-[20px] border border-[#e4e8f2] bg-white p-5 shadow-[0_12px_38px_rgba(26,41,77,0.045)] sm:p-7 lg:p-8">
             {/* 머리 */}
@@ -167,7 +188,7 @@ export function ExpertProfileView({ expertId }: { expertId: string }) {
             </div>
 
             <div id="expert-work-tab" role="tabpanel" aria-labelledby="expert-work-button" hidden={currentTab !== "work"} className="pt-6">
-              {currentTab === "work" && <WorkTab collaborations={finished} names={names} />}
+              {currentTab === "work" && <WorkTab collaborations={finished} names={names} demoReviews={demoReviews} />}
             </div>
             <div id="expert-portfolio-tab" role="tabpanel" aria-labelledby="expert-portfolio-button" hidden={currentTab !== "portfolio"} className="pt-6">
               {currentTab === "portfolio" && <PortfolioTab profile={profile} names={names} />}
@@ -198,7 +219,7 @@ export function ExpertProfileView({ expertId }: { expertId: string }) {
             </div>
             <button
               type="button"
-              onClick={() => setRequesting(true)}
+              onClick={openCollaboration}
               className="mt-5 flex h-[50px] w-full items-center justify-center gap-2 rounded-xl bg-[#4f42db] text-[15px] font-bold text-white shadow-[0_7px_18px_rgba(79,66,219,0.20)] transition-colors hover:bg-[#3d33b8]"
             >
               <SendIcon />
@@ -219,22 +240,39 @@ export function ExpertProfileView({ expertId }: { expertId: string }) {
           <p className={`text-[12px] leading-[19px] ${profile.engaged ? "text-[#b26a00]" : "text-success"}`}>{availabilityNote}</p>
           {rewards && <p className="truncate text-xs leading-[18px] text-[#8c94ab]">{rewards}</p>}
         </div>
-        <button type="button" onClick={() => setRequesting(true)} className="h-12 w-[150px] shrink-0 rounded-xl bg-[#4b3fd6] text-[15px] text-white">
+        <button type="button" onClick={openCollaboration} className="h-12 w-[150px] shrink-0 rounded-xl bg-[#4b3fd6] text-[15px] text-white">
           협업 요청
         </button>
       </div>
 
-      {requesting && <CollabRequestDialog expert={{ user_id: profile.user_id, nickname: profile.nickname }} role={role} names={names} onClose={() => setRequesting(false)} />}
+      {demoRequestInfo && (
+        <Modal
+          title="시연용 협업 요청"
+          description="LOCAL DEMO · 실제 요청은 전송되지 않습니다"
+          onClose={() => setDemoRequestInfo(false)}
+          footer={
+            <button type="button" onClick={() => setDemoRequestInfo(false)} className="min-h-11 rounded-lg bg-brand px-6 text-sm font-semibold text-white">
+              확인
+            </button>
+          }
+        >
+          <div className="rounded-xl border border-[#d8e1f7] bg-[#f4f7ff] p-4 text-[13px] leading-6 text-[#526487]">
+            <p className="font-semibold text-ink">이 프로필은 화면 검수용 가상 전문가입니다.</p>
+            <p className="mt-2">실제 Discord 계정이나 협업 대상자가 없기 때문에 서버로 요청을 보내지 않습니다. 실제 전문가에서는 기존 협업 요청 모달이 정상 동작합니다.</p>
+          </div>
+        </Modal>
+      )}
+      {requesting && !demoReviews && <CollabRequestDialog expert={{ user_id: profile.user_id, nickname: profile.nickname }} role={role} names={names} onClose={() => setRequesting(false)} />}
     </PageContainer>
   );
 }
 
 /* ---------- 탭 내용 ---------- */
 
-function WorkTab({ collaborations, names }: { collaborations: ExpertCollaboration[]; names: Names }) {
+function WorkTab({ collaborations, names, demoReviews }: { collaborations: ExpertCollaboration[]; names: Names; demoReviews?: DemoReview | null }) {
   return (
     <div className="space-y-5">
-      <ExpertReviewSummary completedCount={collaborations.length} />
+      <ExpertReviewSummary completedCount={collaborations.length} demo={demoReviews} />
       {collaborations.length === 0 ? (
         <div className="flex items-start gap-3 rounded-2xl border border-[#e5eaf3] bg-[#f8faff] px-5 py-5 text-[13px] leading-6 text-muted">
           <InfoIcon />
@@ -247,7 +285,7 @@ function WorkTab({ collaborations, names }: { collaborations: ExpertCollaboratio
         <section aria-labelledby="completed-expert-projects">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 id="completed-expert-projects" className="text-base font-bold text-ink">완료한 협업 {collaborations.length}건</h2>
-            <span className="text-[11px] text-faint">완료된 협업 최근 최대 50건</span>
+            <span className="text-[11px] text-faint">{demoReviews ? "시연용 가상 이력" : "완료된 협업 최근 최대 50건"}</span>
           </div>
           <ul className="mt-2 divide-y divide-[#edf0f5]">
             {collaborations.map((item, index) => (
@@ -264,7 +302,7 @@ function WorkTab({ collaborations, names }: { collaborations: ExpertCollaboratio
                     ))}
                   </div>
                   <p className="mt-1.5 text-[12px] leading-5 text-faint">
-                    연구 제목과 참여자 정보는 당사자 보호를 위해 공개되지 않습니다.
+                    {demoReviews ? "LOCAL DEMO · 협업 이력·분야·기간 모두 가상의 시연 데이터입니다." : "연구 제목과 참여자 정보는 당사자 보호를 위해 공개되지 않습니다."}
                   </p>
                   {item.able_work_ids.length > 0 && (
                     <dl className="mt-3 grid gap-2 text-xs sm:grid-cols-[68px_minmax(0,1fr)]">
@@ -287,7 +325,7 @@ function PortfolioTab({ profile, names }: { profile: ExpertPublicProfile; names:
     <section aria-labelledby="expert-portfolios">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 id="expert-portfolios" className="text-[17px] font-bold text-ink">포트폴리오 {profile.portfolios.length}건</h2>
-        <span className="text-xs text-faint">전문가가 직접 등록한 프로젝트 경험</span>
+        <span className="text-xs text-faint">전문가 등록 정보 또는 LOCAL DEMO 시연 데이터</span>
       </div>
       {profile.portfolios.length === 0 ? (
         <p className="mt-4 rounded-xl bg-page p-5 text-sm text-muted">아직 등록된 포트폴리오가 없습니다.</p>
@@ -322,7 +360,7 @@ function PortfolioTab({ profile, names }: { profile: ExpertPublicProfile; names:
           ))}
         </ul>
       )}
-      <p className="mt-4 text-[11px] leading-5 text-faint">포트폴리오는 전문가의 직접 작성 정보입니다. 서비스 내 완료 협업 이력이나 검증된 평가와 구분해서 확인하세요.</p>
+      <p className="mt-4 text-[11px] leading-5 text-faint">포트폴리오는 전문가의 직접 등록 정보이며, LOCAL DEMO에서는 가상 포트폴리오도 포함됩니다. 완료 협업 이력이나 검증된 평가와 구분해 확인하세요.</p>
     </section>
   );
 }
