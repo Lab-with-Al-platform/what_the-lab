@@ -62,11 +62,13 @@ def expand_query(query: str) -> tuple[list[str], list[str]]:
     return sorted(groups), sorted(fields)
 
 
-# 참여 중 = 협업을 시작했고(started) 희망 종료일이 아직 안 지났거나 정하지 않은 요청이 있음
+# '진행 중' 판단은 실제 협업 공간의 상태를 기준으로 합니다.
+# 요청 상태 started는 협업 완료 뒤에도 남으므로 이를 가용성으로 사용하면 안 됩니다.
 ENGAGED_SQL = """
-    SELECT expert_id, MAX(COALESCE(accepted_end_date, end_date)) AS engaged_until
-    FROM collaboration_request
-    WHERE status = 'started' AND COALESCE(accepted_end_date, end_date) >= CURRENT_DATE
+    SELECT expert_id, MAX(end_date) AS engaged_until
+    FROM collaboration
+    WHERE status = 'ongoing'
+      AND end_date >= (now() AT TIME ZONE 'Asia/Seoul')::date
     GROUP BY expert_id
 """
 
