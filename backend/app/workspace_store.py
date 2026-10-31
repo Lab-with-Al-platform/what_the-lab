@@ -16,6 +16,22 @@ from app.google_calendar import add_calendar_url, google_ready
 # 오늘 날짜는 한국 시간 기준 (DB 서버 시간대와 상관없이)
 TODAY_KST = "(now() AT TIME ZONE 'Asia/Seoul')::date"
 
+
+# 요청 표시 (진행 중인 요청만, 요청 기록 collaboration_task_event 에서 계산. 따로 저장하지 않아요)
+# - due_talk: 받은 사람이 [기한 얘기하기]를 했고, 그 뒤로 기한이 안 바뀌었어요 (보낸 사람이 답할 차례)
+# - returned: 보낸 사람이 [다시 요청]을 했고, 아직 다시 완료하지 않았어요
+# 웹 협업 상세는 같은 규칙을 파이썬으로 계산해요 (app/workspace_detail.py 의 task_marks)
+TASK_FLAG_SQL = """
+    CASE WHEN t.status <> 'open' THEN NULL
+         WHEN (SELECT e.kind FROM collaboration_task_event e
+               WHERE e.task_id = t.task_id AND e.kind IN ('due_talk', 'due_kept', 'due', 'done', 'canceled')
+               ORDER BY e.event_id DESC LIMIT 1) = 'due_talk' THEN 'due_talk'
+         WHEN (SELECT e.kind FROM collaboration_task_event e
+               WHERE e.task_id = t.task_id AND e.kind IN ('returned', 'done')
+               ORDER BY e.event_id DESC LIMIT 1) = 'returned' THEN 'returned'
+    END
+"""
+
 # 시작할 때 합의한 내용 복사본. 요청(cr)과 연구(rs)에서 읽어요.
 # (마이그레이션 010/20261028_13 에서 기존 협업을 옮길 때와 같은 모양)
 AGREEMENT_SQL = """
@@ -66,10 +82,23 @@ def create_collaboration(cursor, request_id: int) -> None:
 
 
 def complete_ended_collaborations(cursor) -> None:
-    """종료일이 지난 진행 중 협업을 완료로 바꿔요. (종료일 당일까지는 진행 중)"""
+    """종료일이 지난 진행 중 협업을 완료로 바꿔요. (종료일 당일까지는 진행 중)
+
+    그때 끝나지 않은 요청은 요청 기록에 "협업 종료로 마감(ended)" 한 줄을 남겨요. 상태는 진행 중 그대로라
+    평가 때 "완료 · 보낸 사람이 취소 · 종료 때 미완료"를 나눠 볼 수 있어요. (한 문장이라 둘이 같이 저장돼요)
+    """
     cursor.execute(
-        f"UPDATE collaboration SET status = 'done', ended_at = now()"
-        f" WHERE status = 'ongoing' AND end_date < {TODAY_KST}"
+        f"""
+        WITH ended AS (
+            UPDATE collaboration SET status = 'done', ended_at = now()
+            WHERE status = 'ongoing' AND end_date < {TODAY_KST}
+            RETURNING collaboration_id
+        )
+        INSERT INTO collaboration_task_event (task_id, actor_id, kind, source)
+        SELECT t.task_id, NULL, 'ended', 'web'
+        FROM collaboration_task t JOIN ended e ON e.collaboration_id = t.collaboration_id
+        WHERE t.status = 'open'
+        """
     )
 
 
@@ -156,7 +185,8 @@ def load_workspace(user_id: int) -> dict:
         cursor.execute(
             "SELECT t.task_id, t.collaboration_id, t.content, t.due_date, t.created_at,"
             " CASE WHEN t.assignee = %s THEN 'in' ELSE 'out' END AS direction,"
-            " rq.nickname AS requested_by_nickname, asg.nickname AS assignee_nickname"
+            " rq.nickname AS requested_by_nickname, asg.nickname AS assignee_nickname,"
+            f" {TASK_FLAG_SQL} AS flag"
             " FROM collaboration_task t"
             " JOIN users rq ON rq.user_id = t.requested_by JOIN users asg ON asg.user_id = t.assignee"
             " WHERE t.collaboration_id = ANY(%s) AND t.status = 'open'"

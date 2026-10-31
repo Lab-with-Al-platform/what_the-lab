@@ -1,6 +1,6 @@
 """알림 문구 만들기 (DB 없이). 받는 사람이 전문가인지 연구회원인지에 따라 문구가 달라요."""
 
-from datetime import datetime
+from datetime import date, datetime
 
 from app.notification_store import build_message
 from app.request_rules import KST
@@ -70,3 +70,27 @@ def test_canceled_wording_follows_reason():
 def test_expired_after_accept_has_its_own_wording():
     title, _ = build_message(row("request_expired", responded_at="x"), RESEARCHER)
     assert title == "neural_kim 님이 수락한 요청이 시작 기한이 지나 만료됐어요"
+
+
+
+# ---------- 협업 공간 알림 (요청 · 아침 브리핑) ----------
+def task_row(kind, **fields):
+    return {
+        "type": kind, "actor_nickname": "jiwoo_lab", "task_content": "그래프를 표로 정리해 주세요",
+        "task_due": date(2026, 11, 10), "notice_on": None, "collab_title": "세포 이미지 분석",
+        "collab_end": date(2026, 11, 17), "collaboration_id": 3, "task_id": 12, **fields,
+    }
+
+
+def test_task_notice_wording_and_link():
+    from app.notification_store import notice_link, task_message
+
+    assert task_message(task_row("task_created")) == ("jiwoo_lab 님이 요청을 남겼어요", "그래프를 표로 정리해 주세요 · 세포 이미지 분석")
+    assert task_message(task_row("task_due"))[0] == "jiwoo_lab 님이 기한을 11.10(으)로 바꿨어요"
+    assert task_message(task_row("task_due_kept"))[0] == "jiwoo_lab 님이 지금 기한(11.10)을 유지하기로 했어요"
+    assert task_message(task_row("task_due_soon", notice_on=date(2026, 11, 10)))[0] == "요청 기한이 오늘까지예요"
+    assert task_message(task_row("task_due_soon", notice_on=date(2026, 11, 9)))[0] == "요청 기한이 내일까지예요"
+    assert task_message(task_row("collab_ending", task_id=None))[0] == "협업 종료 3일 전이에요 (11.17)"
+    assert notice_link(task_row("task_done")) == "/workspace/3#task-12"  # 누르면 그 요청 줄로
+    assert notice_link(task_row("collab_ending", task_id=None)) == "/workspace/3"
+    assert notice_link({"collaboration_id": None, "task_id": None}) == "/requests"  # 매칭 알림은 그대로

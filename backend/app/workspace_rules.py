@@ -16,7 +16,7 @@ MAX_PLACE = 300
 MAX_MEMO = 500
 MAX_REPEAT = 26  # 매주 반복은 최대 26번 (약 반년)
 MAX_TASK = 300  # 요청 내용 (collaboration_task.content)
-
+MAX_TASK_NOTE = 200  # 기한 얘기하기 · 다시 요청 이유 (collaboration_task_event.note)
 
 class ScheduleInput(BaseModel):
     kind: str  # meeting / work / due / etc
@@ -89,6 +89,43 @@ def check_due(due: date | None, period: tuple[date, date], today: date) -> date 
         raise bad_request(f"기한은 오늘부터 협업 종료일({fmt(period[1])}) 사이로 골라 주세요")
     return due
 
+class TalkInput(BaseModel):
+    """[기한 얘기하기] (받은 사람): 원하는 기한(선택, 비우면 "이 기한으로는 어려워요") + 이유(필수)"""
+
+    due_date: date | None = None
+    note: str
+
+class KeepInput(BaseModel):
+    """[지금 기한 유지] (보낸 사람): 이유(선택)"""
+
+    note: str | None = None
+
+class ReturnInput(BaseModel):
+    """[다시 요청] (보낸 사람): 무엇이 부족한지(필수) + 새 기한(선택, 비우면 원래 기한 그대로)"""
+
+    note: str
+    due_date: date | None = None
+
+
+def clean_talk(body: TalkInput, period: tuple[date, date], today: date) -> dict:
+    """기한 얘기하기 입력: 원하는 기한은 기한 규칙(check_due)과 같아요. 보낸 사람이 그대로 바꿀 수 있는 날만."""
+    return {
+        "due": check_due(body.due_date, period, today),
+        "note": required_text(body.note, MAX_TASK_NOTE, "이유"),
+    }
+
+def clean_keep(body: KeepInput) -> str | None:
+    """지금 기한 유지 이유: 선택 (200자)"""
+    return optional_text(body.note, MAX_TASK_NOTE, "이유")
+
+def clean_return(body: ReturnInput, old_due: date | None, period: tuple[date, date], today: date) -> dict:
+    """다시 요청 입력: 새 기한을 안 쓰면 원래 기한. 원래 기한이 이미 지났으면 새 기한을 꼭 받아요."""
+    note = required_text(body.note, MAX_TASK_NOTE, "부족한 점")
+    if body.due_date is not None:
+        return {"due": check_due(body.due_date, period, today), "note": note}
+    if old_due is not None and old_due < today:
+        raise bad_request("원래 기한이 지났어요. 새 기한을 정해 주세요")
+    return {"due": old_due, "note": note}
 
 def clean_task(body: TaskInput, period: tuple[date, date], today: date) -> dict:
     """요청 입력 정리: 내용(필수, 300자) + 기한(선택, check_due 규칙)"""

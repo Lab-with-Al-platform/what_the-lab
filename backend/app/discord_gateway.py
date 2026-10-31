@@ -26,11 +26,35 @@ from discord import app_commands
 from fastapi import HTTPException
 
 from app import workspace_rules as rules
-from app.config import DISCORD_BOT_TOKEN, DISCORD_GUILD_ID
+from app.config import DISCORD_BOT_TOKEN, DISCORD_GUILD_ID, FRONTEND_URL
 from app.db import get_connection
-from app.routers.workspace_tasks import change_due, close_task, create_task, reopen_task, today_kst
-from app.task_sync import save_message_id, sync_google_by_id, task_card
-from app.task_text import WEEKDAYS, day_text, done_line, due_line, short_day, task_message
+from app.discord_bot import channel_url
+from app.routers.workspace_tasks import (
+    change_due,
+    close_task,
+    create_task,
+    keep_due,
+    reopen_task,
+    return_task,
+    talk_due,
+    today_kst,
+)
+from app.task_sync import last_event, save_message_id, sync_google_by_id, task_card
+from app.task_text import (
+    WEEKDAYS,
+    cancel_line,
+    day_text,
+    done_line,
+    due_line,
+    keep_line,
+    reopen_line,
+    return_line,
+    short_day,
+    talk_line,
+    task_list_text,
+    task_message,
+)
+from app.workspace_store import TASK_FLAG_SQL
 
 log = logging.getLogger("labbridge.discord")
 
@@ -71,6 +95,48 @@ def user_by_discord(discord_id: int) -> int | None:
         row = cursor.fetchone()
         return row["user_id"] if row else None
 
+def my_tasks(collaboration_id: int, user_id: int, direction: str) -> list[dict]:
+    """/받은요청 · /보낸요청 에 보여 줄 요청: 진행 중 전부 + 최근 7일 안에 완료한 것.
+
+    direction: "in"(내가 받은 요청) / "out"(내가 보낸 요청)
+    flag: due_talk(기한 얘기 있음) · returned(다시 요청됨) · None — TASK_FLAG_SQL 과 같은 규칙
+    """
+    who = "t.assignee" if direction == "in" else "t.requested_by"
+    with get_connection() as conn, conn.cursor() as cursor:
+        cursor.execute(
+            f"""
+            SELECT t.task_id, t.content, t.due_date, t.status, t.discord_message_id,
+                   (t.closed_at AT TIME ZONE 'Asia/Seoul')::date AS closed_on,
+                   rq.nickname AS requested_by_nickname, asg.nickname AS assignee_nickname,
+                   {TASK_FLAG_SQL} AS flag
+            FROM collaboration_task t
+            JOIN users rq ON rq.user_id = t.requested_by
+            JOIN users asg ON asg.user_id = t.assignee
+            WHERE t.collaboration_id = %s AND {who} = %s
+              AND (t.status = 'open' OR (t.status = 'done' AND t.closed_at > now() - interval '7 days'))
+            ORDER BY t.due_date NULLS LAST, t.task_id
+            """,
+            (collaboration_id, user_id),
+        )
+        return cursor.fetchall()
+
+
+def list_sections(rows: list[dict], direction: str) -> list[tuple[str, list[dict]]]:
+    """목록을 묶음으로: 내가 답할 것 → 진행 중 → 최근 완료 (보낸 요청만, [다시 요청]할 수 있게)
+
+    내가 답할 것: 받은 요청은 다시 요청된 것, 보낸 요청은 상대가 기한을 얘기한 것
+    """
+    need = "returned" if direction == "in" else "due_talk"
+    for row in rows:
+        row["who"] = f"{row['requested_by_nickname']} → 나" if direction == "in" else f"나 → {row['assignee_nickname']}"
+    open_rows = [row for row in rows if row["status"] == "open"]
+    sections = [
+        ("내가 답할 것", [row for row in open_rows if row["flag"] == need]),
+        ("진행 중", [row for row in open_rows if row["flag"] != need]),
+    ]
+    if direction == "out":
+        sections.append(("최근 완료 (7일)", [row for row in rows if row["status"] == "done"]))
+    return sections
 
 # ---------------------------------------------------------------------------
 # 기한 읽기: 디스코드 창에 적은 글자 → 정확한 날짜 (캘린더에 들어가야 하니 애매하면 받지 않아요)
@@ -158,12 +224,27 @@ def panel(task: dict, user_id: int) -> tuple[str, list[str]]:
     sender, receiver = user_id == task["requested_by"], user_id == task["assignee"]
     if task["status"] == "open":
         if receiver:
-            return f"{head}\n\n받은 요청이에요. 다 했으면 **완료**를 눌러 주세요.", ["done"]
+            return (
+                f"{head}\n\n받은 요청이에요. 다 했으면 **완료**를, 기한이 어려우면 **기한 얘기하기**를 눌러 주세요.",
+                ["done", "talk"],
+            )
+        if sender and task.get("flag") == "due_talk":
+            want = f"**{day_text(task['talk_due'])}**까지로" if task.get("talk_due") else "다른 날로"
+            text = (
+                f"{head}\n\n🗓 {task['assignee_nickname']} 님이 기한을 {want} 바꿔 달래요. "
+                f"**기한 변경**(요청한 날이 채워져 있어요) 또는 **지금 기한 유지**로 답해 주세요."
+            )
+            return text, ["due", "keep", "cancel"]        
+        
         if sender:
             return f"{head}\n\n보낸 요청이에요. 기한을 바꾸거나 요청을 취소할 수 있어요.", [
                 "due",
                 "cancel",
             ]
+    elif task["status"] == "done" and receiver:
+        return f"{head}\n\n완료한 요청이에요. 잘못 눌렀다면 되돌릴 수 있어요.", ["reopen"]
+    elif task["status"] == "done" and sender:
+        return f"{head}\n\n완료된 요청이에요. 부족한 점이 있으면 **다시 요청**할 수 있어요.", ["return"]
     elif task["status"] == "done" and receiver:
         return f"{head}\n\n완료한 요청이에요. 잘못 눌렀다면 되돌릴 수 있어요.", ["reopen"]
     elif task["status"] == "canceled" and sender:
@@ -243,37 +324,49 @@ PANEL_BUTTONS = {
     "due": ("기한 변경", discord.ButtonStyle.primary),
     "cancel": ("요청 취소", discord.ButtonStyle.danger),
     "reopen": ("되돌리기", discord.ButtonStyle.secondary),
+    "talk": ("기한 얘기하기", discord.ButtonStyle.primary),
+    "keep": ("지금 기한 유지", discord.ButtonStyle.secondary),
+    "return": ("다시 요청", discord.ButtonStyle.primary),
 }
 
 
 class PanelView(discord.ui.View):
-    """[요청 관리]를 누른 사람에게만 보이는 창의 버튼들. 잘못 열었으면 그냥 닫으면 돼요."""
+    """[요청 관리]를 누른 사람에게만 보이는 창의 버튼들. 잘못 열었으면 그냥 닫으면 돼요.
 
-    def __init__(self, task_id: int, user_id: int, actions: list[str]) -> None:
+    back: /받은요청 · /보낸요청 목록에서 열었으면 {collaboration_id, user_id, direction} → [← 목록으로]를 붙여요
+    """
+
+    def __init__(self, task_id: int, user_id: int, actions: list[str], back: dict | None = None) -> None:
         # 10분 지나면 이 창의 버튼은 꺼져요 ([요청 관리]를 다시 누르면 돼요)
         super().__init__(timeout=600)
         self.task_id = task_id
         self.user_id = user_id
+        self.back = back
         for action in actions:
             label, style = PANEL_BUTTONS[action]
             button = discord.ui.Button(label=label, style=style)
             button.callback = self.make_callback(action)
             self.add_item(button)
+        if back:
+            self.add_item(BackButton(back))
 
     def make_callback(self, action: str):
         async def callback(interaction: discord.Interaction) -> None:
-            if action == "due":
+            if action in ("due", "talk", "return", "keep"):  # 입력 창이 필요한 버튼
                 task = await asyncio.to_thread(task_card, self.task_id)
-                await interaction.response.send_modal(DueModal(task, self.user_id, today_kst()))
+                modal = {"due": DueModal, "talk": TalkModal, "return": ReturnModal, "keep": KeepModal}[action]
+                window = modal(task, self.user_id, today_kst())
+                window.back = self.back
+                await interaction.response.send_modal(window)
             elif action == "cancel":  # 한 번 더 물어요 (이 창 안에서만, 채널 메시지는 그대로)
                 await interaction.response.edit_message(
                     content="**정말 이 요청을 취소할까요?** 취소해도 나중에 되돌릴 수 있어요.",
-                    view=ConfirmCancelView(self.task_id, self.user_id),
+                    view=ConfirmCancelView(self.task_id, self.user_id, self.back),
                 )
             elif action == "done":
-                await run_and_refresh(interaction, close_task, self.user_id, self.task_id, "done")
+                await run_and_refresh(interaction, close_task, self.user_id, self.task_id, "done", back=self.back)
             elif action == "reopen":
-                await run_and_refresh(interaction, reopen_task, self.user_id, self.task_id)
+                await run_and_refresh(interaction, reopen_task, self.user_id, self.task_id, back=self.back)
 
         return callback
 
@@ -281,22 +374,119 @@ class PanelView(discord.ui.View):
 class ConfirmCancelView(discord.ui.View):
     """요청 취소 확인: [네, 취소할게요] [아니요]. 이 창도 나에게만 보여요."""
 
-    def __init__(self, task_id: int, user_id: int) -> None:
+    def __init__(self, task_id: int, user_id: int, back: dict | None = None) -> None:
         super().__init__(timeout=600)
         self.task_id = task_id
         self.user_id = user_id
+        self.back = back
 
     @discord.ui.button(label="네, 취소할게요", style=discord.ButtonStyle.danger)
     async def yes(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
-        await run_and_refresh(interaction, close_task, self.user_id, self.task_id, "canceled")
+        await run_and_refresh(interaction, close_task, self.user_id, self.task_id, "canceled", back=self.back)
 
     @discord.ui.button(label="아니요", style=discord.ButtonStyle.secondary)
     async def no(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
         task = await asyncio.to_thread(task_card, self.task_id)
         text, actions = panel(task, self.user_id)
         await interaction.response.edit_message(
-            content=text, view=PanelView(self.task_id, self.user_id, actions)
+            content=text, view=PanelView(self.task_id, self.user_id, actions, self.back)
         )
+
+
+# ---------------------------------------------------------------------------
+# /받은요청 · /보낸요청 목록: 드롭다운에서 고르면 같은 메시지가 그 요청의 패널로 바뀌어요 (스크롤 없이 처리)
+# ---------------------------------------------------------------------------
+
+SELECT_LIMIT = 25  # 디스코드 드롭다운에 넣을 수 있는 최대 개수
+
+
+def select_options(sections: list[tuple[str, list[dict]]]) -> list[discord.SelectOption]:
+    """목록 묶음 순서 그대로(내가 답할 것 → 진행 중 → 최근 완료) 드롭다운 항목을 만들어요. 최대 25개."""
+    options = []
+    for name, rows in sections:
+        for row in rows:
+            if len(options) == SELECT_LIMIT:
+                return options
+            content = row["content"].replace("\n", " ")
+            flag = {"due_talk": "🗓 기한 수정 요청", "returned": "↩️ 다시 요청됨"}.get(row["flag"], name)
+            # 드롭다운에는 디스코드 시간 표시(<t:…>)가 안 보여서 날짜 글자만 써요
+            due = f"{short_day(row['closed_on'])} 완료" if row["status"] == "done" else day_text(row["due_date"])
+            options.append(
+                discord.SelectOption(
+                    label=content[:95] + ("…" if len(content) > 95 else ""),
+                    value=str(row["task_id"]),
+                    description=f"{due} · {flag}"[:100],
+                )
+            )
+    return options
+
+
+def list_message(back: dict) -> tuple[str, list[discord.SelectOption]]:
+    """목록 글 + 드롭다운 항목 (DB를 읽어서 asyncio.to_thread 로 불러요). back: collaboration_id · user_id · direction · channel_id
+
+    드롭다운 창(ListView)은 여기서 만들지 않아요. 디스코드 창(View)은 봇의 이벤트 루프 안에서 만들어야
+    누른 걸 받을 수 있어서, 부르는 쪽(list_view)이 루프 안에서 만들어요.
+    """
+    rows = my_tasks(back["collaboration_id"], back["user_id"], back["direction"])
+    sections = list_sections(rows, back["direction"])
+    title = "📥 **받은 요청**" if back["direction"] == "in" else "📤 **보낸 요청**"
+    text = task_list_text(
+        title,
+        sections,
+        channel_url(str(back["channel_id"])),
+        f"{FRONTEND_URL}/workspace/{back['collaboration_id']}",
+    )
+    return text, select_options(sections)
+
+
+async def list_view(back: dict) -> tuple[str, discord.ui.View | None]:
+    """목록 글 + [처리할 요청 고르기 ▾] 창. 요청이 없으면 창 없이 글만."""
+    text, options = await asyncio.to_thread(list_message, back)
+    return text, (ListView(options, back) if options else None)
+
+
+class ListView(discord.ui.View):
+    """목록 아래 [처리할 요청 고르기 ▾]. 고르면 이 메시지가 그 요청의 패널로 바뀌어요."""
+
+    def __init__(self, options: list[discord.SelectOption], back: dict) -> None:
+        super().__init__(timeout=600)  # 10분 지나면 꺼져요 (명령어를 다시 치면 돼요)
+        self.back = back
+        picker = discord.ui.Select(placeholder="처리할 요청 고르기", options=options, min_values=1, max_values=1)
+        picker.callback = self.picked
+        self.picker = picker
+        self.add_item(picker)
+
+    async def picked(self, interaction: discord.Interaction) -> None:
+        task_id = int(self.picker.values[0])
+        task = await asyncio.to_thread(task_card, task_id)
+        if task is None:
+            await interaction.response.edit_message(content="요청을 찾을 수 없어요.", view=back_view(self.back))
+            return
+        text, actions = panel(task, self.back["user_id"])
+        await interaction.response.edit_message(
+            content=text, view=PanelView(task_id, self.back["user_id"], actions, self.back)
+        )
+
+
+class BackButton(discord.ui.Button):
+    """[← 목록으로]: 이 메시지를 다시 목록으로 (지금 상태로 새로 읽어요)"""
+
+    def __init__(self, back: dict) -> None:
+        super().__init__(label="← 목록으로", style=discord.ButtonStyle.secondary)
+        self.back = back
+
+    async def callback(self, interaction: discord.Interaction) -> None:
+        text, view = await list_view(self.back)
+        await interaction.response.edit_message(content=text, view=view)
+
+
+def back_view(back: dict | None) -> discord.ui.View | None:
+    """처리 결과 아래에 붙일 [← 목록으로]. 목록에서 연 게 아니면 None (버튼 없음)"""
+    if not back:
+        return None
+    view = discord.ui.View(timeout=600)
+    view.add_item(BackButton(back))
+    return view
 
 
 DONE_TEXT = {
@@ -306,20 +496,29 @@ DONE_TEXT = {
 }
 
 
-async def run_and_refresh(interaction: discord.Interaction, action, *args) -> None:
-    """저장(웹과 같은 함수) → 채널 메시지 고치기 → 내 창에 결과. 안 되면 내 창에 이유만 보여요."""
-    try:
-        await asyncio.to_thread(action, *args)
-    except HTTPException as error:
-        await interaction.response.edit_message(content=f"⚠️ {error.detail}", view=None)
-        return
-    task = await refresh_message(interaction.client, args[1])
-    await interaction.response.edit_message(content=DONE_TEXT[task["status"]], view=None)
-    await asyncio.to_thread(sync_google_by_id, args[1])
-    # 완료는 메시지를 고치기만 하면 알림이 안 가서, 보낸 사람을 불러 한 줄 남겨요
-    if task["status"] == "done":
-        await interaction.channel.send(done_line(task), allowed_mentions=MENTION_USERS)
+async def run_and_refresh(
+    interaction: discord.Interaction, action, user_id: int, task_id: int, *args, back: dict | None = None
+) -> None:
+    """저장(웹과 같은 함수, 기록은 source="discord") → 채널 메시지 고치기 → 내 창에 결과. 안 되면 내 창에 이유만.
 
+    back: 목록(/받은요청 · /보낸요청)에서 열었으면 결과 아래에 [← 목록으로]를 붙여요
+    """
+    try:
+        await asyncio.to_thread(lambda: action(user_id, task_id, *args, source="discord"))
+    except HTTPException as error:
+        await interaction.response.edit_message(content=f"⚠️ {error.detail}", view=back_view(back))
+        return
+    task = await refresh_message(interaction.client, task_id)
+    await interaction.response.edit_message(content=DONE_TEXT[task["status"]], view=back_view(back))
+    await asyncio.to_thread(sync_google_by_id, task_id)
+    # 메시지를 고치기만 하면 알림이 안 가서, 상대를 불러 새 메시지로 한 줄 남겨요 (휴대폰 푸시)
+    if task["status"] == "done":
+        line = done_line(task)  # → 보낸 사람
+    elif task["status"] == "canceled":
+        line = cancel_line(task)  # → 받은 사람
+    else:  # 되돌리기 → 상대
+        line = reopen_line(task, by_requester=user_id == task["requested_by"])
+    await interaction.channel.send(line, allowed_mentions=MENTION_USERS)
 
 def due_help(today: date, end: date) -> str:
     return f"이렇게 적어 주세요: {DUE_EXAMPLES}\n(오늘 {short_day(today)} ~ 협업 종료일 {short_day(end)} 사이 · 비우면 기한 없음)"
@@ -327,7 +526,7 @@ def due_help(today: date, end: date) -> str:
 
 class DueModal(discord.ui.Modal, title="기한 변경"):
     """보낸 사람의 [기한 변경] 창. 지금 기한을 미리 채워 두고, 비우면 기한 없음."""
-
+    back: dict | None = None
     due = discord.ui.TextInput(label="새 기한", required=False, max_length=20)
 
     def __init__(self, task: dict, user_id: int, today: date) -> None:
@@ -335,31 +534,34 @@ class DueModal(discord.ui.Modal, title="기한 변경"):
         self.task = task  # task_card 결과
         self.user_id = user_id
         self.due.placeholder = f"예: {DUE_EXAMPLES} · 비우면 기한 없음"[:100]
-        self.due.default = short_day(task["due_date"])
+        asked = task.get("talk_due") if task.get("flag") == "due_talk" else None
+        self.due.default = short_day(asked or task["due_date"])
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
         today = today_kst()
         task_id = self.task["task_id"]
         try:
             due = parse_due(self.due.value, today)
-            result = await asyncio.to_thread(change_due, self.user_id, task_id, due)
+            result = await asyncio.to_thread(
+                lambda: change_due(self.user_id, task_id, due, source="discord")
+            )
         except DueError:
             await interaction.response.edit_message(
                 content=f'⚠️ "{self.due.value}" 을(를) 날짜로 읽지 못했어요. 기한은 그대로예요.\n'
                 + due_help(today, self.task["end_date"]),
-                view=None,
+                view=back_view(self.back),
             )
             return
         except HTTPException as error:
-            await interaction.response.edit_message(content=f"⚠️ {error.detail}", view=None)
+            await interaction.response.edit_message(content=f"⚠️ {error.detail}", view=back_view(self.back))
             return
 
         task = await refresh_message(interaction.client, task_id)
         if result["old_due"] == due:
-            await interaction.response.edit_message(content="기한이 그대로예요.", view=None)
+            await interaction.response.edit_message(content="기한이 그대로예요.", view=back_view(self.back))
             return
         await interaction.response.edit_message(
-            content=f"📅 기한을 **{day_text(due)}** 로 바꿨어요.", view=None
+            content=f"📅 기한을 **{day_text(due)}** 로 바꿨어요.", view=back_view(self.back)
         )
         await asyncio.to_thread(sync_google_by_id, task_id)
         # 채널 메시지를 고치기만 하면 알림이 안 가서, 받은 사람을 불러 한 줄 남겨요
@@ -367,6 +569,130 @@ class DueModal(discord.ui.Modal, title="기한 변경"):
             due_line(task, result["old_due"]), allowed_mentions=MENTION_USERS
         )
 
+class KeepModal(discord.ui.Modal, title="지금 기한 유지"):
+    """보낸 사람이 기한 수정 요청에 "지금 기한 그대로 갈게요"로 답하는 창. 이유는 선택."""
+    back: dict | None = None  # 목록에서 열었으면 결과 아래 [← 목록으로]
+    note = discord.ui.TextInput(
+        label="이유 (선택)",
+        style=discord.TextStyle.paragraph,
+        placeholder="예: 11.10 회의 전에 꼭 필요해요",
+        required=False,
+        max_length=rules.MAX_TASK_NOTE,
+    )
+
+    def __init__(self, task: dict, user_id: int, today: date) -> None:
+        super().__init__()
+        self.task = task
+        self.user_id = user_id
+
+    async def on_submit(self, interaction: discord.Interaction) -> None:
+        task_id = self.task["task_id"]
+        try:
+            body = rules.KeepInput(note=self.note.value)
+            await asyncio.to_thread(lambda: keep_due(self.user_id, task_id, body, source="discord"))
+        except HTTPException as error:
+            await interaction.response.edit_message(content=f"⚠️ {error.detail}", view=back_view(self.back))
+            return
+        await interaction.response.edit_message(
+            content=f"📌 지금 기한({day_text(self.task['due_date'])})을 유지해요. {self.task['assignee_nickname']} 님에게 알렸어요.",
+            view=back_view(self.back),
+        )
+        event = await asyncio.to_thread(last_event, task_id, "due_kept")
+        await interaction.channel.send(keep_line(self.task, event), allowed_mentions=MENTION_USERS)
+
+class TalkModal(discord.ui.Modal, title="기한 얘기하기"):
+    """받은 사람의 [기한 얘기하기] 창: 원하는 기한(선택) + 이유(필수). 기한은 바뀌지 않고, 보낸 사람을 불러요."""
+    back: dict | None = None  # 목록에서 열었으면 결과 아래 [← 목록으로]
+    due = discord.ui.TextInput(label="원하는 기한 (비우면 '지금 기한으로는 어려워요')", required=False, max_length=20)
+    note = discord.ui.TextInput(
+        label="이유",
+        style=discord.TextStyle.paragraph,
+        placeholder="예: 샘플 사진까지 같이 보려면 시간이 더 필요해요",
+        max_length=rules.MAX_TASK_NOTE,
+    )
+
+    def __init__(self, task: dict, user_id: int, today: date) -> None:
+        super().__init__()
+        self.task = task  # task_card 결과
+        self.user_id = user_id
+        self.due.placeholder = f"예: {DUE_EXAMPLES}"[:100]
+
+    async def on_submit(self, interaction: discord.Interaction) -> None:
+        today = today_kst()
+        task_id = self.task["task_id"]
+        try:
+            due = parse_due(self.due.value, today)
+            body = rules.TalkInput(due_date=due, note=self.note.value)
+            await asyncio.to_thread(lambda: talk_due(self.user_id, task_id, body, source="discord"))
+        except DueError:
+            await interaction.response.edit_message(
+                content=f'⚠️ "{self.due.value}" 을(를) 날짜로 읽지 못했어요. 보내지 않았어요.\n'
+                + due_help(today, self.task["end_date"]),
+                view=back_view(self.back),
+            )
+            return
+        except HTTPException as error:
+            await interaction.response.edit_message(content=f"⚠️ {error.detail}. 보내지 않았어요.", view=back_view(self.back))
+            return
+
+        await interaction.response.edit_message(
+            content=f"🗓 {self.task['requested_by_nickname']} 님에게 기한 수정을 요청했어요. 답이 오면 알려 드려요.",
+            view=back_view(self.back),
+        )
+        event = await asyncio.to_thread(last_event, task_id, "due_talk")
+        # 새 메시지라 보낸 사람에게 멘션 알림이 가요
+        await interaction.channel.send(talk_line(self.task, event), allowed_mentions=MENTION_USERS)
+
+
+class ReturnModal(discord.ui.Modal, title="다시 요청"):
+    """보낸 사람의 [다시 요청] 창: 부족한 점(필수) + 새 기한(선택, 비우면 원래 기한). 완료 → 다시 진행 중"""
+    back: dict | None = None  # 목록에서 열었으면 결과 아래 [← 목록으로]
+    note = discord.ui.TextInput(
+        label="무엇이 부족한가요",
+        style=discord.TextStyle.paragraph,
+        placeholder="예: 날짜 칸 형식이 아직 섞여 있어요",
+        max_length=rules.MAX_TASK_NOTE,
+    )
+    due = discord.ui.TextInput(label="새 기한 (비우면 원래 기한)", required=False, max_length=20)
+
+    def __init__(self, task: dict, user_id: int, today: date) -> None:
+        super().__init__()
+        self.task = task
+        self.user_id = user_id
+        old = task["due_date"]
+        self.due.placeholder = (
+            f"원래 기한 {short_day(old)}이 지났어요. 새 기한을 꼭 적어 주세요"
+            if old and old < today
+            else f"예: {DUE_EXAMPLES}"
+        )[:100]
+
+    async def on_submit(self, interaction: discord.Interaction) -> None:
+        today = today_kst()
+        task_id = self.task["task_id"]
+        try:
+            due = parse_due(self.due.value, today)
+            body = rules.ReturnInput(note=self.note.value, due_date=due)
+            await asyncio.to_thread(lambda: return_task(self.user_id, task_id, body, source="discord"))
+        except DueError:
+            await interaction.response.edit_message(
+                content=f'⚠️ "{self.due.value}" 을(를) 날짜로 읽지 못했어요. 다시 요청하지 않았어요.\n'
+                + due_help(today, self.task["end_date"]),
+                view=back_view(self.back),
+            )
+            return
+        except HTTPException as error:
+            await interaction.response.edit_message(
+                content=f"⚠️ {error.detail}. 다시 요청하지 않았어요.", view=back_view(self.back)
+            )
+            return
+
+        task = await refresh_message(interaction.client, task_id)
+        await interaction.response.edit_message(
+            content=f"↩️ 다시 요청했어요. {task['assignee_nickname']} 님에게 알렸어요.", view=back_view(self.back)
+        )
+        await asyncio.to_thread(sync_google_by_id, task_id)
+        event = await asyncio.to_thread(last_event, task_id, "returned")
+        await interaction.channel.send(return_line(task, event), allowed_mentions=MENTION_USERS)
 
 class TaskModal(discord.ui.Modal, title="요청 남기기"):
     """/요청 을 치면 뜨는 창: 요청 내용(필수) + 기한(선택, 비우면 기한 없음)"""
@@ -452,6 +778,32 @@ def add_commands(tree: app_commands.CommandTree, guild: discord.Object) -> None:
             await interaction.response.send_message(NOT_COLLAB_CHANNEL, ephemeral=True)
             return
         await interaction.response.send_modal(TaskModal(member))
+        
+    async def send_list(interaction: discord.Interaction, direction: str) -> None:
+        """나에게만 보이는 요청 목록. 제목 = 채널 요청 메시지 링크 (누르면 그 메시지로 이동)"""
+        member = await asyncio.to_thread(find_member, interaction.channel_id, interaction.user.id)
+        if member is None:
+            await interaction.response.send_message(NOT_COLLAB_CHANNEL, ephemeral=True)
+            return
+        back = {
+            "collaboration_id": member["collaboration_id"],
+            "user_id": member["user_id"],
+            "direction": direction,
+            "channel_id": interaction.channel_id,
+        }
+        text, view = await list_view(back)
+        kwargs = {"view": view} if view else {}
+        await interaction.response.send_message(
+            text, ephemeral=True, suppress_embeds=True, allowed_mentions=discord.AllowedMentions.none(), **kwargs
+        )
+
+    @tree.command(name="받은요청", description="이 협업에서 내가 받은 요청 보기 (나에게만 보여요)", guild=guild)
+    async def received_command(interaction: discord.Interaction) -> None:
+        await send_list(interaction, "in")
+
+    @tree.command(name="보낸요청", description="이 협업에서 내가 보낸 요청 보기 (나에게만 보여요)", guild=guild)
+    async def sent_command(interaction: discord.Interaction) -> None:
+        await send_list(interaction, "out")
 
 
 def main() -> None:
