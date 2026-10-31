@@ -256,12 +256,16 @@ def report_review(user_id: int, review_id: int, reason: str, description: str) -
             """
             SELECT v.reviewer_id FROM collaboration_review v
             JOIN collaboration c ON c.collaboration_id=v.collaboration_id
-            JOIN expert e ON e.user_id=v.reviewee_id
-            JOIN users u ON u.user_id=e.user_id
-            WHERE v.review_id=%s AND v.reviewer_side='researcher'
-              AND v.visibility='visible' AND c.status='done'
-              AND c.ended_at <= now()-interval '7 days' AND e.is_public=TRUE AND u.status='active'
-            """, (review_id,),
+            LEFT JOIN expert e ON e.user_id=v.reviewee_id
+            LEFT JOIN users u ON u.user_id=e.user_id
+            WHERE v.review_id=%s AND v.visibility='visible'
+              AND c.ended_at <= now()-interval '7 days'
+              AND (
+                (v.reviewer_side='researcher' AND c.status='done'
+                  AND e.is_public=TRUE AND u.status='active')
+                OR (v.reviewee_id=%s AND c.status IN ('done','ended_early'))
+              )
+            """, (review_id,user_id),
         )
         row = cursor.fetchone()
         if not row:
