@@ -10,7 +10,7 @@ import { PageContainer } from "@/components/page-container";
 import { Avatar } from "@/components/request-parts";
 import { ApiError, requestApi } from "@/lib/api";
 import { photoOrDefault } from "@/lib/collab-requests";
-import { buildNames, countByCategory, dayAfter, monthDay, periodLabel, type ExpertCollaboration, type ExpertPublicProfile, type Names } from "@/lib/expert-search";
+import { buildNames, countByCategory, monthDay, periodLabel, type ExpertCollaboration, type ExpertPublicProfile, type Names } from "@/lib/expert-search";
 import { CAREER_LABELS, formatMonth, MEETING_LABELS, REWARD_LABELS, TIME_LABELS, type AbleWorkOption, type FieldCategory } from "@/lib/my-career";
 
 type Role = "researcher" | "expert" | null; // null = 로그인 안 했거나 유형 미선택
@@ -18,7 +18,7 @@ type Tab = "work" | "portfolio" | "history";
 
 const DONUT_COLORS = ["#4f7bea", "#22a699", "#f5a524", "#c2508a", "#8c94ab"]; // 도넛·범례 색 (분야 순서대로)
 
-/** AI 전문가 상세. 탭은 [연구 · 평가 · 포트폴리오] / [경력 · 학력 · 자격증] 두 개예요. */
+/** 공개 전문가 상세. 협업·평가 / 포트폴리오 / 경력 탭과 요청 CTA를 제공합니다. */
 export function ExpertProfileView({ expertId }: { expertId: string }) {
   const searchParams = useSearchParams();
   const backHref = safeExpertBackHref(searchParams.get("from"));
@@ -415,7 +415,7 @@ function Donut({ total, counts }: { total: number; counts: number[] }) {
   const sum = counts.reduce((a, b) => a + b, 0) || 1;
   let offset = 0;
   return (
-    <div className="relative size-[104px] shrink-0">
+    <div role="img" aria-label={`완료 협업 ${total}건의 연구 분야별 구성`} className="relative size-[104px] shrink-0">
       <svg viewBox="0 0 104 104" className="size-full -rotate-90">
         {counts.map((count, index) => {
           const part = (count / sum) * length;
@@ -487,6 +487,17 @@ function TabButton({ active, onClick, children, panelId, tabId }: { active: bool
       aria-selected={active}
       tabIndex={active ? 0 : -1}
       onClick={onClick}
+      onKeyDown={(event) => {
+        if (!["ArrowRight", "ArrowLeft", "Home", "End"].includes(event.key)) return;
+        const tabs = Array.from(event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]') ?? []);
+        if (!tabs.length) return;
+        const index = tabs.indexOf(event.currentTarget);
+        const next = event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1
+          : (index + (event.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length;
+        event.preventDefault();
+        tabs[next]?.focus();
+        tabs[next]?.click();
+      }}
       className={`-mb-px shrink-0 border-b-2 px-1 pb-3 text-[13px] leading-5 transition-colors lg:text-[14px] lg:leading-[22px] ${active ? "border-[#4b3fd6] font-bold text-[#3d33b8]" : "border-transparent font-medium text-[#8c94ab] hover:text-[#5e6678]"}`}
     >
       {children}
