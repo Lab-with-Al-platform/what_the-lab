@@ -57,12 +57,12 @@ def my_review_opportunities(user_id: int = Depends(get_current_user_id)) -> list
 
 @router.get("/reputation")
 def list_public_reputation(
-    ids: str = Query("", max_length=700),
+    ids: str = Query("", max_length=1300),
 ) -> dict[str, dict]:
     """Batched public reputation snapshots for cards (no per-card N+1)."""
     if not ids:
         return {}
-    if len(ids) > 700:
+    if len(ids) > 1300:
         raise HTTPException(422, "전문가 ID 목록이 너무 깁니다.")
     values = ids.split(",")
     if len(values) > 60 or any(not value.isascii() or not value.isdecimal() for value in values):
