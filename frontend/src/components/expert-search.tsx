@@ -253,6 +253,17 @@ export function ExpertSearch() {
         </div>
         <fieldset className="mt-3 space-y-1.5">
           <legend className="sr-only">수행 기술 필터</legend>
+          <label className={"flex min-h-9 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] transition-colors " + (works.length === 0 ? "bg-[#eef1ff] font-semibold text-[#354d9e]" : "text-muted hover:bg-page")}>
+            <input
+              type="checkbox"
+              checked={works.length === 0}
+              onChange={() => { setWorks([]); setApplied(null); }}
+              aria-label="모든 수행 기술 보기 (필터 해제)"
+              className="size-4 shrink-0 accent-[#405dc3]"
+            />
+            <span>전체 기술</span>
+            <span className="ml-auto text-[10px] text-faint">전체 보기</span>
+          </label>
           {visibleWorks.map((item) => (
             <label key={item.able_work_id} className={"flex min-h-9 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] transition-colors " + (works.includes(item.able_work_id) ? "bg-[#eef1ff] font-semibold text-[#354d9e]" : "text-muted hover:bg-page")}>
               <input type="checkbox" checked={works.includes(item.able_work_id)} onChange={() => toggleWork(item.able_work_id)} className="size-4 shrink-0 accent-[#405dc3]" />
