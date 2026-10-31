@@ -157,8 +157,8 @@ export function LabTrustIndicator({
       {variant === "profile" && (
         <div className="relative mt-4 border-t border-[#e4ecf3] pt-3">
           <p className="text-[11px] leading-[19px] text-[#64768e]">
-            단순 접속·응답 속도가 아닌, <strong className="text-[#3d587a]">실제로 완료한 연구 협업의 연구자 평가</strong>로 계산해요.
-            신원·자격증 인증이나 협업 성공 보장을 의미하지 않습니다.
+            단순 접속·응답 속도가 아닌, <strong className="text-[#3d587a]">플랫폼상 정상 종료된 협업의 연구회원 평가</strong>로 계산해요.
+            종료 상태는 일정 기준으로 자동 확정될 수 있어, 신원·자격증·연구 결과물의 외부 검증이나 협업 성공 보장을 의미하지 않습니다.
           </p>
           <details className="group mt-3 rounded-xl bg-white/80 px-3 py-3 text-[11px] text-[#536783] open:ring-1 open:ring-[#d6e3f3]">
             <summary className="cursor-pointer font-bold text-[#496ca3] focus-visible:rounded focus-visible:outline-2 focus-visible:outline-[#5d80cd]">
@@ -172,6 +172,7 @@ export function LabTrustIndicator({
               <p>신규 회원이나 평가가 부족한 회원을 0점으로 취급하지 않고, 검색 순위에도 이 점수를 사용하지 않습니다.</p>
             </div>
           </details>
+          <a href="/faq#lab-trust" className="mt-2 inline-flex min-h-9 items-center text-[11px] font-semibold text-[#466bae] underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-[#5d80cd]">LAB TRUST 자주 묻는 질문 보기</a>
         </div>
       )}
     </section>
