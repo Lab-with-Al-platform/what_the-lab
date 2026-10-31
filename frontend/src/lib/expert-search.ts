@@ -28,7 +28,8 @@ export type ExpertCollaboration = {
   end_date: string; // 희망 종료일 YYYY-MM-DD
   ongoing: boolean; // 종료일이 아직 안 지났으면 true (진행 중)
   title: string; // 연구 제목
-  partner_nickname: string; // 함께한 연구회원 닉네임
+  partner_nickname: string | null; // 공개 동의 전에는 제공되지 않음
+  private?: boolean; // 해당 연구·연구회원 식별 정보를 비공개로 처리 // 함께한 연구회원 닉네임
   category_ids: string[]; // 연구 분야 대분류 ID (F01~F10)
   able_work_ids: string[]; // 연구에서 맡긴 일 UG ID
 };
