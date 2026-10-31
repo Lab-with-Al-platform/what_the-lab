@@ -10,6 +10,8 @@ export type ExpertListContext = {
   shown: number;
   focus?: number;
   researchId?: number | null;
+  engagement?: "all" | "idle" | "engaged";
+  sort?: "relevance" | "newest";
 };
 
 export function restoredExpertCount(raw: string | null): number {
@@ -23,6 +25,8 @@ export function expertListHref(context: ExpertListContext): string {
   if (q) params.set("q", q);
   if (context.works.length) params.set("works", context.works.join(",").slice(0, 200));
   if (context.fields.length) params.set("fields", context.fields.join(",").slice(0, 200));
+  if (context.engagement && context.engagement !== "all") params.set("engagement", context.engagement);
+  if (context.sort && context.sort !== "relevance") params.set("sort", context.sort);
   if (context.shown > 6) params.set("shown", String(restoredExpertCount(String(context.shown))));
   if (context.focus && Number.isSafeInteger(context.focus) && context.focus > 0) {
     params.set("focus", String(context.focus));
@@ -48,7 +52,10 @@ export function safeExpertBackHref(from?: string | string[] | null): string {
     const focus = focusRaw && /^\d{1,12}$/.test(focusRaw) ? Number(focusRaw) : undefined;
     const researchRaw = target.searchParams.get("research");
     const researchId = researchRaw && /^\d{1,12}$/.test(researchRaw) ? Number(researchRaw) : undefined;
-    return expertListHref({query,works,fields,shown,focus,researchId});
+    const engagementRaw = target.searchParams.get("engagement");
+    const engagement = engagementRaw === "idle" || engagementRaw === "engaged" ? engagementRaw : "all";
+    const sort = target.searchParams.get("sort") === "newest" ? "newest" : "relevance";
+    return expertListHref({query,works,fields,shown,focus,researchId,engagement,sort});
   } catch {
     return "/experts";
   }
