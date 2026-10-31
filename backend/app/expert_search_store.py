@@ -210,50 +210,63 @@ def load_engagement(user_id: int) -> dict:
     return {"engaged": row is not None, "engaged_until": row["engaged_until"] if row else None}
 
 def load_collaborations(user_id: int) -> list[dict]:
-    """이 서비스에서 진행한 연구 (협업을 시작한 요청). 최근에 시작한 것부터.
+    """Public, consent-safe history of completed collaborations.
 
-    title: 연구 제목 / partner_nickname: 함께한 연구회원 닉네임
-    ongoing: 희망 종료일이 아직 안 지났으면 True (진행 중)
+    The internal workspace is the source of truth for completed work, not the
+    collaboration_request's 'started' status (which persists after completion).
+    Research names, researchers' identities, schedules, and agreement details
+    must never leave this public endpoint without explicit bilateral consent.
+    Only broad field categories and the expert's performed work codes are shown.
     """
     with get_connection() as conn, conn.cursor() as cursor:
         cursor.execute(
             """
-            SELECT cr.research_id,
-                   COALESCE(cr.accepted_start_date, cr.start_date) AS start_date,
-                   COALESCE(cr.accepted_end_date, cr.end_date) AS end_date, r.title,
-                   u.nickname AS partner_nickname,
-                   (COALESCE(cr.accepted_end_date, cr.end_date) >= CURRENT_DATE) AS ongoing
-            FROM collaboration_request cr
-            JOIN research r ON r.research_id = cr.research_id
-            JOIN users u ON u.user_id = r.user_id
-            WHERE cr.expert_id = %s AND cr.status = 'started'
-            ORDER BY 2 DESC, cr.request_id DESC
+            SELECT c.collaboration_id, c.start_date, c.end_date,
+                   COALESCE(c.agreement -> 'field_ids', '[]'::jsonb) AS field_ids,
+                   COALESCE(c.agreement -> 'able_work_ids', '[]'::jsonb) AS work_ids
+            FROM collaboration c
+            WHERE c.expert_id = %s AND c.status = 'done'
+            ORDER BY c.end_date DESC, c.collaboration_id DESC
+            LIMIT 50
             """,
             (user_id,),
         )
         rows = cursor.fetchall()
-        ids = [row["research_id"] for row in rows]
-        categories: dict[int, list[str]] = {}
-        works: dict[int, list[str]] = {}
-        if ids:
+        field_ids = sorted({
+            field_id
+            for row in rows
+            for field_id in (row["field_ids"] or [])
+            if isinstance(field_id, str)
+        })
+        categories: dict[str, str] = {}
+        if field_ids:
             cursor.execute(
-                "SELECT DISTINCT d.research_id, f.field_category_id FROM research_domain d"
-                " JOIN research_field f ON f.field_id = d.field_id WHERE d.research_id = ANY(%s)"
-                " ORDER BY f.field_category_id",
-                (ids,),
+                "SELECT field_id, field_category_id FROM research_field"
+                " WHERE field_id = ANY(%s)",
+                (field_ids,),
             )
-            for row in cursor.fetchall():
-                categories.setdefault(row["research_id"], []).append(row["field_category_id"])
-            cursor.execute(
-                "SELECT research_id, able_work_id FROM research_able_work"
-                " WHERE research_id = ANY(%s) ORDER BY research_able_work_id",
-                (ids,),
-            )
-            for row in cursor.fetchall():
-                works.setdefault(row["research_id"], []).append(row["able_work_id"])
+            categories = {
+                row["field_id"]: row["field_category_id"]
+                for row in cursor.fetchall()
+            }
 
-    for row in rows:
-        research_id = row.pop("research_id")
-        row["category_ids"] = categories.get(research_id, [])
-        row["able_work_ids"] = works.get(research_id, [])
-    return rows
+    return [
+        {
+            "start_date": row["start_date"],
+            "end_date": row["end_date"],
+            "ongoing": False,
+            "title": "완료한 협업 연구",
+            "partner_nickname": None,
+            "private": True,
+            "category_ids": sorted({
+                categories[field_id]
+                for field_id in (row["field_ids"] or [])
+                if isinstance(field_id, str) and field_id in categories
+            }),
+            "able_work_ids": [
+                work_id for work_id in (row["work_ids"] or [])
+                if isinstance(work_id, str) and work_id.startswith("UG")
+            ],
+        }
+        for row in rows
+    ]
