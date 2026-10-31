@@ -561,7 +561,7 @@ function ProfilePortrait({ expert, featured = false }: { expert: ExpertCardData;
       src={photoOrDefault(expert.user_photo, "expert")}
       alt=""
       loading="lazy"
-      className={featured ? "h-[142px] w-[132px] rounded-xl bg-page object-cover sm:h-[160px] sm:w-[152px]" : "size-[65px] rounded-xl bg-page object-cover"}
+      className={featured ? "size-[92px] shrink-0 rounded-xl bg-page object-cover sm:size-[104px]" : "size-[65px] rounded-xl bg-page object-cover"}
     />
   );
 }
@@ -581,35 +581,42 @@ function FeaturedExpert({ expert, names, interest, returnHref, reputation }: { e
   const reason = interest ? expertReason(expert, interest, names) : null;
   const href = "/experts/" + expert.user_id + "?from=" + encodeURIComponent(returnHref);
   return (
-    <article className="flex flex-col gap-3.5 rounded-xl border border-[#e1e6f4] bg-white p-3 shadow-[0_4px_18px_rgba(20,43,89,0.06)] sm:flex-row sm:items-center sm:gap-4 sm:p-3.5">
-      <div className="relative flex shrink-0 items-center justify-center self-start rounded-xl bg-[#f1f4fb] sm:block sm:self-center">
+    <article className="grid grid-cols-[92px_minmax(0,1fr)] items-start gap-x-3 gap-y-3 rounded-xl border border-[#e1e6f4] bg-white p-3 shadow-[0_4px_18px_rgba(20,43,89,0.06)] sm:grid-cols-[104px_minmax(0,1fr)] sm:gap-4 sm:p-3.5 lg:grid-cols-[104px_minmax(0,1fr)_228px] lg:items-center">
+      <div className="relative self-start overflow-hidden rounded-xl bg-[#f1f4fb] lg:self-center">
         <ProfilePortrait expert={expert} featured />
-        <span className="absolute left-2 top-2 rounded-full bg-[#4f6ed1] px-2 py-1 text-[10px] font-bold text-white shadow-sm">추천</span>
+        <span className="absolute left-1.5 top-1.5 rounded-full bg-[#4f6ed1] px-2 py-1 text-[10px] font-bold text-white shadow-sm">추천</span>
       </div>
-      <div className="flex min-w-0 flex-1 flex-col justify-center py-1">
+      <div className="min-w-0 self-center lg:pr-1">
         <div className="flex flex-wrap items-center gap-2">
-          <h3 className="text-[17px] font-bold text-ink">{expert.nickname}</h3>
+          <h3 className="text-[16px] font-bold text-ink">{expert.nickname}</h3>
           <EngagementBadge engaged={expert.engaged} />
         </div>
-        <p className="mt-1 text-[12px] font-medium text-[#687b9c]">
+        <p className="mt-1 text-[12px] font-medium leading-5 text-[#687b9c]">
           {[expert.affiliation, expert.current_job ? JOB_LABELS[expert.current_job] : null, expert.ai_career ? "AI 경력 " + (CAREER_LABELS[expert.ai_career] ?? expert.ai_career) : null].filter(Boolean).join(" · ") || "AI 전문가"}
         </p>
-        <p className="mt-2 line-clamp-2 text-[13px] leading-6 text-muted">{expert.introduce || "프로필 소개를 확인해보세요."}</p>
-        {reason && <p className="mt-1 text-xs font-semibold text-[#4966b8]">{reason}</p>}
-        <ul aria-label="전문 분야 및 수행 기술" className="mt-3 flex flex-wrap gap-1.5">
-          {shown.map((tag, i) => <li key={tag + i} className="rounded-full bg-[#eef2ff] px-2.5 py-1 text-[11px] font-semibold text-[#506ba5]">{tag}</li>)}
-          {rest > 0 && <li className="rounded-full bg-page px-2.5 py-1 text-[11px] text-muted">+{rest}</li>}
+        <p className="mt-1.5 line-clamp-2 text-[12px] leading-5 text-muted">{expert.introduce || "프로필 소개를 확인해보세요."}</p>
+        {reason && <p className="mt-1 line-clamp-2 text-[11px] font-semibold text-[#4966b8]">{reason}</p>}
+        <ul aria-label="전문 분야 및 수행 기술" className="mt-2 flex flex-wrap gap-1.5">
+          {shown.map((tag, i) => <li key={tag + i} className="rounded-full bg-[#eef2ff] px-2.5 py-1 text-[10px] font-semibold text-[#506ba5]">{tag}</li>)}
+          {rest > 0 && <li className="rounded-full bg-page px-2.5 py-1 text-[10px] text-muted">+{rest}</li>}
         </ul>
       </div>
-      <div className="flex shrink-0 flex-col gap-2.5 rounded-xl bg-[#f6f8fd] p-3 sm:w-[234px] xl:w-[252px]">
-        <div>
+      <div className="col-span-2 grid min-w-0 grid-cols-1 gap-2 rounded-xl border border-[#e7edf8] bg-[#f7f9fe] p-2.5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center lg:col-span-1 lg:flex lg:flex-col lg:items-stretch">
+        <div className="min-w-0">
           <LabTrustIndicator snapshot={reputation} variant="compact" demoPreview={getLocalDemoFlaskPreview(expert)} />
-          <span className="mt-2 block text-[11px] font-semibold text-[#47618f]">현재 참여 상태</span>
-          <p className="mt-1 text-[12px] leading-5 text-muted">{engagedLabel(expert) || "진행 중인 협업 없음"}</p>
-          <p className="mt-1 text-[11px] leading-5 text-faint">요청 가능 여부는 상세 프로필에서 확인</p>
+          <p className="mt-1.5 text-[11px] leading-4 text-[#617393]">
+            <span className="font-bold text-[#4d648c]">현재 참여</span>
+            <span className="mx-1 text-[#a5b2c5]" aria-hidden="true">·</span>
+            {engagedLabel(expert) || "진행 중 협업 없음"}
+          </p>
         </div>
-        <Link id={"expert-profile-" + expert.user_id} href={href} className="inline-flex min-h-11 items-center justify-center rounded-lg bg-[#20396f] px-3 text-[12px] font-bold text-white transition-colors hover:bg-[#34548c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand">
-          프로필 보기 <span aria-hidden="true" className="ml-1">→</span>
+        <Link
+          id={"expert-profile-" + expert.user_id}
+          href={href}
+          className="group inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-lg bg-[#253e75] px-3.5 py-2 text-[12px] font-bold text-white transition-colors hover:bg-[#365695] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+        >
+          프로필 보기
+          <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">→</span>
         </Link>
       </div>
     </article>
@@ -642,9 +649,16 @@ function ExpertCard({ expert, names, interest, returnHref, reputation }: { exper
         {shown.map((tag, i) => <li key={tag + i} className="rounded-md bg-[#f1f4fa] px-2 py-1 text-[10px] font-medium text-[#60759d]">{tag}</li>)}
         {rest > 0 && <li className="rounded-md bg-page px-2 py-1 text-[10px] text-muted">+{rest}</li>}
       </ul>
-      <Link id={"expert-profile-" + expert.user_id} href={href} className="mt-auto inline-flex min-h-10 items-center justify-center rounded-lg border border-[#cbd5e7] bg-white px-3 pt-2 text-[12px] font-semibold text-[#263f79] transition-colors hover:border-[#7890cd] hover:bg-[#f4f7ff] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand">
-        프로필 보기 <span aria-hidden="true" className="ml-1">→</span>
-      </Link>
+      <div className="mt-auto border-t border-[#e9eef7] pt-3">
+        <Link
+          id={"expert-profile-" + expert.user_id}
+          href={href}
+          className="group ml-auto inline-flex min-h-9 items-center gap-2 rounded-lg px-2.5 py-1 text-[12px] font-bold text-[#325184] transition-colors hover:bg-[#f1f5fc] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+        >
+          프로필 보기
+          <span aria-hidden="true" className="grid size-7 shrink-0 place-items-center rounded-full bg-[#ebf1fb] text-[#4969a3] transition-transform group-hover:translate-x-0.5">→</span>
+        </Link>
+      </div>
     </article>
   );
 }
