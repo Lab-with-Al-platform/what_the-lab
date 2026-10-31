@@ -13,6 +13,7 @@ from datetime import UTC, datetime, timedelta
 from fastapi import HTTPException
 
 from app.db import get_connection, transaction
+from app.reputation_store import expert_reputation
 from app.workspace_store import complete_ended_collaborations
 
 SUBMIT_DAYS = 30
@@ -236,6 +237,7 @@ def public_expert_reviews(expert_id: int) -> dict:
     return {
         "count": summary["count"],
         "average": summary["average"],
+        "reputation": expert_reputation(expert_id),
         "criteria": {key: summary[key] for key in ("expertise","communication","timeliness","quality")},
         "reviews": [{**item, "author": "협업 연구회원"} for item in results],
         "policy": "정상 완료한 협업에서 제출한 검증된 연구자 평가입니다. 종료 후 7일이 지나 공개됩니다.",
