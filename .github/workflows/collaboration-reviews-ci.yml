@@ -57,6 +57,33 @@ jobs:
       - run: npm run lint
       - run: npm run build
 
+  review-postgres-schema:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci-review-test-only
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      PGPASSWORD: ci-review-test-only
+    steps:
+      - uses: actions/checkout@v4
+      - name: PostgreSQL schema fixture
+        run: psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f backend/tests/sql/review_schema_smoke.sql
+      - name: Execute production review DDL in PostgreSQL 17
+        run: psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f backend/migrations/sql/20261031_21/001_create_collaboration_reviews.sql
+      - name: Verify integrity, unique reviewer and immutable RLS boundaries
+        run: psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f backend/tests/sql/review_schema_assertions.sql
+
   backend-unit:
     runs-on: ubuntu-latest
     defaults:
