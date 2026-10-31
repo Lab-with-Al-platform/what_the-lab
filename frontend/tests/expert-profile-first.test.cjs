@@ -59,3 +59,25 @@ test("모바일 상세 요청 CTA와 검색 결과 복원 계약을 유지한다
   assert.match(list, /scrollIntoView/);
   assert.match(list, /searchGeneration\.current/);
 });
+
+test("채택된 B안은 검색창을 다크 히어로 안에 두고 흰색 결과 영역으로 전환한다", () => {
+  const list = read("expert-search.tsx");
+  const hero = read("expert-search-hero.tsx");
+  assert.match(list, /<ExpertSearchHero>[\s\S]*?<form[\s\S]*?<\/form>[\s\S]*?<\/ExpertSearchHero>/);
+  assert.match(list, /전문가 탐색/);
+  assert.match(list, /rounded-b-\[22px\]/);
+  assert.match(list, /검색 결과/);
+  assert.match(list, /overflow-hidden rounded-2xl border border-line bg-white/);
+  assert.doesNotMatch(list, /-mt-7/);
+  assert.match(hero, /AI 전문가 매칭/);
+  assert.match(hero, /HeroBenefit/);
+  assert.match(hero, /\{children\}/);
+});
+
+test("데모 전문가 자료는 선택 실행식 로컬 SQL로만 존재한다", () => {
+  const sql = fs.readFileSync(path.join(__dirname, "../../docs/qa/expert-search-demo-local.sql"), "utf8");
+  assert.match(sql, /whatlab-ui-demo-01/);
+  assert.match(sql, /ON CONFLICT/);
+  assert.match(sql, /BEGIN;/);
+  assert.match(sql, /COMMIT;/);
+});
