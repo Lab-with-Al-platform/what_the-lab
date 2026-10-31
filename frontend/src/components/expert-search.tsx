@@ -581,8 +581,8 @@ function FeaturedExpert({ expert, names, interest, returnHref, reputation }: { e
   const reason = interest ? expertReason(expert, interest, names) : null;
   const href = "/experts/" + expert.user_id + "?from=" + encodeURIComponent(returnHref);
   return (
-    <article className="flex flex-col gap-4 rounded-xl border border-[#e1e6f4] bg-white p-3 shadow-[0_4px_18px_rgba(20,43,89,0.06)] sm:flex-row sm:items-stretch sm:p-3.5">
-      <div className="relative flex shrink-0 items-center justify-center rounded-xl bg-[#f1f4fb] sm:block">
+    <article className="flex flex-col gap-3.5 rounded-xl border border-[#e1e6f4] bg-white p-3 shadow-[0_4px_18px_rgba(20,43,89,0.06)] sm:flex-row sm:items-center sm:gap-4 sm:p-3.5">
+      <div className="relative flex shrink-0 items-center justify-center self-start rounded-xl bg-[#f1f4fb] sm:block sm:self-center">
         <ProfilePortrait expert={expert} featured />
         <span className="absolute left-2 top-2 rounded-full bg-[#4f6ed1] px-2 py-1 text-[10px] font-bold text-white shadow-sm">추천</span>
       </div>
@@ -601,12 +601,12 @@ function FeaturedExpert({ expert, names, interest, returnHref, reputation }: { e
           {rest > 0 && <li className="rounded-full bg-page px-2.5 py-1 text-[11px] text-muted">+{rest}</li>}
         </ul>
       </div>
-      <div className="flex shrink-0 flex-col justify-between gap-3 rounded-xl bg-[#f6f8fd] p-3 sm:w-[176px]">
+      <div className="flex shrink-0 flex-col gap-2.5 rounded-xl bg-[#f6f8fd] p-3 sm:w-[234px] xl:w-[252px]">
         <div>
-          <LabTrustIndicator snapshot={reputation} variant="featured" demoPreview={getLocalDemoFlaskPreview(expert)} />
-          <span className="text-[11px] font-semibold text-[#47618f]">현재 참여 상태</span>
+          <LabTrustIndicator snapshot={reputation} variant="compact" demoPreview={getLocalDemoFlaskPreview(expert)} />
+          <span className="mt-2 block text-[11px] font-semibold text-[#47618f]">현재 참여 상태</span>
           <p className="mt-1 text-[12px] leading-5 text-muted">{engagedLabel(expert) || "진행 중인 협업 없음"}</p>
-          <p className="mt-2 text-[11px] leading-5 text-faint">요청 가능 여부는 상세 프로필에서 확인</p>
+          <p className="mt-1 text-[11px] leading-5 text-faint">요청 가능 여부는 상세 프로필에서 확인</p>
         </div>
         <Link id={"expert-profile-" + expert.user_id} href={href} className="inline-flex min-h-11 items-center justify-center rounded-lg bg-[#20396f] px-3 text-[12px] font-bold text-white transition-colors hover:bg-[#34548c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand">
           프로필 보기 <span aria-hidden="true" className="ml-1">→</span>
