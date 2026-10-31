@@ -88,6 +88,16 @@ test("개인·관리자 비공개 검색어는 공개 주소나 로그에 옮겨
   }
 });
 
+test("임의 쿼리 키, 잘못된 상태/정렬값, 초과 검색 길이가 공개 카테고리에 복사되지 않음", () => {
+  assert.equal(
+    navigation.communityCategoryHref("secret=123&redirect=https%3A%2F%2Fevil.test&order=hidden&status=other&unanswered=no&page=9", "idea"),
+    "/community?category=idea",
+  );
+  const href = navigation.communityCategoryHref("q=" + "a".repeat(250), "question");
+  assert.ok(href.startsWith("/community?q="));
+  assert.equal(new URLSearchParams(href.split("?")[1]).get("q").length, 200);
+});
+
 test("모든 카테고리 링크는 공개 목록만 가리키며 타인의 비공개 목록으로 이동할 수 없음", () => {
   for (const scope of ["mine", "saved", "notifications", "inbox", "moderation"]) {
     for (const item of navigation.COMMUNITY_CATEGORIES) {
