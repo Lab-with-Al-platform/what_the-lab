@@ -12,6 +12,7 @@ from app.config import GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 from app.db import get_connection
 from app.discord_bot import channel_url
 from app.google_calendar import add_calendar_url, google_ready
+from app.notification_store import notify_requests
 
 # 오늘 날짜는 한국 시간 기준 (DB 서버 시간대와 상관없이)
 TODAY_KST = "(now() AT TIME ZONE 'Asia/Seoul')::date"
@@ -70,7 +71,13 @@ def complete_ended_collaborations(cursor) -> None:
     cursor.execute(
         f"UPDATE collaboration SET status = 'done', ended_at = now()"
         f" WHERE status = 'ongoing' AND end_date < {TODAY_KST}"
+        " RETURNING request_id"
     )
+    completed_requests = [row["request_id"] for row in cursor.fetchall()]
+    # UPDATE is atomic: only the first runner receives the changed rows. Repeated
+    # background jobs/page reads do not create new review reminders.
+    if completed_requests:
+        notify_requests(cursor, "review_ready", completed_requests)
 
 
 def user_role(cursor, user_id: int) -> str:
