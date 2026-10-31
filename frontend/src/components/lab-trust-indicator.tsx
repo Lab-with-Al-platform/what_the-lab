@@ -3,7 +3,7 @@
 import { useId } from "react";
 import type { ReputationSnapshot } from "@/lib/reviews";
 
-type Variant = "compact" | "featured" | "profile";
+type Variant = "compact" | "featured" | "profile" | "card";
 
 function indexColor(score: number | null, demo: boolean) {
   if (demo) return { from: "#8271f6", to: "#48c4d5", stroke: "#615dd6", bubble: "#f1fbff" };
@@ -98,7 +98,7 @@ export function LabTrustIndicator({
   const label = demo ? "시연용 플라스크" : unavailable ? "신뢰 지수 조회 불가" :
     isLoading ? "신뢰 지수 확인 중" : established ? snapshot!.level : "평가 축적 중";
   const isCompact = variant === "compact";
-  const size = isCompact ? 43 : variant === "featured" ? 61 : 101;
+  const size = variant === "card" ? 39 : isCompact ? 43 : variant === "featured" ? 61 : 101;
   const subtitle = established
     ? `완료 협업 평가 ${snapshot!.review_count}건 · 연구자 ${snapshot!.reviewer_count}명`
     : demo ? "LOCAL DEMO · 실제 지수가 아닙니다"
@@ -123,6 +123,27 @@ export function LabTrustIndicator({
       </div>
     </div>
   );
+
+  // List cards show only the flask and its value; other variants retain their explanations.
+  if (variant === "card") {
+    return (
+      <div
+        role="group"
+        aria-label={`LAB TRUST: ${label}, ${scoreLabel}. ${subtitle}`}
+        title={`LAB TRUST · ${label} · ${scoreLabel}. ${subtitle}`}
+        className="flex w-14 shrink-0 flex-col items-center gap-0.5 text-center"
+      >
+        <FlaskArt fill={score} color={palette} demo={demo} size={size} />
+        <span className="whitespace-nowrap text-[13px] font-extrabold leading-4 tabular-nums tracking-tight text-[#253b62]">
+          {score !== null ? (
+            <>{score}<span className="text-[9px] font-semibold text-[#8993aa]">/100</span></>
+          ) : (
+            <span className="text-[10px] font-semibold text-[#6b7893]">미산정</span>
+          )}
+        </span>
+      </div>
+    );
+  }
 
   if (isCompact) {
     return <div role="group" aria-label={`LAB TRUST: ${label}, ${scoreLabel}. ${subtitle}`}
