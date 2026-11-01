@@ -68,7 +68,10 @@
 .home-hero__video-stage { display: grid; background: var(--color-card); }
 .home-hero__video-frame { position: relative; width: 100%; aspect-ratio: 16 / 7.8; overflow: hidden; background: #f4f7fb; }
 .home-hero__video-frame video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
-.home-hero__video-bar { position: absolute; left: 50%; bottom: 14px; z-index: 1; display: flex; gap: 8px; transform: translateX(-50%); }
+.home-hero__video-bar { position: absolute; left: 50%; bottom: 14px; z-index: 1; display: flex; gap: 8px; transform: translateX(-50%); transition: opacity .2s ease; }
+/* 재생 중에는 흐리게, 마우스를 올리거나 키보드로 버튼에 오면 다시 또렷하게 보입니다. */
+.home-hero__video-bar[data-dimmed="true"] { opacity: .4; }
+.home-hero__video-bar[data-dimmed="true"]:hover, .home-hero__video-bar[data-dimmed="true"]:has(:focus-visible) { opacity: 1; }
 .home-hero__video-icon { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid rgb(255 255 255 / .8); border-radius: 999px; background: rgb(255 255 255 / .84); color: var(--color-ink); cursor: pointer; backdrop-filter: blur(10px); }
 .home-hero__video-icon svg { width: 18px; height: 18px; }
 .home-hero__video-icon[aria-pressed="true"] { color: var(--color-brand); }
@@ -163,4 +166,5 @@
 @media (prefers-reduced-motion: reduce) {
   .home-hero__slide { transition: none; }
   .home-hero__progress::after { animation: none !important; }
+  .home-hero__video-bar { transition: none; }
 }
