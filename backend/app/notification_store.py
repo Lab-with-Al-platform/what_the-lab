@@ -18,6 +18,22 @@ TO_EXPERT = {"request_received", "request_canceled"}  # 연구회원이 한 일 
 TO_RESEARCHER = {"request_accepted", "request_rejected", "request_withdrawn"}  # 전문가가 한 일 → 연구회원에게
 TO_BOTH = {"request_expired", "collab_started"}  # 둘 다에게 (서로가 상대방)
 
+# 요청 기록 종류 → 상대에게 보낼 알림 종류 (한 사람이 한 일을 상대에게)
+TASK_NOTICE = {
+    "created": "task_created",  # 보낸 사람이 남김 → 받은 사람
+    "done": "task_done",  # 받은 사람이 완료 → 보낸 사람
+    "canceled": "task_canceled",  # 보낸 사람이 취소 → 받은 사람
+    "reopened": "task_reopened",  # 되돌림 → 상대
+    "due": "task_due",  # 보낸 사람이 기한 변경 → 받은 사람
+    "due_talk": "task_due_talk",  # 받은 사람이 기한 수정 요청 → 보낸 사람
+    "due_kept": "task_due_kept",  # 보낸 사람이 지금 기한 유지 → 받은 사람
+    "returned": "task_returned",  # 보낸 사람이 다시 요청 → 받은 사람
+}
+# 아침 브리핑 알림 (하루 한 번, notice_on)
+DAILY_TYPES = {"task_due_soon", "task_overdue", "task_talk_waiting", "collab_ending"}
+# 협업 안의 일: DM 없이 채널 멘션 + 종
+WORKSPACE_TYPES = set(TASK_NOTICE.values()) | DAILY_TYPES
+
 # 거절 사유 (프론트 REJECT_REASON_LABELS와 같은 문구)
 REJECT_LABELS = {
     "schedule": "일정이 맞지 않아요",
@@ -68,6 +84,63 @@ def notify_requests(cursor, type_: str, request_ids: list[int]) -> None:
         raise ValueError(f"모르는 알림 종류: {type_}")
     cursor.execute(UPSERT_SQL.format(source=source), {"type": type_, "ids": request_ids})
 
+def notify_task(cursor, task_id: int, actor_id: int, kind: str) -> None:
+    """요청에 일이 생겼을 때 상대에게 종 알림 한 줄. 요청을 바꾼 같은 트랜잭션 안에서 불러요.
+
+    kind: 요청 기록 종류 (TASK_NOTICE 에 없는 종류는 알림 없음)
+    상대 = 요청의 두 사람(보낸 사람 · 받은 사람) 중 actor_id 가 아닌 사람
+    디스코드 DM은 보내지 않아요 (discord_status = skipped). 협업 채널 멘션은 app/task_sync.py · 봇이 보내요.
+    """
+    notice = TASK_NOTICE.get(kind)
+    if notice is None:
+        return
+    cursor.execute(
+        """
+        INSERT INTO notification (user_id, type, actor_id, task_id, collaboration_id, discord_status, discord_error)
+        SELECT CASE WHEN t.requested_by = %(actor)s THEN t.assignee ELSE t.requested_by END,
+               %(type)s, %(actor)s, t.task_id, t.collaboration_id, 'skipped', '협업 채널로 알려요'
+        FROM collaboration_task t WHERE t.task_id = %(task)s
+        """,
+        {"actor": actor_id, "type": notice, "task": task_id},
+    )
+
+
+def task_message(row: dict) -> tuple[str, str]:
+    """요청 · 아침 브리핑 알림 → (제목, 작은 설명). 설명은 "요청 내용 · 협업(연구) 제목"
+
+    row: type, actor_nickname, task_content, task_due, notice_on, collab_title, collab_end
+    """
+    actor = row["actor_nickname"] or "상대"
+    content = (row.get("task_content") or "").replace("\n", " ")
+    content = content[:40] + ("…" if len(content) > 40 else "")
+    title = row.get("collab_title") or "협업"
+    title = title[:24] + ("…" if len(title) > 24 else "")
+    detail = f"{content} · {title}" if content else title
+    due = row.get("task_due")
+    due_text = f"{due.month}.{due.day}" if due else "기한 없음"
+    kind = row["type"]
+    simple = {
+        "task_created": f"{actor} 님이 요청을 남겼어요",
+        "task_done": f"{actor} 님이 요청을 완료했어요",
+        "task_canceled": f"{actor} 님이 요청을 취소했어요",
+        "task_reopened": f"{actor} 님이 요청을 다시 진행 중으로 돌렸어요",
+        "task_due": f"{actor} 님이 기한을 {due_text}(으)로 바꿨어요",
+        "task_due_talk": f"{actor} 님이 기한 수정을 요청했어요",
+        "task_due_kept": f"{actor} 님이 지금 기한({due_text})을 유지하기로 했어요",
+        "task_returned": f"{actor} 님이 다시 요청했어요",
+        "task_overdue": f"요청 기한({due_text})이 지났어요",
+        "task_talk_waiting": f"{actor} 님의 기한 수정 요청에 아직 답하지 않았어요",
+    }
+    if kind in simple:
+        return simple[kind], detail
+    if kind == "task_due_soon":
+        when = "오늘" if due == row.get("notice_on") else "내일"
+        return f"요청 기한이 {when}까지예요", detail
+    if kind == "collab_ending":
+        end = row.get("collab_end")
+        end_text = f" ({end.month}.{end.day})" if end else ""
+        return f"협업 종료 3일 전이에요{end_text}", f"{title} · 열린 요청을 끝내거나 정리해 주세요"
+    return "새 알림이 있어요", detail
 
 # ---------- 읽기 ----------
 def build_message(row: dict, user_id: int) -> tuple[str, str]:
@@ -132,15 +205,20 @@ def load_notifications(user_id: int) -> list[dict]:
     with get_connection() as conn, conn.cursor() as cursor:
         cursor.execute(
             """
-            SELECT n.notification_id, n.type, n.read_at, n.created_at,
+            SELECT n.notification_id, n.type, n.read_at, n.created_at, n.task_id, n.collaboration_id,
+                   n.notice_on,
                    a.nickname AS actor_nickname, r.title AS research_title,
                    cr.reject_reason, cr.expert_id, cr.status AS request_status,
                    cr.is_urgent, cr.expires_at, cr.accepted_start_date, cr.cancel_reason,
-                   cr.responded_at
+                   cr.responded_at,
+                   t.content AS task_content, t.due_date AS task_due,
+                   c.agreement ->> 'title' AS collab_title, c.end_date AS collab_end
             FROM notification n
             LEFT JOIN users a ON a.user_id = n.actor_id
             LEFT JOIN collaboration_request cr ON cr.request_id = n.request_id
             LEFT JOIN research r ON r.research_id = cr.research_id
+            LEFT JOIN collaboration_task t ON t.task_id = n.task_id
+            LEFT JOIN collaboration c ON c.collaboration_id = n.collaboration_id
             WHERE n.user_id = %s AND n.created_at >= now() - make_interval(days => %s)
             ORDER BY n.created_at DESC, n.notification_id DESC
             LIMIT %s
@@ -151,19 +229,27 @@ def load_notifications(user_id: int) -> list[dict]:
 
     items = []
     for row in rows:
-        title, detail = build_message(row, user_id)
+        title, detail = (task_message(row) if row["type"] in WORKSPACE_TYPES else build_message(row, user_id))
         items.append(
             {
                 "notification_id": row["notification_id"],
                 "type": row["type"],
                 "title": title,
                 "detail": detail,
-                "link": "/requests",  # 지금은 모두 요청관리. 협업공간이 생기면 collab_started는 그쪽으로
+                "link": notice_link(row),
                 "read": row["read_at"] is not None,
                 "created_at": row["created_at"],
             }
         )
     return items
+
+
+def notice_link(row: dict) -> str:
+    """누르면 갈 화면: 요청 알림 → 협업 상세의 그 요청 줄, 협업 알림 → 협업 상세, 나머지 → 요청 관리"""
+    if row.get("collaboration_id"):
+        anchor = f"#task-{row['task_id']}" if row.get("task_id") else ""
+        return f"/workspace/{row['collaboration_id']}{anchor}"
+    return "/requests"
 
 
 def count_unread(user_id: int) -> int:

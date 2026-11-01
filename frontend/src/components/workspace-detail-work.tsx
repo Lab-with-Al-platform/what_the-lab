@@ -9,9 +9,17 @@ import {
   CollabTask,
   CollaborationDetail,
   completeTask,
+  dayText,
   dueText,
+  eventText,
+  eventTime,
+  keepTaskDue,
   reopenTask,
+  returnTask,
+  talkTaskDue,
   TASK_LIMIT,
+  TASK_NOTE_LIMIT,
+  TaskEvent,
 } from "@/lib/workspace-detail";
 import { FieldTitle, INPUT_CLASS, Modal, ModalActions, useSaving } from "@/components/modal";
 
@@ -142,17 +150,32 @@ function TaskItem({
   onChange: (next: CollaborationDetail) => void;
 }) {
   const [confirming, setConfirming] = useState(false); // [취소] 한 번 더 확인
-  const [changingDue, setChangingDue] = useState(false); // [기한 변경] 창
+  const [dialog, setDialog] = useState<"due" | "talk" | "return" | "keep" | null>(null); // 열린 창
+  const [showLog, setShowLog] = useState(false); // 기록 펼치기
   const { saving, error, run } = useSaving();
   const isDone = task.status === "done";
   const kind = isDone ? "done" : task.direction;
-  const canComplete = editable && !isDone && task.direction === "in";
-  const canEdit = editable && !isDone && task.direction === "out"; // 기한 변경 · 취소
-  const canReopen = editable && isDone && task.direction === "in"; // 완료는 받은 사람이 되돌려요
-  const who = task.direction === "in" ? `${task.requested_by_nickname} → 나` : `나 → ${task.assignee_nickname}`;
+  const mine = task.direction === "in"; // 내가 받은 요청
+  const canComplete = editable && !isDone && mine; // 받은 사람: 완료 · 기한 얘기하기
+  const canEdit = editable && !isDone && !mine; // 보낸 사람: 기한 변경 · 취소
+  const canReopen = editable && isDone && mine; // 완료는 받은 사람이 되돌려요
+  const canReturn = editable && isDone && !mine; // 보낸 사람은 완료된 요청을 다시 요청
+  const who = mine ? `${task.requested_by_nickname} → 나` : `나 → ${task.assignee_nickname}`;
+  // 마지막으로 일어난 일 (남김 빼고). 위 상자(기한 얘기 · 다시 요청)에 이미 보이면 한 줄은 빼요
+  const latest = task.events.filter((event) => event.kind !== "created").at(-1);
+  const showLatest = latest && latest.event_id !== task.talk?.event_id && latest.event_id !== task.returned?.event_id;
+  const unfinished = task.status === "open" && task.events.some((event) => event.kind === "ended"); // 협업 종료로 마감
+  const closeDialog = () => setDialog(null);
+  const saved = (next: CollaborationDetail) => {
+    setDialog(null);
+    onChange(next);
+  };
 
   return (
-    <div className="grid min-h-[72px] grid-cols-[minmax(0,1fr)_26px] overflow-hidden rounded-card border border-line bg-card transition-shadow hover:shadow-[0_4px_14px_rgba(16,28,60,0.07)] sm:grid-cols-[minmax(0,1fr)_auto_26px]">
+    <div
+      id={`task-${task.task_id}`}
+      className="grid min-h-[72px] scroll-mt-24 grid-cols-[minmax(0,1fr)_26px] overflow-hidden rounded-card border border-line bg-card transition-shadow hover:shadow-[0_4px_14px_rgba(16,28,60,0.07)] target:border-brand target:shadow-[0_0_0_3px_rgba(80,54,244,0.18)] sm:grid-cols-[minmax(0,1fr)_auto_26px]"
+    >
       <div className="min-w-0 py-3.5 pl-[18px] pr-1">
         <p className={`whitespace-pre-line font-semibold leading-snug ${isDone ? "text-muted" : ""}`}>{task.content}</p>
         <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted">
@@ -161,7 +184,71 @@ function TaskItem({
           <span>{who}</span>
           <Dot />
           <span>{task.source === "discord" ? "디스코드" : "웹"}</span>
+          {unfinished && <span className="rounded bg-page px-1.5 py-px font-semibold text-faint">협업 종료로 마감 · 미완료</span>}
+          {task.events.length > 0 && (
+            <>
+              <Dot />
+              <button type="button" onClick={() => setShowLog(!showLog)} aria-expanded={showLog} className="font-semibold text-faint hover:text-brand">
+                기록 {task.events.length} {showLog ? "▴" : "▾"}
+              </button>
+            </>
+          )}
         </p>
+
+        {/* 받은 사람이 기한 수정을 요청함 → 보낸 사람이 [기한 변경] 또는 [지금 기한 유지]로 답할 차례 */}
+        {task.talk && (
+          <div className="mt-2.5 rounded-[9px] bg-editorial-warning-soft px-3 py-2 text-[12.5px] leading-relaxed text-[#8a5a12]">
+            <p>
+              🗓{" "}
+              {mine ? (
+                <>기한 수정을 요청했어요{task.talk.new_due ? ` (${dayText(task.talk.new_due)}까지)` : " (지금 기한으로는 어려움)"} · {task.requested_by_nickname} 님 답을 기다려요</>
+              ) : (
+                <>
+                  <b className="text-ink">{task.talk.actor_nickname}</b> 님이{" "}
+                  {task.talk.new_due ? (
+                    <>
+                      <b className="text-ink">{dayText(task.talk.new_due)}</b>까지로 바꿔 달래요
+                    </>
+                  ) : (
+                    "지금 기한으로는 어렵대요"
+                  )}
+                </>
+              )}
+              <span className="text-faint"> · {eventTime(task.talk.created_at)}</span>
+            </p>
+            <p className="mt-0.5 break-words">“{task.talk.note}”</p>
+            {canEdit && (
+              <p className="mt-1.5 flex flex-wrap gap-3 text-xs font-semibold">
+                <button type="button" onClick={() => setDialog("due")} className="text-brand hover:underline" title="요청한 날이 미리 채워져 있어요. 그대로 저장하면 수락이에요">
+                  기한 변경
+                </button>
+                <button type="button" onClick={() => setDialog("keep")} className="text-muted hover:text-ink">
+                  지금 기한 유지
+                </button>
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* 보낸 사람이 다시 요청함 (다시 완료할 때까지) */}
+        {task.returned && (
+          <div className="mt-2.5 rounded-[9px] bg-danger-soft px-3 py-2 text-[12.5px] leading-relaxed text-danger">
+            <p>
+              ↩ {mine ? <><b>{task.returned.actor_nickname}</b> 님이 다시 요청했어요</> : "다시 요청했어요"}
+              <span className="text-faint"> · {eventTime(task.returned.created_at)}</span>
+            </p>
+            <p className="mt-0.5 break-words text-ink">“{task.returned.note}”</p>
+          </div>
+        )}
+
+        {/* 마지막으로 일어난 일 한 줄: 누가 · 무엇을 */}
+        {showLatest && !showLog && (
+          <p className="mt-1.5 text-[11.5px] text-faint">
+            {eventTime(latest.created_at)} · {latest.actor_nickname ? `${latest.actor_nickname} 님` : "자동"} · {eventText(latest)}
+          </p>
+        )}
+        {showLog && <TaskLog events={task.events} />}
+
         {error && <p className="mt-1 text-xs text-danger">{error}</p>}
         {confirming && (
           <p className="mt-2 flex flex-wrap items-center gap-2 text-xs">
@@ -184,18 +271,23 @@ function TaskItem({
       {/* 버튼: 넓은 화면은 오른쪽, 좁은 화면은 내용 아래 */}
       <div className="col-start-1 row-start-2 flex items-center gap-3 px-[18px] pb-3 empty:hidden sm:col-start-2 sm:row-start-1 sm:px-4 sm:pb-0">
         {canComplete && (
-          <button
-            type="button"
-            onClick={() => run(async () => onChange(await completeTask(task.task_id)))}
-            disabled={saving}
-            className="text-xs font-semibold text-faint hover:text-success disabled:opacity-50"
-          >
-            {saving ? "완료하는 중…" : "완료"}
-          </button>
+          <>
+            <button
+              type="button"
+              onClick={() => run(async () => onChange(await completeTask(task.task_id)))}
+              disabled={saving}
+              className="text-xs font-semibold text-faint hover:text-success disabled:opacity-50"
+            >
+              {saving ? "완료하는 중…" : "완료"}
+            </button>
+            <button type="button" onClick={() => setDialog("talk")} className="text-xs font-semibold text-faint hover:text-brand">
+              기한 얘기하기
+            </button>
+          </>
         )}
         {canEdit && !confirming && (
           <>
-            <button type="button" onClick={() => setChangingDue(true)} className="text-xs font-semibold text-faint hover:text-brand">
+            <button type="button" onClick={() => setDialog("due")} className="text-xs font-semibold text-faint hover:text-brand">
               기한 변경
             </button>
             <button type="button" onClick={() => setConfirming(true)} className="text-xs font-semibold text-faint hover:text-danger">
@@ -214,6 +306,11 @@ function TaskItem({
             {saving ? "되돌리는 중…" : "↩ 되돌리기"}
           </button>
         )}
+        {canReturn && (
+          <button type="button" onClick={() => setDialog("return")} className="text-xs font-semibold text-faint hover:text-danger">
+            다시 요청
+          </button>
+        )}
       </div>
 
       {/* 오른쪽 끝 띠: 색으로 상태, 완료만 ✓ */}
@@ -228,19 +325,30 @@ function TaskItem({
         )}
       </span>
 
-      {changingDue && (
-        <DueDialog
-          task={task}
-          today={today}
-          endDate={endDate}
-          onClose={() => setChangingDue(false)}
-          onSaved={(next) => {
-            setChangingDue(false);
-            onChange(next);
-          }}
-        />
+      {dialog === "due" && (
+        <DueDialog task={task} today={today} endDate={endDate} asked={task.talk} onClose={closeDialog} onSaved={saved} />
       )}
+      {dialog === "keep" && <KeepDialog task={task} onClose={closeDialog} onSaved={saved} />}
+      {dialog === "talk" && <TalkDialog task={task} today={today} endDate={endDate} onClose={closeDialog} onSaved={saved} />}
+      {dialog === "return" && <ReturnDialog task={task} today={today} endDate={endDate} onClose={closeDialog} onSaved={saved} />}
     </div>
+  );
+}
+
+/** 요청 기록 (오래된 것부터): "10.31 14:05 · 김연구 · 기한 변경 11.9 → 11.14 · 디스코드" + 이유 */
+function TaskLog({ events }: { events: TaskEvent[] }) {
+  return (
+    <ol className="mt-2.5 space-y-1.5 border-l-2 border-line pl-3 text-[11.5px] leading-relaxed">
+      {events.map((event) => (
+        <li key={event.event_id}>
+          <span className="text-faint">{eventTime(event.created_at)}</span>
+          <span className="text-muted"> · {event.actor_nickname ? `${event.actor_nickname} 님` : "자동"} · </span>
+          <span className="font-semibold text-ink">{eventText(event)}</span>
+          <span className="text-faint"> · {event.source === "discord" ? "디스코드" : "웹"}</span>
+          {event.note && <span className="block break-words text-muted">“{event.note}”</span>}
+        </li>
+      ))}
+    </ol>
   );
 }
 
@@ -259,21 +367,26 @@ function Dot() {
   return <span className="h-[3px] w-[3px] rounded-full bg-[#c6cddd]" aria-hidden="true" />;
 }
 
-/** 보낸 사람의 [기한 변경] 창: 오늘 ~ 협업 종료일, 비우면 기한 없음 */
+/**
+ * 보낸 사람의 [기한 변경] 창: 오늘 ~ 협업 종료일, 비우면 기한 없음.
+ * 기한 수정 요청에 답하는 중이면(asked) 요청한 날을 미리 채워요. 그대로 저장하면 수락, 고치면 다른 날로 바뀌어요.
+ */
 function DueDialog({
   task,
   today,
   endDate,
+  asked,
   onClose,
   onSaved,
 }: {
   task: CollabTask;
   today: string;
   endDate: string;
+  asked?: TaskEvent | null; // 답을 기다리는 기한 수정 요청
   onClose: () => void;
   onSaved: (next: CollaborationDetail) => void;
 }) {
-  const [due, setDue] = useState(task.due_date ?? "");
+  const [due, setDue] = useState(asked?.new_due ?? task.due_date ?? "");
   const { saving, error, run } = useSaving();
   const dueOk = !due || (due >= today && due <= endDate);
 
@@ -293,7 +406,18 @@ function DueDialog({
         />
       }
     >
-      <p className="mb-5 rounded-button bg-page px-4 py-3 text-sm leading-relaxed">{task.content}</p>
+      <p className="mb-5 rounded-button bg-page px-4 py-3 text-sm leading-relaxed">
+        {task.content}
+        <span className="mt-1 block text-xs text-muted">지금 기한: {dayText(task.due_date)}</span>
+      </p>
+      {asked && (
+        <p className="mb-5 rounded-button bg-editorial-warning-soft px-4 py-3 text-[13px] leading-relaxed text-[#8a5a12]">
+          🗓 {asked.actor_nickname} 님이 {asked.new_due ? `${dayText(asked.new_due)}까지로 바꿔 달래요.` : "지금 기한으로는 어렵대요."} “{asked.note}”
+          <span className="mt-1 block text-xs">
+            {asked.new_due ? "요청한 날이 채워져 있어요. 그대로 저장하면 수락이에요." : "새 기한을 골라 주세요."}
+          </span>
+        </p>
+      )}
       <FieldTitle optional htmlFor="task-new-due">
         새 기한
       </FieldTitle>
@@ -301,6 +425,188 @@ function DueDialog({
       <p className={`mt-2 text-xs ${dueOk ? "text-muted" : "text-danger"}`}>
         {dueOk ? "오늘부터 협업 종료일까지 고를 수 있어요. 비우면 기한 없음이에요." : "오늘부터 협업 종료일 사이로 골라 주세요."}
       </p>
+    </Modal>
+  );
+}
+
+/** 보낸 사람의 [지금 기한 유지] 창: 기한 수정 요청에 "지금 기한 그대로 갈게요"로 답해요. 이유는 선택 */
+function KeepDialog({ task, onClose, onSaved }: { task: CollabTask; onClose: () => void; onSaved: (next: CollaborationDetail) => void }) {
+  const [note, setNote] = useState("");
+  const { saving, error, run } = useSaving();
+
+  return (
+    <Modal
+      title="지금 기한 유지"
+      description={`${task.assignee_nickname} 님의 기한 수정 요청에 지금 기한(${dayText(task.due_date)}) 그대로 가자고 답해요. 디스코드에서도 알려 드려요.`}
+      onClose={onClose}
+      footer={
+        <ModalActions
+          onCancel={onClose}
+          onSave={() => run(async () => onSaved(await keepTaskDue(task.task_id, note.trim() || null)))}
+          canSave
+          saving={saving}
+          error={error}
+          saveLabel="지금 기한 유지"
+        />
+      }
+    >
+      <p className="mb-5 rounded-button bg-page px-4 py-3 text-sm leading-relaxed">{task.content}</p>
+      <FieldTitle optional htmlFor="keep-note" extra={`${note.length} / ${TASK_NOTE_LIMIT}`}>
+        이유
+      </FieldTitle>
+      <textarea
+        id="keep-note"
+        value={note}
+        maxLength={TASK_NOTE_LIMIT}
+        onChange={(event) => setNote(event.target.value)}
+        rows={3}
+        autoFocus
+        placeholder="예: 11.10 회의 전에 꼭 필요해요"
+        className="w-full rounded-button border border-line bg-card px-4 py-3 text-sm outline-none placeholder:text-faint focus:border-brand"
+      />
+    </Modal>
+  );
+}
+
+/** 받은 사람의 [기한 얘기하기] 창: 원하는 기한(선택) + 이유(필수). 기한은 바뀌지 않고, 보낸 사람에게 알려요 */
+function TalkDialog({
+  task,
+  today,
+  endDate,
+  onClose,
+  onSaved,
+}: {
+  task: CollabTask;
+  today: string;
+  endDate: string;
+  onClose: () => void;
+  onSaved: (next: CollaborationDetail) => void;
+}) {
+  const [due, setDue] = useState("");
+  const [note, setNote] = useState("");
+  const { saving, error, run } = useSaving();
+  const dueOk = !due || (due >= today && due <= endDate);
+
+  return (
+    <Modal
+      title="기한 얘기하기"
+      description={`${task.requested_by_nickname} 님에게 기한 수정을 요청해요. 보낸 사람이 [기한 변경] 또는 [지금 기한 유지]로 답해요. 디스코드에서도 알려 드려요.`}
+      onClose={onClose}
+      footer={
+        <ModalActions
+          onCancel={onClose}
+          onSave={() => run(async () => onSaved(await talkTaskDue(task.task_id, { due_date: due || null, note: note.trim() })))}
+          canSave={dueOk && Boolean(note.trim())}
+          saving={saving}
+          error={error}
+          saveLabel="보내기"
+        />
+      }
+    >
+      <p className="mb-5 rounded-button bg-page px-4 py-3 text-sm leading-relaxed">
+        {task.content}
+        <span className="mt-1 block text-xs text-muted">지금 기한: {dayText(task.due_date)}</span>
+      </p>
+      <div className="space-y-6">
+        <div>
+          <FieldTitle optional htmlFor="talk-due">
+            원하는 기한
+          </FieldTitle>
+          <input id="talk-due" type="date" value={due} min={today} max={endDate} onChange={(event) => setDue(event.target.value)} className={INPUT_CLASS} />
+          <p className={`mt-2 text-xs ${dueOk ? "text-muted" : "text-danger"}`}>
+            {dueOk ? "비우면 \"지금 기한으로는 어려워요\"로 보내져요." : "오늘부터 협업 종료일 사이로 골라 주세요."}
+          </p>
+        </div>
+        <div>
+          <FieldTitle required htmlFor="talk-note" extra={`${note.length} / ${TASK_NOTE_LIMIT}`}>
+            이유
+          </FieldTitle>
+          <textarea
+            id="talk-note"
+            value={note}
+            maxLength={TASK_NOTE_LIMIT}
+            onChange={(event) => setNote(event.target.value)}
+            rows={3}
+            placeholder="예: 샘플 사진까지 같이 보려면 시간이 더 필요해요"
+            className="w-full rounded-button border border-line bg-card px-4 py-3 text-sm outline-none placeholder:text-faint focus:border-brand"
+          />
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
+/** 보낸 사람의 [다시 요청] 창: 부족한 점(필수) + 새 기한(선택, 비우면 원래 기한. 원래 기한이 지났으면 필수) */
+function ReturnDialog({
+  task,
+  today,
+  endDate,
+  onClose,
+  onSaved,
+}: {
+  task: CollabTask;
+  today: string;
+  endDate: string;
+  onClose: () => void;
+  onSaved: (next: CollaborationDetail) => void;
+}) {
+  const [due, setDue] = useState("");
+  const [note, setNote] = useState("");
+  const { saving, error, run } = useSaving();
+  const pastDue = Boolean(task.due_date && task.due_date < today); // 원래 기한이 지났으면 새 기한 필수
+  const dueOk = due ? due >= today && due <= endDate : !pastDue;
+
+  return (
+    <Modal
+      title="다시 요청"
+      description={`완료된 요청을 다시 진행 중으로 돌려요. ${task.assignee_nickname} 님에게 디스코드로도 알려 드려요.`}
+      onClose={onClose}
+      footer={
+        <ModalActions
+          onCancel={onClose}
+          onSave={() => run(async () => onSaved(await returnTask(task.task_id, { note: note.trim(), due_date: due || null })))}
+          canSave={dueOk && Boolean(note.trim())}
+          saving={saving}
+          error={error}
+          saveLabel="다시 요청"
+        />
+      }
+    >
+      <p className="mb-5 rounded-button bg-page px-4 py-3 text-sm leading-relaxed">{task.content}</p>
+      <div className="space-y-6">
+        <div>
+          <FieldTitle required htmlFor="return-note" extra={`${note.length} / ${TASK_NOTE_LIMIT}`}>
+            무엇이 부족한가요
+          </FieldTitle>
+          <textarea
+            id="return-note"
+            value={note}
+            maxLength={TASK_NOTE_LIMIT}
+            onChange={(event) => setNote(event.target.value)}
+            rows={3}
+            autoFocus
+            placeholder="예: 날짜 칸 형식이 아직 섞여 있어요"
+            className="w-full rounded-button border border-line bg-card px-4 py-3 text-sm outline-none placeholder:text-faint focus:border-brand"
+          />
+        </div>
+        <div>
+          {pastDue ? (
+            <FieldTitle required htmlFor="return-due">
+              새 기한
+            </FieldTitle>
+          ) : (
+            <FieldTitle optional htmlFor="return-due">
+              새 기한
+            </FieldTitle>
+          )}
+          <input id="return-due" type="date" value={due} min={today} max={endDate} onChange={(event) => setDue(event.target.value)} className={INPUT_CLASS} />
+          <p className={`mt-2 text-xs ${dueOk ? "text-muted" : "text-danger"}`}>
+            {pastDue
+              ? `원래 기한(${dayText(task.due_date)})이 지났어요. 오늘부터 협업 종료일 사이로 새 기한을 정해 주세요.`
+              : `비우면 원래 기한(${dayText(task.due_date)}) 그대로예요.`}
+          </p>
+        </div>
+      </div>
     </Modal>
   );
 }

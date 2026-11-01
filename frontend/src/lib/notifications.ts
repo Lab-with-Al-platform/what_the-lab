@@ -6,7 +6,22 @@ export type NotificationType =
   | "request_rejected"
   | "request_canceled"
   | "request_expired"
-  | "collab_started";
+  | "request_withdrawn"
+  | "collab_started"
+  // 협업 공간: 요청 (한 사람이 한 일 → 상대에게). 디스코드는 DM 대신 협업 채널 멘션으로 가요
+  | "task_created"
+  | "task_done"
+  | "task_canceled"
+  | "task_reopened"
+  | "task_due"
+  | "task_due_talk"
+  | "task_due_kept"
+  | "task_returned"
+  // 협업 공간: 아침 브리핑 (하루 한 번)
+  | "task_due_soon"
+  | "task_overdue"
+  | "task_talk_waiting"
+  | "collab_ending";
 
 /** 알림 한 건 (GET /notifications 의 items) */
 export type NotificationItem = {
@@ -31,6 +46,19 @@ export const NOTIFICATION_ICONS: Record<NotificationType, { icon: string; classN
   request_canceled: { icon: "↩", className: "bg-page text-faint" },
   request_expired: { icon: "⏱", className: "bg-page text-faint" },
   collab_started: { icon: "▶", className: "bg-expert-soft text-expert" },
+    request_withdrawn: { icon: "↩", className: "bg-page text-faint" },
+  task_created: { icon: "📌", className: "bg-brand-soft text-brand" },
+  task_done: { icon: "✓", className: "bg-success-soft text-success" },
+  task_canceled: { icon: "✕", className: "bg-page text-faint" },
+  task_reopened: { icon: "↩", className: "bg-brand-soft text-brand" },
+  task_due: { icon: "📅", className: "bg-brand-soft text-brand" },
+  task_due_talk: { icon: "🗓", className: "bg-editorial-warning-soft text-[#8a5a12]" },
+  task_due_kept: { icon: "📌", className: "bg-page text-muted" },
+  task_returned: { icon: "↩", className: "bg-danger-soft text-danger" },
+  task_due_soon: { icon: "⏰", className: "bg-editorial-warning-soft text-[#8a5a12]" },
+  task_overdue: { icon: "!", className: "bg-danger-soft text-danger" },
+  task_talk_waiting: { icon: "🗓", className: "bg-editorial-warning-soft text-[#8a5a12]" },
+  collab_ending: { icon: "⏳", className: "bg-expert-soft text-expert" },
 };
 
 /** 제목을 닉네임과 나머지로 나눠요. 닉네임만 굵게 보여 주려고. "neural_kim 님이 …" → ["neural_kim", " 님이 …"] */

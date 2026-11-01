@@ -153,6 +153,7 @@ export type WorkspaceTask = {
   direction: "in" | "out"; // in = 내가 받은 요청, out = 내가 보낸 요청
   requested_by_nickname: string;
   assignee_nickname: string;
+  flag: "due_talk" | "returned" | null; // due_talk = 받은 사람이 기한을 얘기함 (보낸 사람 차례) / returned = 다시 요청됨
 };
 
 export type WorkspaceData = { collaborations: Collaboration[]; schedules: Schedule[]; tasks: WorkspaceTask[] };

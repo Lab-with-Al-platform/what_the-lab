@@ -15,7 +15,7 @@ from app.collab_channel import make_pending_channels
 from app.config import FRONTEND_URL
 from app.db import get_connection
 from app.discord_bot import DmBlocked, bot_ready, channel_url, send_dm
-from app.notification_store import build_message
+from app.notification_store import WORKSPACE_TYPES, build_message
 
 log = logging.getLogger(__name__)
 WAKE = asyncio.Event()  # 협업 요청이 처리되면 켜져요. 켜지면 15초를 기다리지 않고 바로 보내요.
@@ -27,7 +27,6 @@ MAX_ATTEMPTS = 3  # 디스코드가 잠깐 안 될 때 다시 시도하는 횟�
 FRESH_MINUTES = 60
 # "협업 시작" DM은 채널이 만들어질 때까지 이만큼 기다려요. 넘으면 링크 없이 보내요.
 WAIT_CHANNEL_MINUTES = 3
-WORKSPACE_TYPES: set[str] = set()  # 협업공간 알림 종류 (협업공간 기능 때 추가)
 
 PENDING_SQL = """
     SELECT n.notification_id, n.user_id, n.type, n.discord_attempts,

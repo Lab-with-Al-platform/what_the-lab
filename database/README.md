@@ -19,6 +19,7 @@ PostgreSQL/Supabase 데이터 구조와 변경 이력을 관리합니다.
 - [최초 마이그레이션](../backend/migrations/versions/20261016_01_insight_foundation.py): 서버 전용 insight_private schema와 5개 테이블
 - 2026-10-27: 로컬 Docker용 `database/init/011_create_insight.sql`에 같은 구조와 수집 설정 표를 넣었습니다. 공용 DB의 글 내용은 복사하지 않습니다.
 - 2026-10-27: 공용 DB에 적용된 조회수·운영 이력·방문 수집 표를 `014`~`016`에 넣었습니다. 기록 행은 복사하지 않습니다. `017`은 개정 번호 `20261028_13`만 적고, `018`이 분류 상태를 `active`로 맞춘 뒤 번호를 `20261028_14`로 올립니다. `019`는 협업 디스코드 칸을 추가하고 번호를 `20261028_15`로 올립니다. `020`은 메일 수신을 확인한 대학·연구기관 도메인을 기관 표에 넣고 번호를 `20261028_16`으로 올립니다.
+- 2026-11-01: `025`는 요청 기록 표 `collaboration_task_event`를 만들고 기존 요청의 남김·완료/취소 기록을 채운 뒤 번호를 `20261031_21`로, `026`은 알림 표에 요청 알림 칸·종류를 더하고 번호를 `20261031_22`로 올립니다. 이미 데이터가 있는 Docker DB는 [요청 기능 세팅 안내](../docs/development/SETUP_WORKSPACE_TASKS.md)대로 두 파일을 직접 실행합니다.
 - [실행·안전 확인 순서](../docs/ai-case-automation/FOUNDATION_RUNBOOK.md): 개발 DB 확인, 권한, 테스트, 파괴적인 되돌리기 주의
 - [개발용 DB 검증 결과](../docs/qa/INSIGHT_SUPABASE_MIGRATION_2026-10-16.md): 인사이트 테이블 5개와 public의 버전 테이블 1개, 실제 콘텐츠는 0건
 

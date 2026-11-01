@@ -3,11 +3,13 @@
 - 웹에서 남기거나 바꾸면: 응답을 먼저 보내고(BackgroundTasks) after_web_change 가
   디스코드 채널에 요청 메시지를 올리거나 고치고(HTTP), 구글 캘린더에도 반영해요.
 - 디스코드 봇에서 바꾸면: 채널 메시지는 봇이 직접 고치고, 구글만 sync_google 로 반영해요.
-- 디스코드 · 구글이 잠깐 안 돼도 DB 저장은 이미 끝났어요. 로그만 남기고 넘어가요.
-  (요청에는 "반영됐는지" 칸이 없어서 다시 시도하지 않아요. 다음에 그 요청이 바뀌면 다시 맞춰져요)
+- 디스코드 · 구글이 잠깐 안 되면 2초 뒤에 한 번 더 해 봐요(retry_once). 그래도 안 되면 로그만 남겨요.
+  DB 저장은 이미 끝났고, 매일 아침 resync_task 가 진행 중 요청을 지금 DB 상태로 다시 맞춰요 (app/task_daily.py)
+- 상대가 알아야 하는 일은 채널에 새 메시지 + 멘션으로 남겨요. 휴대폰 디스코드 앱 푸시가 여기서 가요
 """
 
 import logging
+import time
 from datetime import date
 
 import httpx
@@ -21,17 +23,53 @@ from app.google_calendar import (
     task_event_body,
     task_event_id,
 )
-from app.task_text import done_line, due_line, task_message
+from app.task_text import (
+    cancel_line,
+    done_line,
+    due_line,
+    keep_line,
+    reopen_line,
+    return_line,
+    talk_line,
+    task_message,
+)
+from app.workspace_store import TASK_FLAG_SQL
 
 log = logging.getLogger("labbridge.task_sync")
+RETRY_SECONDS = 2  # 실패하면 이만큼 기다렸다가 한 번 더
+
+
+def retry_once(call, *args, **kwargs):
+    """디스코드 · 구글 요청이 잠깐 실패하면(연결 끊김 · 5xx · 429) 2초 뒤에 한 번 더 해요.
+
+    잘못된 요청(400 · 403 · 404 같은 4xx)은 다시 해도 똑같아서 바로 넘겨요.
+    """
+    try:
+        return call(*args, **kwargs)
+    except httpx.HTTPStatusError as error:
+        code = error.response.status_code
+        if code < 500 and code != 429:
+            raise
+    except httpx.HTTPError:
+        pass
+    time.sleep(RETRY_SECONDS)
+    return call(*args, **kwargs)
 
 
 def task_card(task_id: int) -> dict | None:
-    """요청 하나를 메시지 · 구글에 쓸 모양으로: 내용 · 상태 · 두 사람(닉네임·디스코드 번호) · 기한 · 협업 정보"""
+    """요청 하나를 메시지 · 구글에 쓸 모양으로: 내용 · 상태 · 두 사람(닉네임·디스코드 번호) · 기한 · 협업 정보
+
+    flag: due_talk(기한 수정 요청에 답 기다림) · returned(다시 요청됨) · None
+    talk_due: 가장 최근 기한 수정 요청이 원한 날 (디스코드 [기한 변경] 창에 미리 채워요)
+    """
     with get_connection() as conn, conn.cursor() as cursor:
         cursor.execute(
-            """
+            f"""
             SELECT t.task_id, t.collaboration_id, t.content, t.due_date, t.status,
+                   {TASK_FLAG_SQL} AS flag,
+                   (SELECT e.new_due FROM collaboration_task_event e
+                    WHERE e.task_id = t.task_id AND e.kind = 'due_talk'
+                    ORDER BY e.event_id DESC LIMIT 1) AS talk_due,
                    t.requested_by, t.assignee, t.discord_message_id,
                    (t.closed_at AT TIME ZONE 'Asia/Seoul')::date AS closed_on,
                    rq.nickname AS requested_by_nickname, rq.discord_id AS requested_by_discord_id,
@@ -44,6 +82,17 @@ def task_card(task_id: int) -> dict | None:
             WHERE t.task_id = %s
             """,
             (task_id,),
+        )
+        return cursor.fetchone()
+
+
+def last_event(task_id: int, kind: str) -> dict | None:
+    """이 요청의 가장 최근 기록 한 줄 (kind: due_talk · returned …). 알림 문구에 이유 · 기한을 넣을 때 써요."""
+    with get_connection() as conn, conn.cursor() as cursor:
+        cursor.execute(
+            "SELECT kind, actor_id, old_due, new_due, note, created_at FROM collaboration_task_event"
+            " WHERE task_id = %s AND kind = %s ORDER BY event_id DESC LIMIT 1",
+            (task_id, kind),
         )
         return cursor.fetchone()
 
@@ -69,9 +118,9 @@ def sync_google(task: dict) -> None:
     calendar, eid = task["google_calendar_id"], task_event_id(task["task_id"])
     try:
         if task["status"] == "canceled" or task["due_date"] is None:
-            delete_event(calendar, eid)
+            retry_once(delete_event, calendar, eid)
         else:
-            put_event(calendar, eid, task_event_body(task))
+            retry_once(put_event, calendar, eid, task_event_body(task))
     except httpx.HTTPError as error:
         log.warning("요청 %s 구글 반영 실패: %s", task["task_id"], error)
 
@@ -130,10 +179,14 @@ def edit_message(channel_id: str, message_id: str, content: str, components: lis
     return True
 
 
-def post_task(task: dict) -> None:
-    """요청 메시지를 새로 올려요. 열린 요청이면 받은 사람에게 멘션 알림이 가요."""
-    alert = mention(task["assignee_discord_id"]) if task["status"] == "open" else mention()
-    message_id = send_message(
+def post_task(task: dict, quiet: bool = False) -> None:
+    """요청 메시지를 새로 올려요. 열린 요청이면 받은 사람에게 멘션 알림이 가요.
+
+    quiet: True 면 멘션 없이 올려요 (아침에 다시 맞추다가 지워진 메시지를 다시 올릴 때 · 알림을 또 보내지 않게)
+    """
+    alert = mention(task["assignee_discord_id"]) if task["status"] == "open" and not quiet else mention()
+    message_id = retry_once(
+        send_message,
         task["discord_channel_id"],
         task_message(task),
         components=manage_components(task["task_id"]),
@@ -142,10 +195,46 @@ def post_task(task: dict) -> None:
     save_message_id(task["task_id"], message_id)
 
 
+def event_alert(task: dict, event: str, old_due: date | None = None) -> tuple[str, str] | None:
+    """웹에서 한 일 → (채널에 남길 한 줄, 멘션할 사람). 알릴 게 없으면 None. (봇에서 한 일은 봇이 직접 보내요)
+
+    한 사람이 한 일을 상대에게: 완료 → 보낸 사람 / 기한 변경 · 취소 · 다시 요청 · 지금 기한 유지 → 받은 사람
+    / 기한 수정 요청 → 보낸 사람 / 되돌리기 → 상대. 새 요청은 요청 메시지 자체가 받은 사람을 불러요.
+    """
+    task_id = task["task_id"]
+    if event == "done":
+        return done_line(task), task["requested_by_discord_id"]
+    if event == "canceled":
+        return cancel_line(task), task["assignee_discord_id"]
+    if event == "due" and old_due != task["due_date"]:
+        return due_line(task, old_due), task["assignee_discord_id"]
+    if event == "due_talk" and (talk := last_event(task_id, "due_talk")):
+        return talk_line(task, talk), task["requested_by_discord_id"]
+    if event == "due_kept" and (kept := last_event(task_id, "due_kept")):
+        return keep_line(task, kept), task["assignee_discord_id"]
+    if event == "returned" and (back := last_event(task_id, "returned")):
+        return return_line(task, back), task["assignee_discord_id"]
+    if event == "reopened" and (again := last_event(task_id, "reopened")):
+        by_requester = again["actor_id"] == task["requested_by"]
+        who = task["assignee_discord_id"] if by_requester else task["requested_by_discord_id"]
+        return reopen_line(task, by_requester), who
+    return None
+
+
+def refresh_channel(task: dict, quiet: bool = False) -> None:
+    """채널의 요청 메시지를 지금 상태로 고쳐요. 메시지가 없으면(예전 요청 · 누가 지움) 새로 올려요."""
+    channel = task["discord_channel_id"]
+    message_id = task["discord_message_id"]
+    components = manage_components(task["task_id"])
+    if not message_id or not retry_once(edit_message, channel, message_id, task_message(task), components):
+        post_task(task, quiet=quiet)
+
+
 def after_web_change(task_id: int, event: str, old_due: date | None = None) -> None:
     """웹에서 요청을 남기거나 바꾼 뒤 (응답을 보낸 다음에 돌아요): 구글 + 디스코드 채널에 반영.
 
     event: created(남김) · done(완료) · canceled(취소) · reopened(되돌림) · due(기한 변경)
+           · due_talk(기한 수정 요청) · due_kept(지금 기한 유지) · returned(다시 요청)
     old_due: 기한 변경일 때 바꾸기 전 기한 ("A → B" 알림에 써요)
     """
     task = task_card(task_id)
@@ -155,23 +244,29 @@ def after_web_change(task_id: int, event: str, old_due: date | None = None) -> N
     if not (bot_ready() and task["discord_channel_id"]):
         return  # 봇 설정이 없거나 아직 채널이 없는 협업
     try:
-        channel = task["discord_channel_id"]
-        components = manage_components(task_id)
-        message_id = task["discord_message_id"]
-        # 예전에 웹에서만 남겨 메시지가 없거나, 누가 메시지를 지웠으면 새로 올려요
-        if (
-            event == "created"
-            or not message_id
-            or not edit_message(channel, message_id, task_message(task), components)
-        ):
-            post_task(task)
-        if event == "done":
-            send_message(
-                channel, done_line(task), mentions=mention(task["requested_by_discord_id"])
-            )
-        elif event == "due" and old_due != task["due_date"]:
-            send_message(
-                channel, due_line(task, old_due), mentions=mention(task["assignee_discord_id"])
-            )
+        if event == "created":
+            post_task(task)  # 요청 메시지가 받은 사람을 불러요
+        else:
+            refresh_channel(task)
+        alert = event_alert(task, event, old_due)
+        if alert:
+            line, who = alert
+            retry_once(send_message, task["discord_channel_id"], line, mentions=mention(who))
     except httpx.HTTPError as error:
         log.warning("요청 %s 디스코드 반영 실패: %s", task_id, error)
+
+
+def resync_task(task_id: int) -> None:
+    """아침에 다시 맞추기: 구글 + 채널 메시지를 지금 DB 상태로 덮어써요. 알림(멘션)은 보내지 않아요."""
+    task = task_card(task_id)
+    if task is None:
+        return
+    sync_google(task)
+    if not (bot_ready() and task["discord_channel_id"]):
+        return
+    if not task["discord_message_id"] and task["status"] != "open":
+        return  # 메시지 없이 끝난 예전 요청은 채널에 새로 올리지 않아요 (소음)
+    try:
+        refresh_channel(task, quiet=True)
+    except httpx.HTTPError as error:
+        log.warning("요청 %s 다시 맞추기 실패: %s", task_id, error)
