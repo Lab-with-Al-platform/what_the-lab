@@ -99,7 +99,7 @@ export function HomeHero({ introVisual }: { introVisual: ReactNode }) {
     <section aria-label="LabBridge 소개와 이용 안내" aria-roledescription="carousel" onFocus={handleFocus}>
       <h1 className="sr-only">LabBridge · 연구의 질문이 AI와 만나는 곳</h1>
       <PageContainer className="home-hero">
-        {/* 영상은 순환 밖입니다. 끝나거나 건너뛰면 소개 화면부터 세 배너만 다시 돕니다. */}
+        {/* 영상은 순환 밖입니다. 건너뛰거나 끝난 뒤 닫으면 소개 화면부터 세 배너만 다시 돕니다. */}
         {showVideo ? (
           <HomeIntroVideo key={videoSession} playedOn={entryDate} autoplay={autoplayVideo} onFinish={finishVideo} />
         ) : (
