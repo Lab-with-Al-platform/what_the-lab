@@ -146,7 +146,7 @@ function Timeline({ detail }: { detail: CollaborationDetail }) {
           .map((item) => (
             <span
               key={item.schedule_id}
-              title={`${shortDay(item.start_date)} ${item.title}`}
+              title={`${shortDay(item.start_date)}${item.start_time ? ` ${item.start_time}` : ""} ${item.title}`}
               className={`absolute top-3 h-3 w-3 -translate-x-1/2 border-2 border-card ${
                 item.kind === "due" ? "rotate-45 rounded-[2px] bg-danger" : item.kind === "meeting" ? "rounded-full bg-brand" : "rounded-full bg-faint"
               } ${past(item) ? "opacity-35" : ""}`}

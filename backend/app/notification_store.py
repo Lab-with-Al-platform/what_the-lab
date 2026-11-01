@@ -9,6 +9,7 @@ from fastapi import HTTPException
 
 from app.db import get_connection
 from app.request_rules import KST
+from app.schedule_notice import schedule_message
 
 RECENT_DAYS = 30  # 최근 며칠 알림만 보여 줄까 (지우지는 않아요)
 LIST_LIMIT = 50  # 한 번에 보여 줄 최대 개수
@@ -32,7 +33,18 @@ TASK_NOTICE = {
 # 아침 브리핑 알림 (하루 한 번, notice_on)
 DAILY_TYPES = {"task_due_soon", "task_overdue", "task_talk_waiting", "collab_ending"}
 # 협업 안의 일: DM 없이 채널 멘션 + 종
-WORKSPACE_TYPES = set(TASK_NOTICE.values()) | DAILY_TYPES
+# 일정 알림 (한 사람이 한 일 → 상대 / 아침 브리핑 → 두 사람). 글자는 app/schedule_notice.py
+SCHEDULE_TYPES = {
+    "schedule_created",
+    "schedule_changed",
+    "schedule_edited",
+    "schedule_deleted",
+    "schedule_tomorrow",
+    "schedule_today",
+    "schedule_ending",
+}
+# 협업 안의 일: DM 없이 채널 멘션 + 종
+WORKSPACE_TYPES = set(TASK_NOTICE.values()) | DAILY_TYPES | SCHEDULE_TYPES
 
 # 거절 사유 (프론트 REJECT_REASON_LABELS와 같은 문구)
 REJECT_LABELS = {
@@ -206,7 +218,7 @@ def load_notifications(user_id: int) -> list[dict]:
         cursor.execute(
             """
             SELECT n.notification_id, n.type, n.read_at, n.created_at, n.task_id, n.collaboration_id,
-                   n.notice_on,
+                   n.notice_on, n.note,
                    a.nickname AS actor_nickname, r.title AS research_title,
                    cr.reject_reason, cr.expert_id, cr.status AS request_status,
                    cr.is_urgent, cr.expires_at, cr.accepted_start_date, cr.cancel_reason,
@@ -229,7 +241,12 @@ def load_notifications(user_id: int) -> list[dict]:
 
     items = []
     for row in rows:
-        title, detail = (task_message(row) if row["type"] in WORKSPACE_TYPES else build_message(row, user_id))
+        if row["type"] in SCHEDULE_TYPES:
+            title, detail = schedule_message(row)
+        elif row["type"] in WORKSPACE_TYPES:
+            title, detail = task_message(row)
+        else:
+            title, detail = build_message(row, user_id)
         items.append(
             {
                 "notification_id": row["notification_id"],

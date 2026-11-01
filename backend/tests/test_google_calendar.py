@@ -80,6 +80,11 @@ def test_timed_event_for_one_day_with_time():
     assert body["start"] == {"dateTime": "2026-11-03T14:00:00", "timeZone": "Asia/Seoul"}
     assert body["end"] == {"dateTime": "2026-11-03T15:00:00", "timeZone": "Asia/Seoul"}
 
+def test_event_without_end_time_lasts_one_hour():
+    body = gc.event_body({**SCHEDULE, "start_time": "14:00", "end_time": None})
+    assert body["end"] == {"dateTime": "2026-11-03T15:00:00", "timeZone": "Asia/Seoul"}
+    late = gc.event_body({**SCHEDULE, "start_time": "23:30", "end_time": None})
+    assert late["end"]["dateTime"] == "2026-11-04T00:30:00"  # 밤 늦은 미팅은 다음 날로 넘어가요
 
 def fake(responses: list, calls: list):
     def call(url, headers, timeout, json=None, params=None):

@@ -18,7 +18,7 @@ type Props = {
   onSaved: (data: WorkspaceData) => void; // 저장한 뒤 최신 목록
 };
 
-/** 일정 추가·수정 창. 협업 → 유형 → 일정명 → 날짜 → 메모. 날짜는 그 협업에서 잡을 수 있는 기간 안에서만 골라요. */
+/** 일정 추가·수정 창. 협업 → 유형 → 일정명 → 날짜 → (하루짜리 미팅·기타) 시각 → 메모. 날짜는 그 협업에서 잡을 수 있는 기간 안에서만 골라요. */
 export function ScheduleDialog({ collabs, editing, defaultCollabId, defaultDate, today, onClose, onSaved }: Props) {
   const firstCollab = editing?.collaboration_id ?? defaultCollabId ?? (collabs.length === 1 ? collabs[0].collaboration_id : 0);
   const [collabId, setCollabId] = useState(firstCollab);
@@ -30,14 +30,18 @@ export function ScheduleDialog({ collabs, editing, defaultCollabId, defaultDate,
   const [start, setStart] = useState(editing?.start_date ?? (collab ? suggestDay(collab, today, defaultDate) : ""));
   const [end, setEnd] = useState(editing?.end_date ?? start);
   const [memo, setMemo] = useState(editing?.memo ?? "");
+  const [startTime, setStartTime] = useState(editing?.start_time ?? "");
+  const [endTime, setEndTime] = useState(editing?.end_time ?? "");
   const [repeat, setRepeat] = useState(false);
   const { saving, error, run } = useSaving();
 
   const oneDay = start === end;
   const canRepeat = !editing && kind === "meeting" && oneDay; // 매주 반복은 새 하루짜리 미팅만
+  const hasTime = (kind === "meeting" || kind === "etc") && oneDay; // 시각은 하루짜리 미팅·기타만 (백엔드 workspace_rules 와 같은 규칙)
+  const timeError = hasTime && endTime !== "" && (startTime === "" || endTime <= startTime);
   const inPeriod = Boolean(period && start && end && start >= period.first && end <= period.last);
-  const canSave = Boolean(collab && title.trim() && start && end && end >= start && inPeriod);
-
+  const canSave = Boolean(collab && title.trim() && start && end && end >= start && inPeriod && !timeError);
+  
   function chooseCollab(id: number) {
     setCollabId(id);
     const next = collabs.find((item) => item.collaboration_id === id);
@@ -64,9 +68,10 @@ export function ScheduleDialog({ collabs, editing, defaultCollabId, defaultDate,
         end_date: end,
         memo: memo.trim(),
         repeat_weekly: canRepeat && repeat,
+        // 시각 칸이 안 보이는 일정(여러 날 · 작업 기간 · 마감)은 시각 없이 저장해요
+        start_time: hasTime && startTime ? startTime : null,
+        end_time: hasTime && startTime && endTime ? endTime : null,
         // 화면에 없는 칸은 원래 값 그대로 (수정할 때 지워지지 않게)
-        start_time: editing?.start_time ?? null,
-        end_time: editing?.end_time ?? null,
         place: editing?.place ?? "",
         assignee: editing?.assignee ?? null,
       };
@@ -102,9 +107,7 @@ export function ScheduleDialog({ collabs, editing, defaultCollabId, defaultDate,
             </select>
           )}
           {period && (
-            <p className="mt-2 text-xs text-muted">
-              이 협업 일정은 <b className="text-ink">{shortDate(period.first)} ~ {shortDate(period.last)}</b> 사이에 잡을 수 있어요.
-            </p>
+            <p className="mt-2 text-xs text-muted">시각을 적으면 구글 캘린더에도 그 시각으로 들어가요. 끝 시각은 비워 두면 1시간으로 잡혀요.</p>
           )}
         </div>
 
@@ -167,6 +170,37 @@ export function ScheduleDialog({ collabs, editing, defaultCollabId, defaultDate,
             </label>
           )}
         </div>
+
+        {hasTime && (
+          <div>
+            <FieldTitle optional htmlFor="schedule-start-time">
+              시각
+            </FieldTitle>
+            <div className="flex items-center gap-2">
+              <input
+                id="schedule-start-time"
+                type="time"
+                aria-label="시작 시각"
+                step={600}
+                value={startTime}
+                onChange={(event) => setStartTime(event.target.value)}
+                className={INPUT_CLASS}
+              />
+              <span className="text-muted">~</span>
+              <input
+                type="time"
+                aria-label="끝 시각"
+                step={600}
+                value={endTime}
+                disabled={!startTime}
+                onChange={(event) => setEndTime(event.target.value)}
+                className={INPUT_CLASS}
+              />
+            </div>
+            <p className="mt-2 text-xs text-muted">시각을 적으면 시작 30분 전에 디스코드로 알려 드려요. 끝 시각은 비워 둬도 돼요.</p>
+            {timeError && <p className="mt-1 text-xs text-danger">끝 시각은 시작 시각보다 늦어야 해요.</p>}
+          </div>
+        )}
 
         <div>
           <FieldTitle optional htmlFor="schedule-memo" extra={`${memo.length} / ${LIMITS.memo}`}>

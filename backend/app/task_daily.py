@@ -9,6 +9,7 @@
    - 기한 지남 → 받은 사람. 지난 다음 날 한 번, 그 뒤로는 일주일에 한 번 (task_overdue)
    - 기한 수정 요청에 1일 · 3일째 답 없음 → 보낸 사람 (task_talk_waiting)
    - 협업 종료 3일 전인데 열린 요청이 있음 → 두 사람 (collab_ending)
+   - 일정: 오늘 시작 · 내일 시작(오늘 추가한 것은 빼요, 추가 알림을 이미 받았어요) · 여러 날 일정이 내일 끝남 → 두 사람
    같은 (사람, 종류, 협업, 요청, 날짜) 알림은 DB가 한 번만 받아요(uq_notification_daily).
    그래서 서버를 껐다 켜도, 서버가 여러 대여도 하루에 한 번만 가요. 새로 들어간 줄만 채널에 올려요.
 3) 다시 맞추기: 진행 중 협업의 열린 요청 + 최근 2일 안에 바뀐 요청을 구글 · 채널 메시지에 덮어써요 (멘션 없이)
@@ -23,6 +24,7 @@ import httpx
 
 from app.db import get_connection, transaction
 from app.discord_bot import bot_ready
+from app.schedule_notice import schedule_line
 from app.task_sync import mention, resync_task, retry_once, send_message
 from app.task_text import KST, brief_text
 from app.workspace_store import complete_ended_collaborations
@@ -68,15 +70,41 @@ ON CONFLICT DO NOTHING
 RETURNING notification_id
 """
 
+# 일정 아침 알림: 진행 중 협업의 두 사람에게 (schedule_today · schedule_tomorrow · schedule_ending)
+SCHEDULE_PICK_SQL = """
+WITH picked AS (
+    SELECT s.schedule_id, s.collaboration_id, 'schedule_today' AS type
+    FROM collaboration_schedule s WHERE s.start_date = %(today)s
+    UNION ALL
+    SELECT s.schedule_id, s.collaboration_id, 'schedule_tomorrow'
+    FROM collaboration_schedule s
+    WHERE s.start_date = %(tomorrow)s AND (s.created_at AT TIME ZONE 'Asia/Seoul')::date < %(today)s
+    UNION ALL
+    SELECT s.schedule_id, s.collaboration_id, 'schedule_ending'
+    FROM collaboration_schedule s WHERE s.end_date = %(tomorrow)s AND s.start_date < s.end_date
+)
+INSERT INTO notification (user_id, type, collaboration_id, schedule_id, notice_on, discord_status, discord_error)
+SELECT people.user_id, p.type, p.collaboration_id, p.schedule_id, %(today)s, 'skipped', '협업 채널로 알려요'
+FROM picked p
+JOIN collaboration c ON c.collaboration_id = p.collaboration_id AND c.status = 'ongoing'
+JOIN research rs ON rs.research_id = c.research_id
+CROSS JOIN LATERAL (VALUES (rs.user_id), (c.expert_id)) AS people(user_id)
+ON CONFLICT DO NOTHING
+RETURNING notification_id
+"""
+
 DETAIL_SQL = """
-SELECT n.type, n.collaboration_id, u.discord_id, a.nickname AS actor,
+SELECT n.notification_id, n.type, n.collaboration_id, n.schedule_id, u.discord_id, a.nickname AS actor,
        t.content, t.due_date, c.discord_channel_id, c.end_date,
+       s.kind AS s_kind, s.title AS s_title, s.start_date AS s_start, s.end_date AS s_end,
+       s.start_time AS s_start_time, s.end_time AS s_end_time,
        (SELECT count(*) FROM collaboration_task x
         WHERE x.collaboration_id = c.collaboration_id AND x.status = 'open') AS open_count
 FROM notification n
 JOIN users u ON u.user_id = n.user_id
 LEFT JOIN users a ON a.user_id = n.actor_id
 LEFT JOIN collaboration_task t ON t.task_id = n.task_id
+LEFT JOIN collaboration_schedule s ON s.schedule_id = n.schedule_id
 JOIN collaboration c ON c.collaboration_id = n.collaboration_id
 WHERE n.notification_id = ANY(%s)
 ORDER BY n.notification_id
@@ -93,31 +121,52 @@ def pick_today(today: date) -> list[dict]:
     """오늘 알릴 것을 종 알림으로 저장하고(이미 있으면 건너뜀), 새로 저장된 줄의 내용을 돌려줘요."""
     with transaction() as cursor:
         complete_ended_collaborations(cursor)
-        cursor.execute(
-            PICK_SQL,
-            {"today": today, "tomorrow": today + timedelta(days=1), "ending": today + timedelta(days=3)},
-        )
+        days = {"today": today, "tomorrow": today + timedelta(days=1), "ending": today + timedelta(days=3)}
+        cursor.execute(PICK_SQL, days)
         ids = [row["notification_id"] for row in cursor.fetchall()]
+        cursor.execute(SCHEDULE_PICK_SQL, days)
+        ids += [row["notification_id"] for row in cursor.fetchall()]
         if not ids:
             return []
         cursor.execute(DETAIL_SQL, (ids,))
-        return cursor.fetchall()
+        rows = [with_schedule(row) for row in cursor.fetchall()]
+        # 일정 알림은 종에 보일 일정 글자를 같이 저장해요 (일정을 나중에 지워도 보이게)
+        notes = [(schedule_line(row["schedule"]), row["notification_id"]) for row in rows if row.get("schedule")]
+        if notes:
+            cursor.executemany("UPDATE notification SET note = %s WHERE notification_id = %s", notes)
+        return rows
+
+
+def with_schedule(row: dict) -> dict:
+    """DETAIL_SQL 한 줄의 일정 칸(s_*)을 row["schedule"] 로 묶어요. 일정 알림이 아니면 None"""
+    if row.get("schedule_id") is None or row.get("s_title") is None:
+        return {**row, "schedule": None}
+    schedule = {
+        "kind": row["s_kind"],
+        "title": row["s_title"],
+        "start_date": row["s_start"],
+        "end_date": row["s_end"],
+        "start_time": row["s_start_time"],
+        "end_time": row["s_end_time"],
+    }
+    return {**row, "schedule": schedule}
 
 
 def group_by_channel(rows: list[dict]) -> dict[str, list[dict]]:
-    """새 알림 줄들 → 채널별 브리핑 항목. 협업 종료 알림은 두 사람을 한 줄로 묶어요."""
+    """새 알림 줄들 → 채널별 브리핑 항목. 두 사람에게 가는 알림(협업 종료 · 일정)은 한 줄로 묶어요."""
     channels: dict[str, list[dict]] = defaultdict(list)
-    ending: dict[str, dict] = {}
+    shared: dict[tuple, dict] = {}
     for row in rows:
         channel = row["discord_channel_id"]
         if not channel:
             continue  # 아직 채널이 없는 협업은 종 알림만
-        if row["type"] == "collab_ending":
-            if channel in ending:
-                ending[channel]["to"].append(row["discord_id"])
+        if row["type"] == "collab_ending" or row.get("schedule"):
+            key = (channel, row["type"], row.get("schedule_id"))
+            if key in shared:
+                shared[key]["to"].append(row["discord_id"])
                 continue
-            ending[channel] = {**row, "to": [row["discord_id"]]}
-            channels[channel].append(ending[channel])
+            shared[key] = {**row, "to": [row["discord_id"]]}
+            channels[channel].append(shared[key])
         else:
             channels[channel].append({**row, "to": [row["discord_id"]]})
     return channels

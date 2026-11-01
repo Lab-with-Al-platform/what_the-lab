@@ -1,4 +1,5 @@
 """LabBridge 디스코드 봇 (계속 켜 두는 프로그램): 협업 채널에서 /요청 명령어와 [요청 관리] 버튼을 받아요.
+일정(/일정 · /일정목록 · [일정 관리])은 app/discord_schedule.py 에 있어요.
 
 실행: backend 폴더에서  uv run python -m app.discord_gateway
 - 웹 서버(uvicorn)와 따로 켜요. 터미널 하나 더 열어서 실행해요
@@ -761,8 +762,14 @@ class LabBridgeBot(discord.Client):
 
     async def setup_hook(self) -> None:
         """켜질 때 LabBridge 서버에 명령어를 등록해요 (서버 하나에만 등록하면 바로 보여요)"""
+        from app.discord_schedule import (  # /일정 · /일정목록 (서로 불러오지 않게 여기서)
+            ScheduleButton,
+            add_schedule_commands,
+        )
+
         add_commands(self.tree, self.guild)
-        self.add_dynamic_items(ManageButton)  # 예전 메시지의 버튼도 받게 (봇을 다시 켜도)
+        add_schedule_commands(self.tree, self.guild)
+        self.add_dynamic_items(ManageButton, ScheduleButton)  # 예전 메시지의 버튼도 받게 (봇을 다시 켜도)
         synced = await self.tree.sync(guild=self.guild)
         log.info("명령어 등록: %s", [command.name for command in synced])
 
