@@ -3,7 +3,7 @@
 import { API_BASE_URL } from "@/lib/api";
 import { addDays, daysBetween, photoOrDefault } from "@/lib/collab-requests";
 import { Schedule } from "@/lib/workspace";
-import { CollaborationDetail, periodHeadline, ROLE_LABELS } from "@/lib/workspace-detail";
+import { CollabTask, CollaborationDetail, dayText, periodHeadline, ROLE_LABELS } from "@/lib/workspace-detail";
 import { fieldName } from "@/lib/taxonomy-options";
 import { Avatar } from "@/components/request-parts";
 
@@ -95,6 +95,7 @@ function GoogleButton({ detail }: { detail: CollaborationDetail }) {
 
 function Timeline({ detail }: { detail: CollaborationDetail }) {
   const { collaboration: collab, schedules } = detail;
+  const pins = detail.tasks.filter((task) => task.due_date && task.status !== "canceled");
   const headline = periodHeadline(collab);
   const from = collab.confirmed_on < collab.start_date ? collab.confirmed_on : collab.start_date;
   const span = Math.max(1, daysBetween(from, collab.end_date));
@@ -152,7 +153,9 @@ function Timeline({ detail }: { detail: CollaborationDetail }) {
               style={{ left: `${x(item.start_date)}%` }}
             />
           ))}
-
+        {pins.map((task) => (
+          <TaskPin key={task.task_id} task={task} today={today} left={x(task.due_date!)} />
+        ))}
         {(running || collab.status === "waiting") && (
           <span className="absolute bottom-0 top-0 w-0.5 -translate-x-px rounded bg-ink" style={{ left: `${x(today)}%` }}>
             <span className={`absolute -top-1 whitespace-nowrap text-[11px] font-bold ${x(today) > 85 ? "right-1.5" : "left-1.5"}`}>오늘</span>
@@ -166,11 +169,41 @@ function Timeline({ detail }: { detail: CollaborationDetail }) {
           <Legend className="rounded-full bg-brand">미팅</Legend>
           <Legend className="rotate-45 rounded-[1px] bg-danger">마감</Legend>
           <Legend className="h-1.5 w-3 rounded-full bg-collab-6">작업 기간</Legend>
+          {pins.length > 0 && <Legend className="rotate-45 rounded-full rounded-br-none bg-[#f0a13a]">요청</Legend>}
         </span>
         <span>{shortDay(collab.end_date)} 종료</span>
       </div>
     </div>
   );
+}
+
+/** 요청 핀: 기한 날 위치에 물방울 모양. 받은 요청 주황 · 보낸 요청 보라, 완료는 흐리게, 기한 지남은 빨간 테두리 */
+function TaskPin({ task, today, left }: { task: CollabTask; today: string; left: number }) {
+  const done = task.status === "done";
+  const late = !done && task.due_date! < today;
+  const who = task.direction === "in" ? `${task.requested_by_nickname} → 나` : `나 → ${task.assignee_nickname}`;
+  const state = done
+    ? `${task.closed_at ? kstDay(task.closed_at) : ""} 완료`
+    : late
+      ? `${daysBetween(task.due_date!, today)}일 지남`
+      : "진행 중";
+  return (
+    <a
+      href={`#task-${task.task_id}`}
+      tabIndex={-1}
+      title={`${dayText(task.due_date)}까지 · 요청 · ${task.content} (${who}) · ${state}`}
+      className={`absolute top-[1px] h-[11px] w-[11px] -translate-x-1/2 rotate-45 rounded-full rounded-br-none border-2 border-card transition-transform hover:scale-125 ${
+        task.direction === "in" ? "bg-[#f0a13a]" : "bg-brand"
+      } ${done ? "opacity-35" : ""} ${late ? "outline outline-2 outline-danger" : ""}`}
+      style={{ left: `${left}%` }}
+    />
+  );
+}
+
+/** 시각(ISO) → 한국 날짜 "11.8" (밤늦게 완료해도 날짜가 하루 밀리지 않게) */
+function kstDay(iso: string): string {
+  const parts = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", month: "numeric", day: "numeric" }).formatToParts(new Date(iso));
+  return `${parts.find((part) => part.type === "month")?.value}.${parts.find((part) => part.type === "day")?.value}`;
 }
 
 function Legend({ className, children }: { className: string; children: string }) {
