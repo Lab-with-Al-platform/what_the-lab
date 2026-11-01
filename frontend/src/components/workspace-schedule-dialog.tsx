@@ -107,7 +107,9 @@ export function ScheduleDialog({ collabs, editing, defaultCollabId, defaultDate,
             </select>
           )}
           {period && (
-            <p className="mt-2 text-xs text-muted">시각을 적으면 구글 캘린더에도 그 시각으로 들어가요. 끝 시각은 비워 두면 1시간으로 잡혀요.</p>
+            <p className="mt-2 text-xs text-muted">
+              이 협업 일정은 <b className="text-ink">{shortDate(period.first)} ~ {shortDate(period.last)}</b> 사이에 잡을 수 있어요.
+            </p>
           )}
         </div>
 
@@ -197,7 +199,7 @@ export function ScheduleDialog({ collabs, editing, defaultCollabId, defaultDate,
                 className={INPUT_CLASS}
               />
             </div>
-            <p className="mt-2 text-xs text-muted">시각을 적으면 시작 30분 전에 디스코드로 알려 드려요. 끝 시각은 비워 둬도 돼요.</p>
+            <p className="mt-2 text-xs text-muted">시각을 적으면 구글 캘린더에도 그 시각으로 들어가요. 끝 시각은 비워 두면 1시간으로 잡혀요.</p>
             {timeError && <p className="mt-1 text-xs text-danger">끝 시각은 시작 시각보다 늦어야 해요.</p>}
           </div>
         )}
