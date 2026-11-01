@@ -165,3 +165,38 @@ test("소개 영상은 한국 날짜의 첫 방문에만 자동재생하고 세 
   assert.match(css, /\.home-hero__video-frame video \{[^}]*object-fit:\s*cover/);
   assert.match(css, /max-width:\s*767px\)[\s\S]*\.home-hero__video-frame video \{[^}]*object-fit:\s*contain/);
 });
+
+test("소개 영상은 끝나도 닫히지 않고 다시보기·닫기와 재생 중 흐린 버튼을 제공한다", () => {
+  const player = loadModule("src/components/home-intro-video.tsx");
+  const videoHtml = renderToStaticMarkup(React.createElement(player.HomeIntroVideo, { playedOn: "2026-10-31", autoplay: false, onFinish() {} }));
+  assert.match(videoHtml, /aria-label="처음부터 다시보기"/);
+  // 처음 그릴 때는 멈춘 상태라 버튼이 또렷해야 합니다.
+  assert.match(videoHtml, /data-dimmed="false"/);
+
+  const source = fs.readFileSync(path.resolve(__dirname, "../src/components/home-intro-video.tsx"), "utf8");
+  // 영상이 끝나면 닫지 않고 끝난 상태만 기록합니다. 닫기는 사용자가 누를 때만 합니다.
+  assert.doesNotMatch(source, /onEnded=\{\(\) => \{[^}]*onFinish\(\)/);
+  assert.match(source, /ended \? "닫기" : "건너뛰기"/);
+
+  const css = fs.readFileSync(path.resolve(__dirname, "../src/components/home-hero.css"), "utf8");
+  assert.match(css, /\.home-hero__video-bar\[data-dimmed="true"\]\s*\{[^}]*opacity:/);
+  assert.match(css, /\.home-hero__video-bar\[data-dimmed="true"\]:hover/);
+  assert.match(css, /\.home-hero__video-bar\[data-dimmed="true"\]:has\(:focus-visible\)/);
+});
+
+test("터치 화면에서는 영상을 한 번 탭하면 흐린 버튼이 잠깐 또렷해진다", () => {
+  const source = fs.readFileSync(path.resolve(__dirname, "../src/components/home-intro-video.tsx"), "utf8");
+  // 마우스는 :hover로 충분하므로 터치·펜 입력에만 반응합니다.
+  assert.match(source, /onPointerDown=\{revealControlsOnTouch\}/);
+  assert.match(source, /pointerType === "mouse"/);
+  assert.match(source, /setTimeout\([\s\S]*?\}, CONTROLS_REVEAL_MS\)/);
+  assert.match(source, /dimControls = !paused && !blocked && !ended && !failed && !controlsRevealed/);
+});
+
+test("흐린 버튼을 터치하면 첫 탭은 보여 주기만 하고 버튼 동작은 막는다", () => {
+  const source = fs.readFileSync(path.resolve(__dirname, "../src/components/home-intro-video.tsx"), "utf8");
+  // 버튼의 onClick보다 먼저 도는 capture 단계에서 첫 탭의 클릭을 멈춥니다.
+  assert.match(source, /onClickCapture=\{blockRevealTapClick\}/);
+  assert.match(source, /blockNextClickRef\.current = dimControls && /);
+  assert.match(source, /event\.stopPropagation\(\)/);
+});
