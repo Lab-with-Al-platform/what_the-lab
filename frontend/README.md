@@ -1,37 +1,48 @@
-# Frontend
+# WHAT THE LAB · Frontend (Next.js)
 
-WHAT THE LAB의 웹 화면을 담당합니다.
+웹 프론트엔드는 Next.js 15 · React 19 · TypeScript · Tailwind CSS 4를 사용합니다. 이 문서는 2026-11-02 현재 `feature/expert-search-dark-profile-first-20261031` 브랜치를 기준으로 합니다. `develop` 병합 및 실제 운영 배포 상태와는 구분해 주세요.
 
-## 예정 기술
+## 실행 및 검증
 
-- Next.js
-- TypeScript
-- Tailwind CSS
+```bash
+npm ci
+npm run dev
+npm test
+npx tsc --noEmit
+npm run lint
+npm run build
+```
 
-공개 화면 시안은 이 폴더의 Next.js 앱입니다. `npm install` 후 `npm run dev`로 확인합니다.
+- 로컬 웹: `http://localhost:3000`
+- API 주소: `NEXT_PUBLIC_API_BASE_URL` (미지정 시 `http://localhost:8000/api/v1`)
+- 실시간 전문가 검색과 자유게시판 검색은 백엔드 및 DB가 실행되어 있어야 결과가 나옵니다. 데이터가 없다고 임의 결과를 만들어 표시하지 않습니다.
 
-랜딩, 사례·트렌드, AI 전문가 목록·상세는 화면 시안용 예시 데이터로 동작합니다. 로그인과 회원가입은 아직 자리만 있습니다.
+## 통합검색 (2026-11-02)
 
-## 책임
+- 진입: 전역 헤더 검색창 또는 `/search?q=키워드`.
+- 고정 순서: **관련 인사이트 → 전문가 찾기 → 자유게시판 → FAQ**.
+- 인사이트: `src/lib/insights.ts`의 사례·트렌드 공개 목록(시안용 콘텐츠 포함)을 서버에서 검색합니다.
+- 전문가: 기존 `GET /api/v1/experts`의 **공개·활성 전문가**만 노출하며 상세 프로필로 이동합니다.
+- 자유게시판: `GET /api/v1/community/posts?scope=public&q=` API로 공개·비숨김 게시글만 조회합니다. 로그인 여부/관리자 여부로 비공개 범위를 넓히지 않습니다.
+- FAQ: `src/lib/faq.ts`를 검색하고 개별 답변 앵커로 연결합니다.
+- 구현: `src/app/search/page.tsx`, `src/components/unified-search.tsx`, `src/lib/global-search.ts`.
+- 테스트: `tests/global-search.test.cjs`; [100개 설계 점검](../docs/qa/global-search-100-question-review-20261102.md).
 
-- 메인, 로그인·회원가입, 역할별 온보딩
-- 프로젝트 및 AI 전문가 목록·상세
-- 협업 요청·참여 신청·프로젝트 진행 UI
-- API 호출 상태(로딩·성공·빈 결과·오류) 표현
-- 접근성, 반응형 화면, 공통 컴포넌트
+## 주요 화면
 
-## UI에서 지킬 규칙
+| 화면 | URL | 현재 동작 |
+|---|---|---|
+| 인사이트 사례 | `/cases` | 공개 사례 목록·상세 |
+| 인사이트 트렌드 | `/trends` | 공개 트렌드 목록·상세 |
+| 전문가 찾기 | `/experts` | 실제 API 검색·기술/분야 필터·공개 프로필 |
+| 통합검색 | `/search` | 네 영역 교차검색 및 원본 화면 연결 |
+| 자유게시판 | `/community` | 공개 게시글/로그인 기반 활동 |
+| FAQ | `/faq` | 질문·답변 검색 및 앵커 이동 |
 
-- 목록은 비교에 필요한 최소 정보, 상세는 최종 판단에 필요한 맥락을 보여줍니다.
-- 상태는 색만으로 표현하지 않고 텍스트를 함께 표시합니다.
-- `Availability`, `Relationship`, `Project Status`를 하나의 배지로 합치지 않습니다.
-- 권한 때문에 버튼을 사용할 수 없다면 이유를 설명합니다.
-- API 타입을 임의로 추측하지 말고 백엔드 계약과 맞춥니다.
+## 개발 원칙
 
-## 담당 협업
-
-- 프로젝트 리드: 메인·인증·통합
-- 프론트엔드 경험자: 공통 UI·레이아웃
-- 초보 팀원: 전문가 목록·상세
-
-인사이트 화면은 `MVP+`입니다. 초기 구조를 방해하지 않는 선에서 디자인 자료를 보존하되, 팀의 범위 승인 전 구현하지 않습니다.
+- 목록은 비교에 필요한 공개 정보만, 상세 페이지는 추가 맥락을 제공합니다.
+- 로딩·빈 결과·실패를 서로 구분하고 색만으로 상태를 표현하지 않습니다.
+- API 데이터 계약과 검색 허용 범위를 임의로 확대하지 않습니다.
+- **협업 요청은 전문가 상세 프로필에서** 시작하며 통합검색 결과는 요청을 자동 생성하지 않습니다.
+- 실제 DB 기반 검색과 시안 인사이트 데이터를 구분합니다.
