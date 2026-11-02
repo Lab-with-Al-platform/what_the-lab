@@ -129,7 +129,7 @@ export function UnifiedSearch({ query, insights, faqs }: {
   const ready = !experts.loading && !posts.loading;
   const totalKnown = insights.length + faqs.length + (experts.error ? 0 : experts.total) + (posts.error ? 0 : posts.total);
   const allEmpty = ready && !experts.error && !posts.error && totalKnown === 0;
-  const count = (value: Remote<unknown>) => value.loading ? "검색 중" : value.error ? "조회 오류" : value.total + "건";
+  const count = (value: Remote<unknown>) => !query ? "검색어 대기" : value.loading ? "검색 중" : value.error ? "조회 오류" : value.total + "건";
   const sections = [
     { id: "insights", label: "인사이트", number: String(insights.length) },
     { id: "experts", label: "전문가", number: count(experts) },
@@ -208,7 +208,9 @@ export function UnifiedSearch({ query, insights, faqs }: {
         <div className="space-y-12 pt-10 sm:space-y-14">
           <section id="insights" aria-labelledby="insights-heading" className="scroll-mt-28">
             <SectionHeading number="01" title="관련 인사이트" description="AI 연구 협업 사례와 AI 트렌드 · 현재 공개 목록 기준" count={insights.length + "건"} anchor="insights" />
-            {query && insights.length ? (
+            {!query ? (
+              <p className="rounded-xl bg-white p-6 text-sm text-[#74819a]">검색어를 입력하면 관련 인사이트가 표시됩니다.</p>
+            ) : insights.length ? (
               <>
                 <div className="grid items-stretch gap-4 sm:grid-cols-2 xl:grid-cols-4">
                   {insights.slice(0, allInsights ? undefined : PREVIEW_INSIGHTS).map((item) => (
@@ -288,7 +290,9 @@ export function UnifiedSearch({ query, insights, faqs }: {
 
           <section id="faq" aria-labelledby="faq-heading" className="scroll-mt-28">
             <SectionHeading number="04" title="관련 FAQ" description="실제 자주 묻는 질문과 답변·키워드 검색" count={faqs.length + "건"} anchor="faq" />
-            {query && faqs.length ? (
+            {!query ? (
+              <p className="rounded-xl bg-white p-6 text-sm text-[#74819a]">검색어를 입력하면 관련 FAQ가 표시됩니다.</p>
+            ) : faqs.length ? (
               <>
                 <div className="grid gap-3 md:grid-cols-2">
                   {faqs.slice(0, allFaqs ? undefined : PREVIEW_FAQS).map((faq) => (
