@@ -178,7 +178,7 @@ export function SiteHeader() {
             aria-controls="header-search"
             onClick={() => setSearchOpen((open) => !open)}
           >
-            <span className="sr-only">인사이트 검색 열기</span>
+            <span className="sr-only">통합검색 열기</span>
             <SearchIcon />
           </button>
 
@@ -290,15 +290,16 @@ export function SiteHeader() {
       </PageContainer>
 
       {searchOpen ? (
-        <form id="header-search" action="/search" className="border-t border-line bg-white">
+        <form id="header-search" action="/search" role="search" onSubmit={() => setSearchOpen(false)} className="border-t border-line bg-white">
           <PageContainer className="flex gap-2 py-3">
             <label className="sr-only" htmlFor="site-search">
-              제목, 분야, 태그로 검색
+              인사이트, 전문가, 자유게시판, FAQ 통합검색
             </label>
             <input
               id="site-search"
               name="q"
-              placeholder="사례와 트렌드 검색"
+              placeholder="인사이트, 전문가, 자유게시판, FAQ 검색"
+              maxLength={50}
               className="h-11 flex-1 rounded-button border border-line px-4 text-sm"
               autoFocus
             />
