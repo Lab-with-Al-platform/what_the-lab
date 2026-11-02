@@ -12,6 +12,7 @@ const KIND_ORDER = { work: 0, due: 1, meeting: 2, etc: 3 } as const; // 작업 �
  * 진행 중 협업들의 일정을 한 달력에. (협업별로 끄고 켜기는 위 "내 협업" 목록에서 해요)
  * 열린 요청은 기한 날에 📌 로 (기한이 없거나 지났으면 오늘 칸). 누르면 그 협업 상세로 가요. 
  * onAdd(날짜?) = 일정 추가 창 열기 (날짜 숫자를 누르면 그 날짜로) / onPick(일정) = 일정 보기 창
+ * googleUrl = 있으면 [구글 캘린더] 버튼 (구글에 추가해 둔 협업이 하나라도 있을 때)
  */
 export function WorkspaceCalendar({
   schedules,
@@ -19,12 +20,14 @@ export function WorkspaceCalendar({
   today,
   onAdd,
   onPick,
+  googleUrl,
 }: {
   schedules: Schedule[];
   tasks: WorkspaceTask[];
   today: string;
   onAdd: (date?: string) => void;
   onPick: (schedule: Schedule) => void;
+  googleUrl?: string;
 }) {
   const thisMonth = { year: Number(today.slice(0, 4)), month: Number(today.slice(5, 7)) };
   const [month, setMonth] = useState(thisMonth);
@@ -55,7 +58,18 @@ export function WorkspaceCalendar({
         <NavButton label="다음 달" onClick={() => move(1)}>
           ›
         </NavButton>
-        <button type="button" onClick={() => onAdd()} className="ml-auto h-8 rounded-button bg-brand px-3 text-xs font-semibold text-white hover:bg-brand-hover">
+        {googleUrl && (
+          <a
+            href={googleUrl}
+            target="_blank"
+            rel="noreferrer"
+            title="구글 캘린더에서 추가해 둔 협업 일정을 한 번에 봐요"
+            className="ml-auto inline-flex h-8 items-center rounded-button border border-line px-3 text-xs font-semibold text-ink hover:bg-page"
+          >
+            📅 구글 캘린더
+          </a>
+        )}
+        <button type="button" onClick={() => onAdd()} className={`${googleUrl ? "" : "ml-auto "}h-8 rounded-button bg-brand px-3 text-xs font-semibold text-white hover:bg-brand-hover`}>    
           + 일정 추가
         </button>
       </div>

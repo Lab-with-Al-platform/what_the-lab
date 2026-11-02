@@ -24,7 +24,7 @@ def test_brief_text_orders_and_mentions_only_who_must_act():
         ],
     )
     lines = text.split("\n")
-    assert lines[0] == "☀️ **오늘 챙길 요청** · 11.2 (월)"
+    assert lines[0] == "☀️ **오늘 챙길 일** · 11.2 (월)"
     assert lines[1].startswith("📅 <@111> <@222> 협업이 11.5 (목)에 끝나요 · 열린 요청 2개")  # 종료 임박이 맨 위
     assert lines[2] == "⚠️ <@222> 기한 10.30 (금)이 3일 지났어요 · 그래프 정리"
     assert lines[3] == "⏰ <@222> 오늘까지예요 · 그래프 정리" and lines[4] == "⏰ <@222> 내일까지예요 · 그래프 정리"

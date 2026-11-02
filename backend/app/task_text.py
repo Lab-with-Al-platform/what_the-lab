@@ -175,19 +175,39 @@ def row_due(row: dict) -> str:
 
 
 def brief_text(today: date, items: list[dict]) -> str:
-    """아침 브리핑 (협업 채널 하나에 하루 한 번). 지금 움직여야 하는 사람만 멘션해요.
+    """아침 브리핑 (협업 채널 하나에 하루 한 번). 알림을 받을 사람만 멘션해요.
 
     items: 알림 한 줄씩 — type · to(멘션할 디스코드 번호들) · content · due_date · actor · end_date · open_count
       task_due_soon(기한 오늘 · 내일) / task_overdue(기한 지남) / task_talk_waiting(기한 수정 요청에 답 없음)
       / collab_ending(협업 종료 3일 전, 열린 요청 있음)
+      / schedule_today(오늘 일정) · schedule_tomorrow(내일 일정) · schedule_ending(내일 끝나는 여러 날 일정): schedule 칸에 일정
     """
-    order = {"collab_ending": 0, "task_overdue": 1, "task_due_soon": 2, "task_talk_waiting": 3}
-    lines = [f"☀️ **오늘 챙길 요청** · {short_day(today)} ({WEEKDAYS[today.weekday()]})"]
-    for item in sorted(items, key=lambda row: (order[row["type"]], row.get("due_date") or today)):
+    from app.schedule_notice import daily_label  # 일정 글자 (서로 불러오지 않게 여기서)
+
+    order = {
+        "collab_ending": 0,
+        "schedule_today": 1,
+        "task_overdue": 2,
+        "task_due_soon": 3,
+        "schedule_ending": 4,
+        "schedule_tomorrow": 5,
+        "task_talk_waiting": 6,
+    }
+
+    def sort_key(row: dict):
+        schedule = row.get("schedule") or {}
+        when = schedule.get("start_time")
+        return (order[row["type"]], row.get("due_date") or schedule.get("start_date") or today, str(when or ""))
+
+    lines = [f"☀️ **오늘 챙길 일** · {short_day(today)} ({WEEKDAYS[today.weekday()]})"]
+    for item in sorted(items, key=sort_key):
         who = " ".join(f"<@{discord_id}>" for discord_id in item["to"] if discord_id)
         content = (item.get("content") or "").replace("\n", " ")[:50]
         kind = item["type"]
-        if kind == "collab_ending":
+        if kind.startswith("schedule_"):
+            icon, _, text = daily_label(kind, item["schedule"], today).partition(" ")
+            lines.append(f"{icon} {who} {text}")
+        elif kind == "collab_ending":
             lines.append(
                 f"📅 {who} 협업이 {day_text(item['end_date'])}에 끝나요 · 열린 요청 {item['open_count']}개를 "
                 f"끝내거나 정리해 주세요 (필요하면 기간 연장을 얘기해요)"

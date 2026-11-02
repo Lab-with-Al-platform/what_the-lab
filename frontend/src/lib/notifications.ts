@@ -21,7 +21,15 @@ export type NotificationType =
   | "task_due_soon"
   | "task_overdue"
   | "task_talk_waiting"
-  | "collab_ending";
+  | "collab_ending"
+  // 일정 (한 사람이 한 일 → 상대 / 아침 브리핑 → 두 사람)
+  | "schedule_created"
+  | "schedule_changed"
+  | "schedule_edited"
+  | "schedule_deleted"
+  | "schedule_tomorrow"
+  | "schedule_today"
+  | "schedule_ending";
 
 /** 알림 한 건 (GET /notifications 의 items) */
 export type NotificationItem = {
@@ -59,6 +67,13 @@ export const NOTIFICATION_ICONS: Record<NotificationType, { icon: string; classN
   task_overdue: { icon: "!", className: "bg-danger-soft text-danger" },
   task_talk_waiting: { icon: "🗓", className: "bg-editorial-warning-soft text-[#8a5a12]" },
   collab_ending: { icon: "⏳", className: "bg-expert-soft text-expert" },
+  schedule_created: { icon: "📅", className: "bg-brand-soft text-brand" },
+  schedule_changed: { icon: "🔁", className: "bg-editorial-warning-soft text-[#8a5a12]" },
+  schedule_edited: { icon: "✎", className: "bg-page text-muted" },
+  schedule_deleted: { icon: "🗑", className: "bg-page text-faint" },
+  schedule_tomorrow: { icon: "🔔", className: "bg-brand-soft text-brand" },
+  schedule_today: { icon: "📅", className: "bg-success-soft text-success" },
+  schedule_ending: { icon: "🏁", className: "bg-expert-soft text-expert" },
 };
 
 /** 제목을 닉네임과 나머지로 나눠요. 닉네임만 굵게 보여 주려고. "neural_kim 님이 …" → ["neural_kim", " 님이 …"] */

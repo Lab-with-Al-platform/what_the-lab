@@ -2,13 +2,15 @@
 
 같은 협업의 두 사람(연구회원, 전문가)만 볼 수 있고 바꿀 수 있어요. 남의 협업은 404.
 저장 API는 모두 처리가 끝난 최신 목록 전체(load_workspace)를 돌려줍니다. 화면은 받은 값으로 그대로 다시 그려요.
+일정을 추가 · 변경 · 삭제하면 상대에게 알려요 (종 알림 + 응답 뒤 협업 채널 멘션, app/schedule_notice.py).
 일정 입력 규칙은 app/workspace_rules.py 에 모아 두었어요.
 """
 
 from datetime import date
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 
+from app import schedule_notice as notice
 from app import workspace_rules as rules
 from app.db import transaction
 from app.google_calendar import event_id
@@ -59,8 +61,42 @@ def open_workspace(collaboration_id: int, user_id: int = Depends(get_current_use
 
 @router.post("/{collaboration_id}/schedules")
 def add_schedule(
-    collaboration_id: int, body: rules.ScheduleInput, user_id: int = Depends(get_current_user_id)
+    collaboration_id: int,
+    body: rules.ScheduleInput,
+    background: BackgroundTasks,
+    user_id: int = Depends(get_current_user_id),
 ) -> dict:
+    """일정 추가 (웹). 저장 · 알림은 save_schedule, 채널 멘션은 응답을 보낸 뒤에."""
+    background.add_task(notice.announce, save_schedule(user_id, collaboration_id, body))
+    return load_workspace(user_id)
+
+
+@router.put("/schedules/{schedule_id}")
+def update_schedule(
+    schedule_id: int,
+    body: rules.ScheduleInput,
+    background: BackgroundTasks,
+    user_id: int = Depends(get_current_user_id),
+) -> dict:
+    """일정 하나 수정 (웹). 저장 · 알림은 edit_schedule."""
+    background.add_task(notice.announce, edit_schedule(user_id, schedule_id, body))
+    return load_workspace(user_id)
+
+
+@router.delete("/schedules/{schedule_id}")
+def delete_schedule(
+    schedule_id: int,
+    background: BackgroundTasks,
+    series: bool = False,
+    user_id: int = Depends(get_current_user_id),
+) -> dict:
+    """일정 삭제 (웹). series=true 면 같은 반복 묶음 중 이 날짜와 그 뒤 일정을 모두. 저장 · 알림은 remove_schedule."""
+    background.add_task(notice.announce, remove_schedule(user_id, schedule_id, series))
+    return load_workspace(user_id)
+
+
+# ---------- 웹 · 디스코드(/일정) 공통: 저장 + 상대 알림 저장. 돌려준 값을 notice.announce 에 넘기면 채널 멘션 ----------
+def save_schedule(user_id: int, collaboration_id: int, body: rules.ScheduleInput) -> dict:
     """일정 추가. 매주 반복을 고르면 종료일까지 같은 요일마다 하나씩 만들고 series_id 로 묶어요."""
     with transaction() as cursor:
         collab = find_collaboration(cursor, user_id, collaboration_id, lock=True)
@@ -74,25 +110,32 @@ def add_schedule(
         repeat = body.repeat_weekly and values["kind"] != "work" and values["start_date"] == values["end_date"]
         days = rules.weekly_dates(values["start_date"], collab["end_date"]) if repeat else [values["start_date"]]
         series_id = None
+        first_id = None
         for day in days:
             end = day if repeat else values["end_date"]  # 반복 일정은 모두 하루짜리
             cursor.execute(INSERT_SCHEDULE, {**values, "start_date": day, "end_date": end, "series_id": series_id})
             new_id = cursor.fetchone()["schedule_id"]
+            first_id = first_id or new_id
             if repeat and series_id is None:  # 첫 일정 번호로 묶어요
                 series_id = new_id
                 cursor.execute("UPDATE collaboration_schedule SET series_id = %s WHERE schedule_id = %s", (new_id, new_id))
-    return load_workspace(user_id)
+        first = {**values, "start_date": days[0], "end_date": days[0] if repeat else values["end_date"]}
+        people = notice.collab_people(cursor, collaboration_id)
+        return notice.notify_schedule(
+            cursor, people, user_id, "schedule_created", first_id, notice.created_note(first, len(days))
+        )
 
 
-@router.put("/schedules/{schedule_id}")
-def update_schedule(
-    schedule_id: int, body: rules.ScheduleInput, user_id: int = Depends(get_current_user_id)
-) -> dict:
-    """일정 하나 수정. (반복 일정이어도 이 날짜 하나만 바뀌어요) 고친 사람을 남기고, 구글에도 다시 반영해요."""
+def edit_schedule(user_id: int, schedule_id: int, body: rules.ScheduleInput) -> dict | None:
+    """일정 하나 수정. (반복 일정이어도 이 날짜 하나만 바뀌어요) 고친 사람을 남기고, 구글에도 다시 반영해요.
+
+    날짜 · 시각이 바뀌면 상대에게 종 + 채널 멘션, 제목 · 메모 · 종류만 바뀌면 종에만 남겨요. 그대로면 None(알림 없음).
+    """
     with transaction() as cursor:
         collab = find_collaboration(cursor, user_id, schedule_owner(cursor, schedule_id), lock=True)
         check_ongoing(collab)
         values = rules.clean_schedule(body, allowed_period(collab))
+        old = find_schedule(cursor, schedule_id)
         cursor.execute(
             """
             UPDATE collaboration_schedule SET kind = %(kind)s, title = %(title)s, start_date = %(start_date)s,
@@ -103,18 +146,29 @@ def update_schedule(
             """,
             {**values, "schedule_id": schedule_id, "updated_by": user_id, "google_status": google_status(collab)},
         )
-    return load_workspace(user_id)
+        if not (notice.is_moved(old, values) or notice.is_edited(old, values)):
+            return None
+        moved = notice.is_moved(old, values)
+        people = notice.collab_people(cursor, collab["collaboration_id"])
+        return notice.notify_schedule(
+            cursor,
+            people,
+            user_id,
+            "schedule_changed" if moved else "schedule_edited",
+            schedule_id,
+            notice.changed_note(old, values) if moved else notice.schedule_line(values),
+        )
 
 
-@router.delete("/schedules/{schedule_id}")
-def delete_schedule(schedule_id: int, series: bool = False, user_id: int = Depends(get_current_user_id)) -> dict:
-    """일정 삭제. series=true 면 같은 반복 묶음 중 이 날짜와 그 뒤 일정을 모두 지워요.
+def remove_schedule(user_id: int, schedule_id: int, series: bool = False) -> dict:
+    """일정 삭제. series=True 면 같은 반복 묶음 중 이 날짜와 그 뒤 일정을 모두 지워요.
 
     구글 캘린더가 있는 협업이면 지운 일정을 대기열(google_event_trash)에 적어 구글에서도 지워요.
     """
     with transaction() as cursor:
         collab = find_collaboration(cursor, user_id, schedule_owner(cursor, schedule_id), lock=True)
         check_ongoing(collab)
+        target = find_schedule(cursor, schedule_id)  # 지우기 전에 알림 글자용으로 읽어 둬요
         deleted: list[int] = []
         if series:
             cursor.execute(
@@ -135,13 +189,24 @@ def delete_schedule(schedule_id: int, series: bool = False, user_id: int = Depen
                 "INSERT INTO google_event_trash (calendar_id, event_id) VALUES (%s, %s)",
                 [(collab["google_calendar_id"], event_id(item)) for item in deleted],
             )
-    return load_workspace(user_id)
+        people = notice.collab_people(cursor, collab["collaboration_id"])
+        return notice.notify_schedule(
+            cursor, people, user_id, "schedule_deleted", schedule_id, notice.deleted_note(target, len(deleted))
+        )
 
 
 def allowed_period(collab: dict) -> tuple[date, date]:
     """일정을 잡을 수 있는 기간. 추가·수정이 같은 기간을 쓰도록 여기서만 계산해요."""
     return rules.schedule_period(collab["start_date"], collab["end_date"], collab["confirmed_on"])
 
+def find_schedule(cursor, schedule_id: int) -> dict:
+    """바꾸기 · 지우기 전 일정 (무엇이 바뀌었는지 · 무엇을 지웠는지 알림에 써요)"""
+    cursor.execute(
+        "SELECT kind, title, start_date, end_date, start_time, end_time, memo FROM collaboration_schedule"
+        " WHERE schedule_id = %s",
+        (schedule_id,),
+    )
+    return cursor.fetchone()
 
 def schedule_owner(cursor, schedule_id: int) -> int:
     """일정이 속한 협업 번호. 없으면 404. (내 협업인지는 find_collaboration 에서 확인해요)"""
