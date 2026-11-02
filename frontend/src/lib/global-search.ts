@@ -26,7 +26,10 @@ function relevance(query: string, title: string, secondary: string[]): number {
   const key = normalize(query);
   const heading = normalize(title);
   const remaining = normalize(secondary.join(" "));
+  const words = key.split(" ").filter(Boolean);
   return (heading === key ? 100 : heading.startsWith(key) ? 55 : heading.includes(key) ? 30 : 0)
+    + words.filter((word) => heading.includes(word)).length * 16
+    + words.filter((word) => remaining.includes(word)).length * 3
     + (remaining.includes(key) ? 12 : 0);
 }
 
