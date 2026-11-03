@@ -4,7 +4,7 @@ from contextlib import contextmanager
 from datetime import date
 
 import pytest
-from fastapi import HTTPException
+from fastapi import BackgroundTasks, HTTPException
 
 from app import workspace_rules as rules
 from app.routers import workspace
@@ -40,11 +40,19 @@ def cursor(monkeypatch) -> FakeCursor:
     @contextmanager
     def fake_transaction():
         yield fake
-
+        
     monkeypatch.setattr(workspace, "transaction", fake_transaction)
     monkeypatch.setattr(workspace, "find_collaboration", lambda *args, **kwargs: COLLAB)
     monkeypatch.setattr(workspace, "load_workspace", lambda user_id: {"ok": True})
+    # 알림은 tests/test_schedule_notice.py 에서 따로 봐요. 여기선 기간 규칙만.
+    monkeypatch.setattr(workspace, "find_schedule", lambda *args: OLD)
+    monkeypatch.setattr(workspace.notice, "collab_people", lambda *args: {})
+    monkeypatch.setattr(workspace.notice, "notify_schedule", lambda *args: None)
     return fake
+
+
+OLD = {"kind": "meeting", "title": "사전 미팅", "start_date": date(2026, 11, 4), "end_date": date(2026, 11, 4),
+       "start_time": None, "end_time": None, "memo": None}
 
 
 def make(start: date) -> rules.ScheduleInput:
@@ -52,20 +60,20 @@ def make(start: date) -> rules.ScheduleInput:
 
 
 def test_add_allows_meeting_before_start(cursor):
-    workspace.add_schedule(COLLAB["collaboration_id"], make(date(2026, 10, 30)), user_id=1)
+    workspace.add_schedule(COLLAB["collaboration_id"], make(date(2026, 10, 30)), BackgroundTasks(), user_id=1)
     assert cursor.saved[0]["start_date"] == date(2026, 10, 30)  # 시작 전 사전 미팅
 
 
 def test_update_allows_meeting_before_start(cursor):
-    workspace.update_schedule(1, make(date(2026, 10, 30)), user_id=1)
+    workspace.update_schedule(1, make(date(2026, 10, 30)), BackgroundTasks(), user_id=1)
     assert cursor.saved[0]["start_date"] == date(2026, 10, 30)
 
 
 @pytest.mark.parametrize(
     "call",
     [
-        lambda body: workspace.add_schedule(COLLAB["collaboration_id"], body, user_id=1),
-        lambda body: workspace.update_schedule(1, body, user_id=1),
+        lambda body: workspace.add_schedule(COLLAB["collaboration_id"], body, BackgroundTasks(), user_id=1),
+        lambda body: workspace.update_schedule(1, body, BackgroundTasks(), user_id=1),
     ],
 )
 def test_rejects_day_before_confirmed(cursor, call):

@@ -121,64 +121,41 @@ export function HomePage() {
 }
 
 function HeroCollage() {
-  // CSS로 숨기는 것만으로는 다운로드를 막지 못합니다. media로 PC 사진을 선택합니다.
-  const sizes = "(min-width: 1440px) 760px, 55vw";
-  const { props: { srcSet } } = getImageProps({
+  const sizes = "(min-width: 1440px) 920px, (min-width: 1024px) 65vw, 100vw";
+  const { props } = getImageProps({
     src: "/generated/labbridge-hero-v1.jpg", alt: "", fill: true, sizes,
   });
 
   return (
-    <div className="relative hidden h-[378px] min-w-0 lg:block">
-      <div className="absolute inset-0 overflow-hidden">
-        <picture>
-          <source media="(min-width: 1024px)" srcSet={srcSet} sizes={sizes} />
-          {/* 모바일은 네트워크 요청이 없는 투명 픽셀을 사용하고 기존 숨김 배치를 유지합니다. */}
-          <img
-            src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-            alt="" loading="lazy" decoding="async" fetchPriority="high"
-            className="absolute inset-0 h-full w-full object-cover object-center"
-          />
-        </picture>
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,#ffffff_0%,rgba(255,255,255,0.72)_11%,rgba(255,255,255,0)_34%)]" />
+    <div className="home-hero__collage home-hero__collage--intro">
+      <div className="home-hero__guide-photo">
+        <img
+          src={props.src}
+          srcSet={props.srcSet}
+          sizes={sizes}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          fetchPriority="high"
+          className="absolute inset-0 h-full w-full object-cover object-center"
+        />
+        <div className="home-hero__guide-fade" />
       </div>
-      <FloatingNote
-        className="absolute top-12 left-[26%] w-[152px]"
-        title="Bioinformatics"
-        body="단백질 구조 예측으로 신약 후보 물질 발굴"
-      />
-      <FloatingNote
-        className="absolute top-12 right-[3%] w-[180px]"
-        title="Medical AI"
-        body="의료 영상 자료로 조기 진단 정확도 향상"
-        titleClass="text-expert"
-      />
-      <FloatingNote
-        className="absolute bottom-7 left-[26%] w-[160px]"
-        title="Climate Tech"
-        body="위성 영상 분석으로 기후 변화 예측"
-      />
-      <p className="absolute right-[4%] bottom-7 max-w-[156px] rounded-[8px] bg-white/72 px-3 py-2 text-xs leading-5 text-muted backdrop-blur-sm">
-        연구의 가능성을 데이터와 AI로 확장합니다.
-      </p>
-    </div>
-  );
-}
-
-function FloatingNote({
-  className,
-  title,
-  body,
-  titleClass = "text-ink",
-}: {
-  className: string;
-  title: string;
-  body: string;
-  titleClass?: string;
-}) {
-  return (
-    <div className={`${className} rounded-card border border-white/80 bg-white/88 p-3 shadow-card backdrop-blur-md`}>
-      <p className={`text-[11px] font-semibold ${titleClass}`}>{title}</p>
-      <p className="mt-1 text-[10px] leading-4 text-muted">{body}</p>
+      <div className="home-hero__guide-notes">
+        <div className="home-hero__note home-hero__note--intro-bio">
+          <p className="home-hero__note-title">Bioinformatics</p>
+          <p className="home-hero__note-body">단백질 구조 예측으로 신약 후보 물질 발굴</p>
+        </div>
+        <div className="home-hero__note home-hero__note--intro-med">
+          <p className="home-hero__note-title text-expert">Medical AI</p>
+          <p className="home-hero__note-body">의료 영상 자료로 조기 진단 정확도 향상</p>
+        </div>
+        <div className="home-hero__note home-hero__note--intro-climate">
+          <p className="home-hero__note-title">Climate Tech</p>
+          <p className="home-hero__note-body">위성 영상 분석으로 기후 변화 예측</p>
+        </div>
+        <p className="home-hero__note home-hero__note--intro-caption">연구의 가능성을 데이터와 AI로 확장합니다.</p>
+      </div>
     </div>
   );
 }

@@ -153,9 +153,18 @@ export type WorkspaceTask = {
   direction: "in" | "out"; // in = 내가 받은 요청, out = 내가 보낸 요청
   requested_by_nickname: string;
   assignee_nickname: string;
+  flag: "due_talk" | "returned" | null; // due_talk = 받은 사람이 기한을 얘기함 (보낸 사람 차례) / returned = 다시 요청됨
 };
 
-export type WorkspaceData = { collaborations: Collaboration[]; schedules: Schedule[]; tasks: WorkspaceTask[] };
+export type WorkspaceData = {
+  collaborations: Collaboration[];
+  schedules: Schedule[];
+  tasks: WorkspaceTask[];
+  google_enabled: boolean; // 서버에 구글 연동 설정이 있는지 (없으면 구글 버튼을 숨겨요)
+};
+
+/** 구글 캘린더 첫 화면. 추가해 둔 협업 캘린더가 모두 같이 보여요 */
+export const GOOGLE_CALENDAR_HOME = "https://calendar.google.com/calendar/r";
 
 /** 요청을 보여 줄 날: 기한이 오늘 뒤면 그날, 기한이 없거나 오늘·지났으면 오늘 (끝날 때까지 매일 오늘 칸에) */
 export function taskDay(task: { due_date: string | null }, today: string): string {

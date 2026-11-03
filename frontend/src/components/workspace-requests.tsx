@@ -43,6 +43,12 @@ export function RequestList({ collabs, tasks, today }: { collabs: Collaboration[
                     )}
                     <span className="text-faint">·</span>
                     <DueText due={task.due_date} today={today} />
+                                        {task.flag === "due_talk" && (
+                      <span className="rounded bg-editorial-warning-soft px-1.5 py-px font-semibold text-[#8a5a12]">
+                        🗓 {task.direction === "out" ? "기한 얘기 왔어요" : "기한 얘기함"}
+                      </span>
+                    )}
+                    {task.flag === "returned" && <span className="rounded bg-danger-soft px-1.5 py-px font-semibold text-danger">↩ 다시 요청됨</span>}
                   </p>
                   <p className={`mt-1 flex items-center gap-1 text-[11px] font-semibold ${tone.text}`}>
                     <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${tone.dot}`} />

@@ -7,7 +7,7 @@
 
 import json
 import time
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from functools import lru_cache
 from pathlib import Path
 
@@ -109,10 +109,12 @@ def event_body(schedule: dict) -> dict:
     """우리 일정 → 구글 일정 모양. 시각이 있는 하루짜리는 그 시각에, 나머지는 '하루 종일'로 넣어요."""
     start, end = schedule["start_date"], schedule["end_date"]
     if schedule.get("start_time") and start == end:
-        end_time = schedule.get("end_time") or schedule["start_time"]
+        begin = datetime.fromisoformat(f"{start}T{schedule['start_time']}")
+        # 끝 시각을 안 적었으면 1시간짜리로 넣어요 (시작과 같게 넣으면 구글에 0분 일정이 돼요)
+        finish = datetime.fromisoformat(f"{start}T{schedule['end_time']}") if schedule.get("end_time") else begin + timedelta(hours=1)
         when = {
-            "start": {"dateTime": f"{start}T{schedule['start_time']}:00", "timeZone": TIMEZONE},
-            "end": {"dateTime": f"{start}T{end_time}:00", "timeZone": TIMEZONE},
+            "start": {"dateTime": begin.isoformat(), "timeZone": TIMEZONE},
+            "end": {"dateTime": finish.isoformat(), "timeZone": TIMEZONE},
         }
     else:
         # 하루 종일 일정은 끝나는 날 '다음 날'을 적어야 해요 (구글 규칙)

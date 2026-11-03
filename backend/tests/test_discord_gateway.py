@@ -5,8 +5,15 @@ from datetime import date
 
 import pytest
 
-from app.discord_gateway import DueError, ManageButton, panel, parse_due
-from app.task_text import due_label, task_message
+from app.discord_gateway import (
+    DueError,
+    ManageButton,
+    list_sections,
+    panel,
+    parse_due,
+    select_options,
+)
+from app.task_text import due_label, task_list_text, task_message
 
 TODAY = date(2026, 10, 30)  # 금요일
 
@@ -96,11 +103,11 @@ def test_task_message_by_status():
 @pytest.mark.parametrize(
     ("status", "user", "buttons"),
     [
-        ("open", RECEIVER, ["done"]),  # 받은 사람: 완료
+        ("open", RECEIVER, ["done", "talk"]),  # 받은 사람: 완료 · 기한 얘기하기
         ("open", SENDER, ["due", "cancel"]),  # 보낸 사람: 기한 변경 · 요청 취소
         ("open", OTHER, []),
         ("done", RECEIVER, ["reopen"]),  # 완료한 사람이 되돌리기
-        ("done", SENDER, []),
+        ("done", SENDER, ["return"]),  # 보낸 사람: 다시 요청
         ("canceled", SENDER, ["reopen"]),  # 취소한 사람이 되돌리기
         ("canceled", RECEIVER, []),
     ],
@@ -119,3 +126,80 @@ def test_button_id_round_trip(custom_id):
     """버튼 id 만으로 어떤 요청인지 알아야 봇을 다시 켜도 동작해요. 예전 버튼 id 도 받아요."""
     match = re.fullmatch(ManageButton.__discord_ui_compiled_template__, custom_id)
     assert match["task_id"] == "42"
+
+
+
+def list_row(task_id, status="open", flag=None, message_id="700", content="그래프 정리"):
+    return {
+        "task_id": task_id, "content": content, "due_date": date(2026, 11, 10), "status": status,
+        "discord_message_id": message_id, "closed_on": date(2026, 10, 29) if status == "done" else None,
+        "requested_by_nickname": "jiwoo_lab", "assignee_nickname": "outsider_lee", "flag": flag,
+    }
+
+
+def test_received_list_puts_returned_first_and_links_messages():
+    """/받은요청: 다시 요청된 요청이 '내가 답할 것'에, 제목은 채널 메시지 링크"""
+    rows = [list_row(1), list_row(2, flag="returned", message_id="701", content="표 [최종] 다시")]
+    text = task_list_text("📥 **받은 요청**", list_sections(rows, "in"), "https://discord.com/channels/1/900", "http://web/workspace/3")
+    answer, progress = text.index("**내가 답할 것**"), text.index("**진행 중**")
+    assert answer < text.index("표 (최종) 다시") < progress  # 대괄호는 링크가 깨지지 않게 바꿔요
+    assert "(https://discord.com/channels/1/900/701)" in text and "jiwoo_lab → 나" in text
+    assert "↩️ 다시 요청됨" in text and "최근 완료" not in text  # 받은 요청에는 완료 묶음이 없어요
+
+
+def test_sent_list_shows_due_talk_and_recent_done():
+    rows = [list_row(1, flag="due_talk"), list_row(2), list_row(3, status="done", message_id=None)]
+    sections = dict(list_sections(rows, "out"))
+    assert [row["task_id"] for row in sections["내가 답할 것"]] == [1]
+    assert [row["task_id"] for row in sections["최근 완료 (7일)"]] == [3]
+    text = task_list_text("📤 **보낸 요청**", list(sections.items()), "https://discord.com/channels/1/900", "http://web")
+    assert "나 → outsider_lee" in text and "10.29 완료" in text and "🗓 기한 얘기 있음" in text
+
+
+def test_list_is_cut_with_web_link():
+    rows = [list_row(i) for i in range(20)]
+    text = task_list_text("📥 **받은 요청**", list_sections(rows, "in"), None, "http://web/workspace/3")
+    assert "외 5개는 웹에서 보세요: http://web/workspace/3" in text
+    assert "](" not in text  # 채널 주소가 없으면 링크 없이 글자만
+    assert len(text) < 2000  # 디스코드 메시지 한도
+    assert "없어요" in task_list_text("📥", list_sections([], "in"), None, "http://web")
+
+
+
+def test_sender_answers_due_talk_with_change_or_keep():
+    """기한 수정 요청이 와 있으면 보낸 사람 패널: [기한 변경] [지금 기한 유지] [요청 취소]"""
+    text, buttons = panel({**CARD, "status": "open", "flag": "due_talk", "talk_due": date(2026, 11, 14)}, SENDER)
+    assert buttons == ["due", "keep", "cancel"] and "**11.14 (토)**까지로" in text
+    assert panel({**CARD, "status": "open", "flag": "due_talk"}, RECEIVER)[1] == ["done", "talk"]
+
+def test_select_options_follow_list_order_with_plain_dates():
+    """/받은요청 드롭다운: 목록과 같은 순서(내가 답할 것 먼저), 날짜는 글자로 (드롭다운엔 <t:…>가 안 보여요)"""
+    rows = [list_row(1), list_row(2, flag="returned", content="x" * 120), list_row(3, status="done")]
+    options = select_options(list_sections(rows, "out"))
+    assert [option.value for option in options] == ["1", "2", "3"]  # 보낸 요청: 내가 답할 것(due_talk) 없음 → 진행 중 → 완료
+    options = select_options(list_sections(rows, "in"))
+    assert options[0].value == "2" and options[0].description == "11.10 (화) · ↩️ 다시 요청됨"
+    assert len(options[0].label) == 96 and options[0].label.endswith("…")  # 디스코드 한도 100자 안
+    assert "<t:" not in "".join(option.description for option in options)
+    many = [list_row(i) for i in range(40)]
+    assert len(select_options(list_sections(many, "in"))) == 25  # 드롭다운 한도
+
+
+
+def test_list_view_is_built_on_the_event_loop(monkeypatch):
+    """디스코드 창(View)을 다른 스레드에서 만들면 눌러도 응답이 없어요("적시에 응답하지 않았어요").
+    DB 읽기만 스레드에서 하고, 창은 이벤트 루프 안에서 만들어야 해요."""
+    import asyncio
+
+    import app.discord_gateway as gateway
+
+    rows = [list_row(1)]
+    monkeypatch.setattr(gateway, "my_tasks", lambda *args: rows)
+    back = {"collaboration_id": 3, "user_id": 4, "direction": "in", "channel_id": 900}
+
+    async def build():
+        return await gateway.list_view(back)
+
+    text, view = asyncio.run(build())
+    assert "받은 요청" in text and view is not None
+    assert view._BaseView__stopped is not None  # 루프 안에서 만들어져야 버튼 · 드롭다운을 받아요 (스레드면 None)
