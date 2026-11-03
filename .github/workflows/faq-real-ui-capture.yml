@@ -70,5 +70,7 @@ jobs:
           git add frontend/public/faq/screenshots/
           if ! git diff --cached --quiet; then
             git commit -m "assets(faq): screenshots from actual Next.js UI with isolated demo records"
+            git fetch origin feature/faq-integrated-help-20261103
+            git rebase origin/feature/faq-integrated-help-20261103
             git push origin HEAD:feature/faq-integrated-help-20261103
           fi
