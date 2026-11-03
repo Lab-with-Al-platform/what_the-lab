@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ApiError } from "@/lib/api";
+import { API_BASE_URL, ApiError } from "@/lib/api";
 import { formatPeriod, photoOrDefault, todayDate } from "@/lib/collab-requests";
-import { Collaboration, isOngoing, loadWorkspace, Schedule, WorkspaceData } from "@/lib/workspace";
+import { Collaboration, GOOGLE_CALENDAR_HOME, isOngoing, loadWorkspace, Schedule, WorkspaceData } from "@/lib/workspace";
 import { Avatar, StatusBadge, Tabs } from "@/components/request-parts";
 import { WorkspaceCalendar } from "@/components/workspace-calendar";
 import { CollabList } from "@/components/workspace-collab-list";
@@ -46,9 +46,13 @@ export function WorkspaceHome({ role }: { role: "researcher" | "expert" }) {
   // 달력에는 진행 중 협업의 일정을 모두, 색 네모로 끈 협업만 빼고 보여요
   const shownIds = new Set(ongoing.filter((collab) => !hidden.includes(collab.collaboration_id)).map((collab) => collab.collaboration_id));
   const schedules = data.schedules.filter((item) => shownIds.has(item.collaboration_id));
-    const tasks = data.tasks.filter((item) => shownIds.has(item.collaboration_id));
-  const todos = buildTodos(ongoing, data.schedules, (collabId) => setEditor({ mode: "add", collabId })).filter((item) => !dismissed.includes(item.key));
-  const pick = (schedule: Schedule) => schedule.schedule_id > 0 && setEditor({ mode: "view", schedule }); // 자동으로 넣은 시작·종료일은 안 열려요
+  const tasks = data.tasks.filter((item) => shownIds.has(item.collaboration_id));
+  const todos = buildTodos(ongoing, data.schedules, data.google_enabled, (collabId) => setEditor({ mode: "add", collabId })).filter(
+  (item) => !dismissed.includes(item.key),
+  );
+  // 구글에 추가해 둔 협업이 하나라도 있으면 달력 위에 [구글 캘린더] (구글에서 모든 협업 일정을 같이 봐요)
+  const googleUrl = data.google_enabled && ongoing.some((collab) => collab.google_linked) ? GOOGLE_CALENDAR_HOME : undefined;
+    const pick = (schedule: Schedule) => schedule.schedule_id > 0 && setEditor({ mode: "view", schedule }); // 자동으로 넣은 시작·종료일은 안 열려요
   const saved = (next: WorkspaceData) => {
     setData(next);
     setEditor(null);
@@ -86,7 +90,14 @@ export function WorkspaceHome({ role }: { role: "researcher" | "expert" }) {
 
           {/* 가운데: 달력 / 오른쪽: 지금 할 일 · 요청(최신 5개) · 다가오는 일정 (모바일에서는 오른쪽 칸이 달력보다 먼저) */}
           <div className="mt-5 grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
-            <WorkspaceCalendar schedules={schedules} tasks={tasks} today={today} onAdd={(date) => setEditor({ mode: "add", date })} onPick={pick} />
+            <WorkspaceCalendar
+              schedules={schedules}
+              tasks={tasks}
+              today={today}
+              onAdd={(date) => setEditor({ mode: "add", date })}
+              onPick={pick}
+              googleUrl={googleUrl}
+            />
             <div className="order-first flex min-w-0 flex-col gap-5 lg:order-none">
               <TodoBox items={todos.map((item) => (item.dismissible ? { ...item, onDismiss: () => setDismissed((list) => [...list, item.key]) } : item))} />
               <RequestList collabs={ongoing} tasks={tasks} today={today} />
@@ -117,9 +128,9 @@ export function WorkspaceHome({ role }: { role: "researcher" | "expert" }) {
 /**
  * "지금 할 일" 만들기. 협업마다 지금 상태를 보고 해야 할 일을 골라요.
  * ① 직접 잡은 일정이 없음 → 첫 미팅 잡기
- * ② 구글 캘린더에 안 넣음 → 권장 (× 로 숨길 수 있어요)
+ * ② 구글 캘린더에 안 넣음 → 권장 (× 로 숨길 수 있어요). 서버에 구글 설정이 없으면(googleOn=false) 안 보여요
  */
-function buildTodos(collabs: Collaboration[], schedules: Schedule[], add: (collabId: number) => void) {
+function buildTodos(collabs: Collaboration[], schedules: Schedule[], googleOn: boolean, add: (collabId: number) => void) {
   const items: (TodoItem & { dismissible?: boolean })[] = [];
   for (const collab of collabs) {
     const who = <b>{collab.partner.nickname}</b>;
@@ -132,13 +143,18 @@ function buildTodos(collabs: Collaboration[], schedules: Schedule[], add: (colla
         action: <TodoButton onClick={() => add(collab.collaboration_id)}>+ 일정 추가</TodoButton>,
       });
     }
-    if (!collab.google_linked) {
+    if (googleOn && !collab.google_linked) {
       items.push({
         key: `google-${collab.collaboration_id}`,
         tone: "muted",
         dismissible: true,
         text: <>{who} 님 협업 일정을 내 구글 캘린더에도 받아 보세요. 폰으로 알림이 와요</>,
-        action: <TodoButton onClick={() => undefined}>구글 캘린더에 추가</TodoButton>, // TODO(구글)
+        // 상세의 [내 구글 캘린더에 추가]와 같은 연결 화면 (구글 로그인 → 이 협업 캘린더 공유 → 구글 캘린더 '추가' 화면)
+        action: (
+          <TodoButton onClick={() => window.location.assign(`${API_BASE_URL}/google/connect?collaboration_id=${collab.collaboration_id}`)}>
+            구글 캘린더에 추가
+          </TodoButton>
+        ),
       });
     }
   }
