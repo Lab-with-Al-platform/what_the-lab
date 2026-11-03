@@ -1,10 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { PageContainer } from "@/components/page-container";
 import { FAQ_CATEGORIES, FAQS, searchFaqs, type FaqCategory } from "@/lib/faq";
+import { FAQ_SCREENSHOTS } from "@/lib/faq-screenshots";
 import { FaqWalkthrough } from "./faq-walkthrough";
 import { Icon } from "./community-ui";
 import communityStyles from "./community.module.css";
@@ -160,7 +162,46 @@ export function FaqPage() {
                     {faq.answer.map((paragraph, paragraphIndex) => (
                       <p key={paragraphIndex}>{paragraph}</p>
                     ))}
-                    {faq.guide && expanded === faq.id && <FaqWalkthrough key={faq.id} faqId={faq.id} guide={faq.guide} />}
+                    {FAQ_SCREENSHOTS[faq.id] && (
+                      <section className={styles.productScreenshots} aria-label="실제 서비스 시연 화면">
+                        <div className={styles.screenshotHeader}>
+                          <div>
+                            <p className={styles.screenshotEyebrow}>IN THE PRODUCT</p>
+                            <h3>실제 서비스 화면으로 확인해 보세요</h3>
+                          </div>
+                          <span className={styles.screenshotCount}>{FAQ_SCREENSHOTS[faq.id].length}개 화면</span>
+                        </div>
+                        {FAQ_SCREENSHOTS[faq.id].map(image => (
+                          <figure className={styles.screenshotFigure} key={image.src}>
+                            <div className={styles.screenshotFrame}>
+                              <Image
+                                src={image.src}
+                                alt={image.alt}
+                                width={1365}
+                                height={930}
+                                sizes="(max-width: 640px) 100vw, 800px"
+                                unoptimized
+                                loading="lazy"
+                                className={styles.screenshotImage}
+                              />
+                            </div>
+                            <figcaption>{image.title} · 실제 앱 UI를 테스트 데이터로 시연한 화면</figcaption>
+                          </figure>
+                        ))}
+                        <p className={styles.screenshotDisclaimer}>
+                          실제 WHAT THE LAB 화면을 캡처했으며, 화면 속 연구·계정·작업·평가는 설명을 위한 시연 데이터입니다.
+                          로그인 상태나 운영 설정에 따라 버튼이 다르게 보일 수 있습니다.
+                        </p>
+                      </section>
+                    )}
+                    {faq.guide && expanded === faq.id && (
+                      FAQ_SCREENSHOTS[faq.id] ? (
+                        <details className={styles.moreSteps}>
+                          <summary>순서대로 따라하기 · {faq.guide.steps.length}단계 안내</summary>
+                          <FaqWalkthrough key={faq.id} faqId={faq.id} guide={faq.guide} />
+                        </details>
+                      ) : <FaqWalkthrough key={faq.id} faqId={faq.id} guide={faq.guide} />
+                    )}
                     <div className={styles.actions}>
                       {faq.links.map(link => (
                         <Link key={link.href} href={link.href}>{link.label}<Icon name="arrow" size={13} /></Link>
