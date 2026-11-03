@@ -189,3 +189,30 @@
   .actions a,.copy,.stepButton,.sideButton,.heroShortcuts a {transition:none;}
   .actions a:hover,.copy:hover {transform:none;}
 }
+
+
+/* Actual browser-captured product UI, never generated illustrative mocks. */
+.productScreenshots {margin:24px 0; overflow:hidden; border:1px solid #dce5f4; border-radius:17px; background:#fbfcff;}
+.screenshotHeader {display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px; padding:19px 20px; border-bottom:1px solid #e8edf5;}
+.screenshotEyebrow {margin:0 0 5px!important; color:#7566cf!important; font-size:10px!important; font-weight:850!important; letter-spacing:.14em;}
+.screenshotHeader h3 {font-size:15px; color:#29385a; line-height:1.5; font-weight:850; letter-spacing:-.02em;}
+.screenshotCount {font-size:10px; font-weight:850; color:#4c43b7; background:#edebff; border-radius:999px; padding:6px 11px;}
+.screenshotFigure {margin:0; padding:16px 16px 12px; background:#fafbff;}
+.screenshotFigure+.screenshotFigure {border-top:1px solid #e9edf7;}
+.screenshotFrame {overflow:hidden; border:1px solid #dfe5f0; border-radius:12px; background:#fff; box-shadow:0 11px 26px -22px #25335a;}
+.screenshotImage {display:block; width:100%; height:auto; object-fit:contain;}
+.screenshotFigure figcaption {margin-top:10px; color:#6c7890; font-size:11px; font-weight:700; line-height:1.6;}
+.screenshotDisclaimer {border-top:1px solid #e7eaf3; background:#f3f5fc; color:#667793!important; padding:11px 16px; font-size:11px!important; line-height:1.7!important; margin:0!important;}
+.moreSteps {margin:15px 0 24px; border:1px solid #e0e4f4; border-radius:14px; background:#fff;}
+.moreSteps>summary {cursor:pointer; list-style:none; padding:15px 19px; min-height:48px; color:#4e43ae; font-size:12px; font-weight:850;}
+.moreSteps>summary::-webkit-details-marker {display:none;}
+.moreSteps>summary::before {content:"＋"; margin-right:8px; color:#5549c9;}
+.moreSteps[open]>summary::before {content:"−";}
+.moreSteps>summary:focus-visible {outline:3px solid #a19be3; outline-offset:2px;}
+.moreSteps .guide {margin:0; border:0; border-top:1px solid #e7eaf3; border-radius:0; box-shadow:none;}
+@media(max-width:640px) {
+  .screenshotHeader {padding:15px 14px;}
+  .screenshotFigure {padding:10px;}
+  .screenshotFigure figcaption {font-size:10px;}
+  .screenshotDisclaimer {padding:10px 12px;}
+}
