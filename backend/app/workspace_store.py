@@ -12,7 +12,6 @@ from app.config import GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 from app.db import get_connection
 from app.discord_bot import channel_url
 from app.google_calendar import add_calendar_url, google_ready
-from app.notification_store import notify_requests
 
 # 오늘 날짜는 한국 시간 기준 (DB 서버 시간대와 상관없이)
 TODAY_KST = "(now() AT TIME ZONE 'Asia/Seoul')::date"
@@ -80,6 +79,12 @@ def create_collaboration(cursor, request_id: int) -> None:
         """,
         (request_id,),
     )
+
+
+def notify_requests(cursor, type_: str, request_ids: list[int]) -> None:
+    """Lazy import prevents task_sync -> workspace_store -> notification_store cycle."""
+    from app.notification_store import notify_requests as dispatch
+    dispatch(cursor, type_, request_ids)
 
 
 def complete_ended_collaborations(cursor) -> None:
