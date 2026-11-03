@@ -21,7 +21,6 @@ from app.routers import (
     expert_history,
     expert_portfolio,
     expert_profile,
-    reviews,
     experts,
     google,
     insights,
@@ -29,12 +28,14 @@ from app.routers import (
     operations,
     profile_photo,
     researcher,
+    reviews,
     researcher_research,
     taxonomy,
     verification,
     workspace,
     workspace_tasks,
 )
+from app.task_daily import daily_forever
 
 
 @asynccontextmanager
@@ -45,7 +46,7 @@ async def lifespan(_app: FastAPI):
     - 디스코드 알림 보내기: 봇 설정이 있을 때만
     - 구글 캘린더에 일정 복사: 서비스 계정 키 파일이 있을 때만
     """
-    tasks = [asyncio.create_task(expire_forever())]
+    tasks = [asyncio.create_task(expire_forever()), asyncio.create_task(daily_forever())]
     if bot_ready():
         tasks.append(asyncio.create_task(run_forever()))
     if google_ready():
