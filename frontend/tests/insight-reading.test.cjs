@@ -75,7 +75,8 @@ test("생성 표지는 JPEG라서 저장소 원본이 작다", () => {
   const dir = path.resolve(__dirname, "../public/generated");
   const files = fs.readdirSync(dir);
   assert.equal(files.filter((name) => name.endsWith(".png")).length, 0);
-  const jpegs = files.filter((name) => name.endsWith(".jpg"));
+  // develop added two product-guide JPGs: cover-size regression checks should not count them.
+  const jpegs = files.filter((name) => name.endsWith(".jpg") && !/^labbridge-(platform|discord)-guide-/.test(name));
   assert.equal(jpegs.length, 28);
   let total = 0;
   for (const name of jpegs) {
@@ -135,13 +136,13 @@ test("첫 화면 대표 표지만 우선 로딩하고 일반 목록 카드는 �
   assert.match(detailSource, /sizes="64px"/);
 });
 
-test("넓은 화면의 크기 상한과 모바일 메인 이미지 다운로드 방지를 명시한다", () => {
+test("넓은 화면의 이미지 크기 상한과 홈 메인 이미지의 지연 로딩을 유지한다", () => {
   const cardSource = fs.readFileSync(path.resolve(__dirname, "../src/components/insight-card.tsx"), "utf8");
   assert.match(cardSource, /min-width: 1440px\) 440px/);
   const homeSource = fs.readFileSync(path.resolve(__dirname, "../src/components/home-page.tsx"), "utf8");
   assert.match(homeSource, /getImageProps/);
-  assert.match(homeSource, /<source media="\(min-width: 1024px\)" srcSet=\{srcSet\}/);
-  assert.match(homeSource, /src="data:image\/gif;base64,/);
+  assert.match(homeSource, /srcSet=\{props\.srcSet\}/);
+  assert.match(homeSource, /loading="lazy"/);
   assert.match(homeSource, /fetchPriority="high"/);
 });
 
