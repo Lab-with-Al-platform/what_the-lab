@@ -126,7 +126,7 @@ export function FaqPage() {
             ))}
           </nav>
 
-          <main>
+          <section aria-label="FAQ 질문과 답변">
             <div className={styles.sectionHeader}>
               <div>
                 <h2>{category === "all" ? "전체 도움말" : FAQ_CATEGORIES[category as FaqCategory]}</h2>
@@ -190,7 +190,7 @@ export function FaqPage() {
                 <Link href="/community/new?visibility=private&category=support">비공개 문의</Link>
               </div>
             </section>
-          </main>
+          </section>
         </div>
       </div>
     </PageContainer>
