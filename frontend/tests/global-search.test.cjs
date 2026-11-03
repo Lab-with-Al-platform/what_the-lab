@@ -101,6 +101,20 @@ test("오류·타임아웃은 출처별로 분리하고 빈 검색어에서는 A
   assert.match(src, /SkeletonCards/);
 });
 
+test("홈 헤더 통합검색은 버튼·Enter 제출을 막지 않고 GET으로 결과 페이지를 연다", () => {
+  const header = read("src/components/site-header.tsx");
+  const formStart = header.match(/<form id="header-search"[^>]*>/)?.[0] ?? "";
+  assert.match(formStart, /action="\/search"/);
+  assert.match(formStart, /method="get"/);
+  assert.doesNotMatch(formStart, /onSubmit=/);
+  const formEnd = header.indexOf("</form>", header.indexOf(formStart));
+  assert.notEqual(formEnd, -1);
+  const form = header.slice(header.indexOf(formStart), formEnd);
+  assert.match(form, /name="q"/);
+  assert.match(form, /<button type="submit"/);
+  assert.match(read("src/app/search/page.tsx"), /query=\{query\}/);
+});
+
 test("헤더 통합검색, URL 재검색, 전문가·게시판·FAQ 원본 화면 연결을 유지한다", () => {
   const header = read("src/components/site-header.tsx");
   const src = read("src/components/unified-search.tsx");
