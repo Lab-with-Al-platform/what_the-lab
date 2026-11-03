@@ -80,7 +80,7 @@ test("moderation route and admin nav enforce independent access from operations 
 });
 
 test("review schema kept separate from old data and does not silently seed ratings",()=>{
-  const sql=read("../database/init/025_create_collaboration_reviews.sql");
+  const sql=read("../database/init/028_create_collaboration_reviews.sql");
   assert.match(sql,/CREATE TABLE public.collaboration_review/);
   assert.match(sql,/ENABLE ROW LEVEL SECURITY/);
   assert.match(sql,/uq_review_collaboration_side/);
