@@ -62,6 +62,17 @@ TASKS_SQL = """
     ORDER BY (t.status = 'open') DESC, t.due_date NULLS LAST, t.task_id
 """
 
+# 요청 기록: 이 협업 요청들의 기록 전부 (오래된 것부터). 요청마다 나눠 붙여요
+TASK_EVENTS_SQL = """
+    SELECT e.event_id, e.task_id, e.actor_id, e.kind, e.old_due, e.new_due, e.note, e.source, e.created_at,
+           u.nickname AS actor_nickname
+    FROM collaboration_task_event e
+    JOIN collaboration_task t ON t.task_id = e.task_id
+    LEFT JOIN users u ON u.user_id = e.actor_id
+    WHERE t.collaboration_id = %s
+    ORDER BY e.event_id
+"""
+
 # 정한 것: 최근 것부터 (화면에서 번호를 붙여 보여 줘요)
 DECISIONS_SQL = """
     SELECT d.decision_id, d.proposed_by, d.content, d.status, d.answered_at, d.answer_note,
@@ -93,13 +104,60 @@ def load_detail(user_id: int, collaboration_id: int) -> dict:
         cursor.execute(COLLAB_SQL, (collaboration_id,))
         row = cursor.fetchone()
         rows = {}
-        for name, sql in (("schedules", SCHEDULES_SQL), ("tasks", TASKS_SQL), ("decisions", DECISIONS_SQL), ("changes", CHANGES_SQL)):
+        for name, sql in (
+            ("schedules", SCHEDULES_SQL),
+            ("tasks", TASKS_SQL),
+            ("task_events", TASK_EVENTS_SQL),
+            ("decisions", DECISIONS_SQL),
+            ("changes", CHANGES_SQL),
+        ):
             cursor.execute(sql, (collaboration_id,))
             rows[name] = cursor.fetchall()
     return build_detail(row, side, user_id, **rows)
 
 
-def build_detail(row: dict, side: str, user_id: int, schedules: list, tasks: list, decisions: list, changes: list) -> dict:
+def task_marks(task: dict, events: list[dict]) -> dict:
+    """요청 하나의 표시 (진행 중일 때만). app/workspace_store.py 의 TASK_FLAG_SQL 과 같은 규칙.
+
+    talk: 답을 기다리는 [기한 얘기하기] 기록 (그 뒤로 기한이 안 바뀌었을 때) — 없으면 None
+    returned: 아직 다시 완료하지 않은 [다시 요청] 기록 — 없으면 None
+    """
+
+    def last(kinds: tuple[str, ...]) -> dict | None:
+        found = [event for event in events if event["kind"] in kinds]
+        return found[-1] if found else None
+
+    if task["status"] != "open":
+        return {"talk": None, "returned": None}
+    talk = last(("due_talk", "due_kept", "due", "done", "canceled"))
+    back = last(("returned", "done"))
+    return {
+        "talk": talk if talk and talk["kind"] == "due_talk" else None,
+        "returned": back if back and back["kind"] == "returned" else None,
+    }
+
+
+def with_events(task: dict, user_id: int, events: list[dict]) -> dict:
+    """요청 한 줄 + 나 기준 방향(in 받은 / out 보낸) + 기록 + 표시(talk · returned)"""
+    mine = [event for event in events if event["task_id"] == task["task_id"]]
+    return {
+        **task,
+        "direction": "in" if task["assignee"] == user_id else "out",
+        "events": mine,
+        **task_marks(task, mine),
+    }
+
+
+def build_detail(
+    row: dict,
+    side: str,
+    user_id: int,
+    schedules: list,
+    tasks: list,
+    decisions: list,
+    changes: list,
+    task_events: list | None = None,
+) -> dict:
     """DB에서 읽은 줄들 → 화면의 CollaborationDetail 모양. "나"를 기준으로 방향(받은/보낸)을 붙여요."""
     researcher = {
         "user_id": row["r_id"],
@@ -147,7 +205,7 @@ def build_detail(row: dict, side: str, user_id: int, schedules: list, tasks: lis
         },
         "agreement": row["agreement"],
         "schedules": schedules,
-        "tasks": [{**task, "direction": "in" if task["assignee"] == user_id else "out"} for task in tasks],
+        "tasks": [with_events(task, user_id, task_events or []) for task in tasks],
         "decisions": [{**decision, "mine": decision["proposed_by"] == user_id} for decision in decisions],
         # 답 기다리는 연장·조기 완료 요청 (협업당 하나). 내가 보냈으면 mine=True → [철회], 아니면 [수락]·[다시 얘기해요]
         "pending_change": (
