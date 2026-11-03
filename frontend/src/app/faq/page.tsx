@@ -3,7 +3,7 @@ import { FaqPage } from "@/components/community/faq-page";
 
 export const metadata = {
   title: "자주 묻는 질문",
-  description: "시작하기, 계정, 연구·전문가 탐색, 공개·비공개 게시판 도움말",
+  description: "연구·전문가 탐색, 직접 협업 요청, 공유 일정·작업 관리, Google Calendar, 협업 평가와 게시판 이용 가이드",
 };
 export default function FaqRoute() {
   return (
