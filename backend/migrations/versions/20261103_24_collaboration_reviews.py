@@ -2,14 +2,14 @@
 from pathlib import Path
 from alembic import op
 
-revision = "20261031_21"
-down_revision = "20261029_20"
+revision = "20261103_24"
+down_revision = "20261101_23"
 branch_labels = None
 depends_on = None
 SQL_FILE = Path(__file__).resolve().parents[1] / "sql" / revision / "001_create_collaboration_reviews.sql"
 
 def upgrade() -> None:
-    op.execute("SELECT pg_advisory_xact_lock(20261031, 21)")
+    op.execute("SELECT pg_advisory_xact_lock(20261103, 24)")
     op.execute("SET LOCAL search_path TO public, pg_catalog")
     op.execute("""
         DO $guard$ BEGIN

@@ -10,6 +10,7 @@ on:
   push:
     branches:
       - feature/expert-search-dark-profile-first-20261031
+      - integration/develop-feature-20261103
 
 permissions:
   contents: read
@@ -80,7 +81,7 @@ jobs:
       - name: PostgreSQL schema fixture
         run: psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f backend/tests/sql/review_schema_smoke.sql
       - name: Execute production review DDL in PostgreSQL 17
-        run: psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f backend/migrations/sql/20261031_21/001_create_collaboration_reviews.sql
+        run: psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f backend/migrations/sql/20261103_24/001_create_collaboration_reviews.sql
       - name: Verify integrity, unique reviewer and immutable RLS boundaries
         run: psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f backend/tests/sql/review_schema_assertions.sql
       - name: Seed legitimate and adversarial reputation examples
@@ -116,5 +117,5 @@ jobs:
           enable-cache: true
       - run: uv python install 3.13
       - run: uv sync --locked
-      - run: uv run pytest -q tests/test_collaboration_reviews.py tests/test_reputation_store.py tests/test_expert_public_profile.py tests/test_expert_search_facets.py tests/test_notification_messages.py
-      - run: uv run python -m compileall -q app/routers/reviews.py app/review_store.py app/reputation_store.py
+      - run: uv run pytest -q tests/test_collaboration_reviews.py tests/test_reputation_store.py tests/test_expert_public_profile.py tests/test_expert_search_facets.py tests/test_notification_messages.py tests/test_develop_feature_integration.py tests/test_schedule_notice.py tests/test_workspace_detail.py
+      - run: uv run python -m compileall -q app/routers/reviews.py app/review_store.py app/reputation_store.py app/notification_store.py app/notification_sender.py app/workspace_store.py app/workspace_detail.py

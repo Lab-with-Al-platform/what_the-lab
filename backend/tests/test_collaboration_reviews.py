@@ -119,11 +119,14 @@ def test_review_submission_enforces_unique_conflict_and_no_fake_users(monkeypatc
 
 
 class CompletionCursor:
+    def __init__(self):
+        self.calls=[]
+
     def execute(self,sql,params=()):
-        self.sql=sql
+        self.calls.append((sql,params))
 
     def fetchall(self):
-        return [{"request_id":9},{"request_id":11}]
+        return [{"request_id":9,"collaboration_id":109},{"request_id":11,"collaboration_id":111}]
 
 
 def test_completion_emits_review_reminder_once_for_updated_rows(monkeypatch):
@@ -132,8 +135,10 @@ def test_completion_emits_review_reminder_once_for_updated_rows(monkeypatch):
     calls=[]
     monkeypatch.setattr(workspace_store,"notify_requests",lambda cursor,kind,ids:calls.append((kind,ids)))
     workspace_store.complete_ended_collaborations(cursor)
-    assert "WHERE status = 'ongoing'" in cursor.sql
-    assert "RETURNING request_id" in cursor.sql
+    assert "WHERE status = 'ongoing'" in cursor.calls[0][0]
+    assert "RETURNING request_id" in cursor.calls[0][0]
+    assert "INSERT INTO collaboration_task_event" in cursor.calls[1][0]
+    assert cursor.calls[1][1] == ([109,111],)
     assert calls == [("review_ready",[9,11])]
 
 
@@ -149,7 +154,7 @@ def test_review_publication_checks_7_day_hold_and_completed_only():
 
 def test_migration_has_rls_and_duplicate_constraints():
     from pathlib import Path
-    sql=Path(__file__).resolve().parents[1]/"migrations/sql/20261031_21/001_create_collaboration_reviews.sql"
+    sql=Path(__file__).resolve().parents[1]/"migrations/sql/20261103_24/001_create_collaboration_reviews.sql"
     text=sql.read_text(encoding="utf-8")
     assert "uq_review_collaboration_side" in text
     assert "uq_review_collaboration_reviewer" in text

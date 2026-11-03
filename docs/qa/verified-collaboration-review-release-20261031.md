@@ -1,3 +1,5 @@
+> **2026-11-03 통합 경고:** 이 문서는 원래 2026-10-31 기준으로 작성되었습니다. develop의 20261031_21~20261101_23 일정·알림 DB 변경과 겹쳐 통합 검증 브랜치에서는 리뷰 마이그레이션을 20261103_24로 이동했습니다. 운영·공유 DB 자동 적용 금지. 기존 DB 개정 이력과 데이터 백업을 먼저 점검하세요.
+
 # WHAT THE LAB · 협업 종료 후 실제 양방향 평가 시스템 — 개발·배포 인계서
 **2026-10-31 | Draft PR #72 | 개발 브랜치** `feature/expert-search-dark-profile-first-20261031`
 
@@ -31,8 +33,8 @@
 - `backend/app/workspace_store.py`, `backend/app/workspace_detail.py` : 협업 종료 업데이트·알림 원자성
 - `backend/app/notification_store.py`, `backend/app/notification_sender.py` : 완료 시 평가 알림과 바로가기
 ### Database
-- `backend/migrations/versions/20261031_21_collaboration_reviews.py` + `backend/migrations/sql/20261031_21/001_create_collaboration_reviews.sql`
-- `database/init/025_create_collaboration_reviews.sql` : 새 Docker 볼륨 초기화 또는 **로컬 Docker 기존 DB에서만** 1회 수동 적용
+- `backend/migrations/versions/20261103_24_collaboration_reviews.py` + `backend/migrations/sql/20261103_24/001_create_collaboration_reviews.sql`
+- `database/init/028_create_collaboration_reviews.sql` : 새 Docker 볼륨 초기화 또는 **로컬 Docker 기존 DB에서만** 1회 수동 적용
 - 테이블 `collaboration_review`, `collaboration_review_report`, `notification` 알림 종류 `review_ready` 허용
 ### Frontend
 - `frontend/src/lib/reviews.ts`, `frontend/src/components/collaboration-review-card.tsx`
