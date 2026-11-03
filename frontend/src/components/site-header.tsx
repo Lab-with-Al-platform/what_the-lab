@@ -290,7 +290,7 @@ export function SiteHeader() {
       </PageContainer>
 
       {searchOpen ? (
-        <form id="header-search" action="/search" role="search" onSubmit={() => setSearchOpen(false)} className="border-t border-line bg-white">
+        <form id="header-search" action="/search" method="get" role="search" className="border-t border-line bg-white">
           <PageContainer className="flex gap-2 py-3">
             <label className="sr-only" htmlFor="site-search">
               인사이트, 전문가, 자유게시판, FAQ 통합검색
