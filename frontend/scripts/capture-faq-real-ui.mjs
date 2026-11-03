@@ -74,7 +74,7 @@ try {
  await shot("workspace-task-detail","/workspace/101","모델 평가 기준 초안");
  await shot("workspace-due-talk","/workspace/101","영상 데이터 50건",async()=>{await page.getByRole("button",{name:"기한 얘기하기"}).first().click();await page.getByText("지금 기한").first().waitFor()});
  await shot("workspace-task-actions","/workspace/101","이미지 품질 점검 보고서");
- await shot("workspace-finished","/workspace","협업 공간",async()=>{await page.getByRole("button",{name:/완료/}).first().click();await page.getByText("협업 평가하기").first().waitFor()});
+ await shot("workspace-finished","/workspace","협업 공간",async()=>{await page.getByRole("tab",{name:/완료/}).first().click();await page.getByText("협업 평가하기").first().waitFor()});
  await shot("collaboration-review","/workspace/102","4가지 항목 평가");
  await shot("collaboration-notifications","/workspace","협업 공간",async()=>{await page.getByRole("button",{name:/알림.*안 읽음/}).first().click();await page.getByText("평가 작성하기").first().waitFor()});
  await shot("private-inquiry","/community/new?visibility=private&category=support","비공개 문의");
