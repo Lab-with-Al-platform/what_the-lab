@@ -81,25 +81,33 @@ def create_collaboration(cursor, request_id: int) -> None:
     )
 
 
-def complete_ended_collaborations(cursor) -> None:
-    """종료일이 지난 진행 중 협업을 완료로 바꿔요. (종료일 당일까지는 진행 중)
+def notify_requests(cursor, type_: str, request_ids: list[int]) -> None:
+    """Lazy import prevents task_sync -> workspace_store -> notification_store cycle."""
+    from app.notification_store import notify_requests as dispatch
+    dispatch(cursor, type_, request_ids)
 
-    그때 끝나지 않은 요청은 요청 기록에 "협업 종료로 마감(ended)" 한 줄을 남겨요. 상태는 진행 중 그대로라
-    평가 때 "완료 · 보낸 사람이 취소 · 종료 때 미완료"를 나눠 볼 수 있어요. (한 문장이라 둘이 같이 저장돼요)
+
+def complete_ended_collaborations(cursor) -> None:
+    """종료 상태 변경·미완료 요청 기록·양측 평가 알림을 같은 트랜잭션에서 저장해요.
+
+    실제 UPDATE 결과만 사용하므로 반복 작업이나 동시 조회로 새 알림을 중복 만들지 않아요.
     """
     cursor.execute(
-        f"""
-        WITH ended AS (
-            UPDATE collaboration SET status = 'done', ended_at = now()
-            WHERE status = 'ongoing' AND end_date < {TODAY_KST}
-            RETURNING collaboration_id
-        )
-        INSERT INTO collaboration_task_event (task_id, actor_id, kind, source)
-        SELECT t.task_id, NULL, 'ended', 'web'
-        FROM collaboration_task t JOIN ended e ON e.collaboration_id = t.collaboration_id
-        WHERE t.status = 'open'
-        """
+        f"""UPDATE collaboration SET status = 'done', ended_at = now()
+        WHERE status = 'ongoing' AND end_date < {TODAY_KST}
+        RETURNING request_id, collaboration_id"""
     )
+    completed = cursor.fetchall()
+    if not completed:
+        return
+    cursor.execute(
+        """INSERT INTO collaboration_task_event (task_id, actor_id, kind, source)
+        SELECT t.task_id, NULL, 'ended', 'web'
+        FROM collaboration_task t
+        WHERE t.status = 'open' AND t.collaboration_id = ANY(%s)""",
+        ([row["collaboration_id"] for row in completed],),
+    )
+    notify_requests(cursor, "review_ready", [row["request_id"] for row in completed])
 
 
 def user_role(cursor, user_id: int) -> str:
@@ -147,7 +155,7 @@ def load_workspace(user_id: int) -> dict:
     - status: waiting(시작 전) / active(진행 중) / done / ended_early / canceled
     - opened: 내 쪽에서 [협업 공간 열기]를 했는지
     """
-    with get_connection() as conn, conn.cursor() as cursor:
+    with get_connection() as conn, conn.transaction(), conn.cursor() as cursor:
         complete_ended_collaborations(cursor)
         role = user_role(cursor, user_id)
         mine = "rs.user_id = %s" if role == "researcher" else "c.expert_id = %s"

@@ -21,15 +21,15 @@ PostgreSQL/Supabase 데이터 구조와 변경 이력을 관리합니다.
 - 2026-10-27: 공용 DB에 적용된 조회수·운영 이력·방문 수집 표를 `014`~`016`에 넣었습니다. 기록 행은 복사하지 않습니다. `017`은 개정 번호 `20261028_13`만 적고, `018`이 분류 상태를 `active`로 맞춘 뒤 번호를 `20261028_14`로 올립니다. `019`는 협업 디스코드 칸을 추가하고 번호를 `20261028_15`로 올립니다. `020`은 메일 수신을 확인한 대학·연구기관 도메인을 기관 표에 넣고 번호를 `20261028_16`으로 올립니다.
 - 2026-11-01: `025`는 요청 기록 표 `collaboration_task_event`를 만들고 기존 요청의 남김·완료/취소 기록을 채운 뒤 번호를 `20261031_21`로, `026`은 알림 표에 요청 알림 칸·종류를 더하고 번호를 `20261031_22`로 올립니다. 이미 데이터가 있는 Docker DB는 [요청 기능 세팅 안내](../docs/development/SETUP_WORKSPACE_TASKS.md)대로 두 파일을 직접 실행합니다.
 - 2026-11-02: `027`은 알림 표에 일정 알림 칸(`schedule_id` · `note`)·종류를 더하고 아침 알림 중복 막기에 일정을 넣은 뒤 번호를 `20261101_23`으로 올립니다. 이미 데이터가 있는 Docker DB는 [일정 기능 세팅 안내](../docs/development/SETUP_WORKSPACE_SCHEDULES.md)대로 직접 실행합니다.
-
-- 2026-11-03: `028`은 일정 표에 채널 메시지 번호 칸(`discord_message_id`)을, 알림 종류에 `daily_brief`를 더하고 번호를 `20261102_24`로 올립니다. 이미 데이터가 있는 Docker DB는 [일정 기능 세팅 안내](../docs/development/SETUP_WORKSPACE_SCHEDULES.md)대로 직접 실행합니다.
+- 2026-11-03: `028`은 협업 리뷰 표(`collaboration_review` · `collaboration_review_report`)와 알림 종류 `review_ready`를 더하고 번호를 `20261103_24`로 올립니다.
+- 2026-11-04: `029`는 일정 표에 채널 메시지 번호 칸(`discord_message_id`)을, 알림 종류에 `daily_brief`를 더하고 번호를 `20261104_25`로 올립니다. 이미 데이터가 있는 Docker DB는 [일정 기능 세팅 안내](../docs/development/SETUP_WORKSPACE_SCHEDULES.md)대로 직접 실행합니다.
 
 ## 마이그레이션 번호 (PR 올리기 전에 꼭)
 
 두 PR이 같은 번호를 쓰면 alembic 이 "끝이 두 개"가 되어 공용 DB에 적용할 수 없어요.
 
 1. **develop 최신을 받은 뒤** 마지막 번호를 확인해요: `backend/migrations/versions/` 의 가장 큰 `날짜_순번`, `database/init/` 의 가장 큰 3자리 번호
-2. 새 마이그레이션은 그 **다음 순번**을 써요. 예: 마지막이 `20261102_24` · `028` 이면 → `날짜_25` · `029`
+2. 새 마이그레이션은 그 **다음 순번**을 써요. 예: 마지막이 `20261104_25` · `029` 이면 → `날짜_26` · `030`
    - `down_revision` 은 develop 의 마지막 개정, Docker 파일 끝의 `WHERE version_num = '…'` 도 그 번호
 3. PR 이 오래 열려 있다가 다른 PR 이 먼저 머지되면, **머지 직전에 develop 을 받아 번호를 다시 올려요**
 4. `backend/tests/test_migration_numbers.py` 가 겹침 · 건너뜀 · 순서를 검사해요. `pytest` 가 통과해야 해요
@@ -59,3 +59,10 @@ PostgreSQL/Supabase 데이터 구조와 변경 이력을 관리합니다.
 - 실제 사용자 개인정보나 연구 데이터를 시드로 사용하지 않습니다.
 - 이미 공유된 마이그레이션 파일을 조용히 수정하지 않습니다. 새 변경 파일을 추가합니다.
 - Supabase 서버 전용 키를 SQL이나 문서에 넣지 않습니다.
+
+
+## 2026-11-03 develop + 기능 통합 검증 브랜치 주의
+
+- 팀 develop에 추가된 순차 마이그레이션: `20261031_21`(협업 요청 기록), `20261031_22`(협업 알림), `20261101_23`(일정 알림).
+- 리뷰 Feature의 이전 `20261031_21`과 동일 revision 충돌을 방지하기 위해 검증용 통합 브랜치에서 협업 평가는 `20261103_24`로 재배치했습니다.
+- 빈 로컬 Docker DB의 SQL 초기화 순서: `025_add_task_events.sql` → `026_add_task_notifications.sql` → `027_add_schedule_notifications.sql` → `028_create_collaboration_reviews.sql` → `029_add_schedule_message.sql`.- 실제 기동 DB에 이미 025번을 적용했거나 과거 리뷰 테이블을 적용했다면 **재실행하지 말고 수동으로 DB 현황을 확인**해야 합니다. `database/init`은 기존 볼륨에 자동 재실행되지 않으며 공유 Supabase·운영 DB에 적용해서는 안 됩니다.

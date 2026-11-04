@@ -17,7 +17,7 @@ LIST_LIMIT = 50  # 한 번에 보여 줄 최대 개수
 # 받는 사람이 누구인지에 따라 나눈 알림 종류
 TO_EXPERT = {"request_received", "request_canceled"}  # 연구회원이 한 일 → 전문가에게
 TO_RESEARCHER = {"request_accepted", "request_rejected", "request_withdrawn"}  # 전문가가 한 일 → 연구회원에게
-TO_BOTH = {"request_expired", "collab_started"}  # 둘 다에게 (서로가 상대방)
+TO_BOTH = {"request_expired", "collab_started", "review_ready"}  # 둘 다에게 (서로가 상대방)
 
 # 요청 기록 종류 → 상대에게 보낼 알림 종류 (한 사람이 한 일을 상대에게)
 TASK_NOTICE = {
@@ -48,8 +48,7 @@ BRIEF_TYPE = "daily_brief"
 # 아침 알림 하나하나: 중복 막기용으로 저장만 하고(읽음) 알림 종에는 안 보여요. 종에는 daily_brief 한 칸만
 BRIEF_PARTS = DAILY_TYPES | {"schedule_tomorrow", "schedule_today", "schedule_ending"}
 # 협업 안의 일: DM 없이 채널 멘션 + 종
-WORKSPACE_TYPES = set(TASK_NOTICE.values()) | DAILY_TYPES | SCHEDULE_TYPES | {BRIEF_TYPE}
-
+WORKSPACE_TYPES = set(TASK_NOTICE.values()) | DAILY_TYPES | SCHEDULE_TYPES | {BRIEF_TYPE, "review_ready"}
 # 거절 사유 (프론트 REJECT_REASON_LABELS와 같은 문구)
 REJECT_LABELS = {
     "schedule": "일정이 맞지 않아요",
@@ -203,6 +202,8 @@ def build_message(row: dict, user_id: int) -> tuple[str, str]:
         return f"{actor} 님에게 보낸 요청이 답이 없어 만료됐어요", title
     if kind == "collab_started":
         return f"{actor} 님과 협업을 시작했어요", title
+    if kind == "review_ready":
+        return "협업이 완료됐어요 · 평가 작성하기", f"{title} · 종료 후 30일 이내에 서로의 협업을 평가할 수 있어요."
     return "새 알림이 있어요", title
 
 
@@ -221,7 +222,8 @@ def load_notifications(user_id: int) -> list[dict]:
     with get_connection() as conn, conn.cursor() as cursor:
         cursor.execute(
             """
-            SELECT n.notification_id, n.type, n.read_at, n.created_at, n.task_id, n.collaboration_id,
+            SELECT n.notification_id, n.type, n.read_at, n.created_at, n.task_id,
+                   COALESCE(n.collaboration_id, rc.collaboration_id) AS collaboration_id,
                    n.notice_on, n.note,
                    a.nickname AS actor_nickname, r.title AS research_title,
                    cr.reject_reason, cr.expert_id, cr.status AS request_status,
@@ -235,6 +237,7 @@ def load_notifications(user_id: int) -> list[dict]:
             LEFT JOIN research r ON r.research_id = cr.research_id
             LEFT JOIN collaboration_task t ON t.task_id = n.task_id
             LEFT JOIN collaboration c ON c.collaboration_id = n.collaboration_id
+            LEFT JOIN collaboration rc ON rc.request_id = n.request_id AND n.type = 'review_ready'
             WHERE n.user_id = %s AND n.created_at >= now() - make_interval(days => %s)
               AND n.type <> ALL(%s)
             ORDER BY n.created_at DESC, n.notification_id DESC
@@ -248,8 +251,9 @@ def load_notifications(user_id: int) -> list[dict]:
     for row in rows:
         if row["type"] == BRIEF_TYPE:
             title, detail = brief_message(row)
+        elif row["type"] == "review_ready":
+            title, detail = build_message(row, user_id)
         elif row["type"] in SCHEDULE_TYPES:
-            title, detail = schedule_message(row)
             title, detail = schedule_message(row)
         elif row["type"] in WORKSPACE_TYPES:
             title, detail = task_message(row)
@@ -278,7 +282,7 @@ def brief_message(row: dict) -> tuple[str, str]:
 def notice_link(row: dict) -> str:
     """누르면 갈 화면: 요청 알림 → 협업 상세의 그 요청 줄, 협업 알림 → 협업 상세, 나머지 → 요청 관리"""
     if row.get("collaboration_id"):
-        anchor = f"#task-{row['task_id']}" if row.get("task_id") else ""
+        anchor = "#review" if row.get("type") == "review_ready" else (f"#task-{row['task_id']}" if row.get("task_id") else "")
         return f"/workspace/{row['collaboration_id']}{anchor}"
     return "/requests"
 

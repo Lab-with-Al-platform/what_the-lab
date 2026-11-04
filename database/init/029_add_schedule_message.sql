@@ -1,5 +1,5 @@
--- 일정 메시지 고치기 · 아침 브리핑 묶기 (PostgreSQL) 027 다음에 실행됩니다.
--- Supabase용 backend/migrations/sql/20261102_24/ 과 같습니다. 아래 개정 번호만 Docker에 있습니다.
+-- 일정 메시지 고치기 · 아침 브리핑 묶기 (PostgreSQL) 028 다음에 실행됩니다.
+-- Supabase용 backend/migrations/sql/20261104_25/ 과 같습니다. 아래 개정 번호만 Docker에 있습니다.
 -- 이미 초기화된 Docker volume에는 이 파일이 자동으로 다시 적용되지 않습니다. (직접 실행)
 
 -- 1) 일정: 채널에 올린 "일정을 추가했어요" 메시지 번호. 일정이 바뀌거나 지워지면 이 메시지를 고쳐요 (요청과 같은 방식)
@@ -39,11 +39,13 @@ ALTER TABLE notification ADD CONSTRAINT ck_notification_type CHECK (type IN (
   'schedule_tomorrow',  -- 내일 시작하는 일정
   'schedule_today',     -- 오늘 시작하는 일정
   'schedule_ending',    -- 여러 날 일정이 내일 끝나요
+  -- 협업 리뷰 (20261103_24 에서 추가)
+  'review_ready',       -- 협업이 끝나 리뷰를 남길 수 있어요
   -- 알림 종에 하루 한 칸으로 묶어 보여 주는 아침 브리핑 (협업마다 한 줄)
   'daily_brief'         -- 오늘 챙길 일 (위 아침 알림들을 묶은 것. 하나하나는 읽음으로 저장하고 종에는 이것만)
 ));
 
--- 027이 적어 둔 개정 번호를 이 변경까지 포함하도록 올립니다.
+-- 028이 적어 둔 개정 번호를 이 변경까지 포함하도록 올립니다.
 UPDATE public.insight_alembic_version
-SET version_num = '20261102_24'
-WHERE version_num = '20261101_23';
+SET version_num = '20261104_25'
+WHERE version_num = '20261103_24';

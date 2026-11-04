@@ -144,35 +144,86 @@
   min-width: 0;
 }
 .sideTitle {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 5px;
+  padding: 7px 12px 13px;
   color: var(--color-faint);
   font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.13em;
-  padding: 7px 14px 13px;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+}
+.sideTitle span {
+  color: #8090aa;
+  font-size: 10px;
+  font-weight: 550;
+  letter-spacing: 0;
 }
 .sideLink {
-  width: 100%;
-  text-align: left;
   display: flex;
+  width: 100%;
+  min-height: 46px;
   align-items: center;
   justify-content: space-between;
-  min-height: 46px;
-  font-size: 13px;
-  padding: 10px 14px;
-  border-radius: var(--radius-button);
+  gap: 8px;
   margin-bottom: 4px;
-  color: var(--color-muted);
+  padding: 7px 11px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: #566782;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 550;
+  transition: background .16s ease, border-color .16s ease, color .16s ease;
+}
+.sideLinkLabel {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 9px;
+}
+.sideLinkIcon {
+  display: grid;
+  width: 27px;
+  height: 27px;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 9px;
+  background: #f0f3fb;
+  color: #667eae;
 }
 .sideLink:hover {
-  background: white;
+  border-color: #e7eafa;
+  background: #fafbff;
+  color: #374e85;
 }
-.sideActive {
-  background: var(--color-brand-soft);
-  color: var(--color-brand);
-  font-weight: 650;
+.sideActive,
+.sideActive:hover {
+  border-color: #e4e8ff;
+  background: #eef0ff;
+  color: #413ecc;
+  font-weight: 750;
 }
-.sideLink span {
-  font-size: 7px;
+.sideActive .sideLinkIcon {
+  background: #e3e5ff;
+  color: #5443da;
+}
+.sideIndicator {
+  display: block;
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: currentColor;
+}
+.sideAdmin {
+  margin-top: 17px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e9f1;
+}
+.mobileCategoryDetails {
+  display: none;
 }
 .sideCard {
   margin-top: 22px;
@@ -236,26 +287,6 @@
   font-size: 12px;
   color: var(--color-brand);
   font-weight: 650;
-}
-.tabs {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-}
-.tab {
-  min-height: 40px;
-  font-size: 12px;
-  padding: 8px 13px;
-  border: 1px solid var(--color-line);
-  border-radius: 24px;
-  background: white;
-  color: var(--color-muted);
-}
-.tabActive {
-  background: var(--color-ink);
-  border-color: var(--color-ink);
-  color: white;
 }
 .filters {
   display: flex;
@@ -988,38 +1019,92 @@
   .sidebar {
     margin-bottom: 18px;
   }
-  .sidebar nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
+  .desktopCategoryLinks {
+    display: none;
   }
-  .sideTitle,
+  .mobileCategoryDetails {
+    display: block;
+    overflow: hidden;
+    border: 1px solid #dfe6f4;
+    border-radius: 14px;
+    background: #ffffff;
+  }
+  .mobileCategorySummary {
+    display: flex;
+    min-height: 52px;
+    cursor: pointer;
+    list-style: none;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 15px;
+    color: #405a8e;
+    font-size: 12px;
+  }
+  .mobileCategorySummary::-webkit-details-marker {
+    display: none;
+  }
+  .mobileCategorySummary > span:first-child {
+    flex-shrink: 0;
+    font-weight: 600;
+    color: #7c89a4;
+  }
+  .mobileCategorySummary strong {
+    flex: 1;
+    text-align: right;
+    font-size: 13px;
+    font-weight: 750;
+    color: #363d87;
+  }
+  .mobileCategoryChevron {
+    flex-shrink: 0;
+    color: #7265cd;
+    font-size: 20px;
+    line-height: 1;
+    transition: transform .16s ease;
+  }
+  .mobileCategoryDetails[open] .mobileCategoryChevron {
+    transform: rotate(180deg);
+  }
+  .mobileCategoryLinks {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 5px;
+    padding: 10px;
+    border-top: 1px solid #edf0f7;
+  }
+  .mobileCategoryLinks .sideLink {
+    min-height: 46px;
+    padding: 8px;
+    margin: 0;
+    font-size: 11px;
+  }
+  .mobileCategoryLinks .sideLinkLabel {
+    gap: 6px;
+  }
+  .mobileCategoryLinks .sideLinkIcon {
+    width: 25px;
+    height: 25px;
+  }
   .sidebar .sideCard,
   .sidebar .sideLinks {
     display: none;
   }
-  .sideLink {
-    width: auto;
-    font-size: 11px;
-    padding: 10px;
+  .sideAdmin {
+    margin: 14px 0 0;
+  }
+  .sideAdmin nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 5px;
+  }
+  .sideAdmin .sideLink {
     min-height: 44px;
     margin: 0;
-    gap: 6px;
-  }
-  .sideLink span {
-    display: none;
+    padding-inline: 9px;
   }
   .rightRail {
     margin-top: 24px;
     grid-template-columns: 1fr;
-  }
-  .tabs {
-    gap: 5px;
-  }
-  .tab {
-    font-size: 11px;
-    padding-inline: 11px;
-    min-height: 44px;
   }
   .filters {
     gap: 7px;

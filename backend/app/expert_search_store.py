@@ -62,11 +62,13 @@ def expand_query(query: str) -> tuple[list[str], list[str]]:
     return sorted(groups), sorted(fields)
 
 
-# 참여 중 = 협업을 시작했고(started) 희망 종료일이 아직 안 지났거나 정하지 않은 요청이 있음
+# '진행 중' 판단은 실제 협업 공간의 상태를 기준으로 합니다.
+# 요청 상태 started는 협업 완료 뒤에도 남으므로 이를 가용성으로 사용하면 안 됩니다.
 ENGAGED_SQL = """
-    SELECT expert_id, MAX(COALESCE(accepted_end_date, end_date)) AS engaged_until
-    FROM collaboration_request
-    WHERE status = 'started' AND COALESCE(accepted_end_date, end_date) >= CURRENT_DATE
+    SELECT expert_id, MAX(end_date) AS engaged_until
+    FROM collaboration
+    WHERE status = 'ongoing'
+      AND end_date >= (now() AT TIME ZONE 'Asia/Seoul')::date
     GROUP BY expert_id
 """
 
@@ -79,6 +81,8 @@ def search_experts(
     limit: int,
     prefer_work_ids: list[str] | None = None,
     prefer_category_ids: list[str] | None = None,
+    engagement: str = "all",
+    sort: str = "relevance",
 ) -> dict:
     """공개 전문가 목록.
 
@@ -101,12 +105,18 @@ def search_experts(
             " WHERE d.user_id = e.user_id AND f.field_category_id = ANY(%s))"
         )
         params.append(category_ids)
+    # Filter in SQL so the total and every pagination page remain consistent.
+    if engagement == "idle":
+        conditions.append("g.expert_id IS NULL")
+    elif engagement == "engaged":
+        conditions.append("g.expert_id IS NOT NULL")
+
     if query.strip():
         # %, _ 는 LIKE에서 특별한 뜻이라, 글자 그대로 찾도록 앞에 역슬래시를 붙입니다.
         like = "%" + re.sub(r"([%_\\])", r"\\\1", query.strip()) + "%"
         conditions.append(
             """(
-            u.nickname ILIKE %s OR e.introduce ILIKE %s
+            u.nickname ILIKE %s OR e.introduce ILIKE %s OR e.affiliation ILIKE %s
             OR EXISTS (SELECT 1 FROM expert_able_work w JOIN able_work a ON a.able_work_id = w.able_work_id
                        WHERE w.user_id = e.user_id AND (a.name ILIKE %s OR w.able_work_id = ANY(%s)))
             OR EXISTS (SELECT 1 FROM expert_domain d
@@ -117,7 +127,7 @@ def search_experts(
             OR EXISTS (SELECT 1 FROM portfolio p WHERE p.user_id = e.user_id AND p.title ILIKE %s)
             )"""
         )
-        params += [like, like, like, group_ids, like, like, field_ids, like]
+        params += [like, like, like, like, group_ids, like, like, field_ids, like]
 
     base = f"""
         FROM expert e
@@ -128,7 +138,7 @@ def search_experts(
     with get_connection() as conn, conn.cursor() as cursor:
         cursor.execute(f"SELECT COUNT(*) AS total {base}", params)
         total = cursor.fetchone()["total"]
-        order_sql = "engaged, g.engaged_until NULLS LAST, e.created_at DESC, e.user_id DESC"
+        order_sql = "g.expert_id IS NOT NULL, g.engaged_until NULLS LAST, e.created_at DESC, e.user_id DESC" if sort == "relevance" else "e.created_at DESC, e.user_id DESC"
         order_params: list = []
         prefer_works = prefer_work_ids or []
         prefer_fields = prefer_category_ids or []
@@ -145,11 +155,14 @@ def search_experts(
                 " WHERE d.user_id = e.user_id AND f.field_category_id = ANY(%s))"
             )
             order_params.append(prefer_fields)
-        if related_checks:
+        if related_checks and sort == "relevance":
             order_sql = f"CASE WHEN {' OR '.join(related_checks)} THEN 0 ELSE 1 END, " + order_sql
+        elif sort == "newest":
+            order_params = []
         cursor.execute(
             f"""
             SELECT e.user_id, u.nickname, u.user_photo, e.introduce,
+                   e.affiliation, e.current_job, e.ai_career,
                    g.expert_id IS NOT NULL AS engaged, g.engaged_until
             {base}
             ORDER BY {order_sql}
@@ -199,50 +212,63 @@ def load_engagement(user_id: int) -> dict:
     return {"engaged": row is not None, "engaged_until": row["engaged_until"] if row else None}
 
 def load_collaborations(user_id: int) -> list[dict]:
-    """이 서비스에서 진행한 연구 (협업을 시작한 요청). 최근에 시작한 것부터.
+    """Public, consent-safe history of completed collaborations.
 
-    title: 연구 제목 / partner_nickname: 함께한 연구회원 닉네임
-    ongoing: 희망 종료일이 아직 안 지났으면 True (진행 중)
+    The internal workspace is the source of truth for completed work, not the
+    collaboration_request's 'started' status (which persists after completion).
+    Research names, researchers' identities, schedules, and agreement details
+    must never leave this public endpoint without explicit bilateral consent.
+    Only broad field categories and the expert's performed work codes are shown.
     """
     with get_connection() as conn, conn.cursor() as cursor:
         cursor.execute(
             """
-            SELECT cr.research_id,
-                   COALESCE(cr.accepted_start_date, cr.start_date) AS start_date,
-                   COALESCE(cr.accepted_end_date, cr.end_date) AS end_date, r.title,
-                   u.nickname AS partner_nickname,
-                   (COALESCE(cr.accepted_end_date, cr.end_date) >= CURRENT_DATE) AS ongoing
-            FROM collaboration_request cr
-            JOIN research r ON r.research_id = cr.research_id
-            JOIN users u ON u.user_id = r.user_id
-            WHERE cr.expert_id = %s AND cr.status = 'started'
-            ORDER BY 2 DESC, cr.request_id DESC
+            SELECT c.collaboration_id, c.start_date, c.end_date,
+                   COALESCE(c.agreement -> 'field_ids', '[]'::jsonb) AS field_ids,
+                   COALESCE(c.agreement -> 'able_work_ids', '[]'::jsonb) AS work_ids
+            FROM collaboration c
+            WHERE c.expert_id = %s AND c.status = 'done'
+            ORDER BY c.end_date DESC, c.collaboration_id DESC
+            LIMIT 50
             """,
             (user_id,),
         )
         rows = cursor.fetchall()
-        ids = [row["research_id"] for row in rows]
-        categories: dict[int, list[str]] = {}
-        works: dict[int, list[str]] = {}
-        if ids:
+        field_ids = sorted({
+            field_id
+            for row in rows
+            for field_id in (row["field_ids"] or [])
+            if isinstance(field_id, str)
+        })
+        categories: dict[str, str] = {}
+        if field_ids:
             cursor.execute(
-                "SELECT DISTINCT d.research_id, f.field_category_id FROM research_domain d"
-                " JOIN research_field f ON f.field_id = d.field_id WHERE d.research_id = ANY(%s)"
-                " ORDER BY f.field_category_id",
-                (ids,),
+                "SELECT field_id, field_category_id FROM research_field"
+                " WHERE field_id = ANY(%s)",
+                (field_ids,),
             )
-            for row in cursor.fetchall():
-                categories.setdefault(row["research_id"], []).append(row["field_category_id"])
-            cursor.execute(
-                "SELECT research_id, able_work_id FROM research_able_work"
-                " WHERE research_id = ANY(%s) ORDER BY research_able_work_id",
-                (ids,),
-            )
-            for row in cursor.fetchall():
-                works.setdefault(row["research_id"], []).append(row["able_work_id"])
+            categories = {
+                row["field_id"]: row["field_category_id"]
+                for row in cursor.fetchall()
+            }
 
-    for row in rows:
-        research_id = row.pop("research_id")
-        row["category_ids"] = categories.get(research_id, [])
-        row["able_work_ids"] = works.get(research_id, [])
-    return rows
+    return [
+        {
+            "start_date": row["start_date"],
+            "end_date": row["end_date"],
+            "ongoing": False,
+            "title": "완료한 협업 연구",
+            "partner_nickname": None,
+            "private": True,
+            "category_ids": sorted({
+                categories[field_id]
+                for field_id in (row["field_ids"] or [])
+                if isinstance(field_id, str) and field_id in categories
+            }),
+            "able_work_ids": [
+                work_id for work_id in (row["work_ids"] or [])
+                if isinstance(work_id, str) and work_id.startswith("UG")
+            ],
+        }
+        for row in rows
+    ]

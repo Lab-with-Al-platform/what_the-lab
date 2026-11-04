@@ -1,6 +1,6 @@
 """일정 메시지 고치기 · 아침 브리핑 묶기: 일정 표에 채널 메시지 번호 칸, 알림 종류에 daily_brief.
 
-SQL 본문은 backend/migrations/sql/20261102_24/ 에 동결해 두었습니다. (Docker용 database/init/028 과 같은 변경)
+SQL 본문은 backend/migrations/sql/20261104_25/ 에 동결해 두었습니다. (Docker용 database/init/029 과 같은 변경)
 기존 일정 · 알림은 지우거나 바꾸지 않아요. 칸과 규칙만 넓혀요.
 """
 
@@ -8,8 +8,8 @@ from pathlib import Path
 
 from alembic import op
 
-revision = "20261102_24"
-down_revision = "20261101_23"
+revision = "20261104_25"
+down_revision = "20261103_24"
 branch_labels = None
 depends_on = None
 
@@ -18,7 +18,7 @@ SQL_FILE = Path(__file__).resolve().parents[1] / "sql" / revision / "001_add_sch
 
 def upgrade() -> None:
     # 같은 DB에 동시에 적용하지 않도록 트랜잭션이 끝날 때까지 잠급니다.
-    op.execute("SELECT pg_advisory_xact_lock(20261102, 24)")
+    op.execute("SELECT pg_advisory_xact_lock(20261104_25)")
     op.execute("SET LOCAL search_path TO public, pg_catalog")
     # 이미 적용된 DB에는 다시 적용하지 않고 멈춥니다.
     op.execute("""
