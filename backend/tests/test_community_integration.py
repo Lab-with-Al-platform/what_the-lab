@@ -100,8 +100,12 @@ def test_existing_routes_and_single_migration_head_are_preserved():
     } <= paths
     root = Path(__file__).resolve().parents[2]
     scripts = ScriptDirectory.from_config(Config(str(root / "backend/alembic.ini")))
-    assert scripts.get_heads() == ["20261101_23"]
-    assert [r.revision for r in scripts.walk_revisions()] == [
+    # 새 마이그레이션이 붙어도 깨지지 않게: head는 하나뿐이고, 기존 이력은 맨 아래에 그대로 남아 있어야 합니다.
+    heads = scripts.get_heads()
+    assert len(heads) == 1
+    revisions = [r.revision for r in scripts.walk_revisions()]
+    assert revisions[0] == heads[0]
+    assert revisions[-23:] == [
         "20261101_23", "20261031_22", "20261031_21", "20261029_20", "20261029_19", "20261029_18", "20261028_17", "20261028_16", "20261028_15", "20261028_14", "20261028_13", "20261027_12", "20261026_11", "20261026_10", "20261026_09", "20261026_08", "20261026_07",
         "20261025_06", "20261022_05", "20261022_04", "20261021_03", "20261021_02", "20261016_01",
     ]
