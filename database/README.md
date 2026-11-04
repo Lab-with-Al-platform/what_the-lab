@@ -47,3 +47,11 @@ PostgreSQL/Supabase 데이터 구조와 변경 이력을 관리합니다.
 - 실제 사용자 개인정보나 연구 데이터를 시드로 사용하지 않습니다.
 - 이미 공유된 마이그레이션 파일을 조용히 수정하지 않습니다. 새 변경 파일을 추가합니다.
 - Supabase 서버 전용 키를 SQL이나 문서에 넣지 않습니다.
+
+
+## 2026-11-03 develop + 기능 통합 검증 브랜치 주의
+
+- 팀 develop에 추가된 순차 마이그레이션: `20261031_21`(협업 요청 기록), `20261031_22`(협업 알림), `20261101_23`(일정 알림).
+- 리뷰 Feature의 이전 `20261031_21`과 동일 revision 충돌을 방지하기 위해 검증용 통합 브랜치에서 협업 평가는 `20261103_24`로 재배치했습니다.
+- 빈 로컬 Docker DB의 SQL 초기화 순서: `025_add_task_events.sql` → `026_add_task_notifications.sql` → `027_add_schedule_notifications.sql` → `028_create_collaboration_reviews.sql`.
+- 실제 기동 DB에 이미 025번을 적용했거나 과거 리뷰 테이블을 적용했다면 **재실행하지 말고 수동으로 DB 현황을 확인**해야 합니다. `database/init`은 기존 볼륨에 자동 재실행되지 않으며 공유 Supabase·운영 DB에 적용해서는 안 됩니다.

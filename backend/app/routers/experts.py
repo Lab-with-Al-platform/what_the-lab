@@ -1,5 +1,7 @@
 """AI 전문가 찾기(목록)와 공개 프로필. 로그인하지 않아도 볼 수 있고, 공개한 전문가만 나옵니다."""
 
+from typing import Literal
+
 from fastapi import APIRouter, HTTPException, Query
 
 from app.db import get_connection
@@ -20,6 +22,8 @@ def list_experts(
     prefer_works: str = Query("", max_length=200),  # 위로 올릴 UG. 목록에서 빼지는 않음
     prefer_fields: str = Query("", max_length=200),  # 위로 올릴 대분류. 목록에서 빼지는 않음
     offset: int = Query(0, ge=0, le=10_000),  # 몇 번째부터 (더 보기)
+    engagement: Literal["all", "idle", "engaged"] = Query("all"),
+    sort: Literal["relevance", "newest"] = Query("relevance"),
 ) -> dict:
     return search_experts(
         q,
@@ -29,6 +33,8 @@ def list_experts(
         PAGE_SIZE,
         prefer_work_ids=split_work_ids(prefer_works),
         prefer_category_ids=split_category_ids(prefer_fields),
+        engagement=engagement,
+        sort=sort,
     )
 
 

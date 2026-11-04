@@ -18,6 +18,12 @@ function load(relative, params = new URLSearchParams()) {
     if (name === "next/navigation") return { useSearchParams: () => params };
     if (name === "next/link") return ({ children, ...props }) => React.createElement("a", props, children);
     if (name === "@/components/page-container") return { PageContainer: ({ children }) => React.createElement("main", null, children) };
+    if (name === "@/components/expert-search-hero") return { ExpertSearchHero: () => React.createElement("header", null) };
+    if (name === "@/components/lab-trust-indicator") return { LabTrustIndicator: () => null };
+    if (name === "@/lib/expert-local-demo") return { getLocalDemoFlaskPreview: () => null };
+    if (name === "@/lib/reviews") return { getExpertReputations: () => Promise.resolve({}) };
+    if (name === "@/lib/expert-search-navigation") return load("src/lib/expert-search-navigation.ts", params);
+    if (name === "@/lib/my-career") return { CAREER_LABELS: {}, JOB_LABELS: {} };
     if (name === "@/components/collab-request-dialog") return { CollabRequestDialog: () => null };
     if (name === "@/components/request-parts") return { Avatar: () => null };
     if (name === "@/lib/api") return { ApiError: class extends Error {}, requestApi: () => Promise.resolve([]) };

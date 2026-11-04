@@ -7,6 +7,9 @@ export type ExpertCardData = {
   nickname: string;
   user_photo: string | null;
   introduce: string | null; // 한 줄 소개 (40자)
+  affiliation?: string | null; // 소속 기관 (공개된 값만)
+  current_job?: string | null; // 현재 직업 코드
+  ai_career?: string | null; // AI 경력 코드
   engaged: boolean; // 지금 다른 연구와 협업 중인지
   engaged_until: string | null; // 협업 종료 예정일 YYYY-MM-DD (정하지 않았으면 null)
   able_work_ids: string[]; // 할 수 있는 일 UG ID
@@ -25,7 +28,8 @@ export type ExpertCollaboration = {
   end_date: string; // 희망 종료일 YYYY-MM-DD
   ongoing: boolean; // 종료일이 아직 안 지났으면 true (진행 중)
   title: string; // 연구 제목
-  partner_nickname: string; // 함께한 연구회원 닉네임
+  partner_nickname: string | null; // 공개 동의 전에는 제공되지 않음
+  private?: boolean; // 해당 연구·연구회원 식별 정보를 비공개로 처리 // 함께한 연구회원 닉네임
   category_ids: string[]; // 연구 분야 대분류 ID (F01~F10)
   able_work_ids: string[]; // 연구에서 맡긴 일 UG ID
 };

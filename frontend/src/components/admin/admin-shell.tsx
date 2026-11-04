@@ -46,7 +46,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
 function AdminWorkspace({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [access, setAccess] = useState<{ operations: boolean; insights: boolean } | null>(null);
+  const [access, setAccess] = useState<{ operations: boolean; insights: boolean; reviews: boolean } | null>(null);
   const [failure, setFailure] = useState("");
   const [login, setLogin] = useState(false);
   const [retry, setRetry] = useState(0);
@@ -69,10 +69,11 @@ function AdminWorkspace({ children }: { children: ReactNode }) {
     Promise.allSettled([
       requestApi<{ can_read_operations: boolean }>("/admin/operations/access"),
       requestApi<{ can_manage_insights: boolean }>("/admin/insights/access"),
-    ]).then(([operations, insights]) => {
+      requestApi<{ can_moderate_reviews: boolean }>("/reviews/moderation/access"),
+]).then(([operations, insights, reviews]) => {
       if (!active) return;
-      setAccess({ operations: operations.status === "fulfilled" && operations.value.can_read_operations === true, insights: insights.status === "fulfilled" && insights.value.can_manage_insights === true });
-      const failed = [operations, insights].filter(result => result.status === "rejected");
+      setAccess({ operations: operations.status === "fulfilled" && operations.value.can_read_operations === true, insights: insights.status === "fulfilled" && insights.value.can_manage_insights === true, reviews: reviews.status === "fulfilled" && reviews.value.can_moderate_reviews === true });
+      const failed = [operations, insights, reviews].filter(result => result.status === "rejected");
       setLogin(failed.some(result => result.status === "rejected" && result.reason instanceof ApiError && result.reason.status === 401));
       const unexpected = failed.find(result => result.status === "rejected" && (!(result.reason instanceof ApiError) || ![401, 403, 404].includes(result.reason.status ?? 0)));
       if (unexpected?.status === "rejected") setFailure(unexpected.reason instanceof Error ? unexpected.reason.message : "권한 확인 중 오류가 발생했습니다.");
@@ -103,11 +104,12 @@ function AdminWorkspace({ children }: { children: ReactNode }) {
 }
 
 /** 주소 읽기는 본문 안에서만 해서, 메뉴를 바꿔도 사이드 박스는 그대로 둡니다. */
-function AdminMain({ children, access, failure, login, isInsights, onDemo, onRetry }: { children: ReactNode; access: { operations: boolean; insights: boolean } | null; failure: string; login: boolean; isInsights: boolean; onDemo: (demo: boolean) => void; onRetry: () => void }) {
+function AdminMain({ children, access, failure, login, isInsights, onDemo, onRetry }: { children: ReactNode; access: { operations: boolean; insights: boolean; reviews: boolean } | null; failure: string; login: boolean; isInsights: boolean; onDemo: (demo: boolean) => void; onRetry: () => void }) {
   const pathname = usePathname();
   const params = useSearchParams();
   const router = useRouter();
-  const demo = !isInsights && params.get("demo") === "1";
+  const isReviews = pathname.startsWith("/admin/reviews");
+  const demo = !isInsights && !isReviews && params.get("demo") === "1";
   useEffect(() => { onDemo(demo); }, [demo, onDemo]);
 
   function changeMode(nextDemo: boolean) {
@@ -116,9 +118,9 @@ function AdminMain({ children, access, failure, login, isInsights, onDemo, onRet
     router.replace(`${pathname}${next.size ? `?${next}` : ""}`, { scroll: false });
   }
 
-  const allowed = isInsights ? access?.insights : access?.operations;
+  const allowed = isReviews ? access?.reviews : isInsights ? access?.insights : access?.operations;
   return <>
     {demo && allowed ? <div className={styles.demoNotice}><AdminIcon name="chart" /><strong>디자인 데모 · 가상 데이터</strong><span>2026.10.26 기준 예시입니다. 서버에 저장하지 않으며 실제 운영 수치가 아닙니다.</span></div> : null}
-    {!access ? <div className={styles.empty} role="status">관리자 권한을 확인하고 있습니다…</div> : allowed ? <PreviewContext.Provider value={demo}><ChromeContext.Provider value={{ showMode: !isInsights, demo, setDemo: changeMode }}>{children}</ChromeContext.Provider></PreviewContext.Provider> : <section className={styles.panel}><div className={styles.empty}><h1 className="text-lg font-bold text-ink">{login ? "로그인이 필요합니다" : "이 메뉴의 관리 권한이 없습니다"}</h1><p className="mt-2">{failure || "회원·연구 조회와 인사이트 운영은 서로 다른 권한으로 관리합니다."}</p><div className="mt-4 flex justify-center gap-3">{login ? <Link href="/login" className="text-brand underline">로그인</Link> : null}<button type="button" className="text-brand underline" onClick={onRetry}>권한 다시 확인</button></div></div></section>}
+    {!access ? <div className={styles.empty} role="status">관리자 권한을 확인하고 있습니다…</div> : allowed ? <PreviewContext.Provider value={demo}><ChromeContext.Provider value={{ showMode: !isInsights && !isReviews, demo, setDemo: changeMode }}>{children}</ChromeContext.Provider></PreviewContext.Provider> : <section className={styles.panel}><div className={styles.empty}><h1 className="text-lg font-bold text-ink">{login ? "로그인이 필요합니다" : "이 메뉴의 관리 권한이 없습니다"}</h1><p className="mt-2">{failure || "회원·연구 조회와 인사이트 운영은 서로 다른 권한으로 관리합니다."}</p><div className="mt-4 flex justify-center gap-3">{login ? <Link href="/login" className="text-brand underline">로그인</Link> : null}<button type="button" className="text-brand underline" onClick={onRetry}>권한 다시 확인</button></div></div></section>}
   </>;
 }

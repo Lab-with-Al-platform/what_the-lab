@@ -4,6 +4,7 @@ export const ADMIN_MENU = [
   { href: "/admin", label: "운영 요약", icon: "overview", area: "operations" },
   { href: "/admin/members", label: "회원 관리", icon: "members", area: "operations" },
   { href: "/admin/projects", label: "연구 등록", icon: "research", area: "operations" },
+  { href: "/admin/reviews", label: "후기 신고 관리", icon: "lock", area: "reviews" },
   { href: "/admin/insights", label: "인사이트 관리", icon: "insights", area: "insights" },
 ] as const;
 
@@ -15,18 +16,20 @@ export function adminHomeHref(canReadOperations: boolean, canManageInsights: boo
 }
 
 /** 권한을 알기 전에는 메뉴를 비웁니다. 없는 권한 칸이 잠깐 보이지 않게 합니다. */
-export function permittedAdminMenu(access: { operations: boolean; insights: boolean } | null) {
+export function permittedAdminMenu(access: { operations: boolean; insights: boolean; reviews?: boolean } | null) {
   if (!access) return [];
   return ADMIN_MENU.filter((item) => access[item.area]);
 }
 
 /** 지금 주소가 없는 권한이면, 있는 관리 화면으로 옮깁니다. */
 export function adminFallbackPath(
-  access: { operations: boolean; insights: boolean },
+  access: { operations: boolean; insights: boolean; reviews?: boolean },
   pathname: string,
 ): string | null {
   const onInsights = pathname.startsWith("/admin/insights");
-  if (!access.operations && access.insights && !onInsights) return "/admin/insights";
+  const onReviews = pathname.startsWith("/admin/reviews");
+  if (onReviews && !access.reviews) return access.operations ? "/admin" : access.insights ? "/admin/insights" : "/";
+  if (!access.operations && access.insights && !onInsights && !onReviews) return "/admin/insights";
   if (access.operations && !access.insights && onInsights) return "/admin";
   return null;
 }
