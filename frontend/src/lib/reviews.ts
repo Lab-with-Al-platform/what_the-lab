@@ -31,6 +31,9 @@ export type ReviewContext = {
   partner: string;
   research_title: string;
   public_policy: string;
+  stopped_by_me?: boolean; // 내가 중단한 협업 (평가하지 않아요)
+  stopped_by_partner?: boolean; // 상대가 중단한 협업 (평가할 수 있어요)
+  end_reason?: string | null; // 중단 사유 (평가할 때 참고)
   my_review: CollaborationReview | null;
   received_review: (Pick<CollaborationReview, "review_id" | "collaboration_id" | "reviewer_side" | "expertise" | "communication" | "timeliness" | "quality" | "comment" | "created_at">) | null;
   can_edit: boolean;

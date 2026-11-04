@@ -9,6 +9,8 @@
    - 기한 지남 → 받은 사람. 지난 다음 날 한 번, 그 뒤로는 일주일에 한 번 (task_overdue)
    - 기한 수정 요청에 1일 · 3일째 답 없음 → 보낸 사람 (task_talk_waiting)
    - 협업 종료 3일 전인데 열린 요청이 있음 → 두 사람 (collab_ending)
+   - 협업이 내일 시작 · 오늘 시작 → 두 사람 (collab_starting · collab_start_today)
+   - 협업 종료 7일 전 → 두 사람 (collab_week_left, 열린 요청이 없어도)
    - 일정 → 두 사람: 미팅 · 기타는 당일, 결과물 마감은 전날(오늘 추가한 건 빼요), 여러 날 일정은 끝나기 전날
    알림 종에는 사람 · 협업마다 하루 한 칸(daily_brief "오늘 챙길 일")만 보여요. 줄마다의 알림은 읽음으로 저장해요(중복 막기용).
    같은 (사람, 종류, 협업, 요청, 날짜) 알림은 DB가 한 번만 받아요(uq_notification_daily).
@@ -68,6 +70,12 @@ FROM (
     CROSS JOIN LATERAL (VALUES (rs.user_id), (c.expert_id)) AS people(user_id)
     WHERE c.status = 'ongoing' AND c.end_date = %(ending)s
       AND EXISTS (SELECT 1 FROM collaboration_task x WHERE x.collaboration_id = c.collaboration_id AND x.status = 'open')
+    UNION ALL
+    SELECT people.user_id, 'collab_week_left', NULL, NULL, c.collaboration_id
+    FROM collaboration c
+    JOIN research rs ON rs.research_id = c.research_id
+    CROSS JOIN LATERAL (VALUES (rs.user_id), (c.expert_id)) AS people(user_id)
+    WHERE c.status = 'ongoing' AND c.end_date = %(week)s AND c.start_date <= %(today)s
     UNION ALL
     SELECT people.user_id, CASE WHEN c.start_date = %(today)s THEN 'collab_start_today' ELSE 'collab_starting' END,
            NULL, NULL, c.collaboration_id
@@ -136,7 +144,12 @@ def pick_today(today: date) -> list[dict]:
     with transaction() as cursor:
         complete_ended_collaborations(cursor)
         expire_changes(cursor)  # 답 기한이 지난 기간 변경 · 시작일 미루기 요청 정리
-        days = {"today": today, "tomorrow": today + timedelta(days=1), "ending": today + timedelta(days=3)}
+        days = {
+            "today": today,
+            "tomorrow": today + timedelta(days=1),
+            "ending": today + timedelta(days=3),
+            "week": today + timedelta(days=7),
+        }   
         cursor.execute(PICK_SQL, days)
         ids = [row["notification_id"] for row in cursor.fetchall()]
         cursor.execute(SCHEDULE_PICK_SQL, days)
@@ -184,6 +197,7 @@ def short_label(row: dict, today: date) -> str:
         "task_talk_waiting": f"기한 수정 요청에 답하기 {content}",
         "collab_ending": "협업 종료 3일 전",
         "collab_starting": "내일 협업 시작",
+        "collab_week_left": "협업 7일 남음",
         "collab_start_today": "오늘부터 협업 시작",
         "schedule_today": f"오늘 {title}",
         "schedule_tomorrow": f"내일 마감 {title}",
@@ -214,7 +228,7 @@ def group_by_channel(rows: list[dict]) -> dict[str, list[dict]]:
         channel = row["discord_channel_id"]
         if not channel:
             continue  # 아직 채널이 없는 협업은 종 알림만
-        if row["type"] in ("collab_ending", "collab_starting", "collab_start_today") or row.get("schedule"):
+        if row["type"] in ("collab_ending", "collab_starting", "collab_start_today", "collab_week_left") or row.get("schedule"):
             key = (channel, row["type"], row.get("schedule_id"))
             if key in shared:
                 shared[key]["to"].append(row["discord_id"])

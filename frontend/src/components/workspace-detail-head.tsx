@@ -6,6 +6,7 @@ import { Schedule } from "@/lib/workspace";
 import { CollabTask, CollaborationDetail, dayText, periodHeadline, ROLE_LABELS } from "@/lib/workspace-detail";
 import { fieldName } from "@/lib/taxonomy-options";
 import { Avatar } from "@/components/request-parts";
+import { ChangeBox, EndedNote, EndingMenu } from "@/components/workspace-ending";
 import { CanceledNote, WaitingBox } from "@/components/workspace-waiting";
 
 const STATUS = {
@@ -18,7 +19,8 @@ const STATUS = {
 
 /**
  * 머리: 상태 · 분야 · 제목 · 두 사람 · [디스코드 채널] [구글 캘린더] + 아래에 협업 기간 타임라인
- * 시작 전이면 안내 상자(시작일 미루기 · 협업 취소), 취소된 협업이면 누가 · 왜 취소했는지
+ * 시작 전이면 안내 상자(시작일 미루기 · 협업 취소), 진행 중이면 [⋯](기간 연장 · 조기 완료 · 중단) + 받은 요청 상자,
+ * 끝난 협업이면 어떻게 끝났는지(취소 · 완료 · 중단)
  */
 export function DetailHead({ detail, onChange }: { detail: CollaborationDetail; onChange: (next: CollaborationDetail) => void }) {
   const { collaboration: collab, agreement } = detail;
@@ -66,10 +68,14 @@ export function DetailHead({ detail, onChange }: { detail: CollaborationDetail; 
             !ended && <span className="inline-flex h-10 items-center px-2 text-xs text-faint">디스코드 채널 준비 중</span>
           )}
           {!ended && <GoogleButton detail={detail} />}
+          {collab.status === "active" && <EndingMenu detail={detail} onChange={onChange} />}
         </div>
       </div>
+
       {collab.status === "waiting" && <WaitingBox detail={detail} onChange={onChange} />}
+      {collab.status === "active" && <ChangeBox detail={detail} onChange={onChange} />}
       <CanceledNote detail={detail} />
+      <EndedNote detail={detail} />
       <Timeline detail={detail} />
     </section>
   );

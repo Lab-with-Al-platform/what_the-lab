@@ -187,6 +187,7 @@ def brief_text(today: date, items: list[dict]) -> str:
     order = {
         "collab_start_today": -2,
         "collab_starting": -1,
+        "collab_week_left": 0,
         "collab_ending": 0,
         "schedule_today": 1,
         "task_overdue": 2,
@@ -209,6 +210,11 @@ def brief_text(today: date, items: list[dict]) -> str:
         if kind.startswith("schedule_"):
             icon, _, text = daily_label(kind, item["schedule"], today).partition(" ")
             lines.append(f"{icon} {who} {text}")
+        elif kind == "collab_week_left":
+            lines.append(
+                f"🗓 {who} 협업이 {day_text(item['end_date'])}에 끝나요 (7일 남음) · "
+                "기간이 더 필요하면 웹 협업 상세 ⋯ → 기간 연장 요청"
+            )
         elif kind == "collab_starting":
             lines.append(f"🚀 {who} 내일 협업이 시작돼요 · 시작일부터 요청 · 일정을 쓸 수 있어요")
         elif kind == "collab_start_today":
