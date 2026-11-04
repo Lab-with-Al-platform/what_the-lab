@@ -1,230 +1,236 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { PageContainer } from "@/components/page-container";
-import { FAQ_CATEGORIES, FAQS, searchFaqs } from "@/lib/faq";
+import { FAQ_CATEGORIES, FAQS, searchFaqs, type FaqCategory } from "@/lib/faq";
+import { FAQ_SCREENSHOTS } from "@/lib/faq-screenshots";
+import { FaqWalkthrough } from "./faq-walkthrough";
 import { Icon } from "./community-ui";
-import styles from "./community.module.css";
+import communityStyles from "./community.module.css";
+import styles from "./faq-visual.module.css";
+
+const QUICK_HELP = [
+  { label: "협업 요청과 작업 요청", id: "workspace-task-vs-request" },
+  { label: "협업 일정·달력", id: "workspace-schedules" },
+  { label: "협업 종료 후 평가", id: "review-after-completion" },
+] as const;
+
+const categoryEntries = Object.entries(FAQ_CATEGORIES) as [FaqCategory, string][];
+
+function getHashFaqId() {
+  if (typeof window === "undefined") return "";
+  try { return decodeURIComponent(window.location.hash.slice(1)); }
+  catch { return ""; }
+}
 
 export function FaqPage() {
   const params = useSearchParams();
   const router = useRouter();
   const query = params.get("q") ?? "";
-  const category = params.get("category") ?? "all";
+  const rawCategory = params.get("category") ?? "all";
+  const category = rawCategory in FAQ_CATEGORIES ? rawCategory : "all";
   const [expanded, setExpanded] = useState("");
   const [copyMessage, setCopyMessage] = useState("");
   const refs = useRef<Record<string, HTMLDetailsElement | null>>({});
-  const results = searchFaqs(query, category);
+  const results = useMemo(() => searchFaqs(query, category), [query, category]);
+
   useEffect(() => {
     function openHash() {
-      const id = window.location.hash.slice(1);
-      if (!FAQS.some((item) => item.id === id)) return;
-      const element = refs.current[id];
-      if (element) {
-        element.open = true;
-        setExpanded(id);
-        element.scrollIntoView({ block: "start" });
+      const id = getHashFaqId();
+      if (!FAQS.some((faq) => faq.id === id)) return;
+      if (!results.some((faq) => faq.id === id)) {
+        // A direct FAQ link must work even when the current search/filter hides it.
+        router.replace(`/faq#${encodeURIComponent(id)}`, { scroll: false });
+        return;
       }
+      setExpanded(id);
+      window.requestAnimationFrame(() => refs.current[id]?.scrollIntoView({ block: "start" }));
     }
     openHash();
     window.addEventListener("hashchange", openHash);
     return () => window.removeEventListener("hashchange", openHash);
-  }, [query, category]);
+  }, [results, router]);
+
   function filter(next: { q?: string; category?: string }) {
-    const p = new URLSearchParams(params.toString());
+    const search = new URLSearchParams(params.toString());
     for (const [key, value] of Object.entries(next)) {
-      if (value && value !== "all") p.set(key, value);
-      else p.delete(key);
+      if (value && value !== "all") search.set(key, value);
+      else search.delete(key);
     }
-    router.replace(`/faq${p.size ? `?${p}` : ""}`, { scroll: false });
+    router.replace(`/faq${search.size ? `?${search.toString()}` : ""}`, { scroll: false });
   }
+
+  async function copyFaqLink(id: string) {
+    const url = new URL(`/faq#${encodeURIComponent(id)}`, window.location.origin).href;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopyMessage("해당 FAQ 주소를 복사했습니다.");
+    } catch {
+      setCopyMessage(`복사가 제한되어 있어요. 이 주소를 복사해 주세요: ${url}`);
+    }
+  }
+
   return (
-    <PageContainer className={styles.page}>
-      <div className={styles.breadcrumb}>
-        <Link href="/">홈</Link>
-        <span>›</span>
-        <span>FAQ</span>
+    <PageContainer className={communityStyles.page}>
+      <div className={communityStyles.breadcrumb}>
+        <Link href="/">홈</Link><span>›</span><span>FAQ</span>
       </div>
-      <header className={styles.faqHero}>
-        <p className={styles.eyebrow}>HELP & GUIDANCE</p>
-        <h1>무엇이 궁금하신가요?</h1>
-        <p>
-          처음 방문했을 때도, 이용하다 막혔을 때도.
-          <br />
-          자주 묻는 질문에서 필요한 답을 찾아보세요.
-        </p>
-        <div className={styles.search} style={{ textAlign: "left" }}>
-          <Icon name="search" />
-          <label className="sr-only" htmlFor="faq-search">
-            도움말 검색
-          </label>
-          <input
-            id="faq-search"
-            value={query}
-            onChange={(e) => filter({ q: e.target.value })}
-            placeholder="예: 비공개 문의, 전문가, 연구 데이터"
-            maxLength={200}
-          />
-          {query && (
-            <button
-              onClick={() => filter({ q: "" })}
-              aria-label="검색어 지우기"
-            >
-              ×
-            </button>
-          )}
+
+      <div className={styles.shell}>
+        <header className={styles.hero}>
+          <div className={styles.heroEyebrow}>WHAT THE LAB / HELP CENTER</div>
+          <h1>궁금한 순간, 바로 찾는 답.</h1>
+          <p>처음 이용하는 방법부터 협업 요청, 함께 쓰는 달력과 할 일, 종료 후 평가까지. 실제 서비스 흐름에 맞춰 안내합니다.</p>
+          <div className={styles.heroSearch}>
+            <Icon name="search" />
+            <label className="sr-only" htmlFor="faq-search">FAQ 검색</label>
+            <input
+              id="faq-search"
+              type="search"
+              value={query}
+              onChange={event => filter({ q: event.target.value })}
+              placeholder="예: 일정 추가, 기한 조정, 평가, 비공개 문의"
+              maxLength={200}
+            />
+            {query ? (
+              <button type="button" aria-label="검색어 지우기" onClick={() => filter({ q: "" })}>지우기</button>
+            ) : <span aria-hidden="true" className="text-[11px] font-semibold text-[#a0aec4]">FAQ</span>}
+          </div>
+          <nav aria-label="자주 찾는 도움말" className={styles.heroShortcuts}>
+            <span>바로 보기</span>
+            {QUICK_HELP.map(item => (
+              <Link href={`/faq#${item.id}`} key={item.id}>{item.label}</Link>
+            ))}
+          </nav>
+        </header>
+
+        <div className={styles.overview}>
+          <div className={styles.overviewText}>
+            <span aria-hidden="true" className={styles.overviewIcon}>✦</span>
+            실제 메뉴와 버튼을 기준으로 작성한 도움말
+          </div>
+          <small>서비스 기능 안내 기준 · 2026.11.03</small>
         </div>
-        <p
-          className={styles.meta}
-          style={{ marginTop: 12, justifyContent: "center", marginBottom: 0 }}
-        >
-          자주 찾는 질문{" "}
-          <Link
-            href="/faq#private-post"
-            onClick={() => setExpanded("private-post")}
-            style={{ color: "var(--color-brand)" }}
-          >
-            비공개 문의
-          </Link>
-          <span>·</span>
-          <Link
-            href="/faq#first-question"
-            onClick={() => setExpanded("first-question")}
-            style={{ color: "var(--color-brand)" }}
-          >
-            첫 질문
-          </Link>
-        </p>
-      </header>
-      <div className={styles.faqMain}>
-        <div className={styles.faqLayout}>
-          <nav aria-label="FAQ 분류">
-            <button
-              className={`${styles.sideLink} ${category === "all" ? styles.sideActive : ""}`}
-              aria-pressed={category === "all"}
-              onClick={() => filter({ category: "all" })}
-            >
-              전체 도움말 <span>{FAQS.length}</span>
+
+        <div className={styles.layout}>
+          <nav className={styles.side} aria-label="FAQ 분류">
+            <span className={styles.sideCaption}>EXPLORE TOPICS</span>
+            <button type="button" className={styles.sideButton} aria-pressed={category === "all"} onClick={() => filter({ category: "all" })}>
+              <span>전체 도움말</span><span>{FAQS.length}</span>
             </button>
-            {Object.entries(FAQ_CATEGORIES).map(([key, label]) => (
-              <button
-                className={`${styles.sideLink} ${category === key ? styles.sideActive : ""}`}
-                key={key}
-                aria-pressed={category === key}
-                onClick={() => filter({ category: key })}
-              >
-                {label}
+            {categoryEntries.map(([id, label]) => (
+              <button type="button" key={id} className={styles.sideButton} aria-pressed={category === id} onClick={() => filter({ category: id })}>
+                <span>{label}</span><span>{FAQS.filter(faq => faq.category === id).length}</span>
               </button>
             ))}
           </nav>
-          <section>
-            <div className={styles.filterLine}>
-              <span className={styles.meta} role="status">
-                {results.length}개의 도움말
-                {query ? ` · ‘${query}’ 검색 결과` : ""}
-              </span>
-              <span className={styles.meta}>안내 기준 2026.10.26</span>
+
+          <section aria-label="FAQ 질문과 답변">
+            <div className={styles.sectionHeader}>
+              <div>
+                <h2>{category === "all" ? "전체 도움말" : FAQ_CATEGORIES[category as FaqCategory]}</h2>
+                <p>{query ? `‘${query}’ 검색 결과` : "필요한 질문을 누르면 답변과 화면 안내를 확인할 수 있어요."}</p>
+              </div>
+              <span className={styles.resultCount} role="status">{results.length}개 질문</span>
             </div>
-            <div className={styles.panel}>
-              {results.map((faq) => (
+            <div className={styles.accordion}>
+              {results.map((faq, index) => (
                 <details
-                  key={faq.id}
                   id={faq.id}
-                  className={styles.faqItem}
-                  ref={(node) => {
-                    refs.current[faq.id] = node;
-                  }}
+                  key={faq.id}
+                  className={styles.item}
+                  ref={node => { refs.current[faq.id] = node; }}
                   open={expanded === faq.id}
                 >
                   <summary
-                    onClick={(event) => {
+                    className={styles.question}
+                    onClick={event => {
                       event.preventDefault();
-                      setExpanded((current) =>
-                        current === faq.id ? "" : faq.id,
-                      );
+                      setExpanded(current => current === faq.id ? "" : faq.id);
                     }}
                   >
-                    <span className={styles.faqQ}>Q.</span>
-                    {faq.question}
+                    <span aria-hidden="true" className={styles.questionNumber}>{String(index + 1).padStart(2, "0")}</span>
+                    <span className={styles.questionText}>{faq.question}</span>
+                    {faq.guide && <span className={styles.guidePill}>단계별 안내</span>}
+                    <span aria-hidden="true" className={styles.expand}>{expanded === faq.id ? "−" : "+"}</span>
                   </summary>
-                  <div className={styles.faqAnswer}>
-                    {faq.answer.map((p, i) => (
-                      <p key={i}>{p}</p>
+
+                  <div className={styles.answer}>
+                    {faq.answer.map((paragraph, paragraphIndex) => (
+                      <p key={paragraphIndex}>{paragraph}</p>
                     ))}
+                    {FAQ_SCREENSHOTS[faq.id] && (
+                      <section className={styles.productScreenshots} aria-label="실제 서비스 시연 화면">
+                        <div className={styles.screenshotHeader}>
+                          <div>
+                            <p className={styles.screenshotEyebrow}>IN THE PRODUCT</p>
+                            <h3>실제 서비스 화면으로 확인해 보세요</h3>
+                          </div>
+                          <span className={styles.screenshotCount}>{FAQ_SCREENSHOTS[faq.id].length}개 화면</span>
+                        </div>
+                        {FAQ_SCREENSHOTS[faq.id].map(image => (
+                          <figure className={styles.screenshotFigure} key={image.src}>
+                            <div className={styles.screenshotFrame}>
+                              <Image
+                                src={image.src}
+                                alt={image.alt}
+                                width={1365}
+                                height={930}
+                                sizes="(max-width: 640px) 100vw, 800px"
+                                unoptimized
+                                loading="lazy"
+                                className={styles.screenshotImage}
+                              />
+                            </div>
+                            <figcaption>{image.title} · 실제 앱 UI를 테스트 데이터로 시연한 화면</figcaption>
+                          </figure>
+                        ))}
+                        <p className={styles.screenshotDisclaimer}>
+                          실제 WHAT THE LAB 화면을 캡처했으며, 화면 속 연구·계정·작업·평가는 설명을 위한 시연 데이터입니다.
+                          로그인 상태나 운영 설정에 따라 버튼이 다르게 보일 수 있습니다.
+                        </p>
+                      </section>
+                    )}
+                    {faq.guide && expanded === faq.id && (
+                      FAQ_SCREENSHOTS[faq.id] ? (
+                        <details className={styles.moreSteps}>
+                          <summary>순서대로 따라하기 · {faq.guide.steps.length}단계 안내</summary>
+                          <FaqWalkthrough key={faq.id} faqId={faq.id} guide={faq.guide} />
+                        </details>
+                      ) : <FaqWalkthrough key={faq.id} faqId={faq.id} guide={faq.guide} />
+                    )}
                     <div className={styles.actions}>
-                      {faq.links.map((link) => (
-                        <Link key={link.href} href={link.href}>
-                          {link.label}
-                          <Icon name="arrow" size={14} />
-                        </Link>
+                      {faq.links.map(link => (
+                        <Link key={link.href} href={link.href}>{link.label}<Icon name="arrow" size={13} /></Link>
                       ))}
-                      <button
-                        className={styles.textButton}
-                        onClick={async () => {
-                          const url = new URL(
-                            `/faq#${faq.id}`,
-                            window.location.origin,
-                          ).href;
-                          try {
-                            await navigator.clipboard.writeText(url);
-                            setCopyMessage("답변 링크를 복사했습니다.");
-                          } catch {
-                            setCopyMessage(`이 주소를 복사해 주세요: ${url}`);
-                          }
-                        }}
-                      >
-                        이 답변 링크
-                      </button>
+                      <button type="button" className={styles.copy} onClick={() => void copyFaqLink(faq.id)}>답변 링크 복사</button>
                     </div>
                   </div>
                 </details>
               ))}
-              {!results.length && (
+              {results.length === 0 && (
                 <div className={styles.empty}>
-                  <Icon name="search" size={30} />
-                  <h2>다른 표현으로 찾아볼까요?</h2>
-                  <p>짧은 단어로 검색하거나 전체 도움말을 확인해 주세요.</p>
-                  <button
-                    className={styles.secondary}
-                    onClick={() => router.replace("/faq", { scroll: false })}
-                  >
-                    검색 초기화
-                  </button>
+                  <h3>다른 표현으로 찾아볼까요?</h3>
+                  <p>기능 이름을 짧게 검색하거나 전체 도움말로 돌아가 보세요.</p>
+                  <button type="button" onClick={() => router.replace("/faq", { scroll: false })}>검색 초기화</button>
                 </div>
               )}
             </div>
-            {copyMessage && (
-              <p className={styles.notice} role="status">
-                {copyMessage}
-              </p>
-            )}
-            <div className={styles.faqCta}>
+            {copyMessage && <p className={styles.copyStatus} role="status">{copyMessage}</p>}
+
+            <section className={styles.cta} aria-label="추가 문의">
               <div>
-                <h2>아직 답을 찾지 못하셨나요?</h2>
-                <p>
-                  함께 나눌 질문은 게시판에,
-                  <br />
-                  개인적인 문제는 비공개 문의로 남겨 주세요.
-                </p>
+                <h2>그래도 해결되지 않았나요?</h2>
+                <p>함께 나눌 질문은 공개 게시판에, 계정이나 개인적인 문제는 비공개 문의로 남겨 주세요.</p>
               </div>
-              <div className={styles.actions}>
-                <Link
-                  className={styles.secondary}
-                  href="/community/new?category=question"
-                >
-                  질문하기
-                </Link>
-                <Link
-                  className={styles.primary}
-                  href="/community/new?visibility=private&category=support"
-                >
-                  <Icon name="lock" size={15} />
-                  비공개 문의
-                </Link>
+              <div className={styles.ctaActions}>
+                <Link href="/community/new?category=question">질문 작성하기</Link>
+                <Link href="/community/new?visibility=private&category=support">비공개 문의</Link>
               </div>
-            </div>
+            </section>
           </section>
         </div>
       </div>
