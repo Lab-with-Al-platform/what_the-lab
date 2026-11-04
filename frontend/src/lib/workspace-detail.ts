@@ -312,3 +312,43 @@ export async function declineChange(changeId: number, note: string): Promise<Col
 export async function withdrawChange(changeId: number): Promise<CollaborationDetail> {
   return requestApi<CollaborationDetail>(`/workspace/changes/${changeId}/withdraw`, { method: "POST" });
 }
+
+// ---------------------------------------------------------------------------
+// 진행 중 협업 마무리 (웹에서만): 기간 연장 · 조기 완료 · 협업 중단 (백엔드 app/collab_ending.py 와 같은 규칙)
+// 받은 요청의 [수락] · [다시 얘기해요]는 위의 acceptChange · declineChange 를 같이 써요
+// ---------------------------------------------------------------------------
+
+/** 중단 사유 (백엔드 STOP_REASONS 와 같은 순서 · 글자) */
+export const STOP_REASONS = [
+  ["contact", "상대와 연락이 잘 안 돼요"],
+  ["terms", "협업 범위 · 조건이 처음과 달라졌어요"],
+  ["personal", "개인 사정 · 일정 문제로 더 진행하기 어려워요"],
+  ["result", "결과물이 기대와 많이 달라요"],
+  ["other", "기타"],
+] as const;
+export type StopReason = (typeof STOP_REASONS)[number][0];
+export const MAX_EXTEND_DAYS = 30; // 한 번에 최대 며칠까지 늘릴 수 있나 (여러 번 가능)
+
+/** [기간 연장 요청]: 새 종료일 + 사유. 상대가 수락하면 종료일이 바뀌어요 */
+export async function extendCollaboration(collaborationId: number, input: { end_date: string; reason: string }): Promise<CollaborationDetail> {
+  return requestApi<CollaborationDetail>(`/workspace/${collaborationId}/extend`, { method: "POST", body: JSON.stringify(input) });
+}
+
+/** [조기 완료 요청]: 진행 중인 요청 · 남은 일정이 없을 때만. 한마디는 선택 */
+export async function requestComplete(collaborationId: number, note: string): Promise<CollaborationDetail> {
+  return requestApi<CollaborationDetail>(`/workspace/${collaborationId}/complete`, { method: "POST", body: JSON.stringify({ note }) });
+}
+
+/** [협업 중단]: 한 명이 바로. 사유 + 남길 말 필수 */
+export async function stopCollaboration(collaborationId: number, input: { reason: StopReason; text: string }): Promise<CollaborationDetail> {
+  return requestApi<CollaborationDetail>(`/workspace/${collaborationId}/stop`, { method: "POST", body: JSON.stringify(input) });
+}
+
+/** 조기 완료를 막는 것: 진행 중인 요청 수 · 오늘 이후 남은 일정 수 (서버도 같은 규칙으로 다시 확인해요) */
+export function completeBlockers(detail: CollaborationDetail): { openTasks: number; upcoming: number; text: string | null } {
+  const today = detail.collaboration.today;
+  const openTasks = detail.tasks.filter((task) => task.status === "open").length;
+  const upcoming = detail.schedules.filter((item) => item.schedule_id > 0 && item.end_date >= today).length;
+  const parts = [openTasks ? `진행 중인 요청 ${openTasks}개` : "", upcoming ? `남은 일정 ${upcoming}개` : ""].filter(Boolean);
+  return { openTasks, upcoming, text: parts.length ? `${parts.join(" · ")}를 먼저 끝내거나 지워 주세요` : null };
+}

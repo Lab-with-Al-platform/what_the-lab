@@ -24,6 +24,8 @@ PostgreSQL/Supabase 데이터 구조와 변경 이력을 관리합니다.
 - 2026-11-03: `028`은 협업 리뷰 표(`collaboration_review` · `collaboration_review_report`)와 알림 종류 `review_ready`를 더하고 번호를 `20261103_24`로 올립니다.
 - 2026-11-04: `029`는 일정 표에 채널 메시지 번호 칸(`discord_message_id`)을, 알림 종류에 `daily_brief`를 더하고 번호를 `20261104_25`로 올립니다. 이미 데이터가 있는 Docker DB는 [일정 기능 세팅 안내](../docs/development/SETUP_WORKSPACE_SCHEDULES.md)대로 직접 실행합니다.
 - 2026-11-04: `030`은 시작일 미루기(`collaboration_change.kind = 'start'`, `old_start_date` · `new_start_date`), 요청 닫힘 사유 `expert_busy`, 채널 상태 `deleted`, 알림 종류 7개를 더하고 번호를 `20261104_26`으로 올립니다. 이미 데이터가 있는 Docker DB는 [시작 전 협업 세팅 안내](../docs/development/SETUP_WAITING_COLLABORATION.md)대로 직접 실행합니다.
+- 2026-11-04: `031`은 알림 종류 7개(기간 연장 · 조기 완료 · 협업 중단 · 종료 7일 전)를 더하고 번호를 `20261104_27`로 올립니다. 표 구조는 바꾸지 않습니다. 이미 데이터가 있는 Docker DB는 [협업 마무리 세팅 안내](../docs/development/SETUP_COLLAB_ENDING.md)대로 직접 실행합니다.
+
 
 ## 마이그레이션 번호 (PR 올리기 전에 꼭)
 

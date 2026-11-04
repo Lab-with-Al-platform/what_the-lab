@@ -31,7 +31,10 @@ TASK_NOTICE = {
     "returned": "task_returned",  # 보낸 사람이 다시 요청 → 받은 사람
 }
 # 아침 브리핑 알림 (하루 한 번, notice_on)
-DAILY_TYPES = {"task_due_soon", "task_overdue", "task_talk_waiting", "collab_ending", "collab_starting", "collab_start_today"}
+DAILY_TYPES = {
+    "task_due_soon", "task_overdue", "task_talk_waiting", "collab_ending",
+    "collab_starting", "collab_start_today", "collab_week_left",
+}
 # 협업 안의 일: DM 없이 채널 멘션 + 종
 # 일정 알림 (한 사람이 한 일 → 상대 / 아침 브리핑 → 두 사람). 글자는 app/schedule_notice.py
 SCHEDULE_TYPES = {
@@ -48,7 +51,12 @@ BRIEF_TYPE = "daily_brief"
 # 아침 알림 하나하나: 중복 막기용으로 저장만 하고(읽음) 알림 종에는 안 보여요. 종에는 daily_brief 한 칸만
 BRIEF_PARTS = DAILY_TYPES | {"schedule_tomorrow", "schedule_today", "schedule_ending"}
 # 시작 전 협업 (한 사람이 한 일 → 상대). 글자는 그때의 사유 · 날짜(note)로 (app/collab_waiting.py)
-COLLAB_TYPES = {"collab_canceled", "start_change_requested", "start_change_accepted", "start_change_declined"}
+COLLAB_TYPES = {
+    "collab_canceled", "start_change_requested", "start_change_accepted", "start_change_declined",
+    # 진행 중 협업 마무리 (app/collab_ending.py)
+    "extend_requested", "extend_accepted", "extend_declined", "complete_requested", "complete_declined",
+    "collab_stopped",
+}
 # 협업 안의 일: DM 없이 채널 멘션 + 종
 WORKSPACE_TYPES = set(TASK_NOTICE.values()) | DAILY_TYPES | SCHEDULE_TYPES | COLLAB_TYPES | {BRIEF_TYPE, "review_ready"}
 # 거절 사유 (프론트 REJECT_REASON_LABELS와 같은 문구)
@@ -157,6 +165,11 @@ def task_message(row: dict) -> tuple[str, str]:
         return "내일 협업이 시작돼요 🚀", f"{title} · 시작일부터 요청 · 일정을 쓸 수 있어요"
     if kind == "collab_start_today":
         return "오늘부터 협업 시작 🚀", title
+    if kind == "collab_week_left":
+        end = row.get("collab_end")
+        end_text = f"{end.month}.{end.day}" if end else "7일 뒤"
+        return f"협업이 {end_text}에 끝나요 (7일 남음)", f"{title} · 기간이 더 필요하면 협업 상세에서 연장을 요청해요"
+    
     if kind == "collab_ending":
         end = row.get("collab_end")
         end_text = f" ({end.month}.{end.day})" if end else ""
@@ -292,6 +305,12 @@ def collab_message(row: dict) -> tuple[str, str]:
         "start_change_requested": f"{actor} 님이 시작일을 미루자고 했어요",
         "start_change_accepted": f"{actor} 님이 시작일 미루기를 수락했어요",
         "start_change_declined": f"{actor} 님이 시작일 미루기에 다시 얘기하자고 했어요",
+        "extend_requested": f"{actor} 님이 기간 연장을 요청했어요",
+        "extend_accepted": f"{actor} 님이 기간 연장을 수락했어요",
+        "extend_declined": f"{actor} 님이 기간 연장에 다시 얘기하자고 했어요",
+        "complete_requested": f"{actor} 님이 조기 완료를 요청했어요",
+        "complete_declined": f"{actor} 님이 조기 완료에 다시 얘기하자고 했어요",
+        "collab_stopped": f"{actor} 님이 협업을 중단했어요",
     }
     return texts.get(row["type"], "새 알림이 있어요"), detail
 

@@ -5,7 +5,8 @@ no editable reputation number, signup gift score, background cache or new table.
 Not an identity, institution, or professional licence verification.
 
 Design:
-- Use only researcher -> expert reviews from normally completed collaborations.
+- Use only researcher -> expert reviews from normally completed collaborations,
+  plus collaborations the expert stopped (ended_early with ended_by = expert).
 - Reuse existing seven-day publication embargo and moderator visibility gate.
 - Cap any one reviewer's influence to their three most recent eligible projects.
 - Hold back the numeric index until >=3 eligible contributions from >=2 people.
@@ -58,7 +59,7 @@ verified AS (
     WHERE v.reviewer_id=r.user_id
       AND v.reviewer_side='researcher'
       AND v.visibility='visible'
-      AND c.status='done'
+      AND (c.status='done' OR (c.status='ended_early' AND c.ended_by=c.expert_id))
       AND c.expert_id=v.reviewee_id
       AND c.ended_at IS NOT NULL
       AND c.ended_at <= now() - interval '7 days'

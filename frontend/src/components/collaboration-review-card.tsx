@@ -123,13 +123,22 @@ export function CollaborationReviewCard({ collaborationId }: { collaborationId: 
           <p className="mt-1.5 text-[12px] leading-5 text-muted">프로젝트가 종료된 뒤 30일 이내에 실제 참여자만 평가할 수 있어요.</p>
         </div>
         <span className={"rounded-full px-3 py-1.5 text-[11px] font-bold " + (existing ? "bg-[#e9f7ed] text-[#26794b]" : context.eligible ? "bg-[#eef1ff] text-[#475abb]" : "bg-[#f3f4f7] text-[#747c90]")}>
-          {existing ? "제출 완료" : context.eligible ? "평가 작성 가능" : "작성 기간 종료"}
+          {existing ? "제출 완료" : context.eligible ? "평가 작성 가능" : context.stopped_by_me ? "평가 없음" : "작성 기간 종료"}
         </span>
       </div>
       <div className="space-y-4 p-5 sm:p-6">
         {context.status === "ended_early" && (
           <div className="rounded-xl border border-[#f0dfc8] bg-[#fffbf4] p-3 text-xs leading-6 text-[#8d6738]">
-            중도 종료한 협업은 평가를 남길 수 있지만, 전문가의 공개 평점에는 합산되지 않습니다.
+            {context.stopped_by_me ? (
+              <>직접 중단한 협업이라 평가를 남기지 않아요. 중단 사유는 상대에게 전달됐고, 상대는 평가를 남길 수 있어요.</>
+            ) : context.stopped_by_partner ? (
+              <>
+                {context.partner} 님이 중단한 협업이에요{context.end_reason ? ` · 사유: ${context.end_reason}` : ""}. 어쩔 수 없는 사정이었는지 참고해서 평가해 주세요.
+                {context.side === "researcher" && " 이 평가는 전문가의 공개 평점에 반영돼요."}
+              </>
+            ) : (
+              <>중도 종료한 협업은 평가를 남길 수 있지만, 전문가의 공개 평점에는 합산되지 않습니다.</>
+            )}
           </div>
         )}
         <div className="rounded-xl bg-[#f7f9fd] px-4 py-3 text-[12px] leading-6 text-[#66748f]">
@@ -229,7 +238,7 @@ export function CollaborationReviewCard({ collaborationId }: { collaborationId: 
             </div>
           </div>
         )}
-        {!context.eligible && !existing && <p className="text-sm leading-6 text-muted">이 협업은 평가 작성 기간이 지났거나 아직 평가 가능한 상태가 아닙니다.</p>}
+        {!context.eligible && !existing && !context.stopped_by_me && <p className="text-sm leading-6 text-muted">이 협업은 평가 작성 기간이 지났거나 아직 평가 가능한 상태가 아닙니다.</p>}
         {success && <p role="status" className="rounded-xl bg-[#eef8f1] p-3 text-[13px] font-semibold text-[#287747]">{success}</p>}
       </div>
     </section>

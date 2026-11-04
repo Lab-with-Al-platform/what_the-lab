@@ -12,6 +12,7 @@ import logging
 import httpx
 
 from app.collab_channel import delete_due_channels, make_pending_channels
+from app.collab_ending import close_finished_channels
 from app.config import FRONTEND_URL
 from app.db import get_connection
 from app.discord_bot import DmBlocked, bot_ready, channel_url, send_dm
@@ -161,6 +162,12 @@ async def run_forever() -> None:
     while True:
         try:
             await asyncio.to_thread(make_pending_channels)
+            
+            try:
+                await asyncio.to_thread(close_finished_channels)  # 방금 끝난 협업 채널: 마지막 메시지 → 잠금 → 2일 뒤 삭제 예약
+            except Exception:
+                log.exception("끝난 협업 채널 정리 실패")
+
             try:
                 await asyncio.to_thread(delete_due_channels)  # 취소 · 종료하고 2일 지난 채널 지우기
             except Exception:

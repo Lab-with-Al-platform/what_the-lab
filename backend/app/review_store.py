@@ -5,7 +5,9 @@ Policies:
 - 30 days to submit after ended_at, one review per side per collaboration.
 - One edit within 48 hours, with revision evidence preserved.
 - Normal 'done' researcher->expert reviews become public 7 days after completion.
-- Ended-early feedback and expert->researcher feedback remain private.
+- Ended-early (중단): only the person who was stopped can review (ended_by cannot).
+  A researcher's review of an expert who stopped the collaboration also counts publicly (PUBLIC_STATUS_SQL).
+- Expert->researcher feedback remains private.
 - No research title, agreement, private counterpart identity in public reviews.
 """
 from datetime import UTC, datetime, timedelta
@@ -23,6 +25,7 @@ PUBLIC_LIMIT = 20
 
 PERSON_SQL = """
  SELECT c.collaboration_id,c.status,c.ended_at,c.expert_id, rs.user_id AS researcher_id,
+        c.ended_by, c.end_reason,
         c.agreement ->> 'title' AS research_title,
         ur.nickname AS researcher_name, ue.nickname AS expert_name
  FROM collaboration c JOIN research rs ON rs.research_id=c.research_id
@@ -44,15 +47,20 @@ def review_window(row: dict, user_id: int, now: datetime | None = None) -> dict:
     now = now or datetime.now(UTC)
     ended = row["ended_at"]
     allowed = row["status"] in ("done", "ended_early") and ended is not None
+    # 중단한 협업은 중단당한 사람만 평가해요 (중단한 사람의 입장은 중단 사유로 남아요)
+    stopped_by_me = row["status"] == "ended_early" and row.get("ended_by") == user_id
     until = ended + timedelta(days=SUBMIT_DAYS) if allowed else None
     return {
         "side": side,
-        "eligible": bool(allowed and now <= until),
+        "eligible": bool(allowed and not stopped_by_me and now <= until),
         "submission_deadline": until,
         "status": row["status"],
         "partner": row["expert_name"] if side == "researcher" else row["researcher_name"],
         "research_title": row["research_title"],
-        "public_policy": "공개 평점은 정상 완료된 협업에서 연구자가 작성한 평가만 반영합니다.",
+        "stopped_by_me": stopped_by_me,  # 내가 중단한 협업이면 평가하지 않아요
+        "stopped_by_partner": row["status"] == "ended_early" and row.get("ended_by") not in (None, user_id),
+        "end_reason": row.get("end_reason") if row["status"] == "ended_early" else None,  # 중단 사유 (평가할 때 참고)
+        "public_policy": "공개 평점은 정상 완료된 협업과 전문가가 중단한 협업에서 연구자가 작성한 평가를 반영합니다.",
     }
 
 
@@ -80,6 +88,8 @@ def review_context(collaboration_id: int, user_id: int) -> dict:
         complete_ended_collaborations(cursor)
         row = _participant(cursor, collaboration_id, user_id)
         window = review_window(row, user_id)
+        if window["stopped_by_me"]:
+            raise HTTPException(409, "직접 중단한 협업은 평가를 남기지 않아요.")
         own = _my_record(cursor, collaboration_id, user_id)
         # Release counterpart feedback only after the same seven-day cool-off.
         received = None
@@ -111,6 +121,7 @@ def eligible_reviews(user_id: int) -> list[dict]:
         cursor.execute(
             """
             SELECT c.collaboration_id,c.status,c.ended_at,c.expert_id,rs.user_id AS researcher_id,
+                   c.ended_by,c.end_reason,
                    c.agreement ->> 'title' AS research_title,
                    ur.nickname AS researcher_name,ue.nickname AS expert_name,
                    rev.review_id,rev.created_at AS reviewed_at,rev.visibility
@@ -211,7 +222,7 @@ def public_expert_reviews(expert_id: int) -> dict:
             raise HTTPException(404, "공개된 전문가를 찾을 수 없습니다")
         criteria = """
           v.reviewee_id=%s AND v.reviewer_side='researcher' AND v.visibility='visible'
-          AND c.status='done' AND c.ended_at IS NOT NULL
+          AND (c.status='done' OR (c.status='ended_early' AND c.ended_by=c.expert_id)) AND c.ended_at IS NOT NULL
           AND c.ended_at <= now() - interval '7 days'
         """
         cursor.execute(f"""
@@ -240,7 +251,7 @@ def public_expert_reviews(expert_id: int) -> dict:
         "reputation": expert_reputation(expert_id),
         "criteria": {key: summary[key] for key in ("expertise","communication","timeliness","quality")},
         "reviews": [{**item, "author": "협업 연구회원"} for item in results],
-        "policy": "정상 완료한 협업에서 제출한 검증된 연구자 평가입니다. 종료 후 7일이 지나 공개됩니다.",
+        "policy": "정상 완료한 협업(또는 전문가가 중단한 협업)에서 제출한 검증된 연구자 평가입니다. 종료 후 7일이 지나 공개됩니다.",
     }
 
 
@@ -263,7 +274,8 @@ def report_review(user_id: int, review_id: int, reason: str, description: str) -
             WHERE v.review_id=%s AND v.visibility='visible'
               AND c.ended_at <= now()-interval '7 days'
               AND (
-                (v.reviewer_side='researcher' AND c.status='done'
+                (v.reviewer_side='researcher'
+                  AND (c.status='done' OR (c.status='ended_early' AND c.ended_by=c.expert_id))
                   AND e.is_public=TRUE AND u.status='active')
                 OR (v.reviewee_id=%s AND c.status IN ('done','ended_early'))
               )
