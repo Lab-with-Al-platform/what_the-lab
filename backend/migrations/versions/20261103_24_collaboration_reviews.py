@@ -1,5 +1,6 @@
 """Verified collaboration reviews and moderation reports. No automatic destructive downgrade."""
 from pathlib import Path
+
 from alembic import op
 
 revision = "20261103_24"

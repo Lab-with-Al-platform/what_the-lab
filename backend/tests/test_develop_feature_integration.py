@@ -2,11 +2,10 @@
 
 공용 DB 없이 안전하게 실행할 수 있는 테스트만 포함합니다.
 """
-from pathlib import Path
 import re
+from pathlib import Path
 
-from app import notification_store, notification_sender, workspace_store
-
+from app import notification_sender, notification_store, workspace_store
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -86,7 +85,7 @@ def test_unique_linear_migrations_after_develop():
     found = {}
     for migration in versions.glob("*.py"):
         text = migration.read_text(encoding="utf-8")
-        match = re.search(r'^revision\s*=\s*["\']([^"\']+)', text, re.M)
+        match = re.search(r'^revision\s*=\s*["\']([^"\']+)', text, re.MULTILINE)
         if match:
             number = match.group(1)
             assert number not in found, (number, found.get(number), migration)

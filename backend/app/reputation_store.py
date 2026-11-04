@@ -16,7 +16,7 @@ Design:
 - No penalties for absence, inactivity, declines, new memberships or profile edits.
 - Do not use this number to sort/search-rank experts in v1.
 """
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import ROUND_HALF_UP, Decimal
 
 from app.db import get_connection
 
@@ -25,7 +25,7 @@ MIN_REVIEWERS = 2
 MAX_REVIEWS_PER_REVIEWER = 3
 MAX_EXPERT_ID = 9_223_372_036_854_775_807  # PostgreSQL BIGINT
 PRIOR_RATING = Decimal("3.8")
-PRIOR_WEIGHT = Decimal("5")
+PRIOR_WEIGHT = Decimal(5)
 WEIGHTS = {
     "expertise": Decimal("0.30"),
     "communication": Decimal("0.20"),
@@ -93,10 +93,10 @@ def compute_reputation(review_count: int, reviewer_count: int, weighted_sum) -> 
     if weighted_sum is None:
         raise ValueError("Sufficient reviews require a numeric rating sum")
     # Defensive data clamp; DB itself guarantees each criterion is 1..5.
-    total = min(Decimal("5") * count, max(Decimal(count), Decimal(str(weighted_sum))))
+    total = min(Decimal(5) * count, max(Decimal(count), Decimal(str(weighted_sum))))
     adjusted = (total + PRIOR_RATING * PRIOR_WEIGHT) / (Decimal(count) + PRIOR_WEIGHT)
-    score = int(((adjusted - Decimal("1")) * Decimal("25")).quantize(
-        Decimal("1"), rounding=ROUND_HALF_UP
+    score = int(((adjusted - Decimal(1)) * Decimal(25)).quantize(
+        Decimal(1), rounding=ROUND_HALF_UP
     ))
     if score >= 90:
         level = "탁월한 협업 신뢰"

@@ -172,7 +172,7 @@ def submit_review(user_id: int, collaboration_id: int, values: dict) -> dict:
 
 def edit_review(user_id: int, collaboration_id: int, values: dict) -> dict:
     with transaction() as cursor:
-        row = _participant(cursor, collaboration_id, user_id, lock=True)
+        _participant(cursor, collaboration_id, user_id, lock=True)
         # Once submitted, only review edit policy applies; a project need not still be in the review window.
         existing = _my_record(cursor, collaboration_id, user_id)
         if not existing:
