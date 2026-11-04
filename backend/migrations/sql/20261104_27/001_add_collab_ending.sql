@@ -55,8 +55,3 @@ ALTER TABLE notification ADD CONSTRAINT ck_notification_type CHECK (type IN (
   'collab_stopped',          -- 상대: 협업을 중단했어요
   'collab_week_left'         -- 둘 다 (아침): 협업이 7일 뒤에 끝나요
 ));
-
--- 030이 적어 둔 개정 번호를 이 변경까지 포함하도록 올립니다.
-UPDATE public.insight_alembic_version
-SET version_num = '20261104_27'
-WHERE version_num = '20261104_26';
