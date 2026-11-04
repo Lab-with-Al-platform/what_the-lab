@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { KeyboardEvent, useState } from "react";
-import { coversDay, monthWeeks, Schedule, taskDay, toneOf, WorkspaceTask } from "@/lib/workspace";
+import { coversDay, isPast, monthWeeks, Schedule, taskDay, toneOf, WorkspaceTask } from "@/lib/workspace";
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 const MAX_IN_CELL = 3; // 한 칸에 보여 줄 일정 수 (넘으면 "+n개")
@@ -137,7 +137,9 @@ function DayCell({
       a.schedule_id - b.schedule_id,
   );
   const visible = sorted.slice(0, MAX_IN_CELL);
-  const shownTasks = tasks.slice(0, Math.max(0, MAX_IN_CELL - visible.length)); // 일정을 먼저, 남는 자리에 요청
+    // 일정을 먼저, 남는 자리에 요청 (열린 요청을 완료한 요청보다 앞에)
+  const orderedTasks = [...tasks].sort((a, b) => Number(a.status === "done") - Number(b.status === "done"));
+  const shownTasks = orderedTasks.slice(0, Math.max(0, MAX_IN_CELL - visible.length));
   const more = sorted.length - visible.length + tasks.length - shownTasks.length;
   const numberColor = !inMonth ? "text-line" : index === 0 ? "text-danger" : index === 6 ? "text-researcher" : "text-ink";
 
@@ -153,8 +155,8 @@ function DayCell({
       </button>
       <div className="mt-0.5 space-y-0.5">
         {visible.map((item) => (
-          <Chip key={item.schedule_id} item={item} day={day} weekStart={index === 0} weekEnd={index === 6} onPick={onPick} />
-        ))}
+          <Chip key={item.schedule_id} item={item} day={day} today={today} weekStart={index === 0} weekEnd={index === 6} onPick={onPick} />
+      ))}
         {shownTasks.map((task) => (
           <TaskChip key={`t${task.task_id}`} task={task} today={today} />
         ))}
@@ -164,9 +166,24 @@ function DayCell({
   );
 }
 
-/** 달력 칸 안의 일정 한 줄. 작업 기간은 여러 날에 걸친 띠로 보이게 칸 끝까지 칠해요. 누르면 일정 보기 창. */
-function Chip({ item, day, weekStart, weekEnd, onPick }: { item: Schedule; day: string; weekStart: boolean; weekEnd: boolean; onPick: (schedule: Schedule) => void }) {
+/** 달력 칸 안의 일정 한 줄. 작업 기간은 여러 날에 걸친 띠로 보이게 칸 끝까지 칠해요. 누르면 일정 보기 창. 지난 일정은 흐리게. */
+function Chip({
+  item,
+  day,
+  today,
+  weekStart,
+  weekEnd,
+  onPick,
+}: {
+  item: Schedule;
+  day: string;
+  today: string;
+  weekStart: boolean;
+  weekEnd: boolean;
+  onPick: (schedule: Schedule) => void;
+}) {
   const tone = toneOf(item.collaboration_id);
+  const faded = isPast(item, today) ? "opacity-40" : ""; // 끝난 날이 오늘 전이면 흐리게
   const clickable = item.schedule_id > 0; // 자동으로 넣은 협업 시작·종료일은 안 열려요
   const press = clickable ? { role: "button", tabIndex: 0, onClick: () => onPick(item), onKeyDown: (event: KeyboardEvent) => event.key === "Enter" && onPick(item) } : {};
   if (item.kind === "work") {
@@ -177,7 +194,7 @@ function Chip({ item, day, weekStart, weekEnd, onPick }: { item: Schedule; day: 
       <div
         {...press}
         title={item.title}
-        className={`h-5 truncate px-1.5 ${clickable ? "cursor-pointer" : ""} text-[11px] font-semibold leading-5 ${tone.soft} ${tone.text} ${first || weekStart ? "ml-1 rounded-l" : ""} ${last || weekEnd ? "mr-1 rounded-r" : ""}`}
+        className={`h-5 truncate px-1.5 ${clickable ? "cursor-pointer" : ""} text-[11px] font-semibold leading-5 ${tone.soft} ${tone.text} ${first || weekStart ? "ml-1 rounded-l" : ""} ${last || weekEnd ? "mr-1 rounded-r" : ""} ${faded}`}
       >
         <span className="hidden sm:inline">{showTitle ? item.title : "\u00a0"}</span>
       </div>
@@ -188,7 +205,7 @@ function Chip({ item, day, weekStart, weekEnd, onPick }: { item: Schedule; day: 
       <div
         {...press}
         title={item.title}
-        className={`mx-1 flex h-5 items-center gap-1 truncate rounded border bg-card px-1 ${clickable ? "cursor-pointer hover:bg-page" : ""} text-[11px] font-semibold ${tone.border} ${tone.text}`}
+        className={`mx-1 flex h-5 items-center gap-1 truncate rounded border bg-card px-1 ${clickable ? "cursor-pointer hover:bg-page" : ""} text-[11px] font-semibold ${tone.border} ${tone.text} ${faded}`}
       >
         <span aria-hidden="true">⚑</span>
         <span className="hidden truncate sm:inline">{item.title}</span>
@@ -199,7 +216,7 @@ function Chip({ item, day, weekStart, weekEnd, onPick }: { item: Schedule; day: 
     <div
       {...press}
       title={`${item.start_time ?? ""} ${item.title}`}
-      className={`mx-1 flex h-5 items-center gap-1 truncate rounded text-[11px] text-ink ${clickable ? "cursor-pointer hover:bg-page" : ""}`}
+      className={`mx-1 flex h-5 items-center gap-1 truncate rounded text-[11px] text-ink ${clickable ? "cursor-pointer hover:bg-page" : ""} ${faded}`}
     >
       <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${tone.dot}`} />
       <span className="hidden truncate sm:inline">
@@ -210,19 +227,26 @@ function Chip({ item, day, weekStart, weekEnd, onPick }: { item: Schedule; day: 
   );
 }
 
-/** 달력 칸 안의 요청 한 줄 (📌). 누르면 그 협업 상세의 요청 카드로 가요. */
+/** 달력 칸 안의 요청 한 줄 (📌). 완료한 요청은 ✓ 로 흐리게. 누르면 그 협업 상세의 요청 카드로 가요. */
 function TaskChip({ task, today }: { task: WorkspaceTask; today: string }) {
   const tone = toneOf(task.collaboration_id);
-  const late = task.due_date !== null && task.due_date < today;
+  const done = task.status === "done";
+  const late = !done && task.due_date !== null && task.due_date < today; // 완료한 요청은 빨갛게 안 해요
   const who = task.direction === "in" ? `${task.requested_by_nickname} → 나` : `나 → ${task.assignee_nickname}`;
-  const when = task.due_date === null ? "기한 없음" : late ? `기한 ${task.due_date} 지남` : `기한 ${task.due_date}`;
+  const when = done
+    ? `${task.closed_on ?? ""} 완료`
+    : task.due_date === null
+      ? "기한 없음"
+      : late
+        ? `기한 ${task.due_date} 지남`
+        : `기한 ${task.due_date}`;
   return (
     <Link
       href={`/workspace/${task.collaboration_id}`}
       title={`요청 · ${task.content} (${who} · ${when})`}
-      className={`mx-1 flex h-5 items-center gap-1 truncate rounded px-0.5 text-[11px] hover:bg-page ${late ? "text-danger" : tone.text}`}
+      className={`mx-1 flex h-5 items-center gap-1 truncate rounded px-0.5 text-[11px] hover:bg-page ${late ? "text-danger" : tone.text} ${done ? "opacity-40" : ""}`}
     >
-      <span aria-hidden="true">📌</span>
+      <span aria-hidden="true">{done ? "✓" : "📌"}</span>
       <span className="hidden truncate sm:inline">{task.content}</span>
     </Link>
   );
@@ -241,6 +265,8 @@ function Legend() {
       </span>
       <span>⚑ 마감</span>
       <span>📌 요청</span>
+      <span>✓ 완료</span>
+      <span className="opacity-40">흐림 = 지난 일정 · 완료</span>
     </div>
   );
 }

@@ -33,10 +33,12 @@ export function ScheduleDialog({ collabs, editing, defaultCollabId, defaultDate,
   const [startTime, setStartTime] = useState(editing?.start_time ?? "");
   const [endTime, setEndTime] = useState(editing?.end_time ?? "");
   const [repeat, setRepeat] = useState(false);
+  const [wholeSeries, setWholeSeries] = useState(false); // 반복 일정 수정: 이 날짜 이후 모두
   const { saving, error, run } = useSaving();
 
   const oneDay = start === end;
   const canRepeat = !editing && kind === "meeting" && oneDay; // 매주 반복은 새 하루짜리 미팅만
+  const canSeries = Boolean(editing?.series_id) && oneDay; // 반복 일정을 고칠 때만 (반복 일정은 하루짜리)
   const hasTime = (kind === "meeting" || kind === "etc") && oneDay; // 시각은 하루짜리 미팅·기타만 (백엔드 workspace_rules 와 같은 규칙)
   const timeError = hasTime && endTime !== "" && (startTime === "" || endTime <= startTime);
   const inPeriod = Boolean(period && start && end && start >= period.first && end <= period.last);
@@ -75,7 +77,7 @@ export function ScheduleDialog({ collabs, editing, defaultCollabId, defaultDate,
         place: editing?.place ?? "",
         assignee: editing?.assignee ?? null,
       };
-      onSaved(editing ? await updateSchedule(editing.schedule_id, input) : await addSchedule(collabId, input));
+      onSaved(editing ? await updateSchedule(editing.schedule_id, input, canSeries && wholeSeries) : await addSchedule(collabId, input));
     });
   }
 
@@ -169,6 +171,12 @@ export function ScheduleDialog({ collabs, editing, defaultCollabId, defaultDate,
             <label className="mt-3 flex items-center gap-2 text-sm">
               <input type="checkbox" checked={repeat} onChange={(event) => setRepeat(event.target.checked)} className="h-4 w-4 accent-brand" />
               매주 같은 요일에 반복 <span className="text-xs text-faint">(협업 종료일까지)</span>
+            </label>
+          )}
+          {canSeries && (
+            <label className="mt-3 flex items-center gap-2 text-sm">
+              <input type="checkbox" checked={wholeSeries} onChange={(event) => setWholeSeries(event.target.checked)} className="h-4 w-4 accent-brand" />
+              이 날짜 이후 반복 일정도 모두 바꾸기 <span className="text-xs text-faint">(날짜를 옮기면 모두 같은 만큼 옮겨요)</span>
             </label>
           )}
         </div>

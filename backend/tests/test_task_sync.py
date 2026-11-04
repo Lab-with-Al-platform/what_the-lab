@@ -66,8 +66,7 @@ def test_done_edits_message_and_calls_requester(calls):
     sync.after_web_change(12, "done")
     assert ("edit", "555", "✅ **요청 완료** · jiwoo_lab → outsider_lee · 11.8 완료") in log
     assert ("send", "✅ <@111> 요청을 완료했어요", ["111"], False) in log  # 보낸 사람에게 알림
-    assert ("google_put", "lbt00012", "✅ [요청] 학습 곡선 그래프를 보내 주세요") in log
-
+    assert ("google_delete", "lbt00012") in log  # 완료한 요청은 구글 캘린더에서 지워요
 
 def test_due_change_calls_assignee(calls):
     log, state = calls

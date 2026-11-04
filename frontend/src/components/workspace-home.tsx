@@ -46,13 +46,14 @@ export function WorkspaceHome({ role }: { role: "researcher" | "expert" }) {
   // 달력에는 진행 중 협업의 일정을 모두, 색 네모로 끈 협업만 빼고 보여요
   const shownIds = new Set(ongoing.filter((collab) => !hidden.includes(collab.collaboration_id)).map((collab) => collab.collaboration_id));
   const schedules = data.schedules.filter((item) => shownIds.has(item.collaboration_id));
-  const tasks = data.tasks.filter((item) => shownIds.has(item.collaboration_id));
+  const tasks = data.tasks.filter((item) => shownIds.has(item.collaboration_id)); // 달력: 열린 요청 + 완료(흐리게)
+  const openTasks = tasks.filter((item) => item.status === "open"); // 요청 목록 · 다가오는 일정: 열린 것만
   const todos = buildTodos(ongoing, data.schedules, data.google_enabled, (collabId) => setEditor({ mode: "add", collabId })).filter(
   (item) => !dismissed.includes(item.key),
   );
   // 구글에 추가해 둔 협업이 하나라도 있으면 달력 위에 [구글 캘린더] (구글에서 모든 협업 일정을 같이 봐요)
   const googleUrl = data.google_enabled && ongoing.some((collab) => collab.google_linked) ? GOOGLE_CALENDAR_HOME : undefined;
-    const pick = (schedule: Schedule) => schedule.schedule_id > 0 && setEditor({ mode: "view", schedule }); // 자동으로 넣은 시작·종료일은 안 열려요
+  const pick = (schedule: Schedule) => schedule.schedule_id > 0 && setEditor({ mode: "view", schedule }); // 자동으로 넣은 시작·종료일은 안 열려요
   const saved = (next: WorkspaceData) => {
     setData(next);
     setEditor(null);
@@ -100,8 +101,8 @@ export function WorkspaceHome({ role }: { role: "researcher" | "expert" }) {
             />
             <div className="order-first flex min-w-0 flex-col gap-5 lg:order-none">
               <TodoBox items={todos.map((item) => (item.dismissible ? { ...item, onDismiss: () => setDismissed((list) => [...list, item.key]) } : item))} />
-              <RequestList collabs={ongoing} tasks={tasks} today={today} />
-              <UpcomingList collabs={ongoing} schedules={schedules} tasks={tasks} today={today} onPick={pick} />
+              <RequestList collabs={ongoing} tasks={openTasks} today={today} />
+              <UpcomingList collabs={ongoing} schedules={schedules} tasks={openTasks} today={today} onPick={pick} />
             </div>
           </div>
         </>

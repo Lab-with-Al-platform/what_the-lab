@@ -105,3 +105,29 @@ uv run python -m app.discord_gateway
 | 구글 | `backend/app/google_calendar.py` (끝 시각 없으면 1시간) |
 | 웹 | `workspace-schedule-dialog.tsx` (시각) · `workspace-calendar.tsx` · `workspace-home.tsx` (구글 버튼) · `workspace-detail-head.tsx` (타임라인 시각) · `lib/notifications.ts` · `lib/workspace.ts` |
 | 테스트 | `test_schedule_notice.py` (새) · `test_discord_schedule.py` (새) · `test_google_calendar.py` · `test_workspace_router.py` · `test_task_daily.py` · `test_community_integration.py` |
+
+
+
+## 추가 (2026-11-03 · `feature/schedule-followup` PR)
+
+| 바뀐 것 | 내용 |
+|---|---|
+| 아침 브리핑 줄이기 | 같은 일을 이틀 연속 알리지 않아요. 미팅 · 기타는 **당일**만, 결과물 마감은 **전날**만, 작업 기간은 **끝나기 전날**만 (시작 알림 없음) |
+| 알림 종 묶기 | 아침 브리핑은 알림 종에 **협업마다 하루 한 칸** "☀️ 오늘 챙길 일이 있어요"로 (줄마다 쌓이지 않아요) |
+| 옛 일정 메시지 고치기 | 채널의 "일정을 추가했어요" 메시지가 일정이 바뀌면 지금 내용으로, 지우면 ~~취소선~~으로 고쳐져요 (요청 메시지와 같은 방식) |
+| `/일정목록` 링크 | 제목을 누르면 그 일정 메시지로 이동 (이번 PR 이후에 추가한 일정부터) |
+| 반복 일정 한 번에 수정 | 웹 일정 창 "이 날짜 이후 반복 일정도 모두 바꾸기", 디스코드 [이 날짜 이후 모두 수정]. 날짜를 옮기면 모두 같은 만큼 옮기고, 알림은 한 번만 |
+| 지난 날짜 안내 | 디스코드에 연도 없이 지난 날(예: 11.2 에 `10.30`)을 적으면 "이미 지난 날이에요"라고 알려 줘요. 지난 일정을 넣으려면 `2026.10.30`처럼 연도까지 |
+| 마이그레이션 번호 검사 | `test_migration_numbers.py` 가 번호 겹침 · 건너뜀 · 순서를 검사해요. 규칙은 [database/README.md](../../database/README.md#마이그레이션-번호-pr-올리기-전에-꼭) |
+
+### DB: `20261103_24` → `20261104_25`
+- 일정 표에 `discord_message_id` 칸, 알림 종류에 `daily_brief` 추가. 기존 데이터 변경 없음
+- 공용 Supabase: **DB 담당자가 적용한 뒤에** 이 코드를 실행하세요. 확인: `SELECT version_num FROM insight_alembic_version;` → `20261104_25`
+- 로컬 Docker:
+  ```powershell
+  cd C:\dev\project\what_the-lab
+  docker exec labbridge-postgres psql -U admin -d labbridge -f /docker-entrypoint-initdb.d/029_add_schedule_message.sql
+  ```
+  `ALTER TABLE` 3개가 나오면 성공. 마지막 `insight_alembic_version` 오류는 무시 (027 때와 같아요)
+
+적용한 뒤 **웹 서버와 봇을 둘 다 다시 켜세요.**

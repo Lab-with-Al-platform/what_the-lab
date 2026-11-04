@@ -8,7 +8,6 @@ from pydantic import ValidationError
 
 from app import review_store
 from app.routers import reviews
-from app.workspace_store import complete_ended_collaborations
 
 NOW = datetime(2026, 11, 20, 8, 0, tzinfo=UTC)
 
