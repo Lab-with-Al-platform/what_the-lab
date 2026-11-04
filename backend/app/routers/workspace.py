@@ -14,9 +14,10 @@ from app import schedule_notice as notice
 from app import workspace_rules as rules
 from app.db import transaction
 from app.google_calendar import event_id
+from app.google_sync import today_kst
 from app.security import get_current_user_id
 from app.workspace_detail import load_detail
-from app.workspace_store import check_ongoing, find_collaboration, load_workspace
+from app.workspace_store import check_ongoing, check_started, find_collaboration, load_workspace
 
 router = APIRouter(prefix="/api/v1/workspace", tags=["workspace"])
 
@@ -102,6 +103,7 @@ def save_schedule(user_id: int, collaboration_id: int, body: rules.ScheduleInput
     with transaction() as cursor:
         collab = find_collaboration(cursor, user_id, collaboration_id, lock=True)
         check_ongoing(collab)
+        check_started(collab, today_kst())  # 시작 전 협업은 일정을 넣을 수 없어요
         values = rules.clean_schedule(body, allowed_period(collab))
         values.update(
             collaboration_id=collaboration_id, created_by=user_id, series_id=None, google_status=google_status(collab)
@@ -146,6 +148,7 @@ def edit_schedule(user_id: int, schedule_id: int, body: rules.ScheduleInput, ser
     with transaction() as cursor:
         collab = find_collaboration(cursor, user_id, schedule_owner(cursor, schedule_id), lock=True)
         check_ongoing(collab)
+        check_started(collab, today_kst())  # 시작 전 협업은 일정을 넣을 수 없어요
         period = allowed_period(collab)
         values = rules.clean_schedule(body, period)
         old = find_schedule(cursor, schedule_id)

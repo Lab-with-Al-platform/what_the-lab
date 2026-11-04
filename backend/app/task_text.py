@@ -185,6 +185,8 @@ def brief_text(today: date, items: list[dict]) -> str:
     from app.schedule_notice import daily_label  # 일정 글자 (서로 불러오지 않게 여기서)
 
     order = {
+        "collab_start_today": -2,
+        "collab_starting": -1,
         "collab_ending": 0,
         "schedule_today": 1,
         "task_overdue": 2,
@@ -207,6 +209,10 @@ def brief_text(today: date, items: list[dict]) -> str:
         if kind.startswith("schedule_"):
             icon, _, text = daily_label(kind, item["schedule"], today).partition(" ")
             lines.append(f"{icon} {who} {text}")
+        elif kind == "collab_starting":
+            lines.append(f"🚀 {who} 내일 협업이 시작돼요 · 시작일부터 요청 · 일정을 쓸 수 있어요")
+        elif kind == "collab_start_today":
+            lines.append(f"🚀 {who} 오늘부터 협업 시작! 이제 웹과 `/요청` · `/일정`을 쓸 수 있어요 ({day_text(item['end_date'])}까지)")     
         elif kind == "collab_ending":
             lines.append(
                 f"📅 {who} 협업이 {day_text(item['end_date'])}에 끝나요 · 열린 요청 {item['open_count']}개를 "

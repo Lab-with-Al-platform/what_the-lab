@@ -113,7 +113,9 @@ export function CollabRequestDialog({ expert, role, names, onClose }: Props) {
   const minStart = earliestStart(urgent);
   const periodOk = Boolean(start && end && start >= minStart && end >= start);
   const urgentTaken = research ? sent.some((item) => item.research_id === research.research_id && item.is_urgent && (item.status === "pending" || item.status === "accepted")) : false;
-  const ready = Boolean(research) && periodOk && message.trim() !== "";
+  // 전문가의 모든 협업이 30일 안에 끝나야 새 요청을 받아요 (서버도 같은 규칙으로 막아요)
+  const busyFrom = profile.available_from ?? null;
+  const ready = !busyFrom && Boolean(research) && periodOk && message.trim() !== "";
 
   /** [급해요]를 켜고 끄면 고를 수 있는 시작일이 바뀌어요. 범위를 벗어난 날짜는 지워요. */
   function toggleUrgent(next: boolean) {
@@ -163,6 +165,11 @@ export function CollabRequestDialog({ expert, role, names, onClose }: Props) {
         }
       >
         <Steps current={1} />
+        {busyFrom && (
+          <p className="mt-3 rounded-button bg-danger-soft px-3 py-2.5 text-[13px] text-danger">
+            {expert.nickname} 님은 진행 중인 협업이 있어서 <b>{monthDay(busyFrom)}부터</b> 새 협업 요청을 받을 수 있어요.
+          </p>
+        )}
         <FieldLabel text="어떤 연구로 요청할까요?" />
         {researches.length === 0 ? (
           <div className="mt-2 rounded-card border border-dashed border-line p-5 text-center text-sm text-muted">

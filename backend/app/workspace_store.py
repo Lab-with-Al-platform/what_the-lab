@@ -109,6 +109,16 @@ def complete_ended_collaborations(cursor) -> None:
     )
     notify_requests(cursor, "review_ready", [row["request_id"] for row in completed])
 
+def expire_changes(cursor, collaboration_id: int | None = None) -> None:
+    """답 기한(3일 · 시작일 0시)이 지난 기간 변경 요청을 만료로 (연장 · 조기 완료 · 시작일 미루기).
+
+    collaboration_id: 한 협업만 (협업 상세를 열 때 · 새로 요청할 때) / None 이면 전부 (아침 브리핑)
+    """
+    cursor.execute(
+        "UPDATE collaboration_change SET status = 'expired', answered_at = now()"
+        " WHERE status = 'pending' AND expires_at < now() AND (%s::bigint IS NULL OR collaboration_id = %s)",
+        (collaboration_id, collaboration_id),
+    )
 
 def user_role(cursor, user_id: int) -> str:
     """연구회원(researcher) / AI 전문가(expert). 회원 유형이 없으면 403."""
@@ -147,6 +157,19 @@ def check_ongoing(collab: dict) -> None:
     if collab["status"] != "ongoing":
         raise HTTPException(status_code=409, detail="끝난 협업이라 일정을 바꿀 수 없어요")
 
+def check_started(collab: dict, today: date) -> None:
+    """시작 전 협업은 요청 · 일정 · 정한 것을 쓸 수 없어요 (취소 · 시작일 미루기 · 디스코드 대화만).
+
+    collab: find_collaboration 결과 (status · start_date) / today: 한국 날짜
+    웹 · 디스코드가 같은 저장 함수를 쓰니까 여기서 막으면 둘 다 막혀요.
+    """
+    if collab["status"] == "ongoing" and today < collab["start_date"]:
+        start = collab["start_date"]
+        raise HTTPException(
+            status_code=409,
+            detail=f"협업이 {start.month}.{start.day} ({'월화수목금토일'[start.weekday()]})에 시작돼요. "
+            "그 전에는 디스코드 채널에서 준비 얘기를 나눠 주세요",
+        )
 
 def load_workspace(user_id: int) -> dict:
     """협업 공간 첫 화면: 내 협업 전부 + 진행 중 협업의 일정.

@@ -108,7 +108,8 @@ def second_try_block(previous: list[dict]) -> str | None:
     if status == "rejected":
         return "거절한 전문가에게는 같은 연구로 다시 보낼 수 없어요"
     no_answer = status == "expired" and last["responded_at"] is None
-    withdrawn = status == "canceled" and last["cancel_reason"] == "withdrawn"
+    # 내가 답 전에 취소했거나, 전문가가 다른 협업을 시작해서 자동으로 닫힌 요청은 다시 보낼 수 있어요
+    withdrawn = status == "canceled" and last["cancel_reason"] in ("withdrawn", "expert_busy")
     if no_answer or withdrawn:
         return None
     return "수락 후 끝난 요청이라 같은 연구로 다시 보낼 수 없어요"

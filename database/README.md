@@ -23,6 +23,7 @@ PostgreSQL/Supabase 데이터 구조와 변경 이력을 관리합니다.
 - 2026-11-02: `027`은 알림 표에 일정 알림 칸(`schedule_id` · `note`)·종류를 더하고 아침 알림 중복 막기에 일정을 넣은 뒤 번호를 `20261101_23`으로 올립니다. 이미 데이터가 있는 Docker DB는 [일정 기능 세팅 안내](../docs/development/SETUP_WORKSPACE_SCHEDULES.md)대로 직접 실행합니다.
 - 2026-11-03: `028`은 협업 리뷰 표(`collaboration_review` · `collaboration_review_report`)와 알림 종류 `review_ready`를 더하고 번호를 `20261103_24`로 올립니다.
 - 2026-11-04: `029`는 일정 표에 채널 메시지 번호 칸(`discord_message_id`)을, 알림 종류에 `daily_brief`를 더하고 번호를 `20261104_25`로 올립니다. 이미 데이터가 있는 Docker DB는 [일정 기능 세팅 안내](../docs/development/SETUP_WORKSPACE_SCHEDULES.md)대로 직접 실행합니다.
+- 2026-11-04: `030`은 시작일 미루기(`collaboration_change.kind = 'start'`, `old_start_date` · `new_start_date`), 요청 닫힘 사유 `expert_busy`, 채널 상태 `deleted`, 알림 종류 7개를 더하고 번호를 `20261104_26`으로 올립니다. 이미 데이터가 있는 Docker DB는 [시작 전 협업 세팅 안내](../docs/development/SETUP_WAITING_COLLABORATION.md)대로 직접 실행합니다.
 
 ## 마이그레이션 번호 (PR 올리기 전에 꼭)
 
@@ -65,4 +66,4 @@ PostgreSQL/Supabase 데이터 구조와 변경 이력을 관리합니다.
 
 - 팀 develop에 추가된 순차 마이그레이션: `20261031_21`(협업 요청 기록), `20261031_22`(협업 알림), `20261101_23`(일정 알림).
 - 리뷰 Feature의 이전 `20261031_21`과 동일 revision 충돌을 방지하기 위해 검증용 통합 브랜치에서 협업 평가는 `20261103_24`로 재배치했습니다.
-- 빈 로컬 Docker DB의 SQL 초기화 순서: `025_add_task_events.sql` → `026_add_task_notifications.sql` → `027_add_schedule_notifications.sql` → `028_create_collaboration_reviews.sql` → `029_add_schedule_message.sql`.- 실제 기동 DB에 이미 025번을 적용했거나 과거 리뷰 테이블을 적용했다면 **재실행하지 말고 수동으로 DB 현황을 확인**해야 합니다. `database/init`은 기존 볼륨에 자동 재실행되지 않으며 공유 Supabase·운영 DB에 적용해서는 안 됩니다.
+- 빈 로컬 Docker DB의 SQL 초기화 순서: `025_add_task_events.sql` → `026_add_task_notifications.sql` → `027_add_schedule_notifications.sql` → `028_create_collaboration_reviews.sql` → `029_add_schedule_message.sql` → `030_add_waiting_collaboration.sql`.- 실제 기동 DB에 이미 025번을 적용했거나 과거 리뷰 테이블을 적용했다면 **재실행하지 말고 수동으로 DB 현황을 확인**해야 합니다. `database/init`은 기존 볼륨에 자동 재실행되지 않으며 공유 Supabase·운영 DB에 적용해서는 안 됩니다.

@@ -12,6 +12,7 @@ import { AgendaCard, PartnerCard } from "@/components/workspace-detail-side";
 import { TasksCard } from "@/components/workspace-detail-work";
 import { ScheduleDialog } from "@/components/workspace-schedule-dialog";
 import { ScheduleView } from "@/components/workspace-schedule-view";
+import { LockedCard } from "@/components/workspace-waiting";
 
 type Editor = { mode: "add" } | { mode: "view"; schedule: Schedule } | { mode: "edit"; schedule: Schedule };
 
@@ -39,7 +40,8 @@ export function WorkspaceDetailPage({ collaborationId }: { collaborationId: numb
   if (!detail) return <p className="py-20 text-center text-sm text-faint">불러오는 중…</p>;
 
   const { collaboration: collab } = detail;
-  const editable = collab.status === "waiting" || collab.status === "active"; // 끝난 협업은 보기만
+  const editable = collab.status === "active"; // 끝난 협업은 보기만, 시작 전은 잠금 (취소 · 시작일 미루기 · 디스코드 대화만)
+  const waiting = collab.status === "waiting";  
   const asListCollab = toListCollab(detail); // 일정 창(목록 화면과 같은 것)이 받는 모양
 
   function saved() {
@@ -54,7 +56,7 @@ export function WorkspaceDetailPage({ collaborationId }: { collaborationId: numb
       </Link>
 
       <div className="mt-3 grid gap-5">
-        <DetailHead detail={detail} />
+        <DetailHead detail={detail} onChange={setDetail} />
         {(collab.status === "done" || collab.status === "ended_early") && (
           <CollaborationReviewCard collaborationId={collab.collaboration_id} />
         )}
@@ -62,12 +64,16 @@ export function WorkspaceDetailPage({ collaborationId }: { collaborationId: numb
         <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
           {/* 오른쪽 칸: 넓은 화면에서는 스크롤해도 따라 내려오고, 좁은 화면에서는 맨 위로 */}
           <aside className="flex min-w-0 flex-col gap-5 lg:sticky lg:top-6 lg:order-2">
-            <AgendaCard detail={detail} editable={editable} onAdd={() => setEditor({ mode: "add" })} onPick={(schedule) => setEditor({ mode: "view", schedule })} />
+            {waiting ? (
+              <LockedCard title="일정" startDate={collab.start_date} action="＋ 추가" />
+            ) : (
+              <AgendaCard detail={detail} editable={editable} onAdd={() => setEditor({ mode: "add" })} onPick={(schedule) => setEditor({ mode: "view", schedule })} />
+            )}
             <PartnerCard detail={detail} />
           </aside>
 
           <div className="flex min-w-0 flex-col gap-5 lg:order-1">
-            <TasksCard detail={detail} editable={editable} onChange={setDetail} />
+            {waiting ? <LockedCard title="요청" startDate={collab.start_date} action="＋ 요청" /> : <TasksCard detail={detail} editable={editable} onChange={setDetail} />}
             {/* 정한 것(DecisionsCard)은 디스코드 명령어를 붙일 때 다시 넣어요 */}
           </div>
         </div>

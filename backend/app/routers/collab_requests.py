@@ -11,6 +11,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from app import request_rules as rules
+from app.collab_waiting import busy_text, expert_open_from
 from app.db import transaction
 from app.form_rules import bad_request, optional_text, required_text
 from app.notification_store import notify_requests
@@ -102,6 +103,12 @@ def send_request(body: SendRequest, user_id: int = Depends(get_current_user_id))
         )
         if cursor.fetchone() is None:
             raise HTTPException(status_code=404, detail="요청할 수 있는 전문가를 찾을 수 없어요")
+
+        # 진행 중 · 시작 전 협업이 30일 안에 다 끝나야 새 요청을 받아요
+        busy_until = expert_open_from(cursor, body.expert_id, rules.today_kst(sent_at))
+        if busy_until:
+            raise HTTPException(status_code=409, detail=busy_text(busy_until))
+            
         cursor.execute(
             "SELECT status, responded_at, cancel_reason FROM collaboration_request"
             " WHERE research_id = %s AND expert_id = %s ORDER BY created_at DESC",
@@ -211,6 +218,12 @@ def accept_request(
         expire_old_requests(cursor)
         request = find_received(cursor, user_id, request_id)
         check_status(request, "pending")
+        busy_until = expert_open_from(cursor, user_id, rules.today_kst(accepted_at))
+        if busy_until:
+            raise HTTPException(
+                status_code=409,
+                detail=f"진행 중인 협업이 있어서 {busy_until.month}.{busy_until.day}부터 새 협업을 수락할 수 있어요",
+            )
 
         adjusted = (body.start_date, body.end_date)
         if adjusted == (request["start_date"], request["end_date"]):
@@ -286,6 +299,7 @@ def start(cursor, request: dict) -> None:
     )
     create_collaboration(cursor, request["request_id"])  # 같은 트랜잭션에서 협업 공간도 만들어요
     notify_requests(cursor, "collab_started", [request["request_id"]])
+    close_busy_requests(cursor, request["expert_id"])
     if active_count(cursor, request["research_id"]) >= rules.MAX_ACTIVE:
         cursor.execute(
             "SELECT request_id FROM collaboration_request"
@@ -293,6 +307,28 @@ def start(cursor, request: dict) -> None:
             (request["research_id"],),
         )
         cancel(cursor, [row["request_id"] for row in cursor.fetchall()], "other_started")
+
+def close_busy_requests(cursor, expert_id: int) -> None:
+    """협업이 시작돼 이 전문가가 새 요청을 받을 수 없게 되면, 답 안 한 요청 · 수락해 둔 요청을 닫아요.
+
+    연구회원은 기다리기만 하다 만료되지 않게 바로 알림을 받아요 (request_busy · cancel_reason = expert_busy).
+    모든 협업이 30일 안에 끝나는 전문가면 아무것도 닫지 않아요.
+    """
+    if expert_open_from(cursor, expert_id, rules.today_kst(now())) is None:
+        return
+    cursor.execute(
+        "SELECT request_id FROM collaboration_request"
+        " WHERE expert_id = %s AND status IN ('pending', 'accepted') FOR UPDATE",
+        (expert_id,),
+    )
+    ids = [row["request_id"] for row in cursor.fetchall()]
+    if not ids:
+        return
+    cursor.execute(
+        "UPDATE collaboration_request SET status = 'canceled', cancel_reason = 'expert_busy' WHERE request_id = ANY(%s)",
+        (ids,),
+    )
+    notify_requests(cursor, "request_busy", ids)
 
 def cancel(cursor, request_ids: list[int], reason: str) -> None:
     """요청들을 이유와 함께 닫고 전문가에게 알려요. reason: withdrawn / declined / other_started"""
@@ -324,7 +360,7 @@ def find_sent(cursor, user_id: int, request_id: int) -> dict:
 def find_received(cursor, user_id: int, request_id: int) -> dict:
     """나에게 온 요청인지 확인합니다. 남의 것이거나 없으면 똑같이 404."""
     cursor.execute(
-        "SELECT request_id, research_id, status, start_date, end_date, is_urgent"
+        "SELECT request_id, research_id, expert_id, status, start_date, end_date, is_urgent"
         " FROM collaboration_request WHERE request_id = %s AND expert_id = %s FOR UPDATE",
         (request_id, user_id),
     )

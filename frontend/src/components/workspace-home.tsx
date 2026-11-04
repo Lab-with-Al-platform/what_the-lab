@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { API_BASE_URL, ApiError } from "@/lib/api";
 import { formatPeriod, photoOrDefault, todayDate } from "@/lib/collab-requests";
-import { Collaboration, GOOGLE_CALENDAR_HOME, isOngoing, loadWorkspace, Schedule, WorkspaceData } from "@/lib/workspace";
+import { Collaboration, dayLabel, GOOGLE_CALENDAR_HOME, isOngoing, loadWorkspace, Schedule, WorkspaceData } from "@/lib/workspace";
 import { Avatar, StatusBadge, Tabs } from "@/components/request-parts";
 import { WorkspaceCalendar } from "@/components/workspace-calendar";
 import { CollabList } from "@/components/workspace-collab-list";
@@ -13,6 +13,7 @@ import { ScheduleView } from "@/components/workspace-schedule-view";
 import { TodoBox, TodoItem } from "@/components/workspace-todo";
 import { RequestList } from "@/components/workspace-requests";
 import { UpcomingList } from "@/components/workspace-upcoming";
+
 
 
 type Tab = "ongoing" | "finished";
@@ -42,6 +43,8 @@ export function WorkspaceHome({ role }: { role: "researcher" | "expert" }) {
   const ongoing = data.collaborations
     .filter(isOngoing)
     .sort((a, b) => (a.status === "waiting" ? a.start_date : a.end_date).localeCompare(b.status === "waiting" ? b.start_date : b.end_date));
+  
+  const activeCollabs = ongoing.filter((collab) => collab.status === "active"); // 일정을 넣을 수 있는 협업 (시작 전은 잠금)
   const finished = data.collaborations.filter((collab) => !isOngoing(collab)).sort((a, b) => b.end_date.localeCompare(a.end_date));
   // 달력에는 진행 중 협업의 일정을 모두, 색 네모로 끈 협업만 빼고 보여요
   const shownIds = new Set(ongoing.filter((collab) => !hidden.includes(collab.collaboration_id)).map((collab) => collab.collaboration_id));
@@ -98,6 +101,7 @@ export function WorkspaceHome({ role }: { role: "researcher" | "expert" }) {
               onAdd={(date) => setEditor({ mode: "add", date })}
               onPick={pick}
               googleUrl={googleUrl}
+              canAdd={activeCollabs.length > 0}
             />
             <div className="order-first flex min-w-0 flex-col gap-5 lg:order-none">
               <TodoBox items={todos.map((item) => (item.dismissible ? { ...item, onDismiss: () => setDismissed((list) => [...list, item.key]) } : item))} />
@@ -109,9 +113,9 @@ export function WorkspaceHome({ role }: { role: "researcher" | "expert" }) {
       )}
 
       {editor?.mode === "add" && (
-        <ScheduleDialog collabs={ongoing} defaultCollabId={editor.collabId} defaultDate={editor.date} today={today} onClose={() => setEditor(null)} onSaved={saved} />
+        <ScheduleDialog collabs={activeCollabs} defaultCollabId={editor.collabId} defaultDate={editor.date} today={today} onClose={() => setEditor(null)} onSaved={saved} />
       )}
-      {editor?.mode === "edit" && <ScheduleDialog collabs={ongoing} editing={editor.schedule} today={today} onClose={() => setEditor(null)} onSaved={saved} />}
+      {editor?.mode === "edit" && <ScheduleDialog collabs={activeCollabs} editing={editor.schedule} today={today} onClose={() => setEditor(null)} onSaved={saved} />}
       {editor?.mode === "view" && (
         <ScheduleView
           schedule={editor.schedule}
@@ -136,12 +140,26 @@ function buildTodos(collabs: Collaboration[], schedules: Schedule[], googleOn: b
   for (const collab of collabs) {
     const who = <b>{collab.partner.nickname}</b>;
     // 번호가 양수인 일정 = 직접 잡은 일정 (음수는 자동으로 넣은 시작일·종료일)
-    if (!schedules.some((item) => item.collaboration_id === collab.collaboration_id && item.schedule_id > 0)) {
+    if (collab.status === "waiting") {
+      // 시작 전에는 일정 · 요청을 못 써요. 디스코드 채널에서 준비 얘기를 나누도록 안내해요
       items.push({
-        key: `first-${collab.collaboration_id}`,
+        key: `waiting-${collab.collaboration_id}`,
         tone: "brand",
-        text: <>{who} 님과 첫 미팅 날짜를 잡아 보세요</>,
-        action: <TodoButton onClick={() => add(collab.collaboration_id)}>+ 일정 추가</TodoButton>,
+        text: (
+          <>
+            {who} 님과 협업이 {dayLabel(collab.start_date)}에 시작돼요 · 그 전에는 디스코드 채널에서 준비 얘기를 나눠 보세요
+          </>
+        ),
+        action: collab.discord_channel_url ? (
+          <TodoButton onClick={() => window.open(collab.discord_channel_url!, "_blank", "noreferrer")}>💬 채널 열기</TodoButton>
+        ) : null,
+      });
+    } else if (!schedules.some((item) => item.collaboration_id === collab.collaboration_id && item.schedule_id > 0)) {
+      items.push({
+          key: `first-${collab.collaboration_id}`,
+          tone: "brand",
+          text: <>{who} 님과 첫 미팅 날짜를 잡아 보세요</>,
+          action: <TodoButton onClick={() => add(collab.collaboration_id)}>+ 일정 추가</TodoButton>,
       });
     }
     if (googleOn && !collab.google_linked) {

@@ -21,6 +21,7 @@ export function WorkspaceCalendar({
   onAdd,
   onPick,
   googleUrl,
+  canAdd = true,
 }: {
   schedules: Schedule[];
   tasks: WorkspaceTask[];
@@ -28,6 +29,7 @@ export function WorkspaceCalendar({
   onAdd: (date?: string) => void;
   onPick: (schedule: Schedule) => void;
   googleUrl?: string;
+  canAdd?: boolean; // false 면 [+ 일정 추가]를 잠가요 (시작 전 협업만 있을 때)
 }) {
   const thisMonth = { year: Number(today.slice(0, 4)), month: Number(today.slice(5, 7)) };
   const [month, setMonth] = useState(thisMonth);
@@ -69,7 +71,13 @@ export function WorkspaceCalendar({
             📅 구글 캘린더
           </a>
         )}
-        <button type="button" onClick={() => onAdd()} className={`${googleUrl ? "" : "ml-auto "}h-8 rounded-button bg-brand px-3 text-xs font-semibold text-white hover:bg-brand-hover`}>    
+        <button
+          type="button"
+          disabled={!canAdd}
+          title={canAdd ? undefined : "협업이 시작되면 일정을 넣을 수 있어요"}
+          onClick={() => onAdd()}
+          className={`${googleUrl ? "" : "ml-auto "}h-8 rounded-button bg-brand px-3 text-xs font-semibold text-white hover:bg-brand-hover disabled:cursor-not-allowed disabled:opacity-40`}
+        >
           + 일정 추가
         </button>
       </div>
@@ -99,7 +107,7 @@ export function WorkspaceCalendar({
               today={today}
               items={schedules.filter((item) => coversDay(item, day))}
               tasks={tasks.filter((task) => taskDay(task, today) === day)}
-              onAdd={onAdd}
+              onAdd={(date) => canAdd && onAdd(date)}
               onPick={onPick}
             />
           ))}

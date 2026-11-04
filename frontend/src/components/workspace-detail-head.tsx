@@ -6,17 +6,21 @@ import { Schedule } from "@/lib/workspace";
 import { CollabTask, CollaborationDetail, dayText, periodHeadline, ROLE_LABELS } from "@/lib/workspace-detail";
 import { fieldName } from "@/lib/taxonomy-options";
 import { Avatar } from "@/components/request-parts";
+import { CanceledNote, WaitingBox } from "@/components/workspace-waiting";
 
 const STATUS = {
-  waiting: { text: "진행 전", className: "bg-editorial-warning-soft text-editorial-warning" },
+  waiting: { text: "시작 전", className: "bg-editorial-warning-soft text-editorial-warning" },
   active: { text: "진행 중", className: "bg-brand-soft text-brand" },
   done: { text: "완료", className: "bg-success-soft text-success" },
   ended_early: { text: "중단", className: "bg-page text-muted" },
   canceled: { text: "취소", className: "bg-page text-muted" },
 } as const;
 
-/** 머리: 상태 · 분야 · 제목 · 두 사람 · [디스코드 채널] [구글 캘린더] + 아래에 협업 기간 타임라인 */
-export function DetailHead({ detail }: { detail: CollaborationDetail }) {
+/**
+ * 머리: 상태 · 분야 · 제목 · 두 사람 · [디스코드 채널] [구글 캘린더] + 아래에 협업 기간 타임라인
+ * 시작 전이면 안내 상자(시작일 미루기 · 협업 취소), 취소된 협업이면 누가 · 왜 취소했는지
+ */
+export function DetailHead({ detail, onChange }: { detail: CollaborationDetail; onChange: (next: CollaborationDetail) => void }) {
   const { collaboration: collab, agreement } = detail;
   const status = STATUS[collab.status];
   const field = agreement.field_ids?.[0];
@@ -64,7 +68,8 @@ export function DetailHead({ detail }: { detail: CollaborationDetail }) {
           {!ended && <GoogleButton detail={detail} />}
         </div>
       </div>
-
+      {collab.status === "waiting" && <WaitingBox detail={detail} onChange={onChange} />}
+      <CanceledNote detail={detail} />
       <Timeline detail={detail} />
     </section>
   );
@@ -114,6 +119,8 @@ function Timeline({ detail }: { detail: CollaborationDetail }) {
             <>
               {headline.label} <span className="text-brand">{headline.dday}</span>
             </>
+          ) : collab.status === "canceled" ? (
+            <>시작 전에 취소됐어요</>
           ) : (
             <>{shortDay(collab.end_date)}에 끝났어요</>
           )}

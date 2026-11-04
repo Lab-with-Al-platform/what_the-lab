@@ -15,6 +15,7 @@ from app.workspace_store import (
     SCHEDULE_COLUMNS,
     TODAY_KST,
     complete_ended_collaborations,
+    expire_changes,
     find_collaboration,
     google_login_ready,
     screen_status,
@@ -26,7 +27,7 @@ COLLAB_SQL = f"""
            (c.created_at AT TIME ZONE 'Asia/Seoul')::date AS confirmed_on,
            c.discord_status, c.discord_channel_id, c.google_calendar_id,
            c.researcher_google_at IS NOT NULL AS researcher_google, c.expert_google_at IS NOT NULL AS expert_google,
-           c.ended_at, c.end_reason, xu.nickname AS ended_by_nickname,
+           c.ended_at, c.end_reason, xu.nickname AS ended_by_nickname,c.discord_delete_at,
            {TODAY_KST} AS today,
            ru.user_id AS r_id, ru.nickname AS r_nickname, ru.user_photo AS r_photo,
            rp.institution_name AS r_institution, rp.department AS r_department, rp.position AS r_position,
@@ -86,6 +87,7 @@ DECISIONS_SQL = """
 # 기간 연장 · 조기 완료 요청: 최근 것부터. 3일이 지난 '기다림'은 아직 만료 처리 전이어도 지난 걸로 봐요
 CHANGES_SQL = """
     SELECT ch.change_id, ch.kind, ch.requested_by, ch.old_end_date, ch.new_end_date, ch.reason,
+           ch.old_start_date, ch.new_start_date,
            ch.status, ch.answer_note, ch.expires_at, ch.answered_at, ch.created_at,
            ch.status = 'pending' AND ch.expires_at < now() AS overdue,
            u.nickname AS requested_by_nickname
@@ -101,6 +103,7 @@ def load_detail(user_id: int, collaboration_id: int) -> dict:
     with get_connection() as conn, conn.transaction(), conn.cursor() as cursor:
         complete_ended_collaborations(cursor)
         side = find_collaboration(cursor, user_id, collaboration_id)["my_side"]
+        expire_changes(cursor, collaboration_id)
         cursor.execute(COLLAB_SQL, (collaboration_id,))
         row = cursor.fetchone()
         rows = {}
@@ -202,6 +205,8 @@ def build_detail(
             "ended_at": row["ended_at"],
             "ended_by_nickname": row["ended_by_nickname"],
             "end_reason": row["end_reason"],
+            # 취소 · 종료한 협업의 디스코드 채널을 지울 때 (지우기 전까지 읽기 전용)
+            "discord_delete_at": row["discord_delete_at"] if row["discord_status"] == "closed" else None,
         },
         "agreement": row["agreement"],
         "schedules": schedules,
@@ -213,5 +218,7 @@ def build_detail(
         ),
         # 기간이 바뀐 기록 (수락된 연장): "12.31 → 1.16"
         "extensions": [change for change in changes if change["kind"] == "extend" and change["status"] == "accepted"],
+        # 시작일을 이미 한 번 미뤘는지 (시작일 미루기는 협업에 한 번만)
+        "postponed": any(change["kind"] == "start" and change["status"] == "accepted" for change in changes),
         "google_enabled": google_login_ready(),
     }

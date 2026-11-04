@@ -11,7 +11,7 @@ import logging
 
 import httpx
 
-from app.collab_channel import make_pending_channels
+from app.collab_channel import delete_due_channels, make_pending_channels
 from app.config import FRONTEND_URL
 from app.db import get_connection
 from app.discord_bot import DmBlocked, bot_ready, channel_url, send_dm
@@ -160,7 +160,11 @@ async def run_forever() -> None:
     """서버가 켜져 있는 동안 보낼 알림을 보내요. 깨우면 바로, 아니면 15초마다. (main.py에서 시작)"""
     while True:
         try:
-            await asyncio.to_thread(make_pending_channels)  # 채널 먼저 → DM에 링크를 넣을 수 있게
+            await asyncio.to_thread(make_pending_channels)
+            try:
+                await asyncio.to_thread(delete_due_channels)  # 취소 · 종료하고 2일 지난 채널 지우기
+            except Exception:
+                log.exception("끝난 협업 채널 지우기 실패")  # 채널 먼저 → DM에 링크를 넣을 수 있게
         except Exception:
             log.exception("협업 디스코드 채널 만들기 실패")
         try:

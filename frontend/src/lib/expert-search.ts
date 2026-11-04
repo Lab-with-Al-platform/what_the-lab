@@ -12,6 +12,7 @@ export type ExpertCardData = {
   ai_career?: string | null; // AI 경력 코드
   engaged: boolean; // 지금 다른 연구와 협업 중인지
   engaged_until: string | null; // 협업 종료 예정일 YYYY-MM-DD (정하지 않았으면 null)
+  available_from?: string | null; // 새 협업 요청을 받을 수 있는 날 (null = 지금 가능). 모든 협업이 30일 안에 끝나야 받아요
   able_work_ids: string[]; // 할 수 있는 일 UG ID
   domain_ids: string[]; // 도메인(연구 분야) FIELD ID
 };
@@ -40,6 +41,7 @@ export type ExpertPublicProfile = Omit<CareerProfile, "is_public"> & {
   affiliation: string | null; // 소속 (선택)
   engaged: boolean;
   engaged_until: string | null;
+  available_from?: string | null; // 새 협업 요청을 받을 수 있는 날 (null = 지금 가능). 모든 협업이 30일 안에 끝나야 받아요
   collaborations: ExpertCollaboration[];
 };
 
@@ -98,8 +100,9 @@ export function monthDay(date: string): string {
 }
 
 /** 카드의 참여 상태 문구. 협업 가능하면 null */
-export function engagedLabel(expert: Pick<ExpertCardData, "engaged" | "engaged_until">): string | null {
+export function engagedLabel(expert: Pick<ExpertCardData, "engaged" | "engaged_until" | "available_from">): string | null {
   if (!expert.engaged) return null;
+  if (expert.available_from) return `참여 중 · ${monthDay(expert.available_from)}부터 요청 가능`;
   return expert.engaged_until ? `참여 중 · ${monthDay(expert.engaged_until)} 종료 예정` : "참여 중";
 }
 

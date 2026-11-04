@@ -8,7 +8,9 @@ import json
 import re
 from pathlib import Path
 
+from app.collab_waiting import open_from
 from app.db import get_connection
+from app.google_sync import today_kst
 
 TAXONOMY_DIR = Path(__file__).resolve().parents[2] / "taxonomy" / "v4.0"
 
@@ -177,9 +179,12 @@ def search_experts(
         )
         domains = group_by_user(cursor, ids, "expert_domain", "field_id", "expert_domain_id")
 
+    today = today_kst()
     for row in rows:
         row["able_work_ids"] = works.get(row["user_id"], [])
         row["domain_ids"] = domains.get(row["user_id"], [])
+        # 새 협업 요청을 받을 수 있는 날 (모든 협업이 30일 안에 끝나면 None = 지금 가능)
+        row["available_from"] = open_from(row["engaged_until"], today)
     return {
         "total": total,
         "items": rows,
@@ -209,7 +214,9 @@ def load_engagement(user_id: int) -> dict:
             f"SELECT engaged_until FROM ({ENGAGED_SQL}) g WHERE expert_id = %s", (user_id,)
         )
         row = cursor.fetchone()
-    return {"engaged": row is not None, "engaged_until": row["engaged_until"] if row else None}
+    until = row["engaged_until"] if row else None
+    # available_from: 새 협업 요청을 받을 수 있는 날 (None = 지금 가능). 요청 창에서 이 날 전에는 못 보내요
+    return {"engaged": row is not None, "engaged_until": until, "available_from": open_from(until, today_kst())}
 
 def load_collaborations(user_id: int) -> list[dict]:
     """Public, consent-safe history of completed collaborations.
