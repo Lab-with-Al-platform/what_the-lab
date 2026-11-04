@@ -8,7 +8,8 @@ CREATE TABLE public.collaboration (
   research_id BIGINT NOT NULL REFERENCES public.research(research_id),
   expert_id BIGINT NOT NULL REFERENCES public.expert(user_id),
   status VARCHAR(20) NOT NULL,
-  ended_at TIMESTAMPTZ
+  ended_at TIMESTAMPTZ,
+  ended_by BIGINT REFERENCES public.users(user_id)
 );
 CREATE TABLE public.notification (
   notification_id BIGINT PRIMARY KEY,
