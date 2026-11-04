@@ -112,12 +112,15 @@ def save_message_id(task_id: int, message_id: int | str) -> None:
 
 
 def sync_google(task: dict) -> None:
-    """요청의 지금 상태를 구글 캘린더에 맞춰요. 협업에 구글 캘린더가 없으면 건너뛰어요."""
+    """요청의 지금 상태를 구글 캘린더에 맞춰요. 협업에 구글 캘린더가 없으면 건너뛰어요.
+
+    진행 중이고 기한이 있는 요청만 구글에 둬요. 완료 · 취소 · 기한 없음이면 구글에서 지워요 (되돌리면 다시 넣어요).
+    """
     if not (google_ready() and task["google_calendar_id"]):
         return
     calendar, eid = task["google_calendar_id"], task_event_id(task["task_id"])
     try:
-        if task["status"] == "canceled" or task["due_date"] is None:
+        if task["status"] != "open" or task["due_date"] is None:
             retry_once(delete_event, calendar, eid)
         else:
             retry_once(put_event, calendar, eid, task_event_body(task))

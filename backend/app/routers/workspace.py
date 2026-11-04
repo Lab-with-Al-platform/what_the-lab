@@ -76,10 +76,11 @@ def update_schedule(
     schedule_id: int,
     body: rules.ScheduleInput,
     background: BackgroundTasks,
+    series: bool = False,
     user_id: int = Depends(get_current_user_id),
 ) -> dict:
-    """일정 하나 수정 (웹). 저장 · 알림은 edit_schedule."""
-    background.add_task(notice.announce, edit_schedule(user_id, schedule_id, body))
+    """일정 수정 (웹). series=true 면 같은 반복 일정 중 이 날짜와 그 뒤를 모두. 저장 · 알림은 edit_schedule."""
+    background.add_task(notice.announce, edit_schedule(user_id, schedule_id, body, series))
     return load_workspace(user_id)
 
 
@@ -126,29 +127,58 @@ def save_schedule(user_id: int, collaboration_id: int, body: rules.ScheduleInput
         )
 
 
-def edit_schedule(user_id: int, schedule_id: int, body: rules.ScheduleInput) -> dict | None:
-    """일정 하나 수정. (반복 일정이어도 이 날짜 하나만 바뀌어요) 고친 사람을 남기고, 구글에도 다시 반영해요.
+UPDATE_SCHEDULE = """
+    UPDATE collaboration_schedule SET kind = %(kind)s, title = %(title)s, start_date = %(start_date)s,
+      end_date = %(end_date)s, start_time = %(start_time)s, end_time = %(end_time)s, place = %(place)s,
+      memo = %(memo)s, assignee = %(assignee)s, updated_by = %(updated_by)s,
+      google_status = %(google_status)s, google_attempts = 0, google_error = NULL
+    WHERE schedule_id = %(schedule_id)s
+"""
 
-    날짜 · 시각이 바뀌면 상대에게 종 + 채널 멘션, 제목 · 메모 · 종류만 바뀌면 종에만 남겨요. 그대로면 None(알림 없음).
+
+def edit_schedule(user_id: int, schedule_id: int, body: rules.ScheduleInput, series: bool = False) -> dict | None:
+    """일정 수정. 고친 사람을 남기고, 구글에도 다시 반영해요.
+
+    series=True 이고 반복 일정이면 이 날짜와 그 뒤 반복 일정을 모두 같은 내용으로 (날짜를 옮기면 모두 같은 만큼 옮겨요).
+    알림은 몇 개를 바꿔도 한 번만. 날짜 · 시각이 바뀌면 상대에게 종 + 채널 멘션, 제목 · 메모 · 종류만 바뀌면 종에만.
+    그대로면 None(알림 없음).
     """
     with transaction() as cursor:
         collab = find_collaboration(cursor, user_id, schedule_owner(cursor, schedule_id), lock=True)
         check_ongoing(collab)
-        values = rules.clean_schedule(body, allowed_period(collab))
+        period = allowed_period(collab)
+        values = rules.clean_schedule(body, period)
         old = find_schedule(cursor, schedule_id)
-        cursor.execute(
-            """
-            UPDATE collaboration_schedule SET kind = %(kind)s, title = %(title)s, start_date = %(start_date)s,
-              end_date = %(end_date)s, start_time = %(start_time)s, end_time = %(end_time)s, place = %(place)s,
-              memo = %(memo)s, assignee = %(assignee)s, updated_by = %(updated_by)s,
-              google_status = %(google_status)s, google_attempts = 0, google_error = NULL
-            WHERE schedule_id = %(schedule_id)s
-            """,
-            {**values, "schedule_id": schedule_id, "updated_by": user_id, "google_status": google_status(collab)},
-        )
+        rows = series_rows(cursor, schedule_id) if series and old["series_id"] else [old]
+        if len(rows) > 1 and values["start_date"] != values["end_date"]:
+            raise HTTPException(status_code=400, detail="반복 일정은 하루짜리로만 함께 바꿀 수 있어요")
+        shift = values["start_date"] - old["start_date"]  # 날짜를 옮긴 만큼 뒤 일정도 옮겨요
+        for row in rows:
+            day = row["start_date"] + shift
+            end = values["end_date"] if len(rows) == 1 else day
+            if len(rows) > 1 and not period[0] <= day <= period[1]:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"옮기면 반복 일정 중 {notice.when_text({'start_date': day, 'end_date': day})}이(가) 협업 기간을 벗어나요",
+                )
+            rules.check_in_period(day, end, period)
+            cursor.execute(
+                UPDATE_SCHEDULE,
+                {
+                    **values,
+                    "start_date": day,
+                    "end_date": end,
+                    "schedule_id": row["schedule_id"],
+                    "updated_by": user_id,
+                    "google_status": google_status(collab),
+                },
+            )
         if not (notice.is_moved(old, values) or notice.is_edited(old, values)):
             return None
         moved = notice.is_moved(old, values)
+        note = notice.changed_note(old, values) if moved else notice.schedule_line(values)
+        if len(rows) > 1:
+            note += f" · 이 날짜부터 매주 {len(rows)}개"
         people = notice.collab_people(cursor, collab["collaboration_id"])
         return notice.notify_schedule(
             cursor,
@@ -156,8 +186,24 @@ def edit_schedule(user_id: int, schedule_id: int, body: rules.ScheduleInput) -> 
             user_id,
             "schedule_changed" if moved else "schedule_edited",
             schedule_id,
-            notice.changed_note(old, values) if moved else notice.schedule_line(values),
+            note,
+            line=notice.schedule_line(values),
+            message_id=old["discord_message_id"],
         )
+
+
+def series_rows(cursor, schedule_id: int) -> list[dict]:
+    """같은 반복 묶음에서 이 날짜와 그 뒤 일정들 (날짜 순)"""
+    cursor.execute(
+        """
+        SELECT t.schedule_id, t.start_date FROM collaboration_schedule t
+        JOIN collaboration_schedule s ON s.schedule_id = %s
+        WHERE t.collaboration_id = s.collaboration_id AND t.series_id = s.series_id AND t.start_date >= s.start_date
+        ORDER BY t.start_date
+        """,
+        (schedule_id,),
+    )
+    return cursor.fetchall()
 
 
 def remove_schedule(user_id: int, schedule_id: int, series: bool = False) -> dict:
@@ -191,7 +237,14 @@ def remove_schedule(user_id: int, schedule_id: int, series: bool = False) -> dic
             )
         people = notice.collab_people(cursor, collab["collaboration_id"])
         return notice.notify_schedule(
-            cursor, people, user_id, "schedule_deleted", schedule_id, notice.deleted_note(target, len(deleted))
+            cursor,
+            people,
+            user_id,
+            "schedule_deleted",
+            schedule_id,
+            notice.deleted_note(target, len(deleted)),
+            line=notice.schedule_line(target),
+            message_id=target["discord_message_id"],
         )
 
 
@@ -202,8 +255,8 @@ def allowed_period(collab: dict) -> tuple[date, date]:
 def find_schedule(cursor, schedule_id: int) -> dict:
     """바꾸기 · 지우기 전 일정 (무엇이 바뀌었는지 · 무엇을 지웠는지 알림에 써요)"""
     cursor.execute(
-        "SELECT kind, title, start_date, end_date, start_time, end_time, memo FROM collaboration_schedule"
-        " WHERE schedule_id = %s",
+        "SELECT schedule_id, kind, title, start_date, end_date, start_time, end_time, memo, series_id,"
+        " discord_message_id FROM collaboration_schedule WHERE schedule_id = %s",
         (schedule_id,),
     )
     return cursor.fetchone()

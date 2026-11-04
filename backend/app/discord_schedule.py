@@ -21,9 +21,11 @@ from app import schedule_notice as notice
 from app import workspace_rules as rules
 from app.config import FRONTEND_URL
 from app.db import get_connection
+from app.discord_bot import channel_url
 from app.discord_gateway import (
     NOT_COLLAB_CHANNEL,
     DueError,
+    due_error_text,
     find_member,
     parse_due,
     user_by_discord,
@@ -150,7 +152,7 @@ def upcoming_schedules(collaboration_id: int, today: date) -> list[dict]:
     with get_connection() as conn, conn.cursor() as cursor:
         cursor.execute(
             """
-            SELECT schedule_id, kind, title, start_date, end_date, start_time, end_time, series_id
+            SELECT schedule_id, kind, title, start_date, end_date, start_time, end_time, series_id, discord_message_id
             FROM collaboration_schedule
             WHERE collaboration_id = %s AND end_date >= %s AND start_date < %s
             ORDER BY start_date, start_time NULLS FIRST, schedule_id
@@ -167,7 +169,7 @@ def upcoming_schedules(collaboration_id: int, today: date) -> list[dict]:
 
 
 def schedule_panel(card: dict, user_id: int) -> tuple[str, list[str]]:
-    """[일정 관리]를 누른 사람에게 보여 줄 (안내 글, 버튼). 버튼: edit · delete · delete_series"""
+    """[일정 관리]를 누른 사람에게 보여 줄 (안내 글, 버튼). 버튼: edit · edit_series · delete · delete_series"""
     head = f"**{card['title']}** · {notice.KIND_NAMES.get(card['kind'], '기타')}\n{notice.when_text(card)}"
     if card.get("memo"):
         head += f"\n📝 {card['memo']}"
@@ -176,12 +178,14 @@ def schedule_panel(card: dict, user_id: int) -> tuple[str, list[str]]:
     if card["collab_status"] != "ongoing":
         return f"{head}\n\n끝난 협업이라 바꿀 수 없어요.", []
     if card.get("series_id"):
-        return f"{head}\n\n매주 반복 일정이에요. 수정은 이 날짜 하나만 바뀌어요.", ["edit", "delete", "delete_series"]
+        return (
+            f"{head}\n\n매주 반복 일정이에요. 이 날짜 하나만 또는 이 날짜 이후 모두를 고치거나 지울 수 있어요.",
+            ["edit", "edit_series", "delete", "delete_series"],
+        )
     return f"{head}\n\n일정을 고치거나 지울 수 있어요. 바꾸면 상대에게 알려요.", ["edit", "delete"]
 
-
-def list_text(rows: list[dict], today: date, web_link: str) -> str:
-    """/일정목록 글: 한 줄에 일정 하나 (날짜 · 시각 · 제목 · 종류)"""
+def list_text(rows: list[dict], today: date, web_link: str, channel_link: str | None = None) -> str:
+    """/일정목록 글: 한 줄에 일정 하나 (날짜 · 시각 · 제목 · 종류). 채널 메시지가 있으면 제목을 누르면 그 메시지로 이동"""
     end = today + timedelta(days=LIST_DAYS - 1)
     lines = [f"📅 **다가오는 일정 (2주)** · {day_text(today)} ~ {day_text(end)}", ""]
     if not rows:
@@ -191,10 +195,13 @@ def list_text(rows: list[dict], today: date, web_link: str) -> str:
         if row["start_date"] <= today <= row["end_date"]:
             when = f"오늘 · {when}"
         repeat = " 🔁" if row.get("series_id") else ""
-        lines.append(f"· {when} · **{row['title']}** · {notice.KIND_NAMES.get(row['kind'], '기타')}{repeat}")
+        title = row["title"].replace("[", "(").replace("]", ")")  # 링크 글자가 깨지지 않게
+        if channel_link and row.get("discord_message_id"):
+            title = f"[{title}]({channel_link}/{row['discord_message_id']})"
+        lines.append(f"· {when} · **{title}** · {notice.KIND_NAMES.get(row['kind'], '기타')}{repeat}")
     lines += ["", f"웹에서 보기: {web_link}"]
     if rows:
-        lines.append("수정 · 삭제는 아래에서 일정을 고르세요.")
+        lines.append("제목을 누르면 그 메시지로 이동해요. 수정 · 삭제는 아래에서 일정을 고르세요.")
     return "\n".join(lines)
 
 
@@ -211,10 +218,11 @@ def schedule_options(rows: list[dict]) -> list[discord.SelectOption]:
 
 
 def list_message(back: dict) -> tuple[str, list[discord.SelectOption]]:
-    """목록 글 + 드롭다운 항목 (DB를 읽어서 asyncio.to_thread 로). back: collaboration_id · user_id"""
+    """목록 글 + 드롭다운 항목 (DB를 읽어서 asyncio.to_thread 로). back: collaboration_id · user_id · channel_id"""
     today = today_kst()
     rows = upcoming_schedules(back["collaboration_id"], today)
-    text = list_text(rows, today, f"{FRONTEND_URL}/workspace/{back['collaboration_id']}")
+    link = channel_url(str(back["channel_id"])) if back.get("channel_id") else None
+    text = list_text(rows, today, f"{FRONTEND_URL}/workspace/{back['collaboration_id']}", link)
     return text, schedule_options(rows)
 
 
@@ -268,6 +276,7 @@ async def open_panel(interaction: discord.Interaction, schedule_id: int, back: d
 
 PANEL_BUTTONS = {
     "edit": ("수정", discord.ButtonStyle.primary),
+    "edit_series": ("이 날짜 이후 모두 수정", discord.ButtonStyle.primary),
     "delete": ("삭제", discord.ButtonStyle.danger),
     "delete_series": ("이 날짜 이후 모두 삭제", discord.ButtonStyle.danger),
 }
@@ -291,12 +300,15 @@ class SchedulePanelView(discord.ui.View):
 
     def make_callback(self, action: str):
         async def callback(interaction: discord.Interaction) -> None:
-            if action == "edit":
+            if action in ("edit", "edit_series"):
                 card = await asyncio.to_thread(schedule_card, self.schedule_id)
                 if card is None:
                     await interaction.response.edit_message(content="지워진 일정이에요.", view=back_view(self.back))
                     return
-                await interaction.response.send_modal(ScheduleModal(card["kind"], self.user_id, card=card, back=self.back))
+                modal = ScheduleModal(
+                    card["kind"], self.user_id, card=card, back=self.back, series=action == "edit_series"
+                )
+                await interaction.response.send_modal(modal)
                 return
             series = action == "delete_series"
             question = "**이 날짜와 그 뒤의 반복 일정을 모두 지울까요?**" if series else "**이 일정을 지울까요?**"
@@ -374,6 +386,7 @@ class ScheduleModal(discord.ui.Modal):
 
     card: 수정이면 지금 일정(schedule_card) → 칸을 미리 채워요. 종류 · 장소 · 담당은 그대로 둬요
     member: 추가면 find_member 결과 (collaboration_id · user_id)
+    series: 반복 일정의 [이 날짜 이후 모두 수정] → 이 날짜와 그 뒤 반복 일정을 모두 같은 내용으로
     """
 
     def __init__(
@@ -385,11 +398,14 @@ class ScheduleModal(discord.ui.Modal):
         member: dict | None = None,
         repeat: bool = False,
         back: dict | None = None,
+        series: bool = False,
     ) -> None:
         name = {value: label for label, value in KINDS}.get(kind, "기타")
-        super().__init__(title=f"일정 {'수정' if card else '추가'} · {name}")
+        action = "반복 일정 모두 수정" if series else "수정" if card else "추가"
+        super().__init__(title=f"{action} · {name}" if series else f"일정 {action} · {name}")
         self.kind, self.user_id, self.card, self.member, self.repeat, self.back = kind, user_id, card, member, repeat, back
-
+        self.series = series
+        
         self.title_box = discord.ui.TextInput(label="제목", max_length=rules.MAX_TITLE, placeholder="예: 주간 미팅")
         many = kind == "work"
         self.when_box = discord.ui.TextInput(
@@ -441,12 +457,15 @@ class ScheduleModal(discord.ui.Modal):
         try:
             body = self.body(today)
             if self.card:
-                sent = await asyncio.to_thread(edit_schedule, self.user_id, self.card["schedule_id"], body)
+                sent = await asyncio.to_thread(edit_schedule, self.user_id, self.card["schedule_id"], body, self.series)
             else:
                 sent = await asyncio.to_thread(save_schedule, self.user_id, self.member["collaboration_id"], body)
-        except DueError:
+        except DueError as error:
             example = PERIOD_EXAMPLES if self.kind == "work" else DATE_EXAMPLES
-            await self.reply(interaction, f'⚠️ "{self.when_box.value}" 을(를) 날짜로 읽지 못했어요. 이렇게 적어 주세요: {example}{retry}')
+            past = getattr(error, "day", None)
+            hint = f"지난 일정을 넣으려면 {past.year}.{past.month}.{past.day} 처럼 연도까지 적어 주세요" if past else ""
+            first = due_error_text(self.when_box.value, error, hint)
+            await self.reply(interaction, f"{first} 이렇게 적어 주세요: {example}{retry}" if not past else f"{first}{retry}")
             return
         except TimeError:
             await self.reply(interaction, f'⚠️ "{self.clock_box.value}" 을(를) 시각으로 읽지 못했어요. 이렇게 적어 주세요: {TIME_EXAMPLES}{retry}')
@@ -498,7 +517,11 @@ def add_schedule_commands(tree: app_commands.CommandTree, guild: discord.Object)
         if member is None:
             await interaction.response.send_message(NOT_COLLAB_CHANNEL, ephemeral=True)
             return
-        back = {"collaboration_id": member["collaboration_id"], "user_id": member["user_id"]}
+        back = {
+            "collaboration_id": member["collaboration_id"],
+            "user_id": member["user_id"],
+            "channel_id": interaction.channel_id,
+        }
         text, view = await list_view(back)
         kwargs = {"view": view} if view else {}
         await interaction.response.send_message(

@@ -184,8 +184,6 @@ def test_select_options_follow_list_order_with_plain_dates():
     many = [list_row(i) for i in range(40)]
     assert len(select_options(list_sections(many, "in"))) == 25  # 드롭다운 한도
 
-
-
 def test_list_view_is_built_on_the_event_loop(monkeypatch):
     """디스코드 창(View)을 다른 스레드에서 만들면 눌러도 응답이 없어요("적시에 응답하지 않았어요").
     DB 읽기만 스레드에서 하고, 창은 이벤트 루프 안에서 만들어야 해요."""
@@ -203,3 +201,18 @@ def test_list_view_is_built_on_the_event_loop(monkeypatch):
     text, view = asyncio.run(build())
     assert "받은 요청" in text and view is not None
     assert view._BaseView__stopped is not None  # 루프 안에서 만들어져야 버튼 · 드롭다운을 받아요 (스레드면 None)
+
+
+def test_recent_past_date_is_past_not_next_year():
+    """11.2 에 "10.30" → 내년이 아니라 "지난 날"이라고 알려요. 많이 지난 날(1.5)은 내년으로 봐요"""
+    import pytest
+
+    from app.discord_gateway import PastDueError, due_error_text, parse_due
+
+    today = date(2026, 11, 2)
+    with pytest.raises(PastDueError) as error:
+        parse_due("10.30", today)
+    assert error.value.day == date(2026, 10, 30)
+    assert due_error_text("10.30", error.value) == '⚠️ "10.30" 은(는) 이미 지난 날(10.30 (금))이에요. 오늘 이후 날짜로 적어 주세요.'
+    assert parse_due("1.5", today) == date(2027, 1, 5)
+    assert parse_due("2026.10.30", today) == date(2026, 10, 30)  # 연도까지 쓰면 그대로

@@ -43,9 +43,12 @@ SCHEDULE_TYPES = {
     "schedule_today",
     "schedule_ending",
 }
+# 아침 브리핑을 알림 종에 협업마다 하루 한 칸으로 묶은 것 (app/task_daily.py)
+BRIEF_TYPE = "daily_brief"
+# 아침 알림 하나하나: 중복 막기용으로 저장만 하고(읽음) 알림 종에는 안 보여요. 종에는 daily_brief 한 칸만
+BRIEF_PARTS = DAILY_TYPES | {"schedule_tomorrow", "schedule_today", "schedule_ending"}
 # 협업 안의 일: DM 없이 채널 멘션 + 종
-WORKSPACE_TYPES = set(TASK_NOTICE.values()) | DAILY_TYPES | SCHEDULE_TYPES | {"review_ready"}
-
+WORKSPACE_TYPES = set(TASK_NOTICE.values()) | DAILY_TYPES | SCHEDULE_TYPES | {BRIEF_TYPE, "review_ready"}
 # 거절 사유 (프론트 REJECT_REASON_LABELS와 같은 문구)
 REJECT_LABELS = {
     "schedule": "일정이 맞지 않아요",
@@ -236,16 +239,19 @@ def load_notifications(user_id: int) -> list[dict]:
             LEFT JOIN collaboration c ON c.collaboration_id = n.collaboration_id
             LEFT JOIN collaboration rc ON rc.request_id = n.request_id AND n.type = 'review_ready'
             WHERE n.user_id = %s AND n.created_at >= now() - make_interval(days => %s)
+              AND n.type <> ALL(%s)
             ORDER BY n.created_at DESC, n.notification_id DESC
             LIMIT %s
             """,
-            (user_id, RECENT_DAYS, LIST_LIMIT),
+            (user_id, RECENT_DAYS, sorted(BRIEF_PARTS), LIST_LIMIT),
         )
         rows = cursor.fetchall()
 
     items = []
     for row in rows:
-        if row["type"] == "review_ready":
+        if row["type"] == BRIEF_TYPE:
+            title, detail = brief_message(row)
+        elif row["type"] == "review_ready":
             title, detail = build_message(row, user_id)
         elif row["type"] in SCHEDULE_TYPES:
             title, detail = schedule_message(row)
@@ -266,6 +272,12 @@ def load_notifications(user_id: int) -> list[dict]:
         )
     return items
 
+def brief_message(row: dict) -> tuple[str, str]:
+    """알림 종의 아침 브리핑 한 칸: ("☀️ 오늘 챙길 일이 있어요", "오늘 주간 미팅 · 요청 내일까지 … · 협업 제목")"""
+    title = row.get("collab_title") or "협업"
+    title = title[:24] + ("…" if len(title) > 24 else "")
+    note = row.get("note") or ""
+    return "☀️ 오늘 챙길 일이 있어요", f"{note} · {title}" if note else title
 
 def notice_link(row: dict) -> str:
     """누르면 갈 화면: 요청 알림 → 협업 상세의 그 요청 줄, 협업 알림 → 협업 상세, 나머지 → 요청 관리"""
@@ -281,8 +293,9 @@ def count_unread(user_id: int) -> int:
         cursor.execute(
             "SELECT count(*) AS count FROM notification"
             " WHERE user_id = %s AND read_at IS NULL"
-            " AND created_at >= now() - make_interval(days => %s)",
-            (user_id, RECENT_DAYS),
+            " AND created_at >= now() - make_interval(days => %s)"
+            " AND type <> ALL(%s)",  # 목록에 안 보이는 아침 알림 줄(예전에 안 읽음으로 쌓인 것)은 세지 않아요
+            (user_id, RECENT_DAYS, sorted(BRIEF_PARTS)),
         )
         return cursor.fetchone()["count"]
 

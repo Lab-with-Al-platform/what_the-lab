@@ -90,7 +90,7 @@ def test_panel_buttons():
     text, actions = ds.schedule_panel(CARD, 1)
     assert actions == ["edit", "delete"]
     assert "**주간 미팅** · 미팅\n11.5 (목) 14:00~15:00\n📝 줌 링크" in text
-    assert ds.schedule_panel({**CARD, "series_id": 7}, 4)[1] == ["edit", "delete", "delete_series"]  # 반복 일정
+    assert ds.schedule_panel({**CARD, "series_id": 7}, 4)[1] == ["edit", "edit_series", "delete", "delete_series"]  # 반복 일정
     assert ds.schedule_panel({**CARD, "collab_status": "done"}, 1)[1] == []  # 끝난 협업
     assert ds.schedule_panel(CARD, 99)[1] == []  # 이 협업 사람이 아님
 
@@ -228,3 +228,30 @@ def test_bad_time_does_not_save(monkeypatch):
 
     [(kind, text)] = asyncio.run(run())
     assert kind == "send" and text.startswith('⚠️ "두시" 을(를) 시각으로 읽지 못했어요')
+
+def test_list_links_to_channel_message():
+    rows = [row(1, date(2026, 11, 5), discord_message_id="555"), row(2, date(2026, 11, 6))]
+    text = ds.list_text(rows, TODAY, "http://web", "https://discord.com/channels/1/900")
+    assert "**[일정1](https://discord.com/channels/1/900/555)**" in text  # 누르면 그 메시지로
+    assert "**일정2**" in text  # 메시지가 없는 예전 일정은 글자만
+
+
+def test_past_date_says_past(monkeypatch):
+    monkeypatch.setattr(ds, "today_kst", lambda: TODAY)
+    monkeypatch.setattr(ds, "save_schedule", lambda *args: pytest.fail("저장하면 안 돼요"))
+
+    async def run():
+        modal = ds.ScheduleModal("meeting", 1, member={"collaboration_id": 3})
+        for box, value in ((modal.title_box, "회의"), (modal.when_box, "10.30"), (modal.clock_box, ""), (modal.memo_box, "")):
+            fill(box, value)
+        interaction = FakeInteraction()
+        await modal.on_submit(interaction)
+        return interaction.response.sent
+
+    [(_kind, text)] = asyncio.run(run())
+    assert text.startswith('⚠️ "10.30" 은(는) 이미 지난 날(10.30 (금))이에요. 지난 일정을 넣으려면 2026.10.30 처럼 연도까지 적어 주세요.')
+
+
+def test_series_edit_modal_title():
+    modal = make_modal("meeting", card={**CARD, "series_id": 7}, series=True)
+    assert modal.title == "반복 일정 모두 수정 · 미팅" and modal.series is True

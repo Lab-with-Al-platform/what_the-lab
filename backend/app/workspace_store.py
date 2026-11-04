@@ -189,15 +189,16 @@ def load_workspace(user_id: int) -> dict:
         )
         schedules = cursor.fetchall()
 
-        # 열린 요청 (최신순). 협업 목록의 요청 목록 · 달력 · 다가오는 일정에 보여요
+ # 열린 요청 + 완료한 요청 (최신순). 달력에는 둘 다(완료는 흐리게), 요청 목록 · 다가오는 일정에는 열린 것만 보여요
         cursor.execute(
-            "SELECT t.task_id, t.collaboration_id, t.content, t.due_date, t.created_at,"
+            "SELECT t.task_id, t.collaboration_id, t.content, t.due_date, t.created_at, t.status,"
+            " (t.closed_at AT TIME ZONE 'Asia/Seoul')::date AS closed_on,"
             " CASE WHEN t.assignee = %s THEN 'in' ELSE 'out' END AS direction,"
             " rq.nickname AS requested_by_nickname, asg.nickname AS assignee_nickname,"
             f" {TASK_FLAG_SQL} AS flag"
             " FROM collaboration_task t"
             " JOIN users rq ON rq.user_id = t.requested_by JOIN users asg ON asg.user_id = t.assignee"
-            " WHERE t.collaboration_id = ANY(%s) AND t.status = 'open'"
+            " WHERE t.collaboration_id = ANY(%s) AND t.status IN ('open', 'done')"
             " ORDER BY t.created_at DESC, t.task_id DESC",
             (user_id, ongoing_ids),
         )
@@ -227,7 +228,7 @@ def load_workspace(user_id: int) -> dict:
     return {
         "collaborations": collaborations,
         "schedules": schedules,
-        "tasks": tasks,  # 진행 중 협업의 열린 요청 (direction: in=받은 · out=보낸)
+        "tasks": tasks,  # 진행 중 협업의 요청: 열린 것 + 완료한 것 (status · closed_on / direction: in=받은 · out=보낸)
         "google_enabled": google_login_ready(),
     }
 

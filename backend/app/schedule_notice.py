@@ -2,7 +2,9 @@
 
 - 알림 종: 같은 트랜잭션 안에서 notification 한 줄 (notify_schedule). 디스코드 DM은 보내지 않아요.
 - 폰 알림: 응답을 보낸 뒤 협업 채널에 상대를 멘션한 한 줄 (announce, BackgroundTasks)
-- 제목 · 메모만 바뀐 것은 종에만 남겨요 (오타 하나 고칠 때마다 폰이 울리지 않게)
+- 처음 "일정을 추가했어요" 메시지 번호를 일정에 저장해 두고, 바뀌거나 지워지면 그 메시지도 고쳐요 (요청과 같은 방식)
+  → 채널을 올려 보다가 옛 메시지를 봐도 지금 일정이 보여요
+- 제목 · 메모만 바뀐 것은 종에만 남기고 원래 메시지만 조용히 고쳐요 (오타 하나 고칠 때마다 폰이 울리지 않게)
 - 알림에는 그때의 일정 글자(note)를 같이 저장해요. 일정을 지워도 "무엇을 지웠는지" 보이게.
 
 아침 브리핑(내일 · 오늘 · 내일 끝남)은 app/task_daily.py 에 있어요.
@@ -13,8 +15,9 @@ from datetime import date, time
 
 import httpx
 
+from app.db import get_connection
 from app.discord_bot import bot_ready
-from app.task_sync import mention, retry_once, send_message
+from app.task_sync import edit_message, mention, retry_once, send_message
 from app.task_text import day_text
 
 log = logging.getLogger("labbridge.schedule_notice")
@@ -83,12 +86,24 @@ def collab_people(cursor, collaboration_id: int) -> dict:
     return cursor.fetchone()
 
 
-def notify_schedule(cursor, people: dict, actor_id: int, type_: str, schedule_id: int, note: str) -> dict:
+def notify_schedule(
+    cursor,
+    people: dict,
+    actor_id: int,
+    type_: str,
+    schedule_id: int,
+    note: str,
+    *,
+    line: str | None = None,
+    message_id: str | None = None,
+) -> dict:
     """상대에게 종 알림 한 줄을 저장하고, 채널에 올릴 때 쓸 정보를 돌려줘요.
 
     people: collab_people 결과 / type_: schedule_created · schedule_changed · schedule_edited · schedule_deleted
     note: 그때의 일정 글자 (예: "주간 미팅 · 미팅 · 11.5 (목) 14:00")
-    돌려주는 값: channel · to(상대 디스코드 번호) · actor(내 닉네임) · type · note · schedule_id → announce 에 그대로 넘겨요
+    line: 지금(바뀐 뒤 · 지우기 전) 일정 한 줄 → 원래 메시지를 이 글자로 고쳐요
+    message_id: 처음 올린 "일정을 추가했어요" 메시지 번호 (없으면 고칠 메시지 없음)
+    돌려주는 값: channel · to · actor · type · note · schedule_id · line · message_id → announce 에 그대로 넘겨요
     """
     mine_is_researcher = people["researcher_id"] == actor_id
     partner = people["expert_id"] if mine_is_researcher else people["researcher_id"]
@@ -108,6 +123,8 @@ def notify_schedule(cursor, people: dict, actor_id: int, type_: str, schedule_id
         "type": type_,
         "note": note,
         "schedule_id": schedule_id,
+        "line": line,
+        "message_id": message_id,
     }
 
 
@@ -123,23 +140,55 @@ def announce_text(notice: dict) -> str:
     return f"{NOW_ICONS[kind]} {who}{notice['actor']} 님이 {verbs[kind]} · {notice['note']}"
 
 
+def message_text(notice: dict) -> str:
+    """처음 올린 "일정을 추가했어요" 메시지를 고칠 글자 (멘션 없음 · 고쳐도 폰은 안 울려요)
+
+    바뀜: "📅 **주간 미팅** · 미팅 · 11.6 (금) 16:00 · ✏️ jiwoo_lab 님이 바꿨어요"
+    지움: "🗑 ~~주간 미팅 · 미팅 · 11.5 (목) 14:00~~ · jiwoo_lab 님이 지웠어요"
+    """
+    line = notice.get("line") or notice["note"]
+    if notice["type"] == "schedule_deleted":
+        return f"🗑 ~~{line}~~ · {notice['actor']} 님이 지웠어요"
+    title, _, rest = line.partition(" · ")
+    return f"📅 **{title}** · {rest} · ✏️ {notice['actor']} 님이 바꿨어요"
+
+
 def announce(notice: dict | None) -> None:
-    """응답을 보낸 뒤: 협업 채널에 상대를 멘션해서 올려요 (폰 알림). 제목 · 메모만 바뀐 것은 올리지 않아요."""
-    if not notice or notice["type"] not in NOW_ICONS:
-        return
-    if not (bot_ready() and notice.get("channel")):
+    """응답을 보낸 뒤 협업 채널에:
+    - 추가 · 날짜/시각 변경 · 삭제 → 상대를 멘션한 새 메시지 (폰 알림). 추가 메시지 번호는 일정에 저장해요
+    - 변경 · 삭제 · 제목/메모 수정 → 처음 올린 추가 메시지를 지금 상태로 고쳐요 (조용히)
+    """
+    if not notice or not (bot_ready() and notice.get("channel")):
         return  # 봇 설정이 없거나 아직 채널이 없는 협업은 종 알림만
+    channel = notice["channel"]
     try:
+        if notice.get("message_id") and notice["type"] != "schedule_created":
+            components = [] if notice["type"] == "schedule_deleted" else manage_components(notice) or []
+            retry_once(edit_message, channel, notice["message_id"], message_text(notice), components)
+        if notice["type"] not in NOW_ICONS:
+            return  # 제목 · 메모만 바뀌었으면 새 메시지(폰 알림)는 안 보내요
         people = [notice["to"]] if notice.get("to") else []
-        retry_once(
+        message_id = retry_once(
             send_message,
-            notice["channel"],
+            channel,
             announce_text(notice),
             components=manage_components(notice),
             mentions=mention(*people),
         )
+        if notice["type"] == "schedule_created" and message_id:
+            save_message_id(notice["schedule_id"], message_id)
     except httpx.HTTPError as error:
-        log.warning("일정 알림 채널 %s 실패: %s", notice["channel"], error)
+        log.warning("일정 알림 채널 %s 실패: %s", channel, error)
+
+
+def save_message_id(schedule_id: int, message_id: int | str) -> None:
+    """처음 올린 "일정을 추가했어요" 메시지 번호를 일정에 저장해요 (바뀌면 이 메시지를 고쳐요)"""
+    with get_connection() as conn, conn.cursor() as cursor:
+        cursor.execute(
+            "UPDATE collaboration_schedule SET discord_message_id = %s WHERE schedule_id = %s",
+            (str(message_id), schedule_id),
+        )
+
 
 def manage_components(notice: dict) -> list | None:
     """추가 · 변경 메시지에 붙는 [일정 관리] 버튼 (디스코드 봇이 schedule:manage:번호 로 받아요). 삭제는 버튼 없음"""
@@ -147,6 +196,7 @@ def manage_components(notice: dict) -> list | None:
         return None
     button = {"type": 2, "style": 2, "label": "일정 관리", "custom_id": f"schedule:manage:{notice['schedule_id']}"}
     return [{"type": 1, "components": [button]}]
+
 
 def created_note(first: dict, count: int) -> str:
     """추가 알림 글자. 매주 반복이면 몇 번인지 붙여요."""
@@ -177,7 +227,7 @@ def schedule_message(row: dict) -> tuple[str, str]:
         "schedule_changed": f"{actor} 님이 일정 날짜·시각을 바꿨어요",
         "schedule_edited": f"{actor} 님이 일정 내용을 고쳤어요",
         "schedule_deleted": f"{actor} 님이 일정을 지웠어요",
-        "schedule_tomorrow": "내일 일정이 있어요",
+        "schedule_tomorrow": "내일 마감이에요",
         "schedule_today": "오늘 일정이 있어요",
         "schedule_ending": "일정이 내일 끝나요",
     }
@@ -191,8 +241,6 @@ def daily_label(kind: str, row: dict, today: date) -> str:
         if row["start_date"] != row["end_date"]:
             return f"📅 오늘부터 · {line}"
         return f"📅 오늘 · {line}"
-    if kind == "schedule_tomorrow":
-        if row["start_date"] != row["end_date"]:
-            return f"🔔 내일부터 · {line}"
-        return f"🔔 내일 · {line}"
+    if kind == "schedule_tomorrow":  # 결과물 마감 전날
+        return f"🔔 내일 마감 · {line}"
     return f"🏁 내일 끝나요 · {line}"

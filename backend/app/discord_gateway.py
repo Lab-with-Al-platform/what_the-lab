@@ -157,6 +157,24 @@ class DueError(ValueError):
     """기한을 날짜로 읽지 못했어요 (형식이 다르거나, 달력에 없는 날)"""
 
 
+
+class PastDueError(DueError):
+    """연도 없이 적은 날짜가 얼마 전에 지난 날이에요 (예: 11.2 에 "10.30"). day = 그 지난 날"""
+
+    def __init__(self, text: str, day: date) -> None:
+        super().__init__(text)
+        self.day = day
+
+
+PAST_DAYS = 60  # 연도 없이 적은 날이 오늘보다 이만큼 안쪽으로 지났으면 "지난 날", 더 지났으면 내년으로 봐요
+
+
+def due_error_text(text: str, error: DueError, past_hint: str = "오늘 이후 날짜로 적어 주세요") -> str:
+    """날짜를 못 읽었을 때 보여 줄 첫 줄. 지난 날이면 "지난 날이에요", 아니면 "날짜로 읽지 못했어요" """
+    if isinstance(error, PastDueError):
+        return f'⚠️ "{text}" 은(는) 이미 지난 날({day_text(error.day)})이에요. {past_hint}.'
+    return f'⚠️ "{text}" 을(를) 날짜로 읽지 못했어요.'
+
 def parse_due(text: str, today: date) -> date | None:
     """디스코드 창에 적은 기한 → 날짜. 비어 있으면 None (기한 없는 요청).
 
@@ -167,7 +185,8 @@ def parse_due(text: str, today: date) -> date | None:
       오늘 · 내일 · 모레                                   → 10-30 · 10-31 · 11-01
       3일 뒤 · 2주 후                                      → 11-02 · 11-13
       이번 주 금요일 · 다음 주 월요일                      → 10-30 · 11-02
-    연도를 안 쓰면 올해 (이미 지났으면 내년).
+    연도를 안 쓰면 올해. 이미 지났으면: 60일 안쪽으로 지난 날은 PastDueError("지난 날이에요"), 더 지났으면 내년
+      (11월에 "1.5" → 내년 1월 5일 / 11.2 에 "10.30" → 지난 날)
     받지 않는 것: "금요일"(이번/다음 없이), "1110"(구분 없이 숫자만), 없는 날(2.30) → DueError
     범위(오늘 ~ 협업 종료일)는 여기서 보지 않아요. 저장할 때 웹과 같은 check_due 가 봐요.
     """
@@ -185,23 +204,32 @@ def parse_due(text: str, today: date) -> date | None:
             return monday + timedelta(weeks=WEEKS[match[1]], days=WEEKDAYS.index(match[2]))
         if match := NUMBER_DATE.fullmatch(compact) or KOREAN_DATE.fullmatch(compact):
             year, month, day = match.groups()
-            return with_year(year, int(month), int(day), today)
+            due = with_year(year, int(month), int(day), today)
+            if due < today and not year:
+                raise PastDueError(text, due)
+            return due
+        
         if match := DAY_ONLY.fullmatch(compact):
             day = int(match[1])
             month, year = (today.month, today.year) if day >= today.day else next_month(today)
             return date(year, month, day)
+
+    except PastDueError:  # 지난 날 → 그대로 올려요 ("지난 날이에요")
+        raise
+        
     except ValueError as error:  # date() 가 없는 날(2.30 · 11.31)이라고 할 때
         raise DueError(text) from error
     raise DueError(text)
 
 
 def with_year(year: str | None, month: int, day: int, today: date) -> date:
-    """연도를 썼으면 그대로, 안 썼으면 올해 (이미 지난 날짜면 내년)"""
+    """연도를 썼으면 그대로. 안 썼으면 올해, 이미 지난 날이면: 60일 안쪽은 그 지난 날(부르는 쪽이 "지난 날"로 알려요), 더 지났으면 내년"""
     if year:
         return date(int(year), month, day)
     due = date(today.year, month, day)
-    return due if due >= today else date(today.year + 1, month, day)
-
+    if due >= today or (today - due).days <= PAST_DAYS:
+        return due
+    return date(today.year + 1, month, day)
 
 def next_month(today: date) -> tuple[int, int]:
     """다음 달 (월, 연도). 12월이면 내년 1월"""
@@ -546,9 +574,9 @@ class DueModal(discord.ui.Modal, title="기한 변경"):
             result = await asyncio.to_thread(
                 lambda: change_due(self.user_id, task_id, due, source="discord")
             )
-        except DueError:
+        except DueError as error:
             await interaction.response.edit_message(
-                content=f'⚠️ "{self.due.value}" 을(를) 날짜로 읽지 못했어요. 기한은 그대로예요.\n'
+                content=f"{due_error_text(self.due.value, error)} 기한은 그대로예요.\n"
                 + due_help(today, self.task["end_date"]),
                 view=back_view(self.back),
             )
@@ -625,9 +653,9 @@ class TalkModal(discord.ui.Modal, title="기한 얘기하기"):
             due = parse_due(self.due.value, today)
             body = rules.TalkInput(due_date=due, note=self.note.value)
             await asyncio.to_thread(lambda: talk_due(self.user_id, task_id, body, source="discord"))
-        except DueError:
+        except DueError as error:
             await interaction.response.edit_message(
-                content=f'⚠️ "{self.due.value}" 을(를) 날짜로 읽지 못했어요. 보내지 않았어요.\n'
+                content=f"{due_error_text(self.due.value, error)} 보내지 않았어요.\n"
                 + due_help(today, self.task["end_date"]),
                 view=back_view(self.back),
             )
@@ -674,9 +702,9 @@ class ReturnModal(discord.ui.Modal, title="다시 요청"):
             due = parse_due(self.due.value, today)
             body = rules.ReturnInput(note=self.note.value, due_date=due)
             await asyncio.to_thread(lambda: return_task(self.user_id, task_id, body, source="discord"))
-        except DueError:
+        except DueError as error:
             await interaction.response.edit_message(
-                content=f'⚠️ "{self.due.value}" 을(를) 날짜로 읽지 못했어요. 다시 요청하지 않았어요.\n'
+                content=f"{due_error_text(self.due.value, error)} 다시 요청하지 않았어요.\n"
                 + due_help(today, self.task["end_date"]),
                 view=back_view(self.back),
             )
@@ -726,9 +754,9 @@ class TaskModal(discord.ui.Modal, title="요청 남기기"):
                 body,
                 "discord",
             )
-        except DueError:
+        except DueError as error:
             await interaction.response.send_message(
-                f'⚠️ "{self.due.value}" 을(를) 날짜로 읽지 못했어요. 요청은 저장하지 않았어요.\n'
+                f"{due_error_text(self.due.value, error)} 요청은 저장하지 않았어요.\n"
                 + due_help(today, self.member["end_date"])
                 + retry,
                 ephemeral=True,
