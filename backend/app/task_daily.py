@@ -30,7 +30,7 @@ from app.google_sync import tidy_google
 from app.schedule_notice import schedule_line
 from app.task_sync import mention, resync_task, retry_once, send_message
 from app.task_text import KST, brief_text
-from app.workspace_store import complete_ended_collaborations
+from app.workspace_store import complete_ended_collaborations, expire_changes
 
 log = logging.getLogger("labbridge.task_daily")
 
@@ -68,6 +68,14 @@ FROM (
     CROSS JOIN LATERAL (VALUES (rs.user_id), (c.expert_id)) AS people(user_id)
     WHERE c.status = 'ongoing' AND c.end_date = %(ending)s
       AND EXISTS (SELECT 1 FROM collaboration_task x WHERE x.collaboration_id = c.collaboration_id AND x.status = 'open')
+    UNION ALL
+    SELECT people.user_id, CASE WHEN c.start_date = %(today)s THEN 'collab_start_today' ELSE 'collab_starting' END,
+           NULL, NULL, c.collaboration_id
+    FROM collaboration c
+    JOIN research rs ON rs.research_id = c.research_id
+    CROSS JOIN LATERAL (VALUES (rs.user_id), (c.expert_id)) AS people(user_id)
+    WHERE c.status = 'ongoing' AND c.start_date IN (%(today)s, %(tomorrow)s)
+      AND (c.created_at AT TIME ZONE 'Asia/Seoul')::date < %(today)s  -- 오늘 만든 협업은 시작 알림을 이미 받았어요
 ) AS picked
 ON CONFLICT DO NOTHING
 RETURNING notification_id
@@ -127,6 +135,7 @@ def pick_today(today: date) -> list[dict]:
     """오늘 알릴 것을 종 알림으로 저장하고(이미 있으면 건너뜀), 새로 저장된 줄의 내용을 돌려줘요."""
     with transaction() as cursor:
         complete_ended_collaborations(cursor)
+        expire_changes(cursor)  # 답 기한이 지난 기간 변경 · 시작일 미루기 요청 정리
         days = {"today": today, "tomorrow": today + timedelta(days=1), "ending": today + timedelta(days=3)}
         cursor.execute(PICK_SQL, days)
         ids = [row["notification_id"] for row in cursor.fetchall()]
@@ -174,6 +183,8 @@ def short_label(row: dict, today: date) -> str:
         "task_overdue": f"요청 기한 지남 {content}",
         "task_talk_waiting": f"기한 수정 요청에 답하기 {content}",
         "collab_ending": "협업 종료 3일 전",
+        "collab_starting": "내일 협업 시작",
+        "collab_start_today": "오늘부터 협업 시작",
         "schedule_today": f"오늘 {title}",
         "schedule_tomorrow": f"내일 마감 {title}",
         "schedule_ending": f"내일 끝남 {title}",
@@ -203,7 +214,7 @@ def group_by_channel(rows: list[dict]) -> dict[str, list[dict]]:
         channel = row["discord_channel_id"]
         if not channel:
             continue  # 아직 채널이 없는 협업은 종 알림만
-        if row["type"] == "collab_ending" or row.get("schedule"):
+        if row["type"] in ("collab_ending", "collab_starting", "collab_start_today") or row.get("schedule"):
             key = (channel, row["type"], row.get("schedule_id"))
             if key in shared:
                 shared[key]["to"].append(row["discord_id"])

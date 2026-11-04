@@ -30,6 +30,7 @@ from app import workspace_rules as rules
 from app.config import DISCORD_BOT_TOKEN, DISCORD_GUILD_ID, FRONTEND_URL
 from app.db import get_connection
 from app.discord_bot import channel_url
+from app.discord_waiting import waiting_text, StartChangeButton
 from app.routers.workspace_tasks import (
     change_due,
     close_task,
@@ -78,7 +79,7 @@ def find_member(channel_id: int, discord_id: int) -> dict | None:
     with get_connection() as conn, conn.cursor() as cursor:
         cursor.execute(
             """
-            SELECT c.collaboration_id, c.end_date, u.user_id
+            SELECT c.collaboration_id, c.status, c.start_date, c.end_date, u.user_id
             FROM collaboration c
             JOIN research rs ON rs.research_id = c.research_id
             JOIN users u ON u.discord_id = %s
@@ -794,7 +795,7 @@ class LabBridgeBot(discord.Client):
             ScheduleButton,
             add_schedule_commands,
         )
-
+        self.add_dynamic_items(ManageButton, ScheduleButton, StartChangeButton)
         add_commands(self.tree, self.guild)
         add_schedule_commands(self.tree, self.guild)
         self.add_dynamic_items(ManageButton, ScheduleButton)  # 예전 메시지의 버튼도 받게 (봇을 다시 켜도)
@@ -812,6 +813,11 @@ def add_commands(tree: app_commands.CommandTree, guild: discord.Object) -> None:
         if member is None:
             await interaction.response.send_message(NOT_COLLAB_CHANNEL, ephemeral=True)
             return
+        locked = waiting_text(member, today_kst())  # 시작 전 · 끝난 협업은 입력 창을 열지 않아요
+        if locked:
+            await interaction.response.send_message(locked, ephemeral=True)
+            return
+        
         await interaction.response.send_modal(TaskModal(member))
         
     async def send_list(interaction: discord.Interaction, direction: str) -> None:

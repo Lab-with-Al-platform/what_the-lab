@@ -30,6 +30,7 @@ from app.discord_gateway import (
     parse_due,
     user_by_discord,
 )
+from app.discord_waiting import waiting_text
 from app.routers.workspace import edit_schedule, remove_schedule, save_schedule
 from app.routers.workspace_tasks import today_kst
 from app.task_text import day_text, short_day
@@ -506,6 +507,11 @@ def add_schedule_commands(tree: app_commands.CommandTree, guild: discord.Object)
         member = await asyncio.to_thread(find_member, interaction.channel_id, interaction.user.id)
         if member is None:
             await interaction.response.send_message(NOT_COLLAB_CHANNEL, ephemeral=True)
+            return
+
+        locked = waiting_text(member, today_kst())  # 시작 전 · 끝난 협업은 입력 창을 열지 않아요
+        if locked:
+            await interaction.response.send_message(locked, ephemeral=True)
             return
         await interaction.response.send_modal(
             ScheduleModal(kind.value, member["user_id"], member=member, repeat=repeat and kind.value == "meeting")

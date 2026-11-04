@@ -168,3 +168,27 @@ async def run_forever() -> None:
         except TimeoutError:
             pass
         WAKE.clear()
+
+def clear_collab_google(collaboration_id: int) -> int:
+    """협업이 취소되면 이 협업이 구글에 넣은 일정 · 시작일/종료일 표시를 모두 지워요. 지운 개수를 돌려줘요.
+
+    없는 일정을 지워도(404) 괜찮아서 몇 번을 돌려도 같아요. 요청(lbt)은 협업이 끝나면 sync_google 이 지워요.
+    """
+    if not google_ready():
+        return 0
+    with get_connection() as conn, conn.cursor() as cursor:
+        cursor.execute("SELECT google_calendar_id FROM collaboration WHERE collaboration_id = %s", (collaboration_id,))
+        row = cursor.fetchone()
+        if not row or not row["google_calendar_id"]:
+            return 0
+        cursor.execute("SELECT schedule_id FROM collaboration_schedule WHERE collaboration_id = %s", (collaboration_id,))
+        ids = [event_id(item["schedule_id"]) for item in cursor.fetchall()]
+    ids += [mark_id(collaboration_id, "start"), mark_id(collaboration_id, "end")]
+    done = 0
+    for eid in ids:
+        try:
+            delete_event(row["google_calendar_id"], eid)
+            done += 1
+        except httpx.HTTPError as error:
+            log.warning("취소한 협업 %s 구글 일정 %s 지우기 실패: %s", collaboration_id, eid, error)
+    return done

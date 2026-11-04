@@ -34,6 +34,7 @@ from app.routers import (
     verification,
     workspace,
     workspace_tasks,
+    workspace_waiting,
 )
 from app.task_daily import daily_forever
 
@@ -116,3 +117,4 @@ app.include_router(workspace.router)
 app.include_router(google.router)
 app.include_router(community.router)
 app.include_router(workspace_tasks.router)
+app.include_router(workspace_waiting.router)

@@ -91,10 +91,12 @@ export type CollabDecision = {
 /** 기간 연장 · 조기 완료 요청. mine = 내가 보냈는지 (내 것이면 [철회], 상대 것이면 [수락]·[다시 얘기해요]) */
 export type ChangeRequest = {
   change_id: number;
-  kind: "extend" | "complete";
+  kind: "extend" | "complete" | "start";
   requested_by: number;
   old_end_date: string;
   new_end_date: string | null;
+  old_start_date: string | null; // 시작일 미루기만
+  new_start_date: string | null; // 시작일 미루기만
   reason: string | null;
   status: "pending" | "accepted" | "declined" | "withdrawn" | "expired";
   answer_note: string | null;
@@ -122,7 +124,8 @@ export type CollaborationDetail = {
     google_calendar_url: string | null;
     ended_at: string | null;
     ended_by_nickname: string | null;
-    end_reason: string | null;
+    end_reason: string | null; // 취소 · 중단 이유 ("사유 · 남길 말")
+    discord_delete_at: string | null; // 끝난 협업의 디스코드 채널을 지울 때 (그 전까지 읽기 전용)
   };
   agreement: Agreement;
   schedules: Schedule[];
@@ -130,6 +133,7 @@ export type CollaborationDetail = {
   decisions: CollabDecision[];
   pending_change: ChangeRequest | null;
   extensions: ChangeRequest[]; // 수락된 연장 기록
+  postponed: boolean; // 시작일을 이미 한 번 미뤘는지 (한 번만 미룰 수 있어요)
   google_enabled: boolean;
 };
 
@@ -268,3 +272,43 @@ export function eventTime(iso: string): string {
   return `${get("month")}.${get("day")} ${get("hour")}:${get("minute")}`;
 }
 
+// ---------------------------------------------------------------------------
+// 시작 전 협업: 협업 취소 · 시작일 미루기 (백엔드 app/collab_waiting.py 와 같은 규칙)
+// ---------------------------------------------------------------------------
+
+/** 취소 사유 (백엔드 CANCEL_REASONS 와 같은 순서 · 글자) */
+export const CANCEL_REASONS = [
+  ["schedule", "일정이 맞지 않게 됐어요"],
+  ["terms", "협업 조건(범위 · 보상 · 데이터)이 달라졌어요"],
+  ["contact", "상대와 연락이 잘 안 돼요"],
+  ["other", "기타"],
+] as const;
+export type CancelReason = (typeof CANCEL_REASONS)[number][0];
+export const WAITING_TEXT_LIMIT = 200; // 취소하며 남길 말 · 미루기 사유 · 다시 얘기해요 이유
+export const MAX_POSTPONE_DAYS = 14; // 원래 시작일에서 최대 며칠까지 미룰 수 있나
+export const CHANNEL_KEEP_DAYS = 2; // 취소한 뒤 채널을 며칠 남겨 둘까
+
+/** [협업 취소]: 시작 전에만, 둘 중 누구나. 사유 + 남길 말 필수 */
+export async function cancelCollaboration(collaborationId: number, input: { reason: CancelReason; text: string }): Promise<CollaborationDetail> {
+  return requestApi<CollaborationDetail>(`/workspace/${collaborationId}/cancel`, { method: "POST", body: JSON.stringify(input) });
+}
+
+/** [시작일 미루기] 요청: 새 시작일 + 사유. 상대가 수락하면 종료일도 같은 만큼 밀려요 */
+export async function postponeStart(collaborationId: number, input: { start_date: string; reason: string }): Promise<CollaborationDetail> {
+  return requestApi<CollaborationDetail>(`/workspace/${collaborationId}/postpone`, { method: "POST", body: JSON.stringify(input) });
+}
+
+/** 시작일 미루기 [수락] (요청을 받은 사람) */
+export async function acceptChange(changeId: number): Promise<CollaborationDetail> {
+  return requestApi<CollaborationDetail>(`/workspace/changes/${changeId}/accept`, { method: "POST" });
+}
+
+/** 시작일 미루기 [다시 얘기해요] (요청을 받은 사람, 한 줄 이유는 선택) */
+export async function declineChange(changeId: number, note: string): Promise<CollaborationDetail> {
+  return requestApi<CollaborationDetail>(`/workspace/changes/${changeId}/decline`, { method: "POST", body: JSON.stringify({ note }) });
+}
+
+/** 시작일 미루기 [요청 철회] (요청한 사람) */
+export async function withdrawChange(changeId: number): Promise<CollaborationDetail> {
+  return requestApi<CollaborationDetail>(`/workspace/changes/${changeId}/withdraw`, { method: "POST" });
+}

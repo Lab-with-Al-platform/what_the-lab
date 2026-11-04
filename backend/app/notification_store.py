@@ -16,7 +16,7 @@ LIST_LIMIT = 50  # 한 번에 보여 줄 최대 개수
 
 # 받는 사람이 누구인지에 따라 나눈 알림 종류
 TO_EXPERT = {"request_received", "request_canceled"}  # 연구회원이 한 일 → 전문가에게
-TO_RESEARCHER = {"request_accepted", "request_rejected", "request_withdrawn"}  # 전문가가 한 일 → 연구회원에게
+TO_RESEARCHER = {"request_accepted", "request_rejected", "request_withdrawn", "request_busy"}  # 전문가가 한 일 → 연구회원에게
 TO_BOTH = {"request_expired", "collab_started", "review_ready"}  # 둘 다에게 (서로가 상대방)
 
 # 요청 기록 종류 → 상대에게 보낼 알림 종류 (한 사람이 한 일을 상대에게)
@@ -31,7 +31,7 @@ TASK_NOTICE = {
     "returned": "task_returned",  # 보낸 사람이 다시 요청 → 받은 사람
 }
 # 아침 브리핑 알림 (하루 한 번, notice_on)
-DAILY_TYPES = {"task_due_soon", "task_overdue", "task_talk_waiting", "collab_ending"}
+DAILY_TYPES = {"task_due_soon", "task_overdue", "task_talk_waiting", "collab_ending", "collab_starting", "collab_start_today"}
 # 협업 안의 일: DM 없이 채널 멘션 + 종
 # 일정 알림 (한 사람이 한 일 → 상대 / 아침 브리핑 → 두 사람). 글자는 app/schedule_notice.py
 SCHEDULE_TYPES = {
@@ -47,8 +47,10 @@ SCHEDULE_TYPES = {
 BRIEF_TYPE = "daily_brief"
 # 아침 알림 하나하나: 중복 막기용으로 저장만 하고(읽음) 알림 종에는 안 보여요. 종에는 daily_brief 한 칸만
 BRIEF_PARTS = DAILY_TYPES | {"schedule_tomorrow", "schedule_today", "schedule_ending"}
+# 시작 전 협업 (한 사람이 한 일 → 상대). 글자는 그때의 사유 · 날짜(note)로 (app/collab_waiting.py)
+COLLAB_TYPES = {"collab_canceled", "start_change_requested", "start_change_accepted", "start_change_declined"}
 # 협업 안의 일: DM 없이 채널 멘션 + 종
-WORKSPACE_TYPES = set(TASK_NOTICE.values()) | DAILY_TYPES | SCHEDULE_TYPES | {BRIEF_TYPE, "review_ready"}
+WORKSPACE_TYPES = set(TASK_NOTICE.values()) | DAILY_TYPES | SCHEDULE_TYPES | COLLAB_TYPES | {BRIEF_TYPE, "review_ready"}
 # 거절 사유 (프론트 REJECT_REASON_LABELS와 같은 문구)
 REJECT_LABELS = {
     "schedule": "일정이 맞지 않아요",
@@ -151,6 +153,10 @@ def task_message(row: dict) -> tuple[str, str]:
     if kind == "task_due_soon":
         when = "오늘" if due == row.get("notice_on") else "내일"
         return f"요청 기한이 {when}까지예요", detail
+    if kind == "collab_starting":
+        return "내일 협업이 시작돼요 🚀", f"{title} · 시작일부터 요청 · 일정을 쓸 수 있어요"
+    if kind == "collab_start_today":
+        return "오늘부터 협업 시작 🚀", title
     if kind == "collab_ending":
         end = row.get("collab_end")
         end_text = f" ({end.month}.{end.day})" if end else ""
@@ -253,6 +259,8 @@ def load_notifications(user_id: int) -> list[dict]:
             title, detail = brief_message(row)
         elif row["type"] == "review_ready":
             title, detail = build_message(row, user_id)
+        elif row["type"] in COLLAB_TYPES:
+            title, detail = collab_message(row)
         elif row["type"] in SCHEDULE_TYPES:
             title, detail = schedule_message(row)
         elif row["type"] in WORKSPACE_TYPES:
@@ -271,6 +279,21 @@ def load_notifications(user_id: int) -> list[dict]:
             }
         )
     return items
+
+def collab_message(row: dict) -> tuple[str, str]:
+    """시작 전 협업 알림 → (제목, 작은 설명). 설명은 "사유 · 날짜 · 협업 제목" (그때 저장한 note)"""
+    actor = row.get("actor_nickname") or "상대"
+    title = row.get("collab_title") or "협업"
+    title = title[:24] + ("…" if len(title) > 24 else "")
+    note = row.get("note") or ""
+    detail = f"{note} · {title}" if note else title
+    texts = {
+        "collab_canceled": f"{actor} 님이 협업을 취소했어요",
+        "start_change_requested": f"{actor} 님이 시작일을 미루자고 했어요",
+        "start_change_accepted": f"{actor} 님이 시작일 미루기를 수락했어요",
+        "start_change_declined": f"{actor} 님이 시작일 미루기에 다시 얘기하자고 했어요",
+    }
+    return texts.get(row["type"], "새 알림이 있어요"), detail
 
 def brief_message(row: dict) -> tuple[str, str]:
     """알림 종의 아침 브리핑 한 칸: ("☀️ 오늘 챙길 일이 있어요", "오늘 주간 미팅 · 요청 내일까지 … · 협업 제목")"""

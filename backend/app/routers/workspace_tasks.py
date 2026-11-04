@@ -23,7 +23,7 @@ from app.notification_store import notify_task
 from app.security import get_current_user_id
 from app.task_sync import after_web_change
 from app.workspace_detail import load_detail
-from app.workspace_store import find_collaboration
+from app.workspace_store import check_started, find_collaboration
 
 router = APIRouter(prefix="/api/v1/workspace", tags=["workspace"])
 
@@ -34,10 +34,10 @@ def today_kst() -> date:
 
 
 def check_open_collab(collab: dict) -> None:
-    """끝난 협업은 읽기 전용이에요."""
+    """끝난 협업은 읽기 전용이에요. 시작 전 협업도 요청을 쓸 수 없어요 (check_started)."""
     if collab["status"] != "ongoing":
         raise HTTPException(status_code=409, detail="끝난 협업이라 바꿀 수 없어요")
-
+    check_started(collab, today_kst())
 
 def partner_id(cursor, collaboration_id: int, my_side: str) -> int:
     """협업의 상대방 회원 번호 (연구회원이면 전문가, 전문가면 연구회원)"""

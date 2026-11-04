@@ -140,3 +140,33 @@ def add_member(channel_id: str, discord_id: str) -> bool:
         return False
     response.raise_for_status()
     return True
+
+# ---------- 협업이 끝난 채널: 잠그기 → 며칠 뒤 지우기 ----------
+THREAD_PERMISSIONS = (1 << 35) | (1 << 36) | (1 << 38)  # 스레드 만들기(공개 · 비공개) · 스레드에 쓰기
+LOCKED_ALLOW = VIEW_CHANNEL | READ_HISTORY  # 보기 · 지난 메시지 · 파일 받기는 그대로
+LOCKED_DENY = SEND_MESSAGES | ATTACH_FILES | ADD_REACTIONS | THREAD_PERMISSIONS  # 쓰기 · 올리기 · 반응은 막아요
+
+
+def lock_member(channel_id: str, discord_id: str) -> bool:
+    """회원 한 명을 '읽기만'으로 바꿔요. 바꿨으면 True, 서버에 없는 사람이면 False.
+
+    채널은 그대로 보이고, 메시지 · 파일 올리기 · 반응 · 스레드만 막혀요. 디스코드가 안 되면 httpx.HTTPError.
+    """
+    response = httpx.put(
+        f"{DISCORD_API}/channels/{channel_id}/permissions/{discord_id}",
+        headers=bot_headers(),
+        json={"type": 1, "allow": str(LOCKED_ALLOW), "deny": str(LOCKED_DENY)},
+        timeout=TIMEOUT,
+    )
+    if response.status_code in (400, 404):
+        return False
+    response.raise_for_status()
+    return True
+
+
+def delete_channel(channel_id: str) -> None:
+    """채널을 지워요. 이미 없으면(404) 지운 걸로 봐요. 디스코드가 안 되면 httpx.HTTPError."""
+    response = httpx.delete(f"{DISCORD_API}/channels/{channel_id}", headers=bot_headers(), timeout=TIMEOUT)
+    if response.status_code == 404:
+        return
+    response.raise_for_status()

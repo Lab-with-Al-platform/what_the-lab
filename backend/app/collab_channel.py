@@ -7,8 +7,13 @@
 import httpx
 
 from app.db import get_connection
-from app.discord_bot import add_member, bot_ready, channel_name, create_private_channel
-
+from app.discord_bot import (
+    add_member,
+    bot_ready,
+    channel_name,
+    create_private_channel,
+    delete_channel,
+)
 BATCH = 10  # 한 번에 만들 최대 개수
 MAX_ATTEMPTS = 5  # 이만큼 실패하면 멈추고 failed 로 남겨요 (이유는 discord_error)
 RETRY_MINUTES = 1  # 실패하면 (시도 횟수 × 1분) 뒤에 다시
@@ -77,3 +82,39 @@ def open_channel(row: dict) -> tuple[str, str | None]:
     members = (("연구회원", row["researcher_discord_id"]), ("AI 전문가", row["expert_discord_id"]))
     missing = [who for who, discord_id in members if not add_member(channel_id, discord_id)]
     return channel_id, (f"서버 미참가: {', '.join(missing)}" if missing else None)
+
+# ---------- 끝난 협업 채널 지우기 (취소 · 종료 뒤 discord_delete_at 이 지나면) ----------
+DUE_DELETE_SQL = """
+    SELECT collaboration_id, discord_channel_id FROM collaboration
+    WHERE discord_delete_at <= now() AND discord_channel_id IS NOT NULL AND discord_status = 'closed'
+    ORDER BY discord_delete_at
+    LIMIT %s
+    FOR UPDATE SKIP LOCKED
+"""
+
+
+def delete_due_channels() -> int:
+    """지울 때가 된 채널을 지우고 discord_status 를 'deleted' 로. 지운 개수를 돌려줘요.
+
+    디스코드가 안 되면 그 채널은 건너뛰고 다음 차례(15초 뒤)에 다시 해요.
+    """
+    if not bot_ready():
+        return 0
+    deleted = 0
+    with get_connection() as conn, conn.transaction(), conn.cursor() as cursor:
+        cursor.execute(DUE_DELETE_SQL, (BATCH,))
+        for row in cursor.fetchall():
+            try:
+                delete_channel(row["discord_channel_id"])
+            except httpx.HTTPError as error:
+                cursor.execute(
+                    "UPDATE collaboration SET discord_error = %s WHERE collaboration_id = %s",
+                    (f"채널 삭제 실패: {error}"[:200], row["collaboration_id"]),
+                )
+                continue
+            cursor.execute(
+                "UPDATE collaboration SET discord_status = 'deleted' WHERE collaboration_id = %s",
+                (row["collaboration_id"],),
+            )
+            deleted += 1
+    return deleted
