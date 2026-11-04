@@ -104,6 +104,21 @@ def event_id(schedule_id: int) -> str:
     """구글 일정 번호를 일정 번호로 정해요: lbs00012 (구글 규칙: 소문자 a~v·숫자, 5자 이상)"""
     return f"lbs{schedule_id:05d}"
 
+def mark_id(collaboration_id: int, which: str) -> str:
+    """협업 시작일 · 종료일 구글 일정 번호: lbc00003a(시작) · lbc00003b(종료일)"""
+    return f"lbc{collaboration_id:05d}{'a' if which == 'start' else 'b'}"
+
+
+def mark_body(collaboration_id: int, which: str, day: date, title: str) -> dict:
+    """협업 시작일 · 종료일 → 구글 하루 종일 일정"""
+    label = "협업 시작" if which == "start" else "협업 종료일"
+    link = f"{FRONTEND_URL}/workspace/{collaboration_id}"
+    return {
+        "summary": f"[협업] {label}",
+        "description": f"{title}\n\n※ LabBridge 협업 기간이에요. 기간 변경은 여기서 → {link}".strip(),
+        "start": {"date": str(day)},
+        "end": {"date": str(day + timedelta(days=1))},  # 하루 종일 일정은 다음 날을 적어요 (구글 규칙)
+    }
 
 def event_body(schedule: dict) -> dict:
     """우리 일정 → 구글 일정 모양. 시각이 있는 하루짜리는 그 시각에, 나머지는 '하루 종일'로 넣어요."""

@@ -17,6 +17,7 @@ from fastapi.responses import RedirectResponse
 from app.config import FRONTEND_URL, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI
 from app.db import transaction
 from app.google_calendar import add_calendar_url, create_calendar, share_calendar
+from app.google_sync import sync_marks, today_kst
 from app.security import get_current_user_id
 from app.workspace_store import check_ongoing, find_collaboration, google_login_ready
 
@@ -90,6 +91,11 @@ def callback(
             cursor.execute(f"UPDATE collaboration SET {column} = now() WHERE collaboration_id = %s", (collaboration_id,))
     except httpx.HTTPError:
         return back_to_workspace("failed")
+
+    try:  # 협업 시작일 · 종료일도 바로 넣어요 (안 되면 다음 날 아침에 다시)
+        sync_marks(today_kst(), collaboration_id)
+    except httpx.HTTPError:
+        pass
 
     # 구글 캘린더의 '이 캘린더 추가' 화면. authuser: 방금 로그인한 그 구글 계정으로 열어요
     response = RedirectResponse(f"{add_calendar_url(calendar_id)}&authuser={quote(email)}")

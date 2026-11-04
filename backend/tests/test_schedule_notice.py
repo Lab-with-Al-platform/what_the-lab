@@ -75,6 +75,8 @@ def test_notify_goes_to_the_other_person():
         "type": "schedule_created",
         "note": "주간 미팅",
         "schedule_id": 42,
+        "line": None,
+        "message_id": None,
     }
     sent = notice.notify_schedule(Saved(), PEOPLE, 4, "schedule_deleted", 42, "주간 미팅")
     assert sent["to"] == "111" and sent["actor"] == "outsider_lee"
@@ -110,7 +112,7 @@ def test_brief_text_with_schedules_mentions_both():
     text = brief_text(
         today,
         [
-            {"type": "schedule_tomorrow", "to": ["111", "444"], "schedule": {**WORK, "start_date": date(2026, 11, 6)}},
+            {"type": "schedule_tomorrow", "to": ["111", "444"], "schedule": {**MEETING, "kind": "due", "title": "1차 결과", "start_date": date(2026, 11, 6), "end_date": date(2026, 11, 6), "start_time": None, "end_time": None}},
             {"type": "task_due_soon", "to": ["444"], "content": "그래프 정리", "due_date": today},
             {"type": "schedule_today", "to": ["111", "444"], "schedule": MEETING},
             {"type": "schedule_ending", "to": ["111", "444"], "schedule": {**WORK, "start_date": date(2026, 11, 1), "end_date": date(2026, 11, 6)}},
@@ -121,8 +123,7 @@ def test_brief_text_with_schedules_mentions_both():
     assert lines[1] == "📅 <@111> <@444> 오늘 · 주간 미팅 · 미팅 · 11.5 (목) 14:00~15:30"
     assert lines[2] == "⏰ <@444> 오늘까지예요 · 그래프 정리"
     assert lines[3] == "🏁 <@111> <@444> 내일 끝나요 · 라벨링 · 작업 기간 · 11.1 (일) ~ 11.6 (금)"
-    assert lines[4] == "🔔 <@111> <@444> 내일부터 · 라벨링 · 작업 기간 · 11.6 (금) ~ 11.12 (목)"
-
+    assert lines[4] == "🔔 <@111> <@444> 내일 마감 · 1차 결과 · 결과물 마감 · 11.6 (금)"
 
 def test_group_by_channel_merges_two_people_per_schedule():
     rows = [
@@ -136,3 +137,62 @@ def test_group_by_channel_merges_two_people_per_schedule():
 def test_deleted_message_has_no_manage_button():
     assert notice.manage_components({"type": "schedule_deleted", "schedule_id": 7}) is None
     assert notice.manage_components({"type": "schedule_created", "schedule_id": 7}) is not None
+
+
+
+# ---------- 처음 올린 메시지 고치기 ----------
+NOTICE = {"channel": "900", "to": "444", "actor": "jiwoo_lab", "schedule_id": 7, "message_id": "555"}
+
+
+def fake_discord(monkeypatch):
+    calls = []
+    monkeypatch.setattr(notice, "bot_ready", lambda: True)
+    monkeypatch.setattr(notice, "edit_message", lambda channel, mid, text, components: calls.append(("edit", mid, text, components)) or True)
+    monkeypatch.setattr(notice, "send_message", lambda channel, text, components, mentions: calls.append(("send", text)) or "777")
+    monkeypatch.setattr(notice, "save_message_id", lambda schedule_id, mid: calls.append(("save", schedule_id, mid)))
+    return calls
+
+
+def test_created_saves_message_id(monkeypatch):
+    calls = fake_discord(monkeypatch)
+    notice.announce({**NOTICE, "type": "schedule_created", "note": "주간 미팅 · 미팅 · 11.5 (목) 14:00", "message_id": None})
+    assert calls == [("send", "📅 <@444> jiwoo_lab 님이 일정을 추가했어요 · 주간 미팅 · 미팅 · 11.5 (목) 14:00"), ("save", 7, "777")]
+
+def test_changed_edits_original_then_mentions(monkeypatch):
+    calls = fake_discord(monkeypatch)
+    notice.announce(
+        {**NOTICE, "type": "schedule_changed", "note": "주간 미팅 · 14:00 → 16:00", "line": "주간 미팅 · 미팅 · 11.5 (목) 16:00"}
+    )
+    edit, send = calls
+    assert edit[:3] == ("edit", "555", "📅 **주간 미팅** · 미팅 · 11.5 (목) 16:00 · ✏️ jiwoo_lab 님이 바꿨어요")
+    assert edit[3][0]["components"][0]["custom_id"] == "schedule:manage:7"  # 버튼은 그대로
+    assert send == ("send", "🔁 <@444> jiwoo_lab 님이 일정을 바꿨어요 · 주간 미팅 · 14:00 → 16:00")
+
+
+def test_edited_only_fixes_original_quietly(monkeypatch):
+    calls = fake_discord(monkeypatch)
+    notice.announce({**NOTICE, "type": "schedule_edited", "note": "x", "line": "킥오프 · 미팅 · 11.5 (목) 14:00"})
+    assert [call[0] for call in calls] == ["edit"]  # 새 메시지(폰 알림) 없이 원래 메시지만
+
+
+def test_deleted_strikes_original(monkeypatch):
+    calls = fake_discord(monkeypatch)
+    notice.announce({**NOTICE, "type": "schedule_deleted", "note": "주간 미팅 · 미팅 · 11.5 (목) 14:00", "line": "주간 미팅 · 미팅 · 11.5 (목) 14:00"})
+    edit, send = calls
+    assert edit == ("edit", "555", "🗑 ~~주간 미팅 · 미팅 · 11.5 (목) 14:00~~ · jiwoo_lab 님이 지웠어요", [])  # 버튼도 없애요
+    assert send[1].startswith("🗑 <@444>")
+
+
+# ---------- 알림 종 한 칸 요약 ----------
+def test_brief_rows_one_per_person_and_collab():
+    today = date(2026, 11, 5)
+    rows = [
+        {"user_id": 1, "collaboration_id": 3, "type": "schedule_today", "schedule": MEETING},
+        {"user_id": 1, "collaboration_id": 3, "type": "task_due_soon", "content": "그래프 정리", "due_date": today},
+        {"user_id": 1, "collaboration_id": 3, "type": "collab_ending"},
+        {"user_id": 4, "collaboration_id": 3, "type": "schedule_today", "schedule": MEETING},
+    ]
+    assert daily.brief_rows(rows, today) == [
+        (1, 3, today, "오늘 주간 미팅 · 요청 오늘까지 그래프 정리 외 1개"),
+        (4, 3, today, "오늘 주간 미팅"),
+    ]

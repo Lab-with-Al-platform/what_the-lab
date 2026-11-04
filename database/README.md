@@ -22,6 +22,18 @@ PostgreSQL/Supabase 데이터 구조와 변경 이력을 관리합니다.
 - 2026-11-01: `025`는 요청 기록 표 `collaboration_task_event`를 만들고 기존 요청의 남김·완료/취소 기록을 채운 뒤 번호를 `20261031_21`로, `026`은 알림 표에 요청 알림 칸·종류를 더하고 번호를 `20261031_22`로 올립니다. 이미 데이터가 있는 Docker DB는 [요청 기능 세팅 안내](../docs/development/SETUP_WORKSPACE_TASKS.md)대로 두 파일을 직접 실행합니다.
 - 2026-11-02: `027`은 알림 표에 일정 알림 칸(`schedule_id` · `note`)·종류를 더하고 아침 알림 중복 막기에 일정을 넣은 뒤 번호를 `20261101_23`으로 올립니다. 이미 데이터가 있는 Docker DB는 [일정 기능 세팅 안내](../docs/development/SETUP_WORKSPACE_SCHEDULES.md)대로 직접 실행합니다.
 
+- 2026-11-03: `028`은 일정 표에 채널 메시지 번호 칸(`discord_message_id`)을, 알림 종류에 `daily_brief`를 더하고 번호를 `20261102_24`로 올립니다. 이미 데이터가 있는 Docker DB는 [일정 기능 세팅 안내](../docs/development/SETUP_WORKSPACE_SCHEDULES.md)대로 직접 실행합니다.
+
+## 마이그레이션 번호 (PR 올리기 전에 꼭)
+
+두 PR이 같은 번호를 쓰면 alembic 이 "끝이 두 개"가 되어 공용 DB에 적용할 수 없어요.
+
+1. **develop 최신을 받은 뒤** 마지막 번호를 확인해요: `backend/migrations/versions/` 의 가장 큰 `날짜_순번`, `database/init/` 의 가장 큰 3자리 번호
+2. 새 마이그레이션은 그 **다음 순번**을 써요. 예: 마지막이 `20261102_24` · `028` 이면 → `날짜_25` · `029`
+   - `down_revision` 은 develop 의 마지막 개정, Docker 파일 끝의 `WHERE version_num = '…'` 도 그 번호
+3. PR 이 오래 열려 있다가 다른 PR 이 먼저 머지되면, **머지 직전에 develop 을 받아 번호를 다시 올려요**
+4. `backend/tests/test_migration_numbers.py` 가 겹침 · 건너뜀 · 순서를 검사해요. `pytest` 가 통과해야 해요
+
 - [실행·안전 확인 순서](../docs/ai-case-automation/FOUNDATION_RUNBOOK.md): 개발 DB 확인, 권한, 테스트, 파괴적인 되돌리기 주의
 - [개발용 DB 검증 결과](../docs/qa/INSIGHT_SUPABASE_MIGRATION_2026-10-16.md): 인사이트 테이블 5개와 public의 버전 테이블 1개, 실제 콘텐츠는 0건
 

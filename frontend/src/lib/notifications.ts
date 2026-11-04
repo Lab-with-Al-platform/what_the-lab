@@ -29,7 +29,9 @@ export type NotificationType =
   | "schedule_deleted"
   | "schedule_tomorrow"
   | "schedule_today"
-  | "schedule_ending";
+  | "schedule_ending"
+  // 아침 브리핑을 협업마다 하루 한 칸으로 (위 아침 알림들은 종에 따로 안 보여요)
+  | "daily_brief";
 
 /** 알림 한 건 (GET /notifications 의 items) */
 export type NotificationItem = {
@@ -54,7 +56,7 @@ export const NOTIFICATION_ICONS: Record<NotificationType, { icon: string; classN
   request_canceled: { icon: "↩", className: "bg-page text-faint" },
   request_expired: { icon: "⏱", className: "bg-page text-faint" },
   collab_started: { icon: "▶", className: "bg-expert-soft text-expert" },
-    request_withdrawn: { icon: "↩", className: "bg-page text-faint" },
+  request_withdrawn: { icon: "↩", className: "bg-page text-faint" },
   task_created: { icon: "📌", className: "bg-brand-soft text-brand" },
   task_done: { icon: "✓", className: "bg-success-soft text-success" },
   task_canceled: { icon: "✕", className: "bg-page text-faint" },
@@ -74,6 +76,7 @@ export const NOTIFICATION_ICONS: Record<NotificationType, { icon: string; classN
   schedule_tomorrow: { icon: "🔔", className: "bg-brand-soft text-brand" },
   schedule_today: { icon: "📅", className: "bg-success-soft text-success" },
   schedule_ending: { icon: "🏁", className: "bg-expert-soft text-expert" },
+  daily_brief: { icon: "☀️", className: "bg-editorial-warning-soft text-[#8a5a12]" },
 };
 
 /** 제목을 닉네임과 나머지로 나눠요. 닉네임만 굵게 보여 주려고. "neural_kim 님이 …" → ["neural_kim", " 님이 …"] */

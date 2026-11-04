@@ -143,12 +143,14 @@ export function monthWeeks(year: number, month: number): string[][] {
 // 협업 시작일·종료일은 일정 테이블에 저장하지 않고, 화면에서 달력에 자동으로 넣어 보여 줘요.
 // ---------------------------------------------------------------------------
 
-/** 진행 중 협업의 열린 요청 (협업 목록 달력 · 다가오는 일정에 보여요) */
+/** 진행 중 협업의 요청. 열린 것 + 완료한 것 (달력에는 둘 다 · 완료는 흐리게, 요청 목록 · 다가오는 일정에는 열린 것만) */
 export type WorkspaceTask = {
   task_id: number;
   collaboration_id: number;
   content: string;
   due_date: string | null; // 기한 없음이면 null
+  status: "open" | "done";
+  closed_on: string | null; // 완료한 날 (열린 요청은 null)
   created_at: string; // 남긴 때 (최신순 정렬)
   direction: "in" | "out"; // in = 내가 받은 요청, out = 내가 보낸 요청
   requested_by_nickname: string;
@@ -166,9 +168,19 @@ export type WorkspaceData = {
 /** 구글 캘린더 첫 화면. 추가해 둔 협업 캘린더가 모두 같이 보여요 */
 export const GOOGLE_CALENDAR_HOME = "https://calendar.google.com/calendar/r";
 
-/** 요청을 보여 줄 날: 기한이 오늘 뒤면 그날, 기한이 없거나 오늘·지났으면 오늘 (끝날 때까지 매일 오늘 칸에) */
-export function taskDay(task: { due_date: string | null }, today: string): string {
+/**
+ * 요청을 보여 줄 날
+ * - 열린 요청: 기한이 오늘 뒤면 그날, 기한이 없거나 오늘·지났으면 오늘 (끝날 때까지 매일 오늘 칸에)
+ * - 완료한 요청: 기한 날 (기한이 없었으면 완료한 날) — 달력에 흐리게 남아요
+ */
+export function taskDay(task: { due_date: string | null; status?: string; closed_on?: string | null }, today: string): string {
+  if (task.status === "done") return task.due_date ?? task.closed_on ?? today;
   return task.due_date && task.due_date > today ? task.due_date : today;
+}
+
+/** 달력에서 흐리게 보일지: 지난 일정(끝난 날이 오늘 전) · 완료한 요청 */
+export function isPast(item: { end_date: string }, today: string): boolean {
+  return item.end_date < today;
 }
 
 /** 협업 목록 + 내가 볼 수 있는 일정 */
@@ -181,9 +193,11 @@ export async function addSchedule(collaborationId: number, input: ScheduleInput)
   return withAutoItems(await requestApi<WorkspaceData>(`/workspace/${collaborationId}/schedules`, { method: "POST", body: JSON.stringify(input) }));
 }
 
-/** 일정 하나 수정 (반복 일정이어도 이 날짜 하나만) */
-export async function updateSchedule(scheduleId: number, input: ScheduleInput): Promise<WorkspaceData> {
-  return withAutoItems(await requestApi<WorkspaceData>(`/workspace/schedules/${scheduleId}`, { method: "PUT", body: JSON.stringify(input) }));
+/** 일정 수정. series=true 면 같은 반복 일정 중 이 날짜와 그 뒤를 모두 바꿔요. */
+export async function updateSchedule(scheduleId: number, input: ScheduleInput, series = false): Promise<WorkspaceData> {
+  return withAutoItems(
+    await requestApi<WorkspaceData>(`/workspace/schedules/${scheduleId}?series=${series}`, { method: "PUT", body: JSON.stringify(input) }),
+  );
 }
 
 /** 일정 삭제. series=true 면 같은 반복 일정 중 이 날짜와 그 뒤를 모두 지워요. */

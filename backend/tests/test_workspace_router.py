@@ -47,13 +47,12 @@ def cursor(monkeypatch) -> FakeCursor:
     # 알림은 tests/test_schedule_notice.py 에서 따로 봐요. 여기선 기간 규칙만.
     monkeypatch.setattr(workspace, "find_schedule", lambda *args: OLD)
     monkeypatch.setattr(workspace.notice, "collab_people", lambda *args: {})
-    monkeypatch.setattr(workspace.notice, "notify_schedule", lambda *args: None)
+    monkeypatch.setattr(workspace.notice, "notify_schedule", lambda *args, **kwargs: None)
     return fake
 
 
 OLD = {"kind": "meeting", "title": "사전 미팅", "start_date": date(2026, 11, 4), "end_date": date(2026, 11, 4),
-       "start_time": None, "end_time": None, "memo": None}
-
+       "start_time": None, "end_time": None, "memo": None, "schedule_id": 1, "series_id": None, "discord_message_id": None}
 
 def make(start: date) -> rules.ScheduleInput:
     return rules.ScheduleInput(kind="meeting", title="사전 미팅", start_date=start)
