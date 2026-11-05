@@ -1,0 +1,41 @@
+# 루트 도커 빌드 컨텍스트 제외 목록 (.dockerignore)
+# 비밀정보, 임시 파일, 대용량 아카이브, 로컬 가상환경의 이미지 유입 차단
+
+# 1. 환경변수 및 비밀정보 (최우선 차단)
+.env
+.env.*
+!.env.example
+
+# 2. 로컬 가상환경 및 패키지 캐시
+node_modules
+.next
+.venv
+venv
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+.ruff_cache
+.turbo
+
+# 3. Git 및 IDE
+.git
+.github
+.vscode
+.idea
+
+# 4. 임시 파일, 아카이브, 비디오/로고 작업물
+archive/
+output/
+tmp/
+temp/
+shorts_assets/
+*.log
+*.dump
+*.sql.gz
+*.sqlite3
+
+# 5. 사용자 업로드 및 로컬 데이터
+backend/uploads/*
+!backend/uploads/.gitkeep
+

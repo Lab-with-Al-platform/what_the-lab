@@ -64,3 +64,6 @@ database/seed/needs_korean_name.csv
 database/seed/missing_homepage.csv
 
 backend/uploads/
+
+# 임시 제작 산출물 및 영상/로고 작업 아카이브
+archive/
