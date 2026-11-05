@@ -1,0 +1,180 @@
+# WHAT THE LAB (LabBridge) — 프로덕션 검증용 Docker Compose
+# 단일 EC2 (t4g.medium, 4GB RAM) 기준 컨테이너 리소스 제한 및 서비스 격리 적용
+
+services:
+  # 1. PostgreSQL 17 데이터베이스 (EC2 내부 DB 또는 로컬 통합 테스트용)
+  postgres:
+    image: postgres:17
+    container_name: labbridge-prod-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: labbridge
+      TZ: Asia/Seoul
+      PGTZ: Asia/Seoul
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d labbridge"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 1200M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - labbridge_internal
+
+  # 2. FastAPI Web API 서버 (단일 Uvicorn Worker)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: labbridge-prod-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      APP_ENV: production
+      DATABASE_URL: postgresql://admin:admin123@postgres:5432/labbridge
+      FRONTEND_URL: http://localhost
+      CORS_ORIGINS: http://localhost,http://127.0.0.1
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:-ci-client-id}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:-ci-secret}
+      DISCORD_REDIRECT_URI: ${DISCORD_REDIRECT_URI:-http://localhost/api/v1/auth/discord/callback}
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
+      DISCORD_GUILD_ID: ${DISCORD_GUILD_ID:-}
+      JWT_SECRET: ${JWT_SECRET:-labbridge-production-jwt-secret-key-32chars}
+    volumes:
+      - backend_uploads:/app/uploads
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 600M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - labbridge_internal
+
+  # 3. Discord Gateway 봇 (상시 웹소켓 리스너)
+  discord-bot:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: labbridge-prod-discord-bot
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      backend:
+        condition: service_started
+    command: ["python", "-m", "app.discord_gateway"]
+    environment:
+      APP_ENV: production
+      DATABASE_URL: postgresql://admin:admin123@postgres:5432/labbridge
+      FRONTEND_URL: http://localhost
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:-ci-client-id}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:-ci-secret}
+      DISCORD_REDIRECT_URI: ${DISCORD_REDIRECT_URI:-http://localhost/api/v1/auth/discord/callback}
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
+      DISCORD_GUILD_ID: ${DISCORD_GUILD_ID:-}
+      JWT_SECRET: ${JWT_SECRET:-labbridge-production-jwt-secret-key-32chars}
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 300M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - labbridge_internal
+
+  # 4. Next.js 15 SSR 프론트엔드
+  frontend:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+    container_name: labbridge-prod-frontend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      NEXT_PUBLIC_APP_URL: http://localhost
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3000/"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 800M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - labbridge_internal
+
+  # 5. Nginx 리버스 프록시 (외부 단일 진입점)
+  nginx:
+    image: nginx:alpine
+    container_name: labbridge-prod-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./infra/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/healthz"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 128M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - labbridge_internal
+
+networks:
+  labbridge_internal:
+    driver: bridge
+
+volumes:
+  postgres_prod_data:
+  backend_uploads:
+
