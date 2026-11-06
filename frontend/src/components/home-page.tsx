@@ -28,7 +28,7 @@ const ENTRY_CARDS = [
   },
   {
     href: "/trends",
-    image: "/generated/ai-trends-card-v1.jpg",
+    image: "/generated/ai-trends-card-v2.webp",
     imageClass: "opacity-95",
     kicker: "AI TRENDS",
     title: "AI 트렌드",
