@@ -112,6 +112,9 @@ export function HomeHero({ introVisual }: { introVisual: ReactNode }) {
                 <p className="home-hero__description">{slide.body}</p>
                 {slide.id === "intro" ? (
                   <Link href="#paths" className="home-hero__cta">지금 시작하기 <span aria-hidden="true">→</span></Link>
+                ) : slide.id === "platform" ? (
+                  // 내부 경로를 쓰면 로컬과 배포 환경 모두에서 같은 FAQ 카테고리로 이동합니다.
+                  <Link href="/faq?category=workspace" className="home-hero__cta">플랫폼 이용 안내 FAQ <span aria-hidden="true">→</span></Link>
                 ) : (
                   // 팀원이 문서를 준비하기 전에는 클릭되지 않는 가짜 링크를 만들지 않습니다.
                   <p className="home-hero__manual"><span>상세 매뉴얼 준비 중</span> 자세한 이용 방법은 FAQ에서 만나요.</p>
