@@ -107,9 +107,11 @@ export function HomeHero({ introVisual }: { introVisual: ReactNode }) {
           {HOME_SLIDES.map((slide, index) => (
             <div key={slide.id} className="home-hero__slide" data-home-slide={slide.id} data-active={activeIndex === index} role="group" aria-roledescription="slide" aria-label={`${index + 1} / ${HOME_SLIDES.length}: ${slide.label}`} aria-hidden={activeIndex !== index}>
               <div className="home-hero__copy">
-                <p className="home-hero__eyebrow">{slide.eyebrow}</p>
-                <h2 className="home-hero__title">{slide.firstLine}<br /><span className={slide.id === "intro" ? undefined : "text-brand"}>{slide.secondLine}</span>{slide.id === "intro" ? <span className="mt-3 block"><BrandWordmark variant="hero" height={56} priority className="h-10 w-auto md:h-14" /></span> : slide.accent ? <span className="text-brand">{slide.accent}</span> : null}</h2>
-                <p className="home-hero__description">{slide.body}</p>
+                <div className="home-hero__message">
+                  <p className="home-hero__eyebrow">{slide.eyebrow}</p>
+                  <h2 className="home-hero__title">{slide.firstLine}<br /><span className={slide.id === "intro" ? undefined : "text-brand"}>{slide.secondLine}</span>{slide.id === "intro" ? <span className="mt-3 block"><BrandWordmark variant="hero" height={56} priority className="h-10 w-auto md:h-14" /></span> : slide.accent ? <span className="text-brand">{slide.accent}</span> : null}</h2>
+                  <p className="home-hero__description">{slide.body}</p>
+                </div>
                 {slide.id === "intro" ? (
                   <Link href="#paths" className="home-hero__cta">지금 시작하기 <span aria-hidden="true">→</span></Link>
                 ) : slide.id === "platform" ? (
