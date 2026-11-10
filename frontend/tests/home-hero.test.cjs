@@ -63,12 +63,18 @@ test("안내 그래픽은 과정·연결을 설명하지만 미정 링크나 연
   assert.doesNotMatch(platform + discord, /home-hero__note-index|>01<|>02<|>03</);
 });
 
-test("새 안내 슬라이드는 가짜 FAQ 링크나 영상·방문 저장 기능을 추가하지 않는다", () => {
+test("플랫폼 안내는 워크스페이스 FAQ로 연결하고 Discord 안내는 준비 문구를 유지한다", () => {
   const { HomeHero } = loadModule("src/components/home-hero.tsx");
   const html = renderToStaticMarkup(React.createElement(HomeHero, { introVisual: null }));
-  assert.equal((html.match(/<a /g) ?? []).length, 1);
+  assert.equal((html.match(/<a /g) ?? []).length, 2);
   assert.match(html, /href="#paths"/);
-  assert.match(html, /상세 매뉴얼 준비 중/);
+  // 슬라이드별로 검사해 FAQ 버튼이 다른 안내 화면에 잘못 생기는 것을 방지합니다.
+  const platform = html.split('data-home-slide="platform"')[1].split('data-home-slide="discord"')[0];
+  const discord = html.split('data-home-slide="discord"')[1];
+  assert.match(platform, /<a href="\/faq\?category=workspace"[^>]*>플랫폼 이용 안내 FAQ/);
+  assert.doesNotMatch(platform, /상세 매뉴얼 준비 중/);
+  assert.match(discord, /상세 매뉴얼 준비 중/);
+  assert.doesNotMatch(discord, /href="\/faq/);
   const source = fs.readFileSync(path.resolve(__dirname, "../src/components/home-hero.tsx"), "utf8");
   assert.doesNotMatch(source, /localStorage|sessionStorage|<video/);
 });
