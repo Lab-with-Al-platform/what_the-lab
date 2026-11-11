@@ -1,7 +1,24 @@
-# 07. 자동 콘텐츠 운영 파이프라인 (Automated Content Operations) — 개정판
+# 07. 예약 작업과 자동 콘텐츠 파이프라인 (Automation Jobs) — v3
 
 > **상태**: `[CONFIRMED]` (Phase 0~6 구현 코드 [`backend/app/insights/`](file:///backend/app/insights/) 전면 재사용)  
 > **핵심 원칙**: 1) 기존 `insight_transfer_v1` 및 Receipt 접수 계약 100% 보존, 2) LangGraph 신규 도입 배제(보류 결론 유지), 3) 외부 Claude 클라우드 정기 작업과 AWS Staging의 완벽한 권한 분리.
+
+---
+
+## 0. v3 추가: 앱 안에서 도는 예약 작업 (AWS 배포에 바로 영향)
+
+인사이트 자동화보다 먼저, **지금 서비스가 매일 의존하는 작업**은 backend 컨테이너 안에서 돌아가요 (`backend/app/main.py`의 `lifespan`) `[CONFIRMED]`.
+
+| 작업 | 함수 | 주기 | 켜지는 조건 | 중복 방지 |
+|---|---|---|---|---|
+| 협업 요청 만료 | `request_store.expire_forever` | 1분 | 항상 | DB 조건 갱신 |
+| 아침 브리핑·마감 정리 | `task_daily.daily_forever` | 1분마다 확인, 9시 이후 하루 1번 | 항상 (디스코드 발송은 봇 설정 시) | 프로세스 메모리 `LAST_RUN` + DB 쪽 중복 방지 |
+| 디스코드 알림 발송 | `notification_sender.run_forever` | 짧은 주기 | 봇 토큰이 있을 때 | `FOR UPDATE SKIP LOCKED` |
+| 구글 캘린더 동기화 | `google_sync.run_forever` | 짧은 주기 | 서비스 계정 키가 있을 때 | `FOR UPDATE SKIP LOCKED` |
+
+- **그래서 운영 backend는 1개, `--workers 1`** 이에요 ([02](02-recommended-architecture.md) 3절).
+- 별도 EventBridge·Lambda 같은 예약 서비스는 쓰지 않아요. 서버가 켜져 있는 동안 backend가 직접 돌려요. 서버가 꺼져 있던 동안의 아침 브리핑은 다시 켜졌을 때 9시 이후면 그날 1번 실행돼요.
+- 시간대: 컨테이너 `TZ=Asia/Seoul`, 코드도 KST 기준(`task_daily.py`)으로 계산해요.
 
 ---
 
@@ -56,6 +73,9 @@ flowchart TD
 - **구현 상태 구분**:
   - `[CONFIRMED]` (구현 완료): 규격 검증 계약(`transfer_contract.py`), 접수 이력 테이블(`transfer_receipts`), 스테이징 처리기(`transfer_staging.py`), 관리자 검토 UI(`agent_review.py`).
   - `[PROPOSED]` (외부 연동 제안): 외부 Claude 클라우드 예약 스케줄러 설정, GitHub PR 자동 생성 봇, 머지 시 실행되는 GitHub Actions 신뢰 반입 워크플로.
+- **v3 주의 — "신뢰하는 반입 실행기"의 DB 접근**: GitHub Actions가 `transfer_staging.py`를 실행하려면 운영 DB 접속 정보가 필요해져요. 그러면 "외부 작업에 DB 키를 주지 않는다"는 원칙과 부딪혀요. 그래서 반입 경로는 **둘 중 하나로 정하기 전까지 운영에서 켜지 않아요** `[PROPOSED]`:
+  1. 관리자만 쓰는 인증된 반입 API(백엔드가 스키마·해시 검증 후 `pending_review` 적재) — Actions에는 이 API용 토큰만 둠
+  2. 관리자가 머지된 JSON을 EC2에서 SSM Run Command로 직접 반입
 - **보안 격리 원칙**:
   - **DB 키 미부여**: 외부 Claude 실행기에는 AWS 운영 PostgreSQL의 접속 정보(`DATABASE_URL`)나 관리자 쿠키를 절대 제공하지 않습니다.
   - **자동 게시 불가**: 외부에서 인입된 원고는 100% `pending_review` 상태로만 저장되며, 관리자의 명시적 승인 전에는 일반 사용자 화면에 절대 노출되지 않습니다.

@@ -1,78 +1,81 @@
-# 05. Discord 연동 아키텍처 (Discord Integration) — 개정판
+# 05. Discord 연동 (Discord Integration) — v4
 
-> **상태**: `[CONFIRMED]` (기존 코드 [`backend/app/discord_bot.py`](file:///backend/app/discord_bot.py), [`backend/app/discord_gateway.py`](file:///backend/app/discord_gateway.py), [`backend/app/collab_channel.py`](file:///backend/app/collab_channel.py) 기반)  
-> **핵심 설계**: 1) REST API 기반 기능과 WebSocket Gateway 기능의 명확한 분리, 2) 이메일 자동 병합 금지, 3) Discord Gateway 봇의 독립 컨테이너 격리 운영.
-
----
-
-## 1. 기존 Discord 구현 현황 상세 분석
-
-| 기능 도메인 | 구현 상태 | 프로토콜 | 동작 원리 및 코드 근거 | AWS 배포 시 요구사항 |
-|---|---|---|---|---|
-| **Discord OAuth2 로그인** | `CONFIRMED (완료)` | HTTPS REST | Discord 권한 승인 후 `auth/discord/callback`에서 토큰 교환 및 프로필 조회 (`[backend/app/routers/auth.py]`) | Gateway 불필요. `DISCORD_REDIRECT_URI`를 프로덕션 도메인으로 설정 |
-| **길드 자동 참여 (`guilds.join`)** | `CONFIRMED (완료)` | HTTPS REST | 로그인 시 획득한 user access_token을 활용해 LabBridge 서버로 회원 자동 초대 (`[backend/app/discord_bot.py]`) | Gateway 불필요. 봇의 `Create Instant Invite` / 멤버 추가 권한 필요 |
-| **협업 비공개 채널 생성** | `CONFIRMED (완료)` | HTTPS REST | 협업 확정 시 연구자+전문가+봇만 접근 가능한 `협업-XXXX` 텍스트 채널 자동 생성 (`[backend/app/collab_channel.py]`) | Gateway 불필요. `DISCORD_COLLAB_CATEGORY_ID` 환경변수 설정 |
-| **Discord 1:1 DM 알림** | `CONFIRMED (완료)` | HTTPS REST v10 | 협업 요청/수락 시 DM 전송. 지수 백오프 재시도 및 `DmBlocked` 예외 처리 완비 (`[backend/app/notification_sender.py]`) | Gateway 불필요. 백엔드 `notification_sender` 워커에서 처리 |
-| **협업 채널 슬래시 커맨드** | `CONFIRMED (완료)` | **WebSocket Gateway** | 채널 내 `/요청`, `/일정`, `/일정목록` 슬래시 커맨드 수신 및 대화형 모달 창 응답 (`[backend/app/discord_gateway.py]`) | **상시 웹소켓 연결 필수**. 독립 컨테이너 운영 권장 |
-| **메시지 버튼 인터랙션** | `CONFIRMED (완료)` | **WebSocket Gateway** | 메시지 하단 `[요청 관리]`, `[완료]`, `[기한 변경]` 버튼 클릭 이벤트 수신 및 처리 (`[backend/app/discord_gateway.py]`) | **상시 웹소켓 연결 필수** |
+> **상태**: 기능 구현은 `[CONFIRMED]` (`backend/app/discord_bot.py`, `discord_gateway.py`, `collab_channel.py`, `notification_sender.py`), AWS 운영은 `[PROPOSED]`
+> **v3 핵심**: 1) REST와 Gateway 분리, 2) **운영 봇·백엔드는 언제나 1개**, 3) 개발용 디스코드 앱 분리, 4) Render → AWS 전환 순서
 
 ---
 
-## 2. Discord 컴포넌트 컨테이너 배포 구조
+## 1. 이번 통합의 이유
 
-FastAPI Web API와 Discord Gateway 상시 봇을 동일 호스트 내에서 독립된 2개 컨테이너로 분리합니다.
+지금 구성(Vercel + Render)에서는 디스코드 봇과 알림이 다루기 어려웠어요.
+- 슬래시 명령·버튼은 **24시간 연결을 유지하는 프로그램**이 필요해요. Vercel은 이런 프로그램을 돌리지 않아요.
+- 알림 발송·아침 브리핑·요청 만료는 backend 안에서 **계속 돌아가는 작업**이에요.
+- backend와 봇이 다른 곳에 있으면 코드 버전·환경변수·DB 버전이 서로 어긋나기 쉬워요.
 
-```mermaid
-flowchart LR
-    subgraph Host ["단일 EC2 호스트 (Docker Compose)"]
-        subgraph C1 ["Backend 컨테이너"]
-            API["FastAPI REST API Server"]
-            Worker["Notification Worker<br>(notification_sender.py)"]
-        end
-        
-        subgraph C2 ["Discord Bot 컨테이너"]
-            BotProc["Gateway Bot 프로세스<br>(python -m app.discord_gateway)"]
-        end
-        
-        SharedDB[("PostgreSQL DB")]
-    end
-
-    subgraph DiscordCloud ["Discord Platform"]
-        RESTAPI["Discord REST API v10<br>(DM, 채널 생성, OAuth)"]
-        GatewayWS["Discord Gateway WebSocket<br>(슬래시 커맨드, 버튼 이벤트)"]
-    end
-
-    API -->|OAuth / 길드 추가| RESTAPI
-    Worker -->|DM 알림 발송| RESTAPI
-    BotProc <-->|상시 양방향 WebSocket| GatewayWS
-    
-    API --> SharedDB
-    Worker --> SharedDB
-    BotProc --> SharedDB
-```
-
-- **분리 운영의 핵심 이점**:
-  1. **무중단 봇 세션**: 백엔드 REST API 코드 수정이나 재배포 중에도 Discord WebSocket 연결이 끊기지 않아 협업 채널의 사용자 명령어가 유실되지 않습니다.
-  2. **장애 격리**: Discord API의 일시적 장애나 봇 메모리 누수가 발생하더라도 Web API 서버(`backend`)는 100% 정상 가동됩니다.
+AWS EC2 한 대에 backend와 봇을 함께 두면 **같은 이미지, 같은 `.env.production`, 같은 운영 DB**로 움직여요.
 
 ---
 
-## 3. 계정 보안 원칙: 이메일 자동 병합 절대 금지
+## 2. 기능별 통신 방식
 
-- **위험 시나리오**: 공격자가 타인의 이메일로 가짜 Discord 계정을 생성한 후, 해당 이메일이 일치한다는 이유로 기존 회원 계정으로 자동 로그인되는 계정 탈취(Account Takeover) 공격.
-- **방어 설계 (`[CONFIRMED]`)**:
-  - Discord 로그인 시 `users.discord_id`가 일치하는 회원이 없으면, 기존 계정으로 자동 로그인시키지 않고 **신규 회원가입 절차**로 분기하거나,
-  - 기존 회원은 로그인된 상태에서 마이페이지(`/settings`)의 'Discord 계정 연결' 메뉴를 통해 본인 인증 후 명시적으로 연동하도록 강제합니다.
+| 기능 | 방식 | 어디서 실행 | 코드 |
+|---|---|---|---|
+| 디스코드 로그인(OAuth2) | HTTPS REST | backend | `routers/auth.py` |
+| 서버 자동 참여(`guilds.join`) | HTTPS REST | backend | `discord_bot.py` |
+| 협업 비공개 채널 생성 | HTTPS REST | backend | `collab_channel.py` |
+| 1:1 DM 알림 | HTTPS REST v10, 재시도·`DmBlocked` 처리 | backend (`notification_sender`) | `notification_sender.py` |
+| 아침 브리핑 | HTTPS REST (채널 메시지) | backend (`daily_forever`) | `task_daily.py` |
+| `/요청`, `/일정`, `/일정목록`, 버튼 | **WebSocket Gateway** | **discord-bot 컨테이너** | `discord_gateway.py` |
+
+- 봇 컨테이너는 같은 backend 이미지를 `python -m app.discord_gateway`로 실행하고, **DB에 직접 연결**해요.
+- 봇은 디스코드에 **나가는 연결**만 쓰므로 EC2에 포트를 더 열 필요가 없어요.
 
 ---
 
-## 4. AWS 프로덕션 환경 필수 설정값 (환경변수)
+## 3. 운영 규칙
 
-| 환경변수 키 | 설명 | 보관 위치 |
+### 3.1 운영 봇·백엔드는 1개만
+- 같은 봇 토큰으로 Gateway에 두 군데서 접속하면 같은 명령을 두 곳이 처리할 수 있어요 `[UNVERIFIED: discord.py 동작 상세]`.
+- 아침 브리핑은 프로세스 메모리로 "오늘 보냈는지"를 판단하므로 backend가 두 개면 두 번 나갈 수 있어요.
+- DM 알림과 채널 생성은 `FOR UPDATE SKIP LOCKED`로 중복을 막지만, **기본 원칙은 1개만**이에요.
+
+### 3.2 개발용 디스코드 앱을 따로
+- 운영 토큰은 운영 EC2에만 있어요. 팀원 로컬·테스트는 **별도 디스코드 애플리케이션(개발용 봇)과 테스트 서버**를 써요.
+- 운영 토큰이 로컬 `.env`에 들어가 있으면 바로 재발급(Reset Token)해요.
+
+### 3.3 이메일 자동 병합
+- 현재 로그인은 디스코드 OAuth 전용이고, 이메일·비밀번호 로그인 경로는 없어요 `[CONFIRMED: routers/auth.py]`. 그래서 "같은 이메일로 다른 계정에 자동 로그인"되는 위험은 지금 구조에서는 생기지 않아요. 이메일 로그인을 추가할 때 자동 병합 금지 원칙을 지켜요.
+
+---
+
+## 4. Render → AWS 전환 순서 (전환하는 날)
+
+1. 운영 RDS에 `alembic upgrade head` 완료, `alembic current` 확인 ([04](04-database-storage.md) 3절)
+2. EC2에서 backend·nginx를 켜고 **discord-bot은 아직 끔**, 프론트를 S3에 올린 뒤 CloudFront 주소로 화면·API 확인
+3. 디스코드 개발자 포털에 새 Redirect URI 추가: `https://<도메인>/api/v1/auth/discord/callback`
+4. **Render의 backend와 봇 서비스를 정지** (이 시점부터 잠깐 알림·명령이 멈춰요)
+5. EC2 discord-bot 시작 → 로그에서 Gateway 연결 확인 → 테스트 채널에서 `/일정목록` 실행
+6. Route 53 DNS를 CloudFront로 전환, Vercel·Render 쪽 옛 주소는 새 도메인으로 안내
+7. 하루 지켜본 뒤 옛 Redirect URI 삭제, Render 서비스 삭제
+
+- 4~5단계 사이는 짧게 해요. 두 봇이 동시에 켜지는 시간이 없게 하는 게 목표예요.
+
+---
+
+## 5. 운영 환경변수 (SSM `/labbridge/prod/*`)
+
+| 키 | 비밀? | 설명 |
 |---|---|---|
-| `DISCORD_CLIENT_ID` | Discord Application Client ID | SSM Parameter Store |
-| `DISCORD_CLIENT_SECRET` | Discord OAuth2 Client Secret | SSM Parameter Store (SecureString) |
-| `DISCORD_REDIRECT_URI` | `https://labbridge.kr/api/v1/auth/discord/callback` | SSM Parameter Store |
-| `DISCORD_BOT_TOKEN` | Discord Bot Token (Gateway 및 REST 공용) | SSM Parameter Store (SecureString) |
-| `DISCORD_GUILD_ID` | LabBridge 공식 디스코드 서버 ID | SSM Parameter Store |
-| `DISCORD_COLLAB_CATEGORY_ID` | 협업 비공개 채널이 생성될 카테고리 ID | SSM Parameter Store |
+| `DATABASE_URL` | 비밀 | 운영 RDS 주소 (`sslmode=require`) |
+| `JWT_SECRET` | 비밀 | 로그인 토큰 서명 키 (32자 이상 무작위) |
+| `DISCORD_CLIENT_ID` | 일반 | 디스코드 앱 ID |
+| `DISCORD_CLIENT_SECRET` | 비밀 | OAuth 비밀값 |
+| `DISCORD_REDIRECT_URI` | 일반 | `https://<도메인>/api/v1/auth/discord/callback` (HTTPS면 쿠키 `Secure` 자동) |
+| `DISCORD_BOT_TOKEN` | 비밀 | 봇 토큰 (REST·Gateway 공용) |
+| `DISCORD_GUILD_ID` | 일반 | LabBridge 디스코드 서버 ID |
+| `DISCORD_COLLAB_CATEGORY_ID` | 일반 | 협업 채널 카테고리 ID |
+| `CORS_ORIGINS` | 일반 | `https://<도메인>` |
+| `NEXT_PUBLIC_APP_URL` | 일반 | `https://<도메인>` — **backend가 `FRONTEND_URL` 대신 이 이름을 읽어요** (`config.py`). compose의 `FRONTEND_URL`은 지금 무시돼요 |
+| `NEXT_PUBLIC_API_BASE_URL` | 일반 | `/api/v1` — **GitHub Actions 프론트 빌드 때** 넣어야 해요 (SSM 값이 아니라 빌드 설정) |
+| `GOOGLE_SERVICE_ACCOUNT_FILE` 등 `GOOGLE_*` | 비밀 | 구글 캘린더 동기화를 켤 때. 키 파일은 EC2에 `chmod 600`으로 두고 마운트 |
+| `ORIGIN_VERIFY_SECRET` | 비밀 | CloudFront 비밀 헤더 값 (nginx용) |

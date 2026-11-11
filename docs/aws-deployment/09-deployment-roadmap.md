@@ -1,60 +1,80 @@
-# 09. 배포 로드맵 및 단계별 실행 계획 (Deployment Roadmap) — 개정판
+# 09. 배포 로드맵 (Deployment Roadmap) — v4
 
-> **상태**: **`CONDITIONAL (Phase 1 로컬 검증 완료, 강사님 피드백 및 Phase 2 착수 대기)`**  
-> **철칙**: 강사님 피드백과 사용자의 명시적 승인 전까지 Phase 2(실제 AWS 리소스 생성)로 절대 진입하지 않습니다.  
-> **기획 및 시연 범위 원칙 (`[CONFIRMED]` docs/planning/)**:
-> - `INSTRUCTOR_FEEDBACK_ACTION_CHECKLIST_2026-10-30.md` 기준, **AWS 인프라 배포 및 AI 챗봇(RAG/MCP)은 핵심 웹 협업 흐름 시연의 필수 완료 조건이 아니며, 시연 이후 장기 서비스를 위한 '후속 운영 확장 계획(`[후속]`)'**으로 관리됩니다.
-> - 인사이트 에이전트 Phase 7(`INSIGHT_AGENT_WORKFLOW_PLAN_AND_CURSOR_PROMPTS_2026-10-29.md`)은 실제 AWS 인프라 배포 단계가 아니라, **Claude 클라우드 예약 작업과 AWS Staging 간의 전송 규격 인계 및 미승인 조건 정리 단계(Handover)**입니다.
+> **상태**: `READY FOR PROVISIONING AFTER BLOCKERS` — AWS 통합 배포 방향은 결정됨(강사님 권장). 아래 차단 항목을 해결하고 팀 승인 후 리소스를 만들어요.
+> **철칙**: 실제 AWS 리소스 생성과 운영 전환은 팀(사용자)의 명시적 승인 후에만 해요. 운영 DB를 바꾸는 명령은 DB 담당자가 실행해요.
 
 ---
 
-## 1. Phase 2 진입 전 5대 필수 결정사항 및 차단 조건 (Blockers)
+## 1. 배포 전 차단 항목 (Blockers)
 
-다음 5가지 조건이 강사님 자문을 통해 확정되지 않으면 Phase 2 인프라 생성을 시작하지 않습니다:
-
-1. **데이터베이스 호스팅 최종 선택**:
-   - `안 A (Supabase 유지)`: 초기 비용 최소화 및 데이터 이전 $0.
-   - `안 B (EC2 내부 PostgreSQL 운영)`: 단일 호스트 완전 통합 및 네트워크 지연 제거.
-2. **단일 EC2 (SPOF) 수용 여부**:
-   - 초기 월 $50 예산 방어를 위한 다운타임 감내 수준 확인.
-3. **FastAPI Lifespan 백그라운드 태스크 멱등성 보장 수준**:
-   - 단일 워커 유지 vs 별도 Worker 분리 및 DB 분산 락.
-4. **Claude 외부 정기 작업과 AWS Staging 반입 경로**:
-   - GitHub Data PR vs M2M Webhook API.
-5. **AI 챗봇 MVP 출시 범위 및 비용 상한선(Rate Limit) 방어**:
-   - Bedrock 경량 모델(Nova Micro / Titan Text Lite) MVP 런칭 여부 및 일일 쿼터 제한.
+| # | 항목 | 위치 | 왜 막히나 | 담당 |
+|---|---|---|---|---|
+| B1 | 비밀값 기본값 제거 | `docker-compose.prod.yml` (`admin123`, `JWT_SECRET` 기본값) | 환경변수를 빠뜨리면 공개된 키로 토큰 위조 가능 | 백엔드 |
+| B2 | 프론트 정적 빌드 전환 | `frontend/next.config.ts`, 동적 주소 8곳, 로그인·검색 | `output: export`, 실제 번호를 주소에서 읽기, `rewrites` 제거, 이미지 최적화 대체, `NEXT_PUBLIC_API_BASE_URL=/api/v1` | 프론트 |
+| B3 | `FRONTEND_URL` → `NEXT_PUBLIC_APP_URL` | `docker-compose.prod.yml` ↔ `backend/app/config.py` | 로그인 후 `localhost:3000`으로 이동 | 백엔드 |
+| B4 | nginx를 API 전용으로 + 443·오리진 인증서·비밀 헤더·요청 제한 | `infra/nginx/nginx.conf` | 지금은 80번 평문, 헤더 검사 없음, frontend로 전달 | 인프라 |
+| B5 | 운영용 compose에서 postgres·frontend 제거 | `docker-compose.prod.yml` | 운영 DB는 RDS, 화면은 S3 (`profiles`로 분리) | 인프라 |
+| B6 | 빈 DB에 `alembic upgrade head` 리허설 | 로컬 PostgreSQL 17 | 운영 RDS를 init SQL 없이 만들 수 있는지 확인 | DB |
+| B7 | ARM64 이미지 빌드 | GitHub Actions | `psycopg`, `cryptography` 등 ARM64 확인 `[UNVERIFIED]` | 인프라 |
+| B8 | `t4g.small`·`t4g.micro` 부하 테스트 | k6 등 | 강사님 권장. micro(1GiB)로 버티면 월 $7.59 절약 | 전체 |
+| B9 | 개발용 디스코드 앱·토큰 분리 | 디스코드 개발자 포털 | 운영 봇과 개발 봇이 같은 토큰을 쓰면 중복 반응 | 디스코드 |
+| B10 | CloudFront 경로·주소 연결 시험 | CloudFront Function | `/workspace/4` 직접 열기·새로고침·화면 이동·없는 주소 404 | 프론트·인프라 |
+| B11 | 운영 DB 접속 절차 | IAM, SSM 터널, 조회 전용 계정 | 사람별 권한, 로컬 backend 연결 금지 | DB |
+| B12 | CI 확장 + 브랜치 보호 | `.github/workflows/`, GitHub 설정 | 지금은 백엔드 일부 테스트만 돌고, CI가 실패해도 머지 가능 | 전체 |
 
 ---
 
-## 2. 단계별 상세 실행 계획
+## 2. 단계별 계획
 
-### Phase 1: Dockerfile 작성 및 로컬 통합 검증 (`[COMPLETED: 12-phase1-container-verification.md]`)
-- [x] Next.js 15 Standalone 멀티스테이지 `frontend/Dockerfile` 작성.
-- [x] Python 3.13 / uv 기반 경량 `backend/Dockerfile` 작성.
-- [x] `docker-compose.prod.yml` 작성: Nginx, Frontend, Backend, Discord Bot, (PostgreSQL).
-- [x] 컨테이너별 메모리 제한(Limit) 설정 검증 (실측 합계 324MiB, 4GB 대비 8.1%).
-- [x] 기본 통신 헬스체크 및 PostgreSQL 17 스키마 초기화(39개 테이블, Alembic `20261104_27`).
-- [ ] *(향후 과제)*: 사용자 브라우저 동시 접속 E2E 부하 테스트.
+### Phase 1: 로컬 컨테이너 검증 — `[COMPLETED 2026-11-05]` ([12](12-phase1-container-verification.md))
+- [x] Dockerfile, `docker-compose.prod.yml`, nginx 설정 작성
+- [x] 5개 컨테이너 기동, 헬스체크, 유휴 메모리 324MiB
+- [ ] B1~B5 수정 PR (코드 변경 — 별도 PR로 하나씩)
 
-### Phase 2: AWS 기초 인프라 프로비저닝 (강사님 피드백 후 진행)
-- [ ] 기본 VPC 내 Public Subnet에 EC2 `t4g.medium` (ARM64) 1대 생성 + Elastic IP 할당.
-- [ ] IAM Role (`WhatTheLabEC2Role`): S3 접근, Bedrock 호출, SSM Session Manager 권한 연결.
-- [ ] S3 버킷 (`whatthelab-storage-apne2-prod`) 생성 및 수명주기 설정.
-- [ ] SSM Parameter Store에 프로덕션 환경변수 등록.
+### Phase 1.2: CI 정리 (AWS 없이 지금 가능, [14](14-ci-cd-pipeline.md) 8절 1~3단계)
+- [ ] B12: 백엔드 전체 테스트, 빈 DB `alembic upgrade head` 검사, `push` 트리거를 `develop`·`main`으로
+- [ ] `develop`·`main` 브랜치 보호(필수 검사, 리뷰 1명)
 
-### Phase 3: 서버 환경 배포 및 서비스 기동
-- [ ] EC2 호스트에 Docker 및 Docker Compose 플러그인 설치.
-- [ ] SSM을 통해 `.env.production` 주입 (`chmod 600`).
-- [ ] 컨테이너 기동: `docker compose -f docker-compose.prod.yml up -d`.
-- [ ] 헬스체크 검증: `curl http://localhost:8000/api/v1/health`.
+### Phase 1.5: 배포 리허설 (로컬)
+- [ ] B6: 빈 PostgreSQL 17 + `alembic upgrade head` → 테이블 수·주요 컬럼을 init SQL 결과와 비교
+- [ ] B7: GitHub Actions에서 arm64 이미지 빌드 → 레지스트리 업로드
+- [ ] 10번 런북의 표준 배포 절차를 `deploy.sh`로 묶어 로컬에서 한 번 실행해 보기
 
-### Phase 4: 도메인, SSL 및 CloudFront CDN 연결
-- [ ] ACM에서 도메인 와일드카드 SSL 인증서 발급 (`us-east-1`).
-- [ ] CloudFront 배포 생성: EC2 Elastic IP 오리진 연결, `X-Origin-Verify-Secret` 헤더 설정.
-- [ ] Route 53 Alias 레코드 연결.
+### Phase 2: AWS 기초 리소스 (승인 후)
+- [ ] AWS Budgets 경보($40 예상 / $50 실제) — **가장 먼저**
+- [ ] VPC, Public 1개 + Private 2개 서브넷, 보안 그룹 2개 ([03](03-network-security.md))
+- [ ] RDS PostgreSQL 17 `db.t4g.micro`, 자동 백업 7일, 삭제 방지 ([04](04-database-storage.md))
+- [ ] EC2 `t4g.small` (Amazon Linux 2023 ARM64, 크레딧 Standard), Elastic IP, IAM 역할
+- [ ] S3 백업 버킷 + Lifecycle(90일 삭제)
+- [ ] SSM Parameter Store에 `/labbridge/prod/*` 등록 ([05](05-discord-integration.md) 5절)
 
-### Phase 5: 외부 연동 및 최종 오픈 (Go-Live)
-- [ ] Discord Developer Portal Redirect URI 갱신 (`https://도메인/api/v1/auth/discord/callback`).
-- [ ] Discord Gateway 봇 슬래시 커맨드 및 DM 발송 실시간 테스트.
-- [ ] S3 일일 백업 Cron 등록 및 실제 복원 테스트.
-- [ ] 서비스 정식 오픈.
+### Phase 3: 서버 기동 (아직 공개 전)
+- [ ] Docker·Compose 설치, `.env.production` 생성(`chmod 600`)
+- [ ] **운영 RDS에 `alembic upgrade head` → `alembic current` = `alembic heads` 확인**
+- [ ] backend → nginx 기동 (discord-bot은 아직 끔)
+- [ ] SSM 터널로 DB 담당자 접속·조회 전용 계정 확인 (B11)
+- [ ] `curl -k https://localhost/api/v1/health` 확인
+
+### Phase 4: 도메인·HTTPS
+- [ ] S3 프론트 버킷(퍼블릭 차단, OAC) 생성 + 정적 파일 업로드
+- [ ] ACM 인증서(us-east-1), CloudFront 배포(기본 경로 S3, `/api/v1/*`는 EC2 HTTPS only + 비밀 헤더, 주소 연결 함수)
+- [ ] `origin.<도메인>` Let's Encrypt 인증서(DNS-01)
+- [ ] CloudFront 기본 주소로 화면·API·디스코드 로그인 확인, `/workspace/4` 직접 열기·새로고침 (B10)
+
+### Phase 5: 전환 (Go-Live) — [05](05-discord-integration.md) 4절 순서
+- [ ] 디스코드 Redirect URI 추가
+- [ ] Render backend·봇 정지 → EC2 discord-bot 시작 → `/일정목록` 테스트
+- [ ] Route 53 DNS 전환
+- [ ] 첫날: 알림 DM, 협업 채널 생성, 다음 날 아침 브리핑이 **한 번만** 오는지 확인
+- [ ] 첫 주: S3 덤프 복원 테스트 1회
+
+### Phase 5.5: 배포 자동화 ([14](14-ci-cd-pipeline.md) 8절 5~6단계)
+- [ ] `deploy.yml`을 버튼 실행(`workflow_dispatch`)으로 시작 → 익숙해지면 `main` 머지 시 자동 실행 + 승인 단계
+
+### Phase 5.8: 베타 운영 (자체 테스트 + 일부 사용자 모집, 2026-11-10 팀 결정)
+- [ ] ALB 없이 EC2 1대로 운영, 비용·CPU 크레딧·메모리를 주 1회 기록
+- [ ] 베타 사용자 의견과 장애 기록을 모아 정식 공개 전 서버 크기·ALB 여부 다시 판단
+- [ ] API·worker 분리 1~6단계 (EC2 1대 안, 비용 $0) — [16](16-api-worker-split.md) 3절
+
+### Phase 6: 이후 (별도 합의)
+- API·worker 분리 7~9단계(S3 업로드, 요청 제한 이전, ALB + api 2대), `t4g.micro` 축소 판단, S3 Presigned 업로드 전환, 커넥션 풀, AI 챗봇(MVP+), 인사이트 반입 자동화, 서버 크기 재검토(1~3개월 실측)
