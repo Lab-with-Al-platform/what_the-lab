@@ -77,7 +77,7 @@ $COMPOSE logs --tail=50 nginx
 ## 4. 장애 대응
 
 ### 4.1 EC2가 통째로 멈춤 (목표 복구 시간 45분 이내 `[UNVERIFIED]`)
-1. 같은 설정으로 새 EC2 생성 (ARM64, `t4g.small`, 같은 보안 그룹·IAM 역할)
+1. 같은 설정으로 새 EC2 생성 (ARM64, 지금 쓰는 크기 `t4g.micro` 또는 `t4g.small`, 같은 보안 그룹·IAM 역할)
 2. Elastic IP를 새 인스턴스에 다시 연결 (CloudFront·DNS 변경 불필요)
 3. SSM에서 `.env.production` 다시 생성, 오리진 인증서 재발급(DNS-01)
 4. 표준 배포 절차 1~5번 실행 (DB는 RDS에 그대로 있음)

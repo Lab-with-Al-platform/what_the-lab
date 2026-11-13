@@ -3,7 +3,7 @@
 > **프로젝트**: WHAT THE LAB (LabBridge)
 > **리전**: AWS 서울 리전 (`ap-northeast-2`)
 > **목표 예산**: **월 $50 내외** (부가세 포함 여부는 [UNVERIFIED])
-> **핵심 전략**: 단일 Graviton EC2 (`t4g.small`, 부족하면 `t4g.medium`) + Docker Compose(nginx·backend·discord-bot) + **프론트 S3 + CloudFront 정적 배포** + **비공개 RDS PostgreSQL** + S3 백업
+> **핵심 전략**: 단일 Graviton EC2 (`t4g.micro`로 시작, 부족하면 `t4g.small`) + Docker Compose(nginx·backend·discord-bot) + **프론트 S3 + CloudFront 정적 배포** + **비공개 RDS PostgreSQL** + S3 백업
 > **개정일**: 2026-11-09 (v4) — 강사님 피드백(프론트 S3+CloudFront, RDS 접속 경로) 반영
 > **상태**: 설계 단계. AWS 리소스 생성·운영 DB 생성·서비스 전환은 아직 하지 않음
 
@@ -16,7 +16,8 @@
 | 프론트엔드는 CloudFront + S3 활용 (비용 최적화) | Next.js를 정적 파일로 빌드해 S3에 두고, CloudFront가 `/api/v1/*`만 EC2로 보냄. EC2에서 frontend 컨테이너 제거 | 임시 복사본 빌드 성공(10곳 수정 전제), 실제 CloudFront 동작은 `[UNVERIFIED]` |
 | RDS private은 좋지만 접근 경로 하나 필요 | RDS는 비공개 유지. **SSM 포트 포워딩**으로 EC2를 거쳐 접속 (포트 추가 없음, $0) | AWS 공식 문서 확인, 실사용은 `[UNVERIFIED]` |
 
-- 비용: EC2를 `t4g.small`로 두면 **AWS 월 $43.90**(거의 그대로), 부하 테스트 후 `t4g.micro`로 낮추면 **$36.31**.
+- 비용: 첫 배포는 `t4g.micro`로 **AWS 월 $36.31**. 테스트 기간에 부족하면 `t4g.small`로 올려 **$43.90**.
+- **팀 결정 (2026-11-13)**: 첫 배포는 **`t4g.micro`로 시작**해요. 배포 후 **2주는 테스트 기간**이고, 회원을 모집해도 **50명 내외**로 예상해요. ALB는 **이용자 수 추이를 보고 정하는 향후 계획**이에요 ([02](02-recommended-architecture.md) 2-1절).
 - **팀 결정 (2026-11-10)**: ALB는 나중으로 미뤄요. 당분간 자체 테스트 + 일부 사용자 **베타 운영**이에요 ([15](15-instructor-feedback-20261110.md) 2-2절).
 - **강사님 피드백 (2026-11-10, [15](15-instructor-feedback-20261110.md))**: 아키텍처·보안 방향은 좋다. 개발 DB는 하나로 유지하고 최신화, micro로 테스트, 비용이 크지 않으면 ALB 고려(월 약 $25라 확장 단계로 둠), CI 통과 시에만 배포, 비용은 EC2·RDS·네트워크로 나눠서.
 - **CI/CD (2026-11-10 추가)**: CI가 통과한 코드만 `main` 머지 → 승인 → 파이프라인이 "마이그레이션 → 확인 → 교체" 순서로 배포 ([14](14-ci-cd-pipeline.md)). 지금은 브랜치 보호와 배포 워크플로가 없어요.
@@ -73,7 +74,7 @@
   3. 백엔드 `FRONTEND_URL` 환경변수 이름 불일치 수정 (`config.py`는 `NEXT_PUBLIC_APP_URL`을 읽음)
   4. nginx에 443·오리진 인증서·비밀 헤더 검사·요청 제한 실제 반영
   5. 빈 PostgreSQL에서 `alembic upgrade head`만으로 운영 스키마가 만들어지는지 리허설
-  6. ARM64 이미지 빌드와 `t4g.small` 부하 테스트
+  6. ARM64 이미지 빌드와 `t4g.micro` 부하 테스트
   7. CloudFront 경로 나누기·주소 연결 함수 시험 (`/workspace/4` 직접 열기·새로고침)
   8. 운영 DB 접속 절차와 조회 전용 계정 준비
 
@@ -81,7 +82,7 @@
 
 ## 3. 핵심 설계 결론
 
-1. **컴퓨팅**: 서울 리전 EC2 1대(`t4g.small`, ARM64, 2 vCPU, 2GiB)에서 Docker Compose로 nginx·backend·discord-bot 3개 컨테이너 운영. 프론트는 S3 정적 파일.
+1. **컴퓨팅**: 서울 리전 EC2 1대(`t4g.micro`로 시작, ARM64, 2 vCPU, 1GiB, 부족하면 `t4g.small` 2GiB)에서 Docker Compose로 nginx·backend·discord-bot 3개 컨테이너 운영. 프론트는 S3 정적 파일.
 2. **운영 DB**: Amazon RDS PostgreSQL 17 `db.t4g.micro` Single-AZ, 비공개 서브넷, EC2와 같은 가용 영역(AZ). 팀 개발은 계속 공용 Supabase(`labbridge-dev`).
 3. **배포 순서 고정**: 이미지 준비 → `alembic upgrade head` → `alembic current` 확인 → backend → discord-bot → nginx 교체 → 프론트 S3 업로드 → CloudFront 캐시 갱신 → 동작 확인.
 4. **단일 실행 원칙**: 운영 backend(백그라운드 작업 포함)와 discord-bot은 각각 정확히 1개. Uvicorn `--workers 1`.

@@ -16,7 +16,7 @@
 | B5 | 운영용 compose에서 postgres·frontend 제거 | `docker-compose.prod.yml` | 운영 DB는 RDS, 화면은 S3 (`profiles`로 분리) | 인프라 |
 | B6 | 빈 DB에 `alembic upgrade head` 리허설 | 로컬 PostgreSQL 17 | 운영 RDS를 init SQL 없이 만들 수 있는지 확인 | DB |
 | B7 | ARM64 이미지 빌드 | GitHub Actions | `psycopg`, `cryptography` 등 ARM64 확인 `[UNVERIFIED]` | 인프라 |
-| B8 | `t4g.small`·`t4g.micro` 부하 테스트 | k6 등 | 강사님 권장. micro(1GiB)로 버티면 월 $7.59 절약 | 전체 |
+| B8 | `t4g.micro` 부하 테스트 (시작 구성, 2026-11-13 팀 결정) | k6 등, 동시 접속 50명 기준 | micro 한도·스왑 설정으로 버티는지 확인. 실패하면 small로 시작 ([02](02-recommended-architecture.md) 2-1절) | 전체 |
 | B9 | 개발용 디스코드 앱·토큰 분리 | 디스코드 개발자 포털 | 운영 봇과 개발 봇이 같은 토큰을 쓰면 중복 반응 | 디스코드 |
 | B10 | CloudFront 경로·주소 연결 시험 | CloudFront Function | `/workspace/4` 직접 열기·새로고침·화면 이동·없는 주소 404 | 프론트·인프라 |
 | B11 | 운영 DB 접속 절차 | IAM, SSM 터널, 조회 전용 계정 | 사람별 권한, 로컬 backend 연결 금지 | DB |
@@ -44,7 +44,7 @@
 - [ ] AWS Budgets 경보($40 예상 / $50 실제) — **가장 먼저**
 - [ ] VPC, Public 1개 + Private 2개 서브넷, 보안 그룹 2개 ([03](03-network-security.md))
 - [ ] RDS PostgreSQL 17 `db.t4g.micro`, 자동 백업 7일, 삭제 방지 ([04](04-database-storage.md))
-- [ ] EC2 `t4g.small` (Amazon Linux 2023 ARM64, 크레딧 Standard), Elastic IP, IAM 역할
+- [ ] EC2 `t4g.micro` (Amazon Linux 2023 ARM64, 크레딧 Standard), 스왑 1GB, Elastic IP, IAM 역할 — 부족하면 `t4g.small`
 - [ ] S3 백업 버킷 + Lifecycle(90일 삭제)
 - [ ] SSM Parameter Store에 `/labbridge/prod/*` 등록 ([05](05-discord-integration.md) 5절)
 
@@ -71,10 +71,13 @@
 ### Phase 5.5: 배포 자동화 ([14](14-ci-cd-pipeline.md) 8절 5~6단계)
 - [ ] `deploy.yml`을 버튼 실행(`workflow_dispatch`)으로 시작 → 익숙해지면 `main` 머지 시 자동 실행 + 승인 단계
 
-### Phase 5.8: 베타 운영 (자체 테스트 + 일부 사용자 모집, 2026-11-10 팀 결정)
-- [ ] ALB 없이 EC2 1대로 운영, 비용·CPU 크레딧·메모리를 주 1회 기록
+### Phase 5.8: 베타 운영 (자체 테스트 + 일부 사용자 모집, 2026-11-10·11-13 팀 결정)
+- [ ] **배포 후 2주 테스트 기간**: `t4g.micro`로 운영하며 메모리·스왑·CPU 크레딧·OOM 재시작을 매일 확인, 비용은 주 1회 기록
+- [ ] 2주 끝에 micro 유지 / small 상향 결정 (기준: [02](02-recommended-architecture.md) 2-1절)
+- [ ] 회원 모집 (예상 50명 내외). 회원 수·동시 접속을 주 1회 기록해 ALB 판단 자료로 사용
+- [ ] ALB 없이 EC2 1대로 운영
 - [ ] 베타 사용자 의견과 장애 기록을 모아 정식 공개 전 서버 크기·ALB 여부 다시 판단
 - [ ] API·worker 분리 1~6단계 (EC2 1대 안, 비용 $0) — [16](16-api-worker-split.md) 3절
 
 ### Phase 6: 이후 (별도 합의)
-- API·worker 분리 7~9단계(S3 업로드, 요청 제한 이전, ALB + api 2대), `t4g.micro` 축소 판단, S3 Presigned 업로드 전환, 커넥션 풀, AI 챗봇(MVP+), 인사이트 반입 자동화, 서버 크기 재검토(1~3개월 실측)
+- API·worker 분리 7~9단계(S3 업로드, 요청 제한 이전, ALB + api 2대), 서버 크기 재판단(micro 유지·small 상향), S3 Presigned 업로드 전환, 커넥션 풀, AI 챗봇(MVP+), 인사이트 반입 자동화, 서버 크기 재검토(1~3개월 실측)
