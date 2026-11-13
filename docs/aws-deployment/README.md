@@ -54,13 +54,14 @@
 | 07 | [자동 콘텐츠 파이프라인](07-automation-jobs.md) | 앱 내부 예약 작업 + 외부 Claude 반입 경계 |
 | 08 | [서울 리전 비용](08-cost-estimate.md) | 공식 단가 기준 비용표, 확인/미확인 표시 |
 | 09 | [배포 로드맵](09-deployment-roadmap.md) | 배포 전 차단 항목, 단계별 체크리스트 |
-| 10 | [운영 런북](10-operations-runbook.md) | 표준 배포 절차, 롤백, 장애 복구 |
+| 10 | [운영 런북](10-operations-runbook.md) | 표준 배포 절차, 롤백, 장애 복구, CloudWatch 대시보드·로그·경보(5절) |
 | 11 | [소스코드 정합성 검토 (과거 기록 + v3 정정)](11-source-consistency-review.md) | 2026-11-05 대조 결과와 정정 사항 |
 | 12 | [Phase 1 컨테이너 실측 (과거 기록 + v3 정정)](12-phase1-container-verification.md) | 로컬 5개 컨테이너 실측 |
 | 13 | [강사님 발표 브리프](13-instructor-presentation-brief.md) | 한 장 구성도, 비용, 결정·질문 |
 | 14 | [CI/CD 자동 배포 계획](14-ci-cd-pipeline.md) | CI 통과 시에만 배포, 승인 단계, SSM Run Command 배포 스크립트 |
 | 15 | [강사님 피드백 기록 (2026-11-10)](15-instructor-feedback-20261110.md) | 7교시 피드백: 개발 DB 하나 유지, micro 테스트, ALB 제안, CI 통과 후 배포, 항목별 비용 |
 | 16 | [API·예약 작업·봇 분리 계획](16-api-worker-split.md) | ALB 전 준비: worker 분리, 하루 1회 작업 DB 판단, 중복 실행 잠금, 업로드 S3 전환 |
+| 17 | [배포 실행 가이드](17-deployment-execution-guide.md) | **실제 배포할 때 먼저 볼 문서**: 0~14단계 순서, 단계별 주의점, 모니터링 설정 순서 |
 
 ---
 

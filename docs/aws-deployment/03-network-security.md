@@ -125,6 +125,9 @@ server {
 | `ssm:GetParametersByPath`, `kms:Decrypt` | `/labbridge/prod/*` | 배포 때 비밀값 읽기 |
 | `s3:PutObject`, `s3:GetObject`, `s3:ListBucket` | `labbridge-backup-apne2/*` | DB 덤프·업로드 파일 백업 |
 | `route53:ChangeResourceRecordSets` | 해당 호스팅 영역만 | Let's Encrypt DNS-01 갱신 |
+| `AmazonEC2ContainerRegistryReadOnly` | 관리형 정책 (또는 우리 ECR 저장소만) | 배포 때 backend 이미지 받기 (2026-11-13 추가) |
+| `CloudWatchAgentServerPolicy` | 관리형 정책 | 메모리·스왑·디스크 지표 보내기 ([10](10-operations-runbook.md) 5.2절) |
+| `logs:CreateLogStream`, `logs:PutLogEvents` | `/labbridge/prod/*` 로그 그룹만 | 컨테이너 로그 보내기 ([10](10-operations-runbook.md) 5.3절) |
 
 - **GitHub Actions 배포 역할(OIDC)**: 프론트 버킷 쓰기, `cloudfront:CreateInvalidation`, ECR 이미지 올리기, 그리고 운영 EC2에 `deploy.sh`만 실행하는 SSM 명령 권한만 허용해요. `main` 브랜치·`production` 환경에서만 역할을 받을 수 있어요 ([14](14-ci-cd-pipeline.md) 6절).
 

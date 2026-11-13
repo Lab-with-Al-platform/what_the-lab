@@ -1,6 +1,7 @@
 # 09. 배포 로드맵 (Deployment Roadmap) — v4
 
 > **상태**: `READY FOR PROVISIONING AFTER BLOCKERS` — AWS 통합 배포 방향은 결정됨(강사님 권장). 아래 차단 항목을 해결하고 팀 승인 후 리소스를 만들어요.
+> **실제로 진행할 때**는 단계별 명령과 주의점을 모은 [17](17-deployment-execution-guide.md)을 따라가요.
 > **철칙**: 실제 AWS 리소스 생성과 운영 전환은 팀(사용자)의 명시적 승인 후에만 해요. 운영 DB를 바꾸는 명령은 DB 담당자가 실행해요.
 
 ---
