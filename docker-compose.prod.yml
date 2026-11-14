@@ -1,5 +1,9 @@
 # WHAT THE LAB (LabBridge) — 프로덕션 검증용 Docker Compose
 # 단일 EC2 (t4g.medium, 4GB RAM) 기준 컨테이너 리소스 제한 및 서비스 격리 적용
+#
+# 비밀값은 이 파일에 쓰지 않아요 (저장소가 공개라서). 값이 빠지면 `${이름:?안내}` 때문에 실행이 멈춰요.
+# 실행: docker compose -f docker-compose.prod.yml --env-file .env.production up -d
+# 필요한 값 목록: infra/env.production.example
 
 services:
   # 1. PostgreSQL 17 데이터베이스 (EC2 내부 DB 또는 로컬 통합 테스트용)
@@ -9,7 +13,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin123
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD 필요 (infra/env.production.example)}
       POSTGRES_DB: labbridge
       TZ: Asia/Seoul
       PGTZ: Asia/Seoul
@@ -46,15 +50,15 @@ services:
         condition: service_healthy
     environment:
       APP_ENV: production
-      DATABASE_URL: postgresql://admin:admin123@postgres:5432/labbridge
-      FRONTEND_URL: http://localhost
-      CORS_ORIGINS: http://localhost,http://127.0.0.1
-      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:-ci-client-id}
-      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:-ci-secret}
-      DISCORD_REDIRECT_URI: ${DISCORD_REDIRECT_URI:-http://localhost/api/v1/auth/discord/callback}
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL 필요}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:?NEXT_PUBLIC_APP_URL 필요 (로그인 후 돌아갈 화면 주소)}
+      CORS_ORIGINS: ${CORS_ORIGINS:?CORS_ORIGINS 필요}
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:?DISCORD_CLIENT_ID 필요}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:?DISCORD_CLIENT_SECRET 필요}
+      DISCORD_REDIRECT_URI: ${DISCORD_REDIRECT_URI:?DISCORD_REDIRECT_URI 필요}
       DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
       DISCORD_GUILD_ID: ${DISCORD_GUILD_ID:-}
-      JWT_SECRET: ${JWT_SECRET:-labbridge-production-jwt-secret-key-32chars}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET 필요 (32자 이상 무작위)}
     volumes:
       - backend_uploads:/app/uploads
     healthcheck:
@@ -90,14 +94,14 @@ services:
     command: ["python", "-m", "app.discord_gateway"]
     environment:
       APP_ENV: production
-      DATABASE_URL: postgresql://admin:admin123@postgres:5432/labbridge
-      FRONTEND_URL: http://localhost
-      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:-ci-client-id}
-      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:-ci-secret}
-      DISCORD_REDIRECT_URI: ${DISCORD_REDIRECT_URI:-http://localhost/api/v1/auth/discord/callback}
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL 필요}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:?NEXT_PUBLIC_APP_URL 필요 (DM 속 링크 주소)}
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:?DISCORD_CLIENT_ID 필요}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:?DISCORD_CLIENT_SECRET 필요}
+      DISCORD_REDIRECT_URI: ${DISCORD_REDIRECT_URI:?DISCORD_REDIRECT_URI 필요}
       DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
       DISCORD_GUILD_ID: ${DISCORD_GUILD_ID:-}
-      JWT_SECRET: ${JWT_SECRET:-labbridge-production-jwt-secret-key-32chars}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET 필요 (32자 이상 무작위)}
     deploy:
       resources:
         limits:
