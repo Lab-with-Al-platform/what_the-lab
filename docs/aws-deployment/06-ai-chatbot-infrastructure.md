@@ -1,4 +1,13 @@
-# 06. AI 챗봇 및 모델 인프라 아키텍처 (AI Chatbot & Model Infrastructure)
+# 06. AI 챗봇 및 모델 인프라 아키텍처 (AI Chatbot & Model Infrastructure) — v3
+
+> **v3 범위 표시 (먼저 읽기)**: AI 챗봇·RAG·Bedrock은 `docs/product/MVP_SCOPE.md` 기준 **MVP+** 예요. **첫 AWS 배포에는 포함하지 않고**, 월 예산도 $0으로 잡아요. 이 문서는 나중에 켤 때를 위한 설계 메모예요.
+> - 2026-11-06 서울 리전 Price List(AmazonBedrock, ap-northeast-2, 2026-11-02 게시) 확인 결과:
+>   - **Nova Micro**: 입력 $0.041 / 출력 $0.164 (100만 토큰당) — v2의 $0.035/$0.140은 미국 리전 값이었어요.
+>   - **Nova Lite**: 입력 $0.071 / 출력 $0.284
+>   - **Titan Text Lite, Llama 3.2 3B**: 서울 Price List에 **없음** → "서울 직접 지원" 표현 삭제.
+>   - **임베딩**: 서울에는 **Titan Text Embeddings V2**($0.0246/100만 토큰)만 확인. V2 기본 차원은 1024 `[UNVERIFIED]`라 04번 v2의 `vector(1536)` 예시는 모델 확정 후 다시 정해요.
+> - 예상 비용 예시: 하루 300회 × 30일, 회당 입력 3,000·출력 500 토큰이면 Nova Micro 기준 월 약 **$1.9** (계산값).
+> - IAM: 교차 리전 추론(cross-region inference)을 쓰면 서울 `foundation-model/*`만 허용한 정책으로는 호출이 막혀요. inference profile ARN과 대상 리전 모델 ARN을 함께 허용해야 해요 `[UNVERIFIED: AWS 문서 재확인]`.
 
 > **상태**: `[PROPOSED]`  
 > **핵심 원칙**: 1) 웹 플랫폼 챗봇과 Discord 챗봇의 단일 공통 Chat Service 엔진 공유, 2) `ModelProvider` 인터페이스 추상화를 통한 벤더 종속 탈피, 3) 비용 효율적인 PostgreSQL + pgvector 하이브리드 RAG 구축, 4) 초기 자체 GPU 서버 미도입 및 관리형 API 우선 적용.
@@ -31,7 +40,7 @@ flowchart TD
     end
 
     subgraph LLMLayer ["LLM Provider 계층"]
-        ModelRouter -->|Primary (기본 추천)| Bedrock["Amazon Bedrock 경량 모델<br>(Nova Micro / Titan Text Lite / Llama 3.2 3B)"]
+        ModelRouter -->|Primary (기본 추천)| Bedrock["Amazon Bedrock 경량 모델<br>(Nova Micro / Nova Lite)"]
         ModelRouter -->|Fallback 1 (외부 API)| OpenAI["OpenAI API<br>(gpt-4o-mini)"]
         ModelRouter -->|Fallback 2 (외부 API)| Gemini["Google Gemini API<br>(gemini-2.5-flash)"]
         ModelRouter -.->|Legacy / 검증 필요| Deprecated["구형 모델 (Claude 3 계열)<br>⚠️ API 수명주기 검증 후 제외 판단"]
@@ -77,9 +86,9 @@ class BaseLLMProvider(ABC):
 1. **`BedrockProvider` (기본 추천)**:
    - AWS IAM Role을 사용하여 별도의 API 키 없이 `boto3` 라이브러리로 Amazon Bedrock 런타임 호출 (`bedrock-runtime`).
    - 추천 후보 모델:
-     - `amazon.nova-micro-v1:0` (Bedrock 최신 초경량 모델: 입력 $0.035/1M, 출력 $0.140/1M).
-     - `amazon.titan-text-lite-v1` (서울 리전 `ap-northeast-2` 직접 지원, 입력 $0.150/1M, 출력 $0.200/1M).
-     - `meta.llama3-2-3b-instruct-v1:0` (Bedrock 서버리스 경량 오픈 가중치 모델: 입력 $0.150/1M, 출력 $0.200/1M).
+     - `amazon.nova-micro-v1:0` (서울 Price List: 입력 $0.041/1M, 출력 $0.164/1M `[CONFIRMED 2026-11-02]`).
+     - `amazon.nova-lite-v1:0` (서울: 입력 $0.071/1M, 출력 $0.284/1M).
+     - ~~Titan Text Lite / Llama 3.2 3B~~: 서울 Price List에서 확인되지 않아 후보에서 제외 (v3).
 2. **`OpenAIProvider` / `GeminiProvider` (대체 및 장애 복구)**:
    - Bedrock 리전 장애 또는 할당량 초과 시 자동으로 동작하는 서킷 브레이커 연동 (`gpt-4o-mini`, `gemini-2.5-flash`).
 3. **구형 모델(Claude 3 계열) 처리 방침**:
@@ -114,8 +123,8 @@ class BaseLLMProvider(ABC):
 
 | 용도 구분 | 요구 특성 | 권장 후보 모델 | 이유 및 수명주기 검증 요건 |
 |---|---|---|---|
-| **실시간 챗봇 대화 (웹/Discord)** | 빠른 응답 속도 (TTFT < 1초), 대화형 자연스러움, 낮은 토큰 비용 | **Amazon Nova Micro** / **Titan Text Lite** (Bedrock) 또는 **gpt-4o-mini** | 100만 토큰당 $0.035~$0.150의 극초저비용으로 월 수만 건 대화에도 비용 부담 최소화 |
-| **RAG 텍스트 임베딩** | 다국어/한국어 벡터 표현력, 일관된 차원 | **Amazon Titan Embeddings G1 - Text** (또는 OpenAI text-embedding-3-small) | 1,536차원, 백만 토큰당 $0.02의 극저비용 |
+| **실시간 챗봇 대화 (웹/Discord)** | 빠른 응답 속도 (TTFT < 1초), 대화형 자연스러움, 낮은 토큰 비용 | **Amazon Nova Micro / Nova Lite** (Bedrock 서울) 또는 외부 API | 서울 기준 입력 100만 토큰당 $0.041~$0.071으로 월 수만 건 대화에도 비용 부담 최소화 |
+| **RAG 텍스트 임베딩** | 다국어/한국어 벡터 표현력, 일관된 차원 | **Amazon Titan Text Embeddings V2** (서울 확인) | 서울 $0.0246/100만 토큰 `[CONFIRMED]`, 차원은 모델 설정에 맞춰 결정 |
 | **연구 사례/트렌드 심층 분석** | 복잡한 논문 독해, 근거 사실성 검증, 12점 평가 산출 | **외부 최신 Frontier 모델** (실행 시점 최신 API 적용) | 특정 구형 모델에 고정하지 않고, 파이프라인 전송 계약(`insight_transfer_v1`)에만 의존하여 유연성 확보 |
 
 ---

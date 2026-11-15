@@ -6,6 +6,15 @@
 > **보안 원칙 준수**: `.env` 및 비밀정보 파일의 내용은 일체 출력하거나 보고서에 포함하지 않음.  
 > **※ [작성 시점 참고]**: 본 11번 보고서는 Phase 0 소스코드 정합성 감사 당시의 과거 기록입니다. 당시의 Phase 1 로컬 컨테이너화 진입 판정 및 예산 추정치(버지니아 단가 기준 등)는 이후 Phase 1 로컬 실측 완료([12번 보고서](file:///docs/aws-deployment/12-phase1-container-verification.md)) 및 서울 리전 단가 정정([08번](file:///docs/aws-deployment/08-cost-estimate.md), [13번](file:///docs/aws-deployment/13-instructor-presentation-brief.md))으로 업데이트되었습니다. 당시의 소스코드 대조 실측 데이터는 역사적 증거로서 보존됩니다.
 
+> **※ [v4 정정, 2026-11-09]**: 2.1절의 "정적 호스팅 불가"는 정정됐어요. 코드 10곳을 고치면 정적 빌드가 가능해 프론트는 S3 + CloudFront로 배포해요 ([00](00-project-audit.md)).
+>
+> **※ [v3 정정, 2026-11-06]**: 이 보고서의 일부 판단을 다음과 같이 바로잡아요.
+> - "문서와 코드 일치"는 **운영·공용 DB의 마이그레이션 버전까지 일치한다는 뜻이 아니에요.** 배포 전에 대상 DB에서 `alembic current`를 직접 확인해야 해요 ([10](10-operations-runbook.md) 1절).
+> - `docker-compose.prod.yml`·`frontend/Dockerfile`·`config.py` 사이에 운영 차단 수준의 불일치가 있어요(비밀값 기본값, `NEXT_PUBLIC_API_BASE_URL` 미주입, `FRONTEND_URL` 이름 불일치) → [09](09-deployment-roadmap.md) B1~B3.
+> - 디스코드 봇은 backend를 HTTP로 부르지 않고 **DB에 직접 연결**해요 (`discord_gateway.py`).
+> - 알림·구글 동기화·채널 생성은 이미 `FOR UPDATE SKIP LOCKED`로 중복을 막고 있어요.
+> - 5절의 "월 $35~$45"와 "100% 일치" 표현은 당시 판단이에요. 최신 비용은 [08](08-cost-estimate.md)을 봐요.
+
 ---
 
 ## 1. 정합성 검토 총괄 요약

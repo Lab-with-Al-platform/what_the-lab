@@ -1,4 +1,20 @@
-# 00. 프로젝트 감사 및 현황 분석 (Project Audit) — 개정판
+# 00. 프로젝트 감사 및 현황 분석 (Project Audit) — v4
+
+> **v3 (2026-11-06)**: AWS 통합 배포가 결정됐어요(강사님 권장). 운영 DB는 RDS로 분리하는 안이 권장안이에요 ([README](README.md) 0절). 아래 1~5절은 2026-11-05 감사 기록이고, 0절에 현재 운영 구성을 추가했어요.
+
+## 0. 현재 운영 구성 (AWS 전환 전) `[CONFIRMED: 팀 운영 현황]`
+
+| 부분 | 지금 | AWS 통합 후 |
+|---|---|---|
+| 프론트 (Next.js) | Vercel | S3 + CloudFront 정적 배포 (v4) |
+| 백엔드 (FastAPI + 예약 작업) | Render | EC2 backend 컨테이너 (1개) |
+| 디스코드 Gateway 봇 | 별도 실행 필요 (운영 난이도 높음) | EC2 discord-bot 컨테이너 (1개) |
+| DB | 공용 Supabase `labbridge-dev` (Session Pooler, 서울) | 운영: RDS PostgreSQL / 개발: Supabase 그대로 |
+| 배포 규칙 | DB 마이그레이션 먼저 → 버전 확인 → PR 머지 | 같은 규칙을 운영 배포 스크립트에 고정 ([10](10-operations-runbook.md)) |
+
+- 통합 이유: 디스코드 봇(상시 연결)과 알림·아침 브리핑·요청 만료 같은 상시 작업을 한 곳에서 같은 코드·설정·DB 버전으로 운영하기 위해서예요.
+
+---
 
 > **상태 표기 기준**:
 > - `[CONFIRMED]`: 실제 저장소 코드, 설정 파일, 최신 QA 결과 문서에서 직접 확인된 사실
@@ -34,7 +50,7 @@
 ### 2.2 Frontend
 - **프레임워크**: Next.js `^15.5.29`, React `^19.1.1` (App Router 기반), Tailwind CSS `^4.1.13`.
 - **렌더링 방식**: SSR (Server-Side Rendering) + Client Component (`"use client"`) 혼합.
-- **정적 호스팅(S3 단독 배포) 불가**: `output: 'export'` 미사용, 동적 라우팅(`[slug]`, `[id]`) 및 `/api/v1/:path*` rewrite 프록시 사용 (`[CONFIRMED: frontend/next.config.ts]`). Node.js 22 런타임 필수.
+- **정적 배포 (v4 정정)**: 지금 코드는 `output: 'export'`를 쓰지 않아 그대로는 빌드가 실패해요. 하지만 `cookies()`·미들웨어·API 라우트를 쓰지 않아서 동적 주소 8곳과 로그인·검색 2곳을 고치면 정적 빌드가 가능해요 (2026-11-09 임시 복사본 빌드 성공: 파일 298개, 31MB). `/api/v1` 프록시는 CloudFront 경로 나누기로 대신해요.
 
 ### 2.3 Backend
 - **프레임워크**: FastAPI `^0.143.0`, Uvicorn `^0.54.0`, Python `>= 3.13`, 패키지 매니저 `uv`.

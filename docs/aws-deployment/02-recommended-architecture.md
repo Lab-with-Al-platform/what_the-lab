@@ -1,100 +1,160 @@
-# 02. 최종 권장 아키텍처 설계 (Recommended Architecture) — 개정판
+# 02. 최종 권장 아키텍처 (Recommended Architecture) — v4
 
-> **상태**: `[PROPOSED]`  
-> **리전**: AWS 서울 리전 (`ap-northeast-2`)  
-> **핵심 목표**: 월 $50 내외의 초저비용 운영, Discord Gateway 상시 연결과 알림의 안정적 분리, 컨테이너별 메모리 제한을 통한 단일 인스턴스 OOM 방지.
+> **상태**: `[PROPOSED]` (AWS 통합 배포 방향은 `[DECIDED]`)
+> **리전**: AWS 서울 (`ap-northeast-2`)
+> **핵심 목표**: 월 $50 내외, 디스코드 봇·알림·예약 작업을 한 곳에서 같은 코드 버전으로 운영, 프론트는 S3 정적 배포, 운영 DB는 비공개 RDS로 분리.
 
 ---
 
-## 1. 전체 아키텍처 구성도
+## 1. 전체 구성도
 
 ```mermaid
 flowchart TB
-    subgraph Users ["🌐 외부 사용자 및 클라이언트"]
-        Browser["웹 브라우저 (사용자)"]
-        DiscordApp["Discord 사용자 / 채널"]
-        ClaudeTask["Claude 클라우드 정기 작업<br>(외부 인사이트 수집·분석)"]
+    subgraph Users ["외부"]
+        Browser["웹 브라우저"]
+        DiscordApp["Discord (채널·DM·슬래시 명령)"]
+        GitHub["GitHub (코드·CI·이미지·프론트 빌드)"]
+        DevPC["DB 담당자 PC"]
     end
 
-    subgraph AWS ["☁️ AWS ap-northeast-2 (Seoul)"]
-        R53["Amazon Route 53 (DNS)"]
-        CF["Amazon CloudFront<br>(CDN + ACM 무료 와일드카드 SSL)"]
-        S3Bucket["Amazon S3 버킷<br>(uploads / pdfs / db-backups)"]
-        Bedrock["Amazon Bedrock 경량 AI 모델<br>(Nova Micro / Titan Text Lite)"]
+    subgraph Edge ["AWS 글로벌 엣지"]
+        R53["Route 53 (DNS)"]
+        CF["CloudFront + ACM 인증서(us-east-1)"]
+    end
 
-        subgraph EC2Host ["단일 EC2 인스턴스 (t4g.medium, ARM64, 2vCPU 4GB)"]
-            IAM["IAM Instance Profile<br>(S3, Bedrock, SSM 권한)"]
-            
-            subgraph DockerNet ["Docker Compose 격리 브리지 네트워크 (labbridge_net)"]
-                Nginx["1. Nginx Reverse Proxy<br>(Port 80/443 종단, 헤더 검증)<br>[메모리 한도: 128MB]"]
-                FE["2. Frontend 컨테이너<br>(Next.js 15 Standalone SSR)<br>[메모리 한도: 800MB]"]
-                BE["3. Backend API 컨테이너<br>(FastAPI + notification_sender)<br>[메모리 한도: 600MB]"]
-                Bot["4. Discord Gateway Bot<br>(discord.py 상시 리스너)<br>[메모리 한도: 300MB]"]
-                LocalDB[("5. PostgreSQL 17 (선택)<br>(pgvector 내장 컨테이너)<br>[메모리 한도: 1.2GB]")]
+    subgraph Seoul ["AWS 서울 리전 · VPC 10.0.0.0/16"]
+        subgraph Pub ["Public Subnet (ap-northeast-2a)"]
+            subgraph EC2 ["EC2 t4g.micro로 시작 (ARM64, 2 vCPU, 1GiB, 부족하면 small) · Docker Compose"]
+                Nginx["nginx :443<br>오리진 인증서 · 비밀 헤더 검사"]
+                BE["backend (FastAPI 1 worker)<br>+ 만료·아침 브리핑·알림·구글 동기화"]
+                Bot["discord-bot (Gateway)"]
             end
-            
-            EBS[("EBS gp3 (50GB)<br>컨테이너 로그 & 볼륨")]
         end
+        subgraph Priv ["Private Subnet (ap-northeast-2a / 2c)"]
+            RDS[("RDS PostgreSQL 17<br>db.t4g.micro · 운영 DB")]
+        end
+        S3Web["S3 프론트 버킷 (비공개, 정적 파일)"]
+        S3["S3 (DB 덤프·업로드 파일 백업)"]
+        SSM["SSM Parameter Store (비밀값)"]
     end
 
-    subgraph ExternalDB ["🐘 데이터베이스 선택지"]
-        Supabase[("Supabase PostgreSQL (labbridge-dev)<br>팀 공통 DB 유지 (Session Pooler)")]
-    end
-
-    %% 트래픽 흐름
-    Browser -->|1. HTTPS| R53 --> CF
-    CF -->|2. Custom Header 포함 전달| Nginx
-    Nginx -->|/api/v1/*| BE
-    Nginx -->|SSR/정적 페이지| FE
-    
-    %% DB 연결 (선택에 따름)
-    BE -.->|안 A: 외부 연결| Supabase
-    BE -->|안 B: 내부 로컬 연결| LocalDB
-    Bot -->|내부 비즈니스 로직| BE
-    
-    %% 외부 서비스 통신
-    Bot <-->|상시 WebSocket| DiscordApp
-    BE -->|알림 발송 REST API v10| DiscordApp
-    BE -->|파일 업로드 Presigned URL| S3Bucket
-    BE -->|AI 챗봇 / RAG 추론| Bedrock
-    
-    %% Claude 인입
-    ClaudeTask -->|Git PR 또는 Staging API| BE
+    Browser --> R53 --> CF
+    CF -->|기본 경로: 화면 파일| S3Web
+    CF -->|/api/v1/*: HTTPS + 비밀 헤더| Nginx
+    Nginx --> BE
+    BE --> RDS
+    Bot --> RDS
+    BE -->|REST: DM·채널 생성·OAuth| DiscordApp
+    Bot <-->|나가는 WebSocket 상시 연결| DiscordApp
+    BE -.->|백업 업로드| S3
+    EC2 -.->|배포 시 비밀값 읽기| SSM
+    GitHub -.->|arm64 이미지| EC2
+    GitHub -.->|프론트 업로드| S3Web
+    DevPC -.->|SSM 터널, 포트 추가 없음| EC2
 ```
 
+### 1.1 그림을 읽는 법
+- **사용자 요청 길**: 브라우저 → Route 53(주소 찾기) → CloudFront(HTTPS 접점) → 화면 파일은 S3에서, `/api/v1`은 EC2 nginx를 거쳐 backend로.
+- **운영 DB 접속 길**: DB 담당자 PC → SSM 터널 → EC2 → RDS. RDS 자체는 비공개 그대로예요 ([03](03-network-security.md) 2.3절).
+- **디스코드 길**: 봇은 사용자 요청을 받지 않아요. 봇이 먼저 디스코드에 **연결을 걸어 두고** 명령·버튼 이벤트를 받아요. 그래서 인바운드 포트가 필요 없어요.
+- **DB 길**: backend와 discord-bot이 **둘 다 RDS에 직접** 연결해요 (`backend/app/discord_gateway.py`가 `app.db.get_connection` 사용 `[CONFIRMED]`). 봇이 backend를 HTTP로 부르는 구조가 아니에요.
+- **개발 DB는 그림에 없어요**: 팀 개발은 계속 공용 Supabase `labbridge-dev`를 쓰고, 운영 RDS와 섞지 않아요.
+
 ---
 
-## 2. Docker Compose 컨테이너 자원 분배 및 안전 장치 (OOM 방지)
+## 2. 컨테이너 자원 한도 (t4g.small 2GiB 기준, micro는 2-1절)
 
-단일 EC2 호스트(`t4g.medium` 4GB RAM)에서 특정 컨테이너의 메모리 누수로 인해 전체 서버가 다운(OOM Crash)되는 사고를 방지하기 위해 엄격한 리소스 한도(Resource Limit)를 설정합니다.
-
-### 2.1 컨테이너별 메모리/CPU 할당 명세
-
-| 서비스명 | 권장 메모리 Limit | 예약 메모리(Reservations) | CPU Limit | 재시작 정책 | 로깅 제한 |
+| 서비스 | 메모리 Limit | 로컬 실측(유휴) | CPU Limit | 재시작 | 로그 |
 |---|---|---|---|---|---|
-| **nginx** | `128 MB` | `64 MB` | 0.25 vCPU | `unless-stopped` | 10MB x 3개 |
-| **frontend** | `800 MB` (최대 1GB) | `384 MB` | 0.75 vCPU | `unless-stopped` | 10MB x 3개 |
-| **backend** | `600 MB` (최대 768MB) | `256 MB` | 0.75 vCPU | `unless-stopped` | 10MB x 3개 |
-| **discord-bot** | `300 MB` (최대 384MB) | `128 MB` | 0.25 vCPU | `unless-stopped` | 10MB x 3개 |
-| **postgres** (안 B 적용 시) | `1.2 GB` | `512 MB` | 0.50 vCPU | `unless-stopped` | 10MB x 3개 |
-| **OS 및 시스템 버퍼** | 약 `1.0 GB` 확보 | — | — | — | — |
-| **합계 (Total)** | **약 2.9 GB ~ 3.5 GB / 4.0 GB** (완전 안전 영역 유지) | — | — | — | — |
+| nginx | 64 MB | 14.7 MiB | 0.25 | `unless-stopped` | 10MB × 3 |
+| backend | 512 MB | 104.6 MiB | 0.75 | `unless-stopped` | 10MB × 3 |
+| discord-bot | 256 MB | 79.7 MiB | 0.25 | `unless-stopped` | 10MB × 3 |
+| **합계** | **832 MB** | **199 MiB** | — | — | — |
+| OS·Docker 여유 | 약 1.2 GB | — | — | — | — |
 
-> [!TIP]
-> **안 A (Supabase 유지 시)의 이점**:
-> PostgreSQL 컨테이너(`1.2GB`)가 빠지므로, 더 저렴한 **`t4g.small` (2GB RAM, 월 약 $13)**으로도 인프라를 충분히 구동할 수 있어 비용을 극대화하여 절감할 수 있습니다.
+- 실측값은 2026-11-05 로컬(x86_64) 기동 직후 한 시점이에요 `[LOCAL_VERIFIED]`. 동시 접속 부하는 `[UNVERIFIED]`.
+- **강사님 권장 (2026-11-10)**: "micro로 한번 테스트해 보라." → **팀 결정 (2026-11-13)**: 첫 배포는 **`t4g.micro`로 시작**해요. 배포 후 **2주는 테스트 기간**이고, 회원을 모집해도 **50명 내외**로 예상해요. ALB는 **이용자 수 추이를 보고 정하는 향후 계획**이에요. micro 한도는 아래 2-1절이에요.
+- **크기 조정 기준**: micro로 시작해서, 2-1절 기준에 해당하면 `t4g.small`(이 표의 한도)로 올려요. 인스턴스 종류 변경은 몇 분 정지가 필요해요.
+- **빌드는 서버에서 하지 않아요**: GitHub Actions에서 arm64 backend 이미지를 만들어 레지스트리에 올리고, 프론트 정적 파일은 S3에 올려요. EC2는 이미지를 받기만 해요.
+
+### 2-1. `t4g.micro`(1GiB)로 시작할 때 (2026-11-13 팀 결정)
+
+small 기준 한도 합계(832MB)를 그대로 쓰면 OS·Docker가 쓸 메모리가 200MB도 안 남아요. 그래서 micro에서는 한도를 줄이고 **스왑(swap) 1GB**를 붙여요.
+
+| 서비스 | micro 메모리 Limit | 로컬 실측(유휴) |
+|---|---|---|
+| nginx | 48 MB | 14.7 MiB |
+| backend | 384 MB | 104.6 MiB |
+| discord-bot | 192 MB | 79.7 MiB |
+| **합계** | **624 MB** | **199 MiB** |
+| OS·Docker 여유 | 약 400 MB + 스왑 1GB | — |
+
+- 한도 값은 실측(유휴)의 약 2.5~3.5배로 잡은 **시작값**이에요 `[PROPOSED]`. 테스트 기간 기록을 보고 조정해요.
+- **스왑**: 디스크(EBS) 일부를 비상용 메모리로 써요. 순간적으로 메모리가 모자랄 때 서버가 꺼지는 것을 막아 주지만, 계속 쓰이면 느려져요. 추가 비용은 없어요(EBS 30GB 안).
+- **CPU**: micro와 small은 둘 다 vCPU 2개예요. 다만 평소 쓸 수 있는 기준 CPU가 micro는 10%, small은 20%라서, **CPU 크레딧**을 small보다 빨리 써요 `[UNVERIFIED: AWS 인스턴스 표 재확인]`.
+
+**2주 테스트 기간에 small로 올리는 기준** (하나라도 해당하면 올려요, 월 +$7.59):
+1. 컨테이너 OOM 재시작이 한 번이라도 생길 때
+2. 메모리 사용이 한도의 80%를 넘는 상태가 자주 보일 때
+3. 스왑 사용량이 100MB 이상인 상태가 하루 넘게 계속될 때
+4. CPU 크레딧 잔액이 계속 줄어 바닥에 가까워질 때
+5. API 응답이 눈에 띄게 느려졌다는 베타 사용자 의견이 나올 때
+
+- small로 올리는 방법: EC2를 멈추고 인스턴스 종류만 바꾼 뒤 다시 켜요(몇 분 정지). 데이터는 RDS와 EBS에 있어서 그대로예요. 한도는 위 2절 small 값으로 되돌려요.
+- 50명 내외 규모에서는 micro로 버틸 가능성이 높다고 봐요 `[ESTIMATE]`. 그래도 실측 전이라 확정은 아니에요.
+
+#### 회원 수로 보는 small 상향 시점 (2026-11-13 추가)
+
+서버 부담은 **회원 수보다 같은 시간에 쓰는 사람 수(동시 접속)**에 달려 있어요. 그래도 감을 잡기 위해 흔한 비율로 바꿔 봤어요 `[ESTIMATE: 하루 접속 20~30%, 몰리는 시간 동시 접속은 하루 접속자의 10~20%로 가정]`.
+
+| 회원 수 | 하루 접속자 | 몰리는 시간 동시 접속 | 판단 |
+|---|---|---|---|
+| 50명 | 10~15명 | 1~3명 | micro로 충분할 가능성 높음 |
+| 100명 | 20~30명 | 2~6명 | micro로 충분할 가능성 높음 |
+| 200~300명 | 40~90명 | 4~18명 | **small 상향 준비 구간**. 기록을 꼼꼼히 확인 |
+| 500명 이상 | 100명 이상 | 10~30명 이상 | small 상향을 미리 준비 |
+
+**아침 9시를 따로 봐요**: 아침 브리핑과 디스코드 DM은 회원 수에 비례해서 늘어나요. 평소에는 한가해도 9시 직후에만 CPU·메모리가 튈 수 있으니 **하루 평균보다 9시 전후 기록**으로 판단해요.
+
+**운영 중 small로 올리는 시점** — 아래 중 **먼저 오는 쪽**:
+1. 회원이 **200명**을 넘을 때 (준비 신호: 기록 확인 주기를 주 1회 → 매일로)
+2. 몰리는 시간 동시 접속이 **B8 부하 테스트에서 찾은 micro 한계의 70%**에 닿을 때
+3. 위 "2주 테스트 기간에 small로 올리는 기준" 5가지 중 하나라도 생길 때
+
+- micro 한계는 B8에서 k6로 동시 접속 **10명 → 20명 → 30명**을 차례로 걸어 찾아요 ([09](09-deployment-roadmap.md) B8).
+- CPU는 메모리보다 먼저 부족해지는 경우가 많아요. CloudWatch `CPUCreditBalance`가 며칠 동안 계속 내려가면 가장 확실한 신호예요.
+- 회원 수와 동시 접속을 **함께 기록**해 두면, 2주 뒤 "우리 서비스에서는 회원 몇 명당 동시 접속 몇 명"인지 알 수 있어요. 그때 위 표의 가정 비율을 실제 값으로 바꿔요.
 
 ---
 
-## 3. 컨테이너 장애 복구 및 생명주기 관리
+## 3. 단일 실행 원칙 (가장 중요)
 
-1. **Graceful Shutdown**:
-   - `stop_grace_period: 30s`를 지정하여 백엔드 비동기 워커가 진행 중인 Discord 알림 발송이나 DB 트랜잭션을 안전하게 커밋하고 종료할 수 있도록 보장합니다.
-2. **Discord Gateway Bot 자동 재연결**:
-   - Discord 네트워크 일시 단절 시 `discord.py` 라이브러리의 지수 백오프 자동 재연결(`reconnect=True`)이 작동하며, 치명적 에러로 종료되더라도 Docker의 `restart: unless-stopped` 정책에 의해 3초 내에 자동 재부팅됩니다.
-3. **로그 로테이션 (Log Rotation)**:
-   - 모든 컨테이너에 `json-file` 드라이버와 `max-size: "10m"`, `max-file: "3"`을 강제하여 Docker 로그가 디스크(EBS)를 가득 채우는 사고를 원천 방지합니다.
-4. **Health Check 구성**:
-   - Nginx: `curl -f http://localhost/ || exit 1`
-   - Backend: `curl -f http://localhost:8000/api/v1/health || exit 1`
-   - Frontend: `curl -f http://localhost:3000/ || exit 1`
+| 무엇 | 운영에서 동시에 몇 개? | 이유 |
+|---|---|---|
+| backend 컨테이너 | **1개** | `lifespan`에서 만료·아침 브리핑·알림·구글 동기화 4개 작업이 시작돼요 (`backend/app/main.py`) |
+| Uvicorn worker | **1개** (`--workers 1`) | 위와 같은 이유 |
+| discord-bot 컨테이너 | **1개** | 같은 토큰으로 두 개가 접속하면 이벤트를 둘 다 받을 수 있어요 |
+
+- 알림 발송·구글 동기화·협업 채널 생성은 이미 `FOR UPDATE SKIP LOCKED`로 중복을 막아요 `[CONFIRMED]` (`notification_sender.py`, `google_sync.py`, `collab_channel.py`).
+- 아침 브리핑은 "오늘 이미 돌았는지"를 프로세스 메모리(`LAST_RUN`)로 판단해요 (`task_daily.py`). 그래서 backend가 두 개 뜨면 브리핑이 두 번 나갈 수 있어요.
+- **전환하는 날에는 Render의 backend·봇을 먼저 끄고 EC2를 켜요** ([05](05-discord-integration.md) 4절).
+
+---
+
+## 4. 장애 복구와 생명주기
+
+1. **정상 종료**: `stop_grace_period: 30s`로 진행 중인 DB 작업과 DM 발송을 마무리할 시간을 줘요.
+2. **봇 재연결**: `discord.py` 자동 재연결 + Docker `restart: unless-stopped`.
+3. **로그 크기 제한**: 모든 컨테이너 `json-file`, `max-size: 10m`, `max-file: 3`.
+4. **헬스체크**: nginx `/healthz`, backend `/api/v1/health`. 헬스체크 통과가 로그인·협업·디스코드 동작 성공을 뜻하지는 않아요.
+5. **EC2가 통째로 죽으면**: 새 EC2를 띄우고 Elastic IP를 다시 붙이면 돼요. DB는 RDS에 있으니 서버를 잃어도 데이터는 남아요 ([10](10-operations-runbook.md)).
+
+---
+
+## 5. 왜 이 정도 규모인가? (과하지도 모자라지도 않게)
+
+- **넣지 않은 것**: ALB, NAT Gateway, ECS/Fargate, Multi-AZ RDS, Redis. 지금 트래픽에는 필요 없고 월 수십 달러가 더 들어요.
+- **꼭 넣은 것**: 관리형 운영 DB(RDS), 마이그레이션 우선 배포 절차, 단일 실행 원칙, 백업 복원 테스트. 사용자가 적어도 데이터 손실과 중복 알림은 바로 신뢰 문제가 되기 때문이에요.
+- **프론트를 S3로 뺀 이유 (v4)**: 화면 접속이 몰려도 EC2의 API와 봇이 영향을 받지 않아요. 비용 절약은 EC2를 작게 줄일 때 생겨요.
+- **ALB (강사님 제안, 2026-11-10)**: 사용자가 늘 때를 대비해 ALB를 앞에 두는 구성을 권하셨어요. 월 약 $25가 더 들고, 서버를 2대 이상으로 늘리려면 API와 예약 작업·봇을 먼저 나눠야 해요. **팀 결정 (2026-11-10): 베타 운영 기간에는 ALB 없이 운영**하고, 그동안 API와 예약 작업·봇 분리를 준비해요 ([16](16-api-worker-split.md)). 그리고 정식 공개나 트래픽 증가 때 서버 분리와 함께 다시 검토해요 ([15](15-instructor-feedback-20261110.md) 2-2절, [08](08-cost-estimate.md) 2.1절).
+- **나중에 바꿀 신호**: 동시 접속 증가로 `t4g.medium`도 모자라거나, 다운타임을 줄여야 할 때 → ALB + 2대 또는 ECS 검토 ([01](01-architecture-options.md)).
