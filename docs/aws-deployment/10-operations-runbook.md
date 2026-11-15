@@ -12,7 +12,7 @@
 
 ```bash
 cd /opt/labbridge
-export COMPOSE="docker compose -f docker-compose.prod.yml --env-file .env.production"
+export COMPOSE="docker compose -f docker-compose.prod.yml -f docker-compose.awslogs.yml --env-file .env.production"
 
 # 0) 지금 상태 기록 (롤백용)
 $COMPOSE images > /tmp/before-deploy.txt
@@ -21,7 +21,7 @@ $COMPOSE run --rm backend alembic current
 # 1) 새 이미지 받기 (서버에서 빌드하지 않음)
 $COMPOSE pull
 
-# 2) DB 마이그레이션 먼저
+# 2) DB 마이그레이션 먼저 (새 마이그레이션이 있으면 바로 위 단계 전에 RDS 스냅샷 — 아래 상자)
 $COMPOSE run --rm backend alembic upgrade head
 
 # 3) 버전 확인: current 와 heads 가 같아야 다음 단계로
@@ -43,6 +43,17 @@ $COMPOSE logs --tail=50 discord-bot   # Gateway 연결 로그
 $COMPOSE ps                            # backend·discord-bot 이 각각 1개인지
 ```
 
+> **마이그레이션 전 RDS 스냅샷 (B6 결과로 추가, 2026-11-15)**: 우리 마이그레이션 27개 중 26개는 `downgrade`가 **일부러 막혀 있어요** ("백업 후 별도 복구 계획" 오류). 그래서 마이그레이션이 포함된 배포는 **먼저 RDS 수동 스냅샷**을 찍어요. 되돌릴 방법은 사실상 이것뿐이에요.
+>
+> ```bash
+> # 관리자 PC 또는 콘솔(RDS → 스냅샷 생성). EC2 역할에는 스냅샷 권한을 주지 않아요.
+> aws rds create-db-snapshot --db-instance-identifier <RDS 인스턴스 이름> \
+>   --db-snapshot-identifier pre-migrate-$(date +%Y%m%d-%H%M)
+> aws rds wait db-snapshot-available --db-snapshot-identifier pre-migrate-<위 이름>
+> ```
+>
+> 수동 스냅샷은 자동으로 지워지지 않아요. 최근 3개 정도만 남기고 지워요 ([17](17-deployment-execution-guide.md) 숨은 비용).
+
 - **3번에서 버전이 다르면 멈추고** DB 담당자에게 알려요. 코드만 먼저 올리면 지난번처럼 특정 API만 503이 날 수 있어요.
 - PR 머지 규칙도 같아요: 마이그레이션이 들어간 PR은 **운영 DB 적용·확인 후** 배포해요.
 - 프론트 업로드는 API 교체 **뒤에** 해요. 새 화면이 아직 없는 API를 부르지 않게 하기 위해서예요.
@@ -56,7 +67,7 @@ $COMPOSE ps                            # backend·discord-bot 이 각각 1개인
 |---|---|
 | 코드만 문제 (마이그레이션 없음) | `/tmp/before-deploy.txt`의 이전 이미지 태그로 되돌리고 `up -d` |
 | 화면만 문제 | 이전 Actions 빌드 결과를 S3에 다시 올리고 캐시 갱신 |
-| 마이그레이션이 포함됨 | **먼저 DB 담당자와 판단**. 보통은 새 마이그레이션이 옛 코드와 함께 동작하도록(컬럼 추가만 등) 만들어서 코드만 되돌려요. `alembic downgrade`는 데이터 손실 가능성을 확인한 뒤에만 |
+| 마이그레이션이 포함됨 | **먼저 DB 담당자와 판단**. 보통은 새 마이그레이션이 옛 코드와 함께 동작하도록(컬럼 추가만 등) 만들어서 코드만 되돌려요. 우리 마이그레이션은 대부분 `downgrade`가 막혀 있어서(B6), DB까지 되돌려야 하면 **배포 전 스냅샷**으로 새 인스턴스를 만들어 비교 후 전환해요 |
 | 데이터가 잘못 바뀜 | RDS 시점 복원(PITR)으로 **새 인스턴스**를 만들어 비교 후 전환 |
 
 ---
