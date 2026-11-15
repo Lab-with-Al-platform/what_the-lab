@@ -73,7 +73,7 @@ test("실제 메인 콘텐츠와 공개 프로필, 공개 게시글, FAQ 인덱�
   const ui = read("src/components/unified-search.tsx");
   assert.match(page, /listInsights\("case"\)/);
   assert.match(page, /listInsights\("trend"\)/);
-  assert.match(page, /searchGlobalFaqs\(FAQS, query\)/);
+  assert.match(read("src/components/search-from-url.tsx"), /searchGlobalFaqs\(FAQS, query\)/);
   assert.match(ui, /requestApi<ExpertSearchResult>\("\/experts\?"/);
   assert.match(ui, /communityApi<PostList>\("\/posts\?"/);
   assert.match(ui, /scope: "public"/);
@@ -112,7 +112,7 @@ test("홈 헤더 통합검색은 버튼·Enter 제출을 막지 않고 GET으로
   const form = header.slice(header.indexOf(formStart), formEnd);
   assert.match(form, /name="q"/);
   assert.match(form, /<button type="submit"/);
-  assert.match(read("src/app/search/page.tsx"), /query=\{query\}/);
+  assert.match(read("src/components/search-from-url.tsx"), /query=\{query\}/);
 });
 
 test("헤더 통합검색, URL 재검색, 전문가·게시판·FAQ 원본 화면 연결을 유지한다", () => {
