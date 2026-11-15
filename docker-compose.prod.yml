@@ -61,6 +61,9 @@ services:
       backend:
         condition: service_started
     command: ["python", "-m", "app.discord_gateway"]
+    # backend 이미지의 HEALTHCHECK(8000번 API 확인)를 물려받지 않게 꺼요. 봇은 웹 서버가 없어서 항상 unhealthy가 돼요.
+    healthcheck:
+      disable: true
     environment:
       APP_ENV: production
       DATABASE_URL: ${DATABASE_URL:?DATABASE_URL 필요}

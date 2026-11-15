@@ -98,3 +98,9 @@ def test_awslogs_override_sends_each_service_to_its_group():
         assert logging["driver"] == "awslogs"
         assert logging["options"]["awslogs-group"] == f"/labbridge/prod/{name}"
         assert logging["options"]["mode"] == "non-blocking"
+
+
+def test_bot_does_not_inherit_api_healthcheck():
+    """봇은 8000번 API가 없어요. 이미지 HEALTHCHECK를 끄지 않으면 늘 unhealthy로 보여요."""
+    bot = load_services(COMPOSE)["discord-bot"]
+    assert bot.get("healthcheck", {}).get("disable") is True
