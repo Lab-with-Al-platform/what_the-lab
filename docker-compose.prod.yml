@@ -1,53 +1,23 @@
 # WHAT THE LAB (LabBridge) — 프로덕션 검증용 Docker Compose
-# 단일 EC2 (t4g.medium, 4GB RAM) 기준 컨테이너 리소스 제한 및 서비스 격리 적용
+# EC2 t4g.micro(1GiB) 한 대 + 스왑 1GB 기준 (docs/aws-deployment/02 2-1절)
+# 운영 DB는 RDS, 화면은 S3+CloudFront라서 여기에는 서버 컨테이너 3개만 있어요: nginx·backend·discord-bot
 #
 # 비밀값은 이 파일에 쓰지 않아요 (저장소가 공개라서). 값이 빠지면 `${이름:?안내}` 때문에 실행이 멈춰요.
-# 실행: docker compose -f docker-compose.prod.yml --env-file .env.production up -d
+# 실행(EC2): docker compose -f docker-compose.prod.yml -f docker-compose.awslogs.yml --env-file .env.production up -d
+#   - docker-compose.awslogs.yml: 로그를 CloudWatch Logs로 보내는 설정 (EC2에서만 덧붙여요)
+#   - 로컬 리허설은 awslogs 파일 없이 실행해요 (AWS 권한이 없어 로그 전송이 실패해요)
 # 필요한 값 목록: infra/env.production.example
 
 services:
-  # 1. PostgreSQL 17 데이터베이스 (EC2 내부 DB 또는 로컬 통합 테스트용)
-  postgres:
-    image: postgres:17
-    container_name: labbridge-prod-postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD 필요 (infra/env.production.example)}
-      POSTGRES_DB: labbridge
-      TZ: Asia/Seoul
-      PGTZ: Asia/Seoul
-    volumes:
-      - postgres_prod_data:/var/lib/postgresql/data
-      - ./database/init:/docker-entrypoint-initdb.d:ro
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d labbridge"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    deploy:
-      resources:
-        limits:
-          cpus: '0.75'
-          memory: 1200M
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-    networks:
-      - labbridge_internal
-
-  # 2. FastAPI Web API 서버 (단일 Uvicorn Worker)
+  # 1. FastAPI Web API 서버 (단일 Uvicorn Worker)
   backend:
+    # EC2는 빌드하지 않고 ECR 이미지를 받아요. 로컬에서는 build 결과에 이 이름이 붙어요.
+    image: ${BACKEND_IMAGE:-labbridge-backend:local}
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: labbridge-prod-backend
     restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
     environment:
       APP_ENV: production
       DATABASE_URL: ${DATABASE_URL:?DATABASE_URL 필요}
@@ -69,8 +39,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.75'
-          memory: 600M
+          cpus: '1.0'
+          memory: 384M  # micro 한도 (유휴 실측 약 105MiB)
     logging:
       driver: "json-file"
       options:
@@ -79,19 +49,21 @@ services:
     networks:
       - labbridge_internal
 
-  # 3. Discord Gateway 봇 (상시 웹소켓 리스너)
+  # 2. Discord Gateway 봇 (상시 웹소켓 리스너)
   discord-bot:
+    image: ${BACKEND_IMAGE:-labbridge-backend:local}  # backend와 같은 이미지
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: labbridge-prod-discord-bot
     restart: unless-stopped
     depends_on:
-      postgres:
-        condition: service_healthy
       backend:
         condition: service_started
     command: ["python", "-m", "app.discord_gateway"]
+    # backend 이미지의 HEALTHCHECK(8000번 API 확인)를 물려받지 않게 꺼요. 봇은 웹 서버가 없어서 항상 unhealthy가 돼요.
+    healthcheck:
+      disable: true
     environment:
       APP_ENV: production
       DATABASE_URL: ${DATABASE_URL:?DATABASE_URL 필요}
@@ -105,8 +77,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.25'
-          memory: 300M
+          cpus: '0.5'
+          memory: 192M  # micro 한도 (유휴 실측 약 80MiB)
     logging:
       driver: "json-file"
       options:
@@ -115,36 +87,7 @@ services:
     networks:
       - labbridge_internal
 
-  # 4. Next.js 15 SSR 프론트엔드
-  frontend:
-    build:
-      context: .
-      dockerfile: ./frontend/Dockerfile
-    container_name: labbridge-prod-frontend
-    restart: unless-stopped
-    environment:
-      NODE_ENV: production
-      PORT: 3000
-      NEXT_PUBLIC_APP_URL: http://localhost
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3000/"]
-      interval: 15s
-      timeout: 5s
-      retries: 3
-    deploy:
-      resources:
-        limits:
-          cpus: '0.75'
-          memory: 800M
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-    networks:
-      - labbridge_internal
-
-  # 5. Nginx 리버스 프록시 (외부 단일 진입점)
+  # 3. Nginx (API 전용 진입점, CloudFront → EC2)
   nginx:
     image: nginx:alpine
     container_name: labbridge-prod-nginx
@@ -154,7 +97,6 @@ services:
     volumes:
       - ./infra/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - frontend
       - backend
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost/healthz"]
@@ -165,7 +107,7 @@ services:
       resources:
         limits:
           cpus: '0.25'
-          memory: 128M
+          memory: 48M  # micro 한도 (유휴 실측 약 15MiB)
     logging:
       driver: "json-file"
       options:
@@ -179,6 +121,5 @@ networks:
     driver: bridge
 
 volumes:
-  postgres_prod_data:
   backend_uploads:
 
