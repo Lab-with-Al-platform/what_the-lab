@@ -72,7 +72,7 @@
 
 ## 2단계. 로컬 리허설
 
-1. **B6 빈 DB 마이그레이션**: 로컬에서 빈 PostgreSQL 17을 띄우고 `alembic upgrade head` → 테이블 수를 init SQL 결과와 비교 (DB 담당).
+1. **B6 빈 DB 마이그레이션** ✅ **완료 (2026-11-15)**: 빈 PostgreSQL 17에 `alembic upgrade head` → init SQL 결과와 구조·seed가 완전히 같았어요 ([09](09-deployment-roadmap.md) Phase 1.5).
 2. **B7 ARM64 이미지**: GitHub Actions에서 `linux/arm64` backend 이미지를 빌드해 봐요. 이 단계에서는 레지스트리에 올리지 않고 빌드 성공만 봐도 돼요.
 3. 10번 1절 배포 명령을 로컬 compose로 한 번 따라 해 봐요 (`deploy.sh` 초안).
 
@@ -174,11 +174,11 @@ docker compose version
 
 1. ECR 저장소 `labbridge-backend` 생성 → GitHub Actions(또는 내 PC의 buildx)로 arm64 이미지 올리기
 2. EC2에 `/opt/labbridge/`를 만들고 `docker-compose.prod.yml`, `deploy.sh`, `.env.production`을 둬요.
-3. **DB 담당자와 함께** 마이그레이션 ([04](04-database-storage.md) 3절):
+3. **DB 담당자와 함께** 마이그레이션 ([04](04-database-storage.md) 3절). 첫 마이그레이션은 빈 DB라 스냅샷이 필요 없지만, **그 다음부터는 매번 먼저 RDS 스냅샷**을 찍어요 ([10](10-operations-runbook.md) 1절):
 
 ```bash
 cd /opt/labbridge
-export COMPOSE="docker compose -f docker-compose.prod.yml --env-file .env.production"
+export COMPOSE="docker compose -f docker-compose.prod.yml -f docker-compose.awslogs.yml --env-file .env.production"
 $COMPOSE run --rm backend alembic upgrade head
 $COMPOSE run --rm backend alembic current   # 이 두 줄의 결과가
 $COMPOSE run --rm backend alembic heads     # 같아야 다음 단계로

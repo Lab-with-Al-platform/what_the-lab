@@ -37,7 +37,12 @@
 - [ ] `develop`·`main` 브랜치 보호(필수 검사, 리뷰 1명)
 
 ### Phase 1.5: 배포 리허설 (로컬)
-- [ ] B6: 빈 PostgreSQL 17 + `alembic upgrade head` → 테이블 수·주요 컬럼을 init SQL 결과와 비교
+- [x] B6: 빈 PostgreSQL 17 + `alembic upgrade head` → init SQL 결과와 비교 — **통과 (2026-11-15, develop `5bc555c`)**
+  - 테이블 58 / 컬럼 460(타입·NULL·기본값) / 제약조건 234 / 인덱스 134 / 트리거 12 / 함수 1 / 스키마 3, seed 행 수(기관 532, 연구분야 83 등)까지 **차이 0**. 버전 둘 다 `20261104_27`
+  - `upgrade head` 재실행 시 변화 없음. **superuser가 아닌 DB 소유 계정**으로도 58개 테이블 생성 (RDS 마스터 계정 상황과 비슷) `[UNVERIFIED: 실제 RDS 파라미터 그룹·SSL에서는 미실행]`
+  - `CREATE EXTENSION` 없음 → RDS에서 따로 켤 확장 없음
+  - **`downgrade`는 27개 중 26개가 일부러 막혀 있음** → 실패해도 트랜잭션이 취소되어 DB는 그대로. 운영 되돌리기는 **마이그레이션 전 RDS 스냅샷**으로 ([10](10-operations-runbook.md) 1절)
+  - 남은 것: 앱 실행 계정과 마이그레이션 계정을 나눌 때의 권한(GRANT) 정리
 - [ ] B7: GitHub Actions에서 arm64 이미지 빌드 → 레지스트리 업로드
 - [ ] 10번 런북의 표준 배포 절차를 `deploy.sh`로 묶어 로컬에서 한 번 실행해 보기
 
@@ -51,7 +56,7 @@
 
 ### Phase 3: 서버 기동 (아직 공개 전)
 - [ ] Docker·Compose 설치, `.env.production` 생성(`chmod 600`)
-- [ ] **운영 RDS에 `alembic upgrade head` → `alembic current` = `alembic heads` 확인**
+- [ ] **RDS 수동 스냅샷 → 운영 RDS에 `alembic upgrade head` → `alembic current` = `alembic heads` 확인**
 - [ ] backend → nginx 기동 (discord-bot은 아직 끔)
 - [ ] SSM 터널로 DB 담당자 접속·조회 전용 계정 확인 (B11)
 - [ ] `curl -k https://localhost/api/v1/health` 확인
