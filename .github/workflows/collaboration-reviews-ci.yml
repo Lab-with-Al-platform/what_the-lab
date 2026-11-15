@@ -7,6 +7,8 @@ on:
       - "backend/**"
       - "database/init/**"
       - "docker-compose.prod.yml"
+      - "docker-compose.awslogs.yml"
+      - "infra/nginx/**"
       - ".github/workflows/collaboration-reviews-ci.yml"
   push:
     branches:

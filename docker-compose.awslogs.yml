@@ -1,0 +1,35 @@
+# EC2 전용: 컨테이너 로그를 CloudWatch Logs로 보내요 (docs/aws-deployment/10-operations-runbook.md 5.3절)
+# docker-compose.prod.yml 뒤에 덧붙여 실행해요:
+#   docker compose -f docker-compose.prod.yml -f docker-compose.awslogs.yml --env-file .env.production up -d
+#
+# 준비물 (먼저 해 둬야 해요)
+#   1. 로그 그룹 3개를 손으로 만들고 보관 기간 14일로 설정 (없으면 실행 시 오류)
+#   2. EC2 역할에 logs:CreateLogStream, logs:PutLogEvents 권한 (docs/aws-deployment/03 4절)
+# driver가 json-file에서 awslogs로 바뀌면 options는 합쳐지지 않고 아래 값으로 바뀌어요.
+
+x-awslogs: &awslogs
+  awslogs-region: ap-northeast-2
+  mode: non-blocking      # 로그 전송이 느려도 앱이 멈추지 않게
+  max-buffer-size: 4m     # 전송 대기 로그를 4MB까지만 메모리에 모아요
+
+services:
+  backend:
+    logging:
+      driver: awslogs
+      options:
+        <<: *awslogs
+        awslogs-group: /labbridge/prod/backend
+
+  discord-bot:
+    logging:
+      driver: awslogs
+      options:
+        <<: *awslogs
+        awslogs-group: /labbridge/prod/discord-bot
+
+  nginx:
+    logging:
+      driver: awslogs
+      options:
+        <<: *awslogs
+        awslogs-group: /labbridge/prod/nginx
