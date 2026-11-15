@@ -150,7 +150,7 @@ jobs:
 # [PROPOSED] 사용법: deploy.sh <이미지 태그>
 set -euo pipefail
 TAG="$1"
-COMPOSE="docker compose -f docker-compose.prod.yml --env-file .env.production"
+COMPOSE="docker compose -f docker-compose.prod.yml -f docker-compose.awslogs.yml --env-file .env.production"
 export IMAGE_TAG="$TAG"
 $COMPOSE images > /tmp/before-deploy.txt          # 롤백 기록
 $COMPOSE pull backend discord-bot
