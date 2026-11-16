@@ -104,3 +104,48 @@ def test_bot_does_not_inherit_api_healthcheck():
     """봇은 8000번 API가 없어요. 이미지 HEALTHCHECK를 끄지 않으면 늘 unhealthy로 보여요."""
     bot = load_services(COMPOSE)["discord-bot"]
     assert bot.get("healthcheck", {}).get("disable") is True
+
+
+# ---- B4: nginx는 CloudFront 전용 HTTPS 오리진 ----
+# 자세한 이유: docs/aws-deployment/03-network-security.md 3절
+ORIGIN_TEMPLATE = ROOT / "infra" / "nginx" / "templates" / "origin.conf.template"
+
+
+def test_nginx_opens_only_https():
+    """보안 그룹이 CloudFront만 443으로 들여보내요. 80번 평문은 열지 않아요."""
+    nginx = load_services(COMPOSE)["nginx"]
+    assert nginx["ports"] == ["443:443"]
+
+
+def test_nginx_origin_values_are_required():
+    """오리진 이름·비밀 헤더 값이 빠지면 실행이 멈춰야 해요 (빈 값이면 누구나 통과)."""
+    env = service_env("nginx")
+    for key in ["ORIGIN_DOMAIN", "ORIGIN_VERIFY_SECRET"]:
+        assert REQUIRED.match(env[key]), f"nginx.{key} = {env[key]!r} → ${{{key}:?...}} 형태로 바꿔 주세요"
+
+
+def test_origin_checks_secret_header_before_proxy():
+    """비밀 헤더 검사, 443 인증서, backend에 비밀 헤더를 넘기지 않기."""
+    text = ORIGIN_TEMPLATE.read_text(encoding="utf-8")
+    assert '"${ORIGIN_VERIFY_SECRET}" 1;' in text
+    assert "if ($origin_verified = 0)" in text and "return 403;" in text
+    assert "/etc/letsencrypt/live/${ORIGIN_DOMAIN}/fullchain.pem" in text
+    assert 'proxy_set_header X-Origin-Verify "";' in text
+    assert "ssl_reject_handshake on;" in text
+
+
+def test_auth_routes_have_strict_rate_limit():
+    """로그인·콜백·인증번호 발송·확인은 엄격한 auth 제한을 받아요."""
+    conf = NGINX_CONF.read_text(encoding="utf-8")
+    text = ORIGIN_TEMPLATE.read_text(encoding="utf-8")
+    assert "zone=auth:1m rate=10r/m" in conf and "limit_req_status 429;" in conf
+    assert "location /api/v1/auth/discord/ {\n        limit_req zone=auth" in text
+    assert "location ~ ^/api/v1/verification/(email|change)/(send|confirm)$ {\n        limit_req zone=auth" in text
+
+
+def test_nginx_reads_only_origin_server_config():
+    """이미지 기본 default.conf(80번 환영 화면)를 읽지 않도록 origin.conf 하나만 불러와요."""
+    conf = NGINX_CONF.read_text(encoding="utf-8")
+    assert "include /etc/nginx/conf.d/origin.conf;" in conf
+    assert "conf.d/*.conf" not in conf
+    assert "listen 80" not in conf
