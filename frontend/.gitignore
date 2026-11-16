@@ -1,3 +1,6 @@
 node_modules
 .next
 out
+
+# CloudFront Function 결과물 (npm run build:static 이 만들어요)
+/build

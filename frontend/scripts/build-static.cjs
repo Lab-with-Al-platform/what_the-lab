@@ -17,3 +17,4 @@ function run(command, args) {
 
 run("npx", ["next", "build"]);
 run("node", [path.join(__dirname, "optimize-static-images.cjs")]);
+run("node", [path.join(__dirname, "build-cloudfront-function.cjs")]);
