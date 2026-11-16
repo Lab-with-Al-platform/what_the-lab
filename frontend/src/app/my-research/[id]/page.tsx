@@ -1,15 +1,16 @@
-import { MyResearchDetail } from "@/components/my-research-detail";
+import { MyResearchDetailRoute } from "@/components/routes/my-research-detail-route";
 import { MySpaceShell } from "@/components/my-space-shell";
+import { placeholderParams } from "@/lib/static-route";
 
-interface PageProps {
-  params: Promise<{ id: string }>; // 주소의 [id] 부분 (예: /my-research/12 → "12")
+// 주소의 [id] 부분(예: /my-research/12 → "12")은 브라우저 주소에서 읽어요.
+export function generateStaticParams() {
+  return placeholderParams("id");
 }
 
-export default async function MyResearchDetailPage({ params }: PageProps) {
-  const { id } = await params;
+export default function MyResearchDetailPage() {
   return (
     <MySpaceShell role="researcher">
-      <MyResearchDetail researchId={Number(id)} />
+      <MyResearchDetailRoute />
     </MySpaceShell>
   );
 }

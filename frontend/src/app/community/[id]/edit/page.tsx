@@ -1,22 +1,22 @@
 import { Suspense } from "react";
-import { CommunityComposer } from "@/components/community/community-composer";
+import { CommunityEditRoute } from "@/components/routes/community-edit-route";
+import { placeholderParams } from "@/lib/static-route";
 
-export const dynamic = "force-dynamic";
 export const metadata = {
   title: "글 수정",
   robots: { index: false, follow: false },
 };
-export default async function EditCommunityPost({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
+
+export function generateStaticParams() {
+  return placeholderParams("id");
+}
+
+export default function EditCommunityPost() {
   return (
     <Suspense
       fallback={<p className="p-8 text-muted">글을 불러오고 있어요…</p>}
     >
-      <CommunityComposer postId={id} />
+      <CommunityEditRoute />
     </Suspense>
   );
 }
