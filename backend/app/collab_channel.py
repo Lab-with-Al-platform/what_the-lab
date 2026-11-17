@@ -14,6 +14,7 @@ from app.discord_bot import (
     create_private_channel,
     delete_channel,
 )
+
 BATCH = 10  # 한 번에 만들 최대 개수
 MAX_ATTEMPTS = 5  # 이만큼 실패하면 멈추고 failed 로 남겨요 (이유는 discord_error)
 RETRY_MINUTES = 1  # 실패하면 (시도 횟수 × 1분) 뒤에 다시

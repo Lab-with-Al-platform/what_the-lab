@@ -30,7 +30,7 @@ from app import workspace_rules as rules
 from app.config import DISCORD_BOT_TOKEN, DISCORD_GUILD_ID, FRONTEND_URL
 from app.db import get_connection
 from app.discord_bot import channel_url
-from app.discord_waiting import waiting_text, StartChangeButton
+from app.discord_waiting import StartChangeButton, waiting_text
 from app.routers.workspace_tasks import (
     change_due,
     close_task,

@@ -1,0 +1,121 @@
+# B12: develop·main에 머지하기 전에 꼭 통과해야 하는 검사예요.
+# 경로 필터를 두지 않아요. 필수 검사로 지정했는데 실행되지 않으면 PR이 "대기 중"으로 멈추기 때문이에요.
+# 자세한 이유: docs/aws-deployment/14-ci-cd-pipeline.md 4절, 09-deployment-roadmap.md B12
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop, main]
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend-test:
+    name: backend-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: backend
+    # 테스트용 가짜 값이에요. 실제 DB에는 연결하지 않아요.
+    env:
+      DISCORD_CLIENT_ID: "ci-placeholder"
+      DISCORD_CLIENT_SECRET: "ci-placeholder"
+      DISCORD_REDIRECT_URI: "http://localhost:8000/api/v1/auth/discord/callback"
+      JWT_SECRET: "ci-not-a-real-token-tests-only"
+      NEXT_PUBLIC_APP_URL: "http://localhost:3000"
+      CORS_ORIGINS: "http://localhost:3000"
+      DATABASE_URL: ""
+      DB_HOST: "127.0.0.1"
+      DB_PORT: "5433"
+      DB_NAME: "labbridge"
+      DB_USER: "admin"
+      DB_PASSWORD: "ci-placeholder"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv python install 3.13
+      - run: uv sync --locked
+      - name: 코드 규칙 (ruff)
+        run: uv run ruff check .
+      - name: 백엔드 전체 테스트
+        run: uv run pytest -q
+      - name: 문법 검사
+        run: uv run python -m compileall -q app
+
+  frontend:
+    name: frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npx tsc --noEmit
+      - run: npm run lint
+      # 일반 빌드(Vercel)는 Vercel 검사가 따로 확인해요. 여기서는 S3용 정적 빌드를 확인해요.
+      - name: S3용 정적 빌드 + CloudFront Function 생성
+        run: npm run build:static
+
+  migration-check:
+    name: migration-check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: labbridge_ci
+          POSTGRES_PASSWORD: ci-migration-only
+          POSTGRES_DB: labbridge
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U labbridge_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      DATABASE_URL: "postgresql://labbridge_ci:ci-migration-only@127.0.0.1:5432/labbridge"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv python install 3.13
+      - run: uv sync --locked
+      - name: 마지막 버전(head)이 하나인지
+        run: |
+          heads=$(uv run alembic heads | grep -c "(head)")
+          echo "heads=$heads"
+          test "$heads" -eq 1
+      - name: 빈 DB → upgrade head (운영 RDS를 처음 만들 때와 같은 순서)
+        run: uv run alembic upgrade head
+      - name: 지금 버전 = head, 다시 실행해도 변화 없음
+        run: |
+          current=$(uv run alembic current | awk '{print $1}')
+          head=$(uv run alembic heads | awk '{print $1}')
+          echo "current=$current head=$head"
+          test -n "$current" && test "$current" = "$head"
+          uv run alembic upgrade head
