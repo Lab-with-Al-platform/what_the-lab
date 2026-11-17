@@ -43,9 +43,7 @@
 .home-hero__description { max-width: 520px; margin-top: 20px; color: var(--color-muted); font-size: 15px; line-height: 1.9; word-break: keep-all; }
 .home-hero__cta { display: inline-flex; align-items: center; gap: 24px; min-height: 44px; margin-top: 20px; padding: 12px 24px; border-radius: var(--radius-button); background: var(--color-brand); color: white; font-size: 14px; font-weight: 600; }
 .home-hero__cta:hover { background: var(--color-brand-hover); }
-.home-hero__manual { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-height: 44px; margin-top: 20px; color: var(--color-muted); font-size: 12px; }
-.home-hero__cta, .home-hero__manual { align-self: start; justify-self: start; }
-.home-hero__manual > span { padding: 5px 10px; border: 1px solid var(--color-line); border-radius: var(--radius-button); background: var(--color-card); font-weight: 600; }
+.home-hero__cta { align-self: start; justify-self: start; }
 .home-hero__intro-art {
   position: relative;
   grid-column: 2;
@@ -167,7 +165,6 @@
   .home-hero__copy { padding: 28px 0 12px; }
   .home-hero__title { font-size: clamp(28px, 7.6vw, 36px); }
   .home-hero__description { font-size: 14px; line-height: 1.8; }
-  .home-hero__manual { font-size: 11px; }
   .home-hero__controls { flex-wrap: wrap; justify-content: center; gap: 4px; margin: 12px 0 16px; }
   .home-hero__choices { width: 100%; justify-content: space-between; gap: 8px; }
   .home-hero__choice { flex: 1; justify-content: center; gap: 4px; font-size: 11px; white-space: nowrap; }
