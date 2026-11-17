@@ -6,5 +6,5 @@
 *.gif binary
 *.webp binary
 
-# 쉘 스크립트는 Windows에서 받아도 LF로 (CRLF면 bash가 $'' 오류를 내요)
+# 쉘 스크립트는 Windows에서 받아도 LF로 (CRLF면 bash가  오류를 내요)
 *.sh text eol=lf
