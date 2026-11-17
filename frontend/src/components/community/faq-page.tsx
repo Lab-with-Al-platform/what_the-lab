@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { PageContainer } from "@/components/page-container";
-import { FAQ_CATEGORIES, FAQS, searchFaqs, type FaqCategory } from "@/lib/faq";
+import { FAQ_CATEGORIES, FAQS, searchFaqs, normalizeFaqCategory, type FaqCategory } from "@/lib/faq";
 import { DISCORD_GUIDES, FAQ_DISCORD_GUIDE_IDS } from "@/lib/faq-discord";
 import { FaqDiscordGuide } from "./faq-discord-guide";
 import { FAQ_SCREENSHOTS } from "@/lib/faq-screenshots";
@@ -33,8 +33,7 @@ export function FaqPage() {
   const params = useSearchParams();
   const router = useRouter();
   const query = params.get("q") ?? "";
-  const rawCategory = params.get("category") ?? "all";
-  const category = rawCategory in FAQ_CATEGORIES ? rawCategory : "all";
+  const category = normalizeFaqCategory(params.get("category"));
   const [expanded, setExpanded] = useState("");
   const [copyMessage, setCopyMessage] = useState("");
   const refs = useRef<Record<string, HTMLDetailsElement | null>>({});

@@ -1829,6 +1829,11 @@ export const FAQS: Faq[] = [
   }
 ];
 
+/** URL 입력은 실제 분류 키만 허용합니다. constructor 같은 상속 속성은 분류가 아닙니다. */
+export function normalizeFaqCategory(value: string | null): FaqCategory | "all" {
+  return value && Object.prototype.hasOwnProperty.call(FAQ_CATEGORIES, value) ? value as FaqCategory : "all";
+}
+
 /** 검색어는 NFKC로 통일하고, 모든 단어가 포함된 질문만 반환합니다. */
 export function searchFaqs(query: string, category = "all"): Faq[] {
   const words = query.normalize("NFKC").toLocaleLowerCase("ko").trim().split(/\s+/).filter(Boolean);

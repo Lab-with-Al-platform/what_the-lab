@@ -48,14 +48,19 @@ const out=path.resolve(process.env.FAQ_QA_OUTPUT || root+'/docs/qa/faq-discord-2
    await page.goto(origin+'/faq#'+faq);
    const region=page.locator('#'+faq).getByRole('region',{name:guide.title+' Discord 사용 안내'});
    await region.waitFor();
-   for(const scene of guide.scenes){
+   for(const [sceneIndex,scene] of guide.scenes.entries()){
     await region.getByRole('button',{name:new RegExp(scene.title)}).click();
     await region.getByRole('heading',{name:scene.heading,exact:true}).waitFor();
+    await region.screenshot({path:out+`/guide-${id}-step-${sceneIndex+1}.png`});
    }
    await region.screenshot({path:out+`/guide-${id}.png`});
    assert.equal(await region.getByRole('button',{name:'다음 단계 →'}).isDisabled(),true);
    report.guides.push({id,faq,scenes:guide.scenes.length});
   }
+  // Prototype names are untrusted URL input, never real category keys.
+  await page.goto(origin+'/faq?category=constructor');
+  await page.getByRole('heading',{name:'전체 도움말',exact:true}).waitFor();
+  assert.equal(await page.locator('details[id]').count(),50);
   // A hash hidden by query/category must recover, then normal filtering must remain usable.
   await page.goto(origin+'/faq?category=privacy&q=없는질문#discord-task-create');
   await page.locator('#discord-task-create[open]').waitFor();

@@ -19,7 +19,7 @@ function load(file) {
   });
   return module.exports;
 }
-const { FAQS, searchFaqs } = load("src/lib/faq.ts");
+const { FAQS, searchFaqs, normalizeFaqCategory } = load("src/lib/faq.ts");
 const { DISCORD_GUIDES, FAQ_DISCORD_GUIDE_IDS } = load("src/lib/faq-discord.ts");
 const { FaqDiscordGuide } = load("src/components/community/faq-discord-guide.tsx");
 const byId = id => FAQS.find(f => f.id === id);
@@ -93,4 +93,12 @@ test("the ten product screenshots remain and guides expose no real channel/accou
   assert.doesNotMatch(content, /https:\/\/discord.com\/channels\/\d|Bearer |Bot [A-Za-z0-9_.-]{20}/);
   const page = read("src/components/community/faq-page.tsx");
   assert.match(page, /expanded === faq.id && FAQ_DISCORD_GUIDE_IDS/);
+});
+
+test("untrusted category URL values cannot render inherited object/function properties", () => {
+  for (const value of [null, "", "all", "constructor", "__proto__", "toString", "unknown"]) {
+    assert.equal(normalizeFaqCategory(value), "all");
+  }
+  assert.equal(normalizeFaqCategory("discord"), "discord");
+  assert.equal(normalizeFaqCategory("privacy"), "privacy");
 });
