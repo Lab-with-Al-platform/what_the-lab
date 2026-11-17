@@ -7,5 +7,4 @@
 *.webp binary
 
 # 쉘 스크립트는 Windows에서 받아도 LF로 받아요 (CRLF면 bash 스크립트가 깨져요)
- 오류를 내요)
 *.sh text eol=lf
