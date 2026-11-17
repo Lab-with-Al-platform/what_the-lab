@@ -50,7 +50,7 @@ const out=path.resolve(process.env.FAQ_QA_OUTPUT || root+'/docs/qa/faq-discord-2
    await region.waitFor();
    for(const [sceneIndex,scene] of guide.scenes.entries()){
     await region.getByRole('button',{name:new RegExp(scene.title)}).click();
-    await region.getByRole('heading',{name:scene.heading,exact:true}).waitFor();
+    await region.getByRole('heading',{name:scene.heading,exact:true,level:5}).waitFor();
     await region.screenshot({path:out+`/guide-${id}-step-${sceneIndex+1}.png`});
    }
    await region.screenshot({path:out+`/guide-${id}.png`});

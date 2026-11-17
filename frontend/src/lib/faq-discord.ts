@@ -118,7 +118,7 @@ export const DISCORD_GUIDES: Record<string, DiscordGuide> = {
       { title: "함께 확인", surface: "channel", view: "message", heading: "@상대에게 · 일정을 추가했어요", text: "예제 데이터 검토 미팅 · 미팅 · 입력한 날짜와 시각", actions: ["일정 관리"], outcome: "두 사람이 사이트 달력에서도 같은 일정을 확인해요. 연결된 협업 Google 캘린더에는 별도 반영 과정이 있어요." },
     ],
     reflection: ["사이트와 Discord가 같은 일정 저장 기능을 사용", "저장 후 사이트 알림·채널 안내·연결된 캘린더 반영"],
-    caution: "알림이 늦다고 같은 일정을 반복 등록하지 마세요. 먼저 사이트에 저장됐는지 확인하세요.",
+    caution: "알림이 늦다고 같은 일정을 반복 등록하지 마세요. 사이트 화면을 새로고침해 저장됐는지 먼저 확인하세요.",
   },
   "discord-schedule-manage": {
     title: "일정을 찾아 고치거나 지우기",
