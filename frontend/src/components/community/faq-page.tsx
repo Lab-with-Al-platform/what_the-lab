@@ -6,6 +6,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { PageContainer } from "@/components/page-container";
 import { FAQ_CATEGORIES, FAQS, searchFaqs, type FaqCategory } from "@/lib/faq";
+import { DISCORD_GUIDES, FAQ_DISCORD_GUIDE_IDS } from "@/lib/faq-discord";
+import { FaqDiscordGuide } from "./faq-discord-guide";
 import { FAQ_SCREENSHOTS } from "@/lib/faq-screenshots";
 import { FaqWalkthrough } from "./faq-walkthrough";
 import { Icon } from "./community-ui";
@@ -14,6 +16,7 @@ import styles from "./faq-visual.module.css";
 
 const QUICK_HELP = [
   { label: "협업 요청과 작업 요청", id: "workspace-task-vs-request" },
+  { label: "Discord 사용 안내", id: "discord-task-create" },
   { label: "협업 일정·달력", id: "workspace-schedules" },
   { label: "협업 종료 후 평가", id: "review-after-completion" },
 ] as const;
@@ -92,7 +95,7 @@ export function FaqPage() {
               type="search"
               value={query}
               onChange={event => filter({ q: event.target.value })}
-              placeholder="예: 일정 추가, 기한 조정, 평가, 비공개 문의"
+              placeholder="예: /요청, Discord 연결, 일정 추가, 기한 조정"
               maxLength={200}
             />
             {query ? (
@@ -112,7 +115,12 @@ export function FaqPage() {
             <span aria-hidden="true" className={styles.overviewIcon}>✦</span>
             실제 메뉴와 버튼을 기준으로 작성한 도움말
           </div>
-          <small>서비스 기능 안내 기준 · 2026.11.03</small>
+          <small>서비스 기능 안내 기준 · 2026.11.17</small>
+        </div>
+
+        <div className={styles.visualLegend} aria-label="화면 안내의 출처 구분">
+          <span><strong>사이트 캡처</strong> 실제 사이트 UI · 시연 데이터</span>
+          <span><strong>Discord 안내도</strong> 코드에 근거한 설명용 화면 · 실제 캡처 아님</span>
         </div>
 
         <div className={styles.layout}>
@@ -154,7 +162,7 @@ export function FaqPage() {
                   >
                     <span aria-hidden="true" className={styles.questionNumber}>{String(index + 1).padStart(2, "0")}</span>
                     <span className={styles.questionText}>{faq.question}</span>
-                    {faq.guide && <span className={styles.guidePill}>단계별 안내</span>}
+                    {(faq.guide || FAQ_DISCORD_GUIDE_IDS[faq.id]) && <span className={styles.guidePill}>단계별 안내</span>}
                     <span aria-hidden="true" className={styles.expand}>{expanded === faq.id ? "−" : "+"}</span>
                   </summary>
 
@@ -193,6 +201,9 @@ export function FaqPage() {
                           로그인 상태나 운영 설정에 따라 버튼이 다르게 보일 수 있습니다.
                         </p>
                       </section>
+                    )}
+                    {expanded === faq.id && FAQ_DISCORD_GUIDE_IDS[faq.id] && (
+                      <FaqDiscordGuide key={faq.id} faqId={faq.id} guide={DISCORD_GUIDES[FAQ_DISCORD_GUIDE_IDS[faq.id]]} />
                     )}
                     {faq.guide && expanded === faq.id && (
                       FAQ_SCREENSHOTS[faq.id] ? (

@@ -216,3 +216,9 @@
   .screenshotFigure figcaption {font-size:10px;}
   .screenshotDisclaimer {padding:10px 12px;}
 }
+
+/* Distinguish product captures from source-grounded Discord illustrations. */
+.visualLegend { display: flex; flex-wrap: wrap; gap: 8px 22px; max-width: 1100px; margin: -8px auto 24px; font-size: 11px; line-height: 1.9; color: var(--color-muted); }
+.visualLegend > span { display: flex; flex-wrap: wrap; gap: 5px 8px; }
+.visualLegend strong { color: var(--color-ink); font-weight: 700; }
+@media(max-width:640px) { .visualLegend { display: grid; gap: 7px; } }

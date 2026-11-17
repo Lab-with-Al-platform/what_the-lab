@@ -1,0 +1,72 @@
+/* A readable illustration using existing product tokens, not a Discord UI replica. */
+.guide { margin: 24px 0; border: 1px solid var(--color-line); border-radius: var(--radius-card); overflow: hidden; background: var(--color-card); color: var(--color-ink); }
+.heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 22px 22px 16px; }
+.eyebrow { color: var(--color-brand); font-size: 10px; letter-spacing: .12em; font-weight: 800; }
+.heading h3 { margin-top: 6px; font-size: 19px; font-weight: 750; line-height: 1.5; letter-spacing: -.035em; }
+.provenance { padding: 6px 10px; background: var(--color-brand-soft); color: var(--color-brand-deep); border-radius: 6px; font-size: 11px; font-weight: 700; }
+.guide .prerequisite { display: grid; grid-template-columns: auto minmax(0,1fr); gap: 9px; padding: 0 22px 18px; margin: 0; font-size: 12px; line-height: 1.8; color: var(--color-muted); }
+.prerequisite strong { color: var(--color-ink); }
+.stepList { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 14px 20px; background: var(--color-page); border-block: 1px solid var(--color-line); list-style: none; }
+.stepList li { min-width: 0; }
+.stepList button { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 10px 12px; border: 1px solid transparent; border-radius: 8px; color: var(--color-muted); font-size: 12px; text-align: left; line-height: 1.5; }
+.stepList button span { font-size: 10px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.stepList button:hover { background: var(--color-card); }
+.stepList button[aria-pressed="true"] { background: var(--color-brand); color: var(--color-card); font-weight: 700; }
+.guide button:focus-visible { outline: 3px solid var(--color-brand); outline-offset: 3px; }
+.stage { padding: 20px; }
+.stageTitle { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.stageTitle > span { padding: 4px 8px; background: var(--color-brand-soft); color: var(--color-brand-deep); font-size: 11px; font-weight: 800; border-radius: 5px; }
+.stageTitle h4 { font-size: 15px; font-weight: 750; }
+.canvas { margin: 0; border: 1px solid var(--color-line); border-radius: 10px; overflow: hidden; }
+.canvasHeader { display: flex; align-items: center; gap: 11px; padding: 16px; background: var(--color-ink); color: var(--color-card); }
+.channelMark { display: grid; place-items: center; flex: none; width: 32px; height: 32px; background: var(--color-muted); border-radius: 9px; font-size: 20px; }
+.canvasHeader > div { min-width: 0; }
+.canvasHeader strong { display: block; font-size: 13px; line-height: 1.5; }
+.canvasHeader > div > span { display: block; margin-top: 3px; font-size: 11px; line-height: 1.6; }
+.example { margin-left: auto; flex: none; padding: 4px 7px; border: 1px solid currentColor; border-radius: 5px; font-size: 10px; }
+.canvasBody { padding: 18px; background: var(--color-page); }
+.sceneType { margin-bottom: 8px; color: var(--color-muted); font-size: 11px; font-weight: 700; }
+.card { padding: 18px; background: var(--color-card); border: 1px solid var(--color-line); border-radius: 8px; }
+.card h5 { color: var(--color-ink); font-size: 16px; font-weight: 750; line-height: 1.6; overflow-wrap: anywhere; }
+.guide .sceneText { margin: 8px 0 0; color: var(--color-muted); font-size: 14px; line-height: 1.85; white-space: pre-line; }
+.fields { display: grid; gap: 12px; margin-top: 18px; }
+.fields dt { color: var(--color-muted); font-size: 12px; line-height: 1.6; font-weight: 650; }
+.fields dd { margin-top: 5px; padding: 11px 12px; border: 1px solid var(--color-line); border-radius: 6px; background: var(--color-page); color: var(--color-ink); font-size: 14px; line-height: 1.7; overflow-wrap: anywhere; }
+.exampleActions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 16px; }
+.exampleActions span { display: inline-flex; align-items: center; padding: 8px 11px; border: 1px solid var(--color-line); border-radius: 6px; color: var(--color-brand-deep); background: var(--color-brand-soft); font-size: 12px; font-weight: 650; line-height: 1.6; overflow-wrap: anywhere; }
+.canvas figcaption { padding: 11px 16px; border-top: 1px solid var(--color-line); color: var(--color-muted); background: var(--color-card); font-size: 11px; line-height: 1.8; }
+.outcome { display: grid; grid-template-columns: 3px minmax(0,1fr); column-gap: 12px; margin-top: 18px; }
+.outcome::before { content: ""; grid-row: span 2; border-radius: 3px; background: var(--color-brand); }
+.outcome strong { color: var(--color-ink); font-size: 12px; }
+.guide .outcome p { margin: 5px 0 0; font-size: 13px; line-height: 1.85; color: var(--color-muted); }
+.pager { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+.pager button { min-height: 44px; padding: 9px 12px; background: var(--color-card); border: 1px solid var(--color-line); border-radius: 8px; font-size: 12px; color: var(--color-brand-deep); font-weight: 700; }
+.pager button:hover:enabled { background: var(--color-brand-soft); }
+.pager button:disabled { color: var(--color-muted); opacity: .55; cursor: default; }
+.pager > span { color: var(--color-muted); font-size: 10px; }
+.reflection { padding: 18px 22px; border-top: 1px solid var(--color-line); background: var(--color-brand-soft); }
+.reflection > strong { color: var(--color-ink); font-size: 12px; }
+.reflection ul { margin-top: 8px; padding-left: 16px; list-style: disc; }
+.reflection li { color: var(--color-muted); font-size: 12px; line-height: 1.9; overflow-wrap: anywhere; }
+.guide .caution { margin: 0; padding: 15px 22px; color: var(--color-muted); font-size: 12px; line-height: 1.9; }
+@media (max-width: 640px) {
+  .heading { padding: 18px 15px 13px; }
+  .heading h3 { font-size: 17px; }
+  .guide .prerequisite { grid-template-columns: 1fr; gap: 3px; padding-inline: 15px; }
+  .stepList { padding: 10px; gap: 4px; }
+  .stepList li { flex: 1 1 calc(50% - 4px); }
+  .stepList button { width: 100%; padding: 10px 8px; }
+  .stage { padding: 15px 12px; }
+  .canvasHeader { padding: 12px; }
+  .canvasBody { padding: 11px; }
+  .card { padding: 13px; }
+  .card h5 { font-size: 15px; }
+  .guide .sceneText, .fields dd { font-size: 14px; }
+  .reflection, .guide .caution { padding-inline: 15px; }
+  .pager > span { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .guide * { scroll-behavior: auto; } }
+@media (forced-colors: active) {
+  .stepList button[aria-pressed="true"] { outline: 2px solid Highlight; }
+  .exampleActions span, .card { border-color: CanvasText; }
+}
