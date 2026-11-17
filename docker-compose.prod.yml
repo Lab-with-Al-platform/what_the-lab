@@ -92,14 +92,21 @@ services:
     image: nginx:alpine
     container_name: labbridge-prod-nginx
     restart: unless-stopped
+    # 보안 그룹이 CloudFront만 443으로 들여보내요. 80번은 열지 않아요. (B4)
     ports:
-      - "80:80"
+      - "443:443"
+    environment:
+      ORIGIN_DOMAIN: ${ORIGIN_DOMAIN:?ORIGIN_DOMAIN 필요 (예 origin.labbridge.kr)}
+      ORIGIN_VERIFY_SECRET: ${ORIGIN_VERIFY_SECRET:?ORIGIN_VERIFY_SECRET 필요 (CloudFront 비밀 헤더 값)}
     volumes:
       - ./infra/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./infra/nginx/templates:/etc/nginx/templates:ro
+      # certbot(DNS-01)이 EC2에 받아 둔 오리진 인증서
+      - ${ORIGIN_CERT_DIR:-/etc/letsencrypt}:/etc/letsencrypt:ro
     depends_on:
       - backend
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost/healthz"]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/healthz"]
       interval: 15s
       timeout: 3s
       retries: 3
