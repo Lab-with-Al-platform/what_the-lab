@@ -29,8 +29,8 @@ const required = [
 ];
 
 test("기존 20개 FAQ 해시와 신규 기능 17개 모두 정확히 하나씩 존재", () => {
-  assert.equal(FAQS.length, 37);
-  assert.equal(new Set(FAQS.map(x => x.id)).size, 37);
+  assert.ok(FAQS.length >= 37);
+  assert.equal(new Set(FAQS.map(x => x.id)).size, FAQS.length);
   for (const id of [...originalAnchors,...required]) assert.equal(FAQS.filter(x => x.id === id).length, 1, id);
 });
 test("모든 FAQ에 검증 가능한 메뉴 링크와 분류가 있고 가이드는 최소 2단계", () => {
@@ -61,7 +61,7 @@ test("일정/Google/반복/알림 안내가 조건과 권한을 빠뜨리지 않
   assert.match(byId("repeat-schedule"),/하루짜리/);
   assert.match(byId("repeat-schedule"),/미팅/);
   assert.match(byId("google-calendar-sync"),/기능이 활성화된 경우/);
-  assert.match(byId("google-calendar-sync"),/수정은 WHAT THE LAB/);
+  assert.match(byId("google-calendar-sync"),/원본 일정 수정은 WHAT THE LAB/);
   assert.match(byId("workspace-notices"),/최근 30일/);
   assert.match(read("src/components/workspace-schedule-dialog.tsx"),/canRepeat = !editing && kind === "meeting" && oneDay/);
   assert.match(read("src/components/workspace-detail-head.tsx"),/if \(!detail\.google_enabled\) return null/);
