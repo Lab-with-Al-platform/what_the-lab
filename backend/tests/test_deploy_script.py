@@ -20,7 +20,7 @@ OLD_IMAGE = "registry.example/labbridge-backend:old"
 
 # 가짜 docker: 받은 명령을 기록하고, 테스트가 정한 값으로 대답해요.
 FAKE_DOCKER = r"""#!/usr/bin/env bash
-echo "IMAGE=${BACKEND_IMAGE:-} $*" >> "$FAKE_LOG"
+echo "IMAGE=${BACKEND_IMAGE:-} DB=${DATABASE_URL:-} $*" >> "$FAKE_LOG"
 case "$*" in
   *"alembic current"*)
     if [ -f "$FAKE_STATE/upgraded" ]; then echo "$FAKE_HEADS (head)"; elif [ -n "$FAKE_CURRENT" ]; then echo "$FAKE_CURRENT"; fi ;;
@@ -67,8 +67,9 @@ def run_deploy(tmp_path: Path, *, current: str, heads: str = "20261104_27", heal
         **(extra_env or {}),
     }
     env.pop("ENABLE_DISCORD_BOT", None)
-    if extra_env and "ENABLE_DISCORD_BOT" in extra_env:
-        env["ENABLE_DISCORD_BOT"] = extra_env["ENABLE_DISCORD_BOT"]
+    env.pop("DATABASE_URL", None)
+    env.pop("MIGRATION_DATABASE_URL", None)
+    env.update(extra_env or {})
     # 실패(종료 코드 1)도 테스트할 값이라 check=False 로 직접 확인해요.
     result = subprocess.run([BASH, str(DEPLOY_SH), NEW_IMAGE], check=False, cwd=tmp_path, env=env,
                             capture_output=True, text=True, encoding="utf-8", timeout=60)
@@ -140,3 +141,25 @@ def test_script_never_downgrades_or_scales():
     assert "downgrade" not in text
     assert "--scale" not in text
     assert text.startswith("#!/usr/bin/env bash\n") and "set -euo pipefail" in text
+
+
+MIGRATOR_URL = "postgresql://labbridge_migrator:x@db.example:5432/labbridge"
+
+
+def test_migrator_account_runs_migrations_and_grants(tmp_path):
+    """계정을 나누면 alembic·권한 맞추기는 migrator 로, 앱 컨테이너는 원래 DATABASE_URL 로 (B11)."""
+    code, calls, out = run_deploy(tmp_path, current="20261103_26", extra_env={
+        "MIGRATION_SNAPSHOT_ID": "pre-migrate-test", "MIGRATION_DATABASE_URL": MIGRATOR_URL})
+    assert code == 0, out
+    for text in ["alembic current", "alembic heads", "alembic upgrade head", "apply_grants.py"]:
+        assert f"DB={MIGRATOR_URL}" in calls[index_of(calls, text)], text
+    assert index_of(calls, "alembic upgrade head") < index_of(calls, "apply_grants.py") < index_of(calls, "up -d --no-deps backend")
+    assert f"DB={MIGRATOR_URL}" not in calls[index_of(calls, "up -d --no-deps backend")]
+    assert MIGRATOR_URL not in out  # 비밀번호가 든 주소를 화면에 찍지 않아요
+
+
+def test_single_account_mode_skips_grants(tmp_path):
+    code, calls, out = run_deploy(tmp_path, current="20261104_27")
+    assert code == 0, out
+    assert not any("apply_grants.py" in c for c in calls)
+    assert "권한 맞추기 건너뜀" in out
