@@ -2,6 +2,9 @@
 .env
 .env.*
 !.env.example
+# 운영 비밀 파일 (구글 서비스 계정 키 등)과 관리자 디스코드 ID 목록
+/secrets/
+infra/admins/admin-ids.txt
 
 # Node.js / Next.js
 node_modules/

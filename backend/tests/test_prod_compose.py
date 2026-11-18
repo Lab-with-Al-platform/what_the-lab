@@ -149,3 +149,50 @@ def test_nginx_reads_only_origin_server_config():
     assert "include /etc/nginx/conf.d/origin.conf;" in conf
     assert "conf.d/*.conf" not in conf
     assert "listen 80" not in conf
+
+
+# ---- 2026-11-18: backend 코드가 읽는 환경변수가 운영 compose에 빠지지 않게 ----
+APP_DIR = ROOT / "backend" / "app"
+ENV_READ = re.compile(r"""os\.(?:getenv|environ\.get)\(\s*["']([A-Z_]+)["']|os\.environ\[\s*["']([A-Z_]+)["']\s*\]""")
+LEGACY_ENV = {"DB_HOST", "DB_PORT", "DB_NAME", "DB_USER", "DB_PASSWORD"}  # DATABASE_URL 이 없을 때만 쓰는 예전 값
+
+
+def env_names_read_by_app() -> set[str]:
+    """backend/app 코드가 읽는 환경변수 이름 (여러 줄에 걸친 getenv 도 포함)."""
+    names: set[str] = set()
+    for path in APP_DIR.rglob("*.py"):
+        for found in ENV_READ.findall(path.read_text(encoding="utf-8")):
+            names.add(found[0] or found[1])
+    return names
+
+
+def test_app_env_vars_are_all_passed_by_compose():
+    """코드가 읽는데 compose가 안 넘기면, 운영에서 조용히 기본값(localhost 등)으로 돌아요."""
+    needed = env_names_read_by_app() - LEGACY_ENV
+    assert "INSIGHT_ALLOWED_ORIGINS" in needed  # 여러 줄 getenv 도 찾는지
+    for name in APP_SERVICES:
+        missing = needed - set(service_env(name))
+        assert not missing, f"{name} 에 빠진 환경변수: {sorted(missing)} → docker-compose.prod.yml x-app-environment"
+
+
+def test_env_example_lists_every_compose_variable():
+    """compose 가 읽는 ${이름} 은 infra/env.production.example 에도 있어야 팀원이 채울 수 있어요."""
+    compose_vars = set(re.findall(r"\$\{([A-Z_]+)", COMPOSE.read_text(encoding="utf-8")))
+    example = (ROOT / "infra" / "env.production.example").read_text(encoding="utf-8")
+    example_vars = set(re.findall(r"^([A-Z_]+)=", example, flags=re.M))
+    assert not compose_vars - example_vars, sorted(compose_vars - example_vars)
+
+
+def test_uploads_are_saved_in_the_volume():
+    """코드 기본값은 컨테이너에서 /backend/uploads 가 되어 권한 오류가 나요. 볼륨 위치로 고정해요."""
+    backend = load_services(COMPOSE)["backend"]
+    target = "/app/uploads"
+    assert service_env("backend")["UPLOAD_DIR"] == target
+    assert f"backend_uploads:{target}" in backend["volumes"]
+
+
+def test_write_origins_follow_cors_by_default():
+    """관리자 쓰기·게시판 글쓰기의 허용 주소가 비면 CORS_ORIGINS 를 따라가요 (코드 기본값 localhost 방지)."""
+    env = service_env("backend")
+    for key in ["INSIGHT_ALLOWED_ORIGINS", "COMMUNITY_ALLOWED_ORIGINS"]:
+        assert env[key] == f"${{{key}:-${{CORS_ORIGINS}}}}"

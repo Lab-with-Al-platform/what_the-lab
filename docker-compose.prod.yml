@@ -8,6 +8,39 @@
 #   - 로컬 리허설은 awslogs 파일 없이 실행해요 (AWS 권한이 없어 로그 전송이 실패해요)
 # 필요한 값 목록: infra/env.production.example
 
+# backend 와 discord-bot 이 함께 쓰는 환경변수 (같은 이미지·같은 app/config.py 를 읽어요)
+# backend/app 이 읽는 값은 모두 여기 있어야 해요. 빠지면 backend/tests/test_prod_compose.py 가 실패해요.
+x-app-environment: &app-environment
+  APP_ENV: production
+  DATABASE_URL: ${DATABASE_URL:?DATABASE_URL 필요}
+  NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:?NEXT_PUBLIC_APP_URL 필요 (로그인 후 돌아갈 화면 주소)}
+  CORS_ORIGINS: ${CORS_ORIGINS:?CORS_ORIGINS 필요}
+  # 관리자 쓰기 요청·게시판 글쓰기를 허용할 화면 주소. 비우면 CORS_ORIGINS 와 같아요 (코드 기본값은 localhost)
+  INSIGHT_ALLOWED_ORIGINS: ${INSIGHT_ALLOWED_ORIGINS:-${CORS_ORIGINS}}
+  COMMUNITY_ALLOWED_ORIGINS: ${COMMUNITY_ALLOWED_ORIGINS:-${CORS_ORIGINS}}
+  DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:?DISCORD_CLIENT_ID 필요}
+  DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:?DISCORD_CLIENT_SECRET 필요}
+  DISCORD_REDIRECT_URI: ${DISCORD_REDIRECT_URI:?DISCORD_REDIRECT_URI 필요}
+  DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
+  DISCORD_GUILD_ID: ${DISCORD_GUILD_ID:-}
+  DISCORD_COLLAB_CATEGORY_ID: ${DISCORD_COLLAB_CATEGORY_ID:-}
+  JWT_SECRET: ${JWT_SECRET:?JWT_SECRET 필요 (32자 이상 무작위)}
+  # 운영 화면 관리자 (디스코드 사용자 ID, 쉼표로 구분). 만드는 법: infra/admins/README.md
+  OPERATIONS_ADMIN_DISCORD_IDS: ${OPERATIONS_ADMIN_DISCORD_IDS:-}
+  INSIGHT_ADMIN_DISCORD_IDS: ${INSIGHT_ADMIN_DISCORD_IDS:-}
+  # 인사이트·방문 통계는 MVP+ 라서 기본으로 꺼 둬요
+  INSIGHTS_ENABLED: ${INSIGHTS_ENABLED:-false}
+  INSIGHT_VIEWS_ENABLED: ${INSIGHT_VIEWS_ENABLED:-false}
+  ANALYTICS_COLLECTION_ENABLED: ${ANALYTICS_COLLECTION_ENABLED:-false}
+  # 구글 로그인(이메일 받기)·캘린더. 키 파일은 아래 google 폴더에 두고 경로를 적어요. 비우면 구글 기능을 건너뛰어요
+  GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+  GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+  GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-}
+  GOOGLE_SERVICE_ACCOUNT_FILE: ${GOOGLE_SERVICE_ACCOUNT_FILE:-}
+  # 업로드 파일은 볼륨(backend_uploads)이 연결된 곳에 저장해요.
+  # 코드 기본값은 컨테이너에서 /backend/uploads 가 되어 권한 오류가 나요 (2026-11-18 확인)
+  UPLOAD_DIR: /app/uploads
+
 services:
   # 1. FastAPI Web API 서버 (단일 Uvicorn Worker)
   backend:
@@ -18,19 +51,11 @@ services:
       dockerfile: Dockerfile
     container_name: labbridge-prod-backend
     restart: unless-stopped
-    environment:
-      APP_ENV: production
-      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL 필요}
-      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:?NEXT_PUBLIC_APP_URL 필요 (로그인 후 돌아갈 화면 주소)}
-      CORS_ORIGINS: ${CORS_ORIGINS:?CORS_ORIGINS 필요}
-      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:?DISCORD_CLIENT_ID 필요}
-      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:?DISCORD_CLIENT_SECRET 필요}
-      DISCORD_REDIRECT_URI: ${DISCORD_REDIRECT_URI:?DISCORD_REDIRECT_URI 필요}
-      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
-      DISCORD_GUILD_ID: ${DISCORD_GUILD_ID:-}
-      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET 필요 (32자 이상 무작위)}
+    environment: *app-environment
     volumes:
       - backend_uploads:/app/uploads
+      # 구글 서비스 계정 키 (있을 때만). GOOGLE_SERVICE_ACCOUNT_FILE=/run/secrets/google/<파일 이름>
+      - ${GOOGLE_KEY_DIR:-./secrets/google}:/run/secrets/google:ro
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health')"]
       interval: 15s
@@ -61,19 +86,13 @@ services:
       backend:
         condition: service_started
     command: ["python", "-m", "app.discord_gateway"]
+    volumes:
+      # 구글 서비스 계정 키 (있을 때만). GOOGLE_SERVICE_ACCOUNT_FILE=/run/secrets/google/<파일 이름>
+      - ${GOOGLE_KEY_DIR:-./secrets/google}:/run/secrets/google:ro
     # backend 이미지의 HEALTHCHECK(8000번 API 확인)를 물려받지 않게 꺼요. 봇은 웹 서버가 없어서 항상 unhealthy가 돼요.
     healthcheck:
       disable: true
-    environment:
-      APP_ENV: production
-      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL 필요}
-      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:?NEXT_PUBLIC_APP_URL 필요 (DM 속 링크 주소)}
-      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:?DISCORD_CLIENT_ID 필요}
-      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:?DISCORD_CLIENT_SECRET 필요}
-      DISCORD_REDIRECT_URI: ${DISCORD_REDIRECT_URI:?DISCORD_REDIRECT_URI 필요}
-      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
-      DISCORD_GUILD_ID: ${DISCORD_GUILD_ID:-}
-      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET 필요 (32자 이상 무작위)}
+    environment: *app-environment
     deploy:
       resources:
         limits:
