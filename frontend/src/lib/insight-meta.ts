@@ -44,7 +44,9 @@ export interface InsightListItem {
   topicLabel: string;
   domains: string[];
   tags: string[];
+  /** 기존 목록 정렬 기준입니다. 실제 글의 발행일로 표시하지 않습니다. */
   publishedOn: string;
+  articlePublishedOn?: string;
   readingMinutes: number;
   cover: CoverTheme;
   coverSrc?: string;

@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { PageContainer } from "@/components/page-container";
 import styles from "@/components/community/community.module.css";
+import { publicPageMetadata } from "@/lib/site-seo";
 
-export const metadata = { title: "커뮤니티 이용 가이드" };
+export const metadata = publicPageMetadata("/community/guidelines");
 export default function GuidelinesPage() {
   return (
     <PageContainer className={styles.page}>

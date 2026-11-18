@@ -23,6 +23,8 @@ function handler(event) {
 
 // 주소 하나를 S3에 있는 파일 이름으로 바꿔요.
 function toS3Key(uri) {
+  // robots.txt는 페이지 이동용 .txt가 아니라 검색 로봇에 제공하는 정적 파일이에요.
+  if (uri === "/robots.txt") return uri;
   var isPageData = uri.slice(-4) === ".txt";
   var page = isPageData ? uri.slice(0, -4) : uri;
   if (!isPageData && hasFileExtension(page)) return uri;

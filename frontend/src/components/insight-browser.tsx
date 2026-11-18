@@ -51,7 +51,7 @@ export function InsightBrowser({
               <p className="mt-3 text-sm text-muted md:text-base">{kicker}</p>
             </div>
             <p className="text-xs text-muted">
-              총 {articles.length}건 · {kind === "case" ? "실증 사례·시안 콘텐츠" : "검증 글·시안 콘텐츠"}
+              총 {articles.length}건 · {kind === "case" ? "원 연구 해설" : "연구·공식 자료 해설"}
             </p>
           </div>
           <p className="sr-only">{description}</p>

@@ -193,7 +193,13 @@ export function ArticleView({
             style={{ ["--header-figure-offset" as string]: `${hideCover ? 0 : HEADER_FIGURE_WIDTH + HEADER_FIGURE_GAP}px` }}
           >
             {article.institution ? <li>{article.institution}</li> : null}
-            <li>{article.publishedOn}</li>
+            {article.editorial?.author ? <li>작성: {article.editorial.author.name}</li> : null}
+            {article.editorial?.publishedOn ? (
+              <li>발행: <time dateTime={article.editorial.publishedOn}>{article.editorial.publishedOn}</time></li>
+            ) : contentOnly ? <li>{article.publishedOn}</li> : null}
+            {article.editorial?.reviewedOn ? (
+              <li>검토: <time dateTime={article.editorial.reviewedOn}>{article.editorial.reviewedOn}</time></li>
+            ) : null}
             <li>읽는 시간 {article.readingMinutes}분</li>
             <li className="font-semibold text-brand">
               {article.sourceUrl ? (
@@ -203,13 +209,19 @@ export function ArticleView({
                   rel="noreferrer"
                   className="transition hover:text-ink"
                 >
-                  원문 보기 ↗
+                  {article.evidence ? `${article.evidence.type} 보기 ↗` : "출처 보기 ↗"}
                 </a>
               ) : (
-                "원문 준비 중 ↗"
+                "공개 출처 없음"
               )}
             </li>
           </ul>
+          {article.evidence ? (
+            <p className="mt-3 text-xs leading-6 text-muted">
+              <strong className="text-ink">출처로 확인할 수 있는 범위</strong>{" "}
+              {article.evidence.takeaway}
+            </p>
+          ) : null}
           {article.sampleNotice ? <p className="mt-2 text-[10px] leading-4 text-faint">{article.sampleNotice}</p> : null}
 
           {!contentOnly && companion ? (
@@ -318,7 +330,7 @@ export function ArticleView({
                 rel="noreferrer"
                 className="mt-4 block text-xs font-semibold leading-5 text-brand transition hover:text-ink"
               >
-                {article.doi ? "DOI 원문 확인하기 ↗" : "원문 확인하기 ↗"}
+                출처 확인하기 ↗
               </a>
             ) : (
               <p className="mt-4 text-xs leading-5 text-muted">원문 링크는 출처 확인이 끝난 뒤에 연결합니다.</p>
@@ -357,7 +369,7 @@ export function ArticleView({
                       <CoverArt theme={item.cover} src={item.coverSrc} className="h-14 w-16 shrink-0 rounded-lg" sizes="64px" />
                       <span>
                         <span className="block text-sm font-semibold">{item.title}</span>
-                        <span className="mt-1 block text-xs text-muted">{item.publishedOn}</span>
+                        <span className="mt-1 block text-xs text-muted">읽는 시간 {item.readingMinutes}분</span>
                       </span>
                     </Link>
                   </li>

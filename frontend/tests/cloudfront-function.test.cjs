@@ -50,6 +50,8 @@ test("화면 이동 데이터(.txt)도 같은 규칙을 따라요", () => {
 });
 
 test("파일 주소는 그대로 둬요", () => {
+  assert.equal(toS3Key("/robots.txt"), "/robots.txt");
+  assert.equal(toS3Key("/sitemap.xml"), "/sitemap.xml");
   assert.equal(toS3Key("/_next/static/chunks/main-abc.js"), "/_next/static/chunks/main-abc.js");
   assert.equal(toS3Key("/photos/climate.jpg"), "/photos/climate.jpg");
   assert.equal(toS3Key("/icon.png"), "/icon.png");

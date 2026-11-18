@@ -10,6 +10,7 @@ const React = require("react");
 const { renderToStaticMarkup } = require("react-dom/server");
 
 const moduleCache = new Map();
+const REMOVED_SCENARIOS = new Set(["cancer-cell-classification", "metastasis-multimodal"]);
 
 /** 로컬 원고 모듈도 읽되, Next 서버나 실제 DB에는 연결하지 않습니다. */
 function loadTypeScript(relativePath) {
@@ -52,7 +53,7 @@ function originalImageSource(markup) {
   return url.searchParams.get("url") ?? url.pathname;
 }
 
-test("31개 글의 최종 표지 경로와 실제 파일이 중복되지 않는다", () => {
+test("공개 29개 글의 최종 표지 경로와 실제 파일이 중복되지 않는다", () => {
   const coverSource = fs.readFileSync(path.resolve(__dirname, "../src/components/cover-art.tsx"), "utf8");
   const defaults = Object.fromEntries([...coverSource.matchAll(/(\w+): "([^"]+)"/g)].map((match) => [match[1], match[2]]));
   const sources = new Set();
@@ -67,8 +68,8 @@ test("31개 글의 최종 표지 경로와 실제 파일이 중복되지 않는�
     sources.add(src);
     fileHashes.add(fileHash);
   }
-  assert.equal(sources.size, 31);
-  assert.equal(Object.keys(GENERATED_INSIGHT_COVERS).length, 18);
+  assert.equal(sources.size, 29);
+  assert.equal(Object.keys(GENERATED_INSIGHT_COVERS).length, 17);
 });
 
 test("생성 표지는 JPEG라서 저장소 원본이 작다", () => {
@@ -155,6 +156,7 @@ test("기존 치주골·MatterGen 내용은 보존하고 허용된 트렌드 표
   for (const [slug, hash] of Object.entries(expected)) {
     const article = { ...getInsight(slug) };
     // 표지 교체와 목록 추천 문구는 허용하되 본문·분류·URL 회귀 검사는 유지합니다.
+    delete article.evidence;
     delete article.featuredRank;
     delete article.featuredHeadline;
     delete article.featuredSummary;
@@ -167,11 +169,11 @@ test("기존 치주골·MatterGen 내용은 보존하고 허용된 트렌드 표
   }
 });
 
-test("나머지 28개 글은 주제별 본문·용어·판단·출처를 갖고 URL을 유지한다", () => {
+test("나머지 26개 글은 주제별 본문·용어·판단·출처를 갖고 URL을 유지한다", () => {
   const preserved = new Set(["periodontal-bone-loss-analysis", "mattergen-material-design", "mattergen-experimental-validation"]);
   const expanded = INSIGHTS.filter((article) => !preserved.has(article.slug));
-  assert.equal(INSIGHTS.length, 31);
-  assert.equal(expanded.length, 28);
+  assert.equal(INSIGHTS.length, 29);
+  assert.equal(expanded.length, 26);
   const bodies = new Set();
   for (const article of expanded) {
     const body = article.sections.flatMap((section) => section.paragraphs.map(textOf)).join("\n");
@@ -190,22 +192,20 @@ test("나머지 28개 글은 주제별 본문·용어·판단·출처를 갖고 
   }
 });
 
-test("예시 기관·DOI·성과는 최종 글에 노출하지 않고 두 시나리오를 명시한다", () => {
+test("예시 기관·DOI·성과와 실제 연구 원문이 없는 시나리오는 공개 원고에서 빠진다", () => {
   const serialized = JSON.stringify(INSIGHTS);
   for (const value of ["10.1234/example", "서울대학교 생명과학연구원", "정확도 92% · 분석 시간 70% 단축"]) {
     assert.ok(!serialized.includes(value), value);
   }
-  for (const slug of ["cancer-cell-classification", "metastasis-multimodal"]) {
-    const article = getInsight(slug);
-    assert.ok(article.sampleNotice.includes("설명용 연구 시나리오"));
-    assert.equal(article.doi, undefined);
-    assert.equal(article.institution, undefined);
+  for (const slug of REMOVED_SCENARIOS) {
+    assert.equal(getInsight(slug), undefined);
+    assert.ok(!serialized.includes(slug));
   }
 });
 
-test("28개 보강 원고는 실제 섹션에 여섯 문단 이상을 추가한다", () => {
+test("26개 보강 원고는 실제 섹션에 여섯 문단 이상을 추가한다", () => {
   const plans = { ...CASE_DETAILS, ...TREND_DETAILS };
-  assert.equal(Object.keys(plans).length, 28);
+  assert.equal(Object.keys(plans).length, 26);
   for (const [slug, plan] of Object.entries(plans)) {
     const article = getInsight(slug);
     const sectionIds = new Set(article.sections.map((section) => section.id));
@@ -225,10 +225,11 @@ test("28개 보강 원고는 실제 섹션에 여섯 문단 이상을 추가한�
   }
 });
 
-test("보강 전과 비교해 URL·목차를 유지하고 짧은 28개 글의 설명을 늘린다", () => {
+test("보강 전과 비교해 URL·목차를 유지하고 짧은 26개 글의 설명을 늘린다", () => {
   const before = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../../docs/qa/insight-depth-20261019/before.json"), "utf8"));
-  assert.equal(before.articles.length, INSIGHTS.length);
+  assert.equal(before.articles.length, INSIGHTS.length + REMOVED_SCENARIOS.size);
   for (const previous of before.articles) {
+    if (REMOVED_SCENARIOS.has(previous.slug)) continue;
     const article = getInsight(previous.slug);
     const chars = article.sections.flatMap((section) => section.paragraphs.map(textOf)).join("").length;
     assert.equal(article.sections.length, previous.sections, `${article.slug}: 목차 개수 변경`);

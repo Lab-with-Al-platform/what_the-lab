@@ -6,6 +6,7 @@
  */
 import { enrichInsight } from "./insight-enrichment";
 import { applyInsightCover } from "./insight-covers";
+import { INSIGHT_EVIDENCE, type InsightEvidence } from "./insight-publication";
 import type { CoverTheme, InsightKind, InsightListItem, InsightTopic } from "./insight-meta";
 
 export type { CoverTheme, InsightKind, InsightListItem, InsightTopic } from "./insight-meta";
@@ -57,7 +58,17 @@ export interface InsightTechnology {
   description: string;
 }
 
+interface InsightEditorialCredit {
+  /** 논문 저자가 아니라 LabBridge 글의 실제 작성자입니다. */
+  author?: { type: "Person" | "Organization"; name: string };
+  /** 확인된 기사 발행일과 검토일만 YYYY-MM-DD 형식으로 적습니다. */
+  publishedOn?: string;
+  reviewedOn?: string;
+}
+
 export interface InsightArticle extends InsightListItem {
+  evidence?: InsightEvidence;
+  editorial?: InsightEditorialCredit;
   source: string;
   institution?: string;
   doi?: string;
@@ -164,7 +175,7 @@ const MATTERGEN_GLOSSARY: InsightTerm[] = [
   },
 ];
 
-interface ArticleSeed {
+interface ArticleSeed extends Pick<InsightArticle, "editorial"> {
   slug: string;
   kind: InsightKind;
   title: string;
@@ -223,81 +234,11 @@ function defaultSections(seed: ArticleSeed): InsightSection[] {
 function toArticle(seed: ArticleSeed): InsightArticle {
   return {
     ...seed,
+    evidence: INSIGHT_EVIDENCE[seed.slug],
     facts: seed.facts ?? defaultFacts(seed),
     sections: seed.sections ?? defaultSections(seed),
   };
 }
-
-const cancerSections: InsightSection[] = [
-  {
-    id: "background",
-    toc: "연구 배경과 문제",
-    title: "어떤 연구 문제였을까?",
-    paragraphs: [
-      "현미경으로 촬영한 세포 이미지는 암의 진단과 치료 연구에 중요한 자료입니다. 하지만 세포의 종류와 상태를 구분하는 작업은 전문 지식이 필요하고, 수천~수만 장의 이미지를 사람이 직접 분석해야 하기 때문에 시간이 오래 걸리고 분석자 간 결과의 차이가 발생할 수 있습니다.",
-    ],
-    chips: ["정상 세포", "양성 종양 세포", "악성 종양 세포", "전이성 세포"],
-  },
-  {
-    id: "limits",
-    toc: "기존 방식의 한계",
-    title: "사람이 직접 볼 때는 어디가 어려울까?",
-    paragraphs: [
-      "숙련된 연구자도 세포 경계를 하나씩 표시하다 보면 피로로 기준이 흔들릴 수 있습니다. 새 염색 배치나 다른 현미경으로 찍은 사진이 들어오면, 예전에 맞춰 둔 기준을 다시 설명해야 하는 일도 생깁니다.",
-      "그래서 이 사례는 ‘AI가 진단을 대신한다’가 아니라, 분류에 쓰이던 시간을 줄이고 연구자가 검토에 집중하게 만드는 협업으로 적었습니다.",
-    ],
-  },
-  {
-    id: "method",
-    toc: "AI 활용 방법",
-    title: "AI를 어떻게 활용했을까?",
-    paragraphs: [
-      "연구팀은 딥러닝 기반의 이미지 분류 모델을 사용해 세포 이미지를 자동으로 분석했습니다. 다양한 현미경 이미지 데이터를 학습시켜 세포의 형태와 패턴을 인식하고, 정상 세포와 암세포를 구분할 수 있도록 모델을 설계했습니다.",
-    ],
-    steps: [
-      { title: "데이터 수집", detail: "현미경 이미지 수천 장 확보" },
-      { title: "전처리", detail: "이미지 정규화 및 일부 라벨링" },
-      { title: "AI 모델 학습", detail: "딥러닝 모델 기반 세포 분류 학습" },
-      { title: "결과 검증", detail: "정확도 및 일반화 성능 평가" },
-    ],
-  },
-  {
-    id: "results",
-    toc: "주요 결과",
-    title: "무엇이 달라졌나?",
-    paragraphs: [
-      "시안에 적은 예시 결과는 딥러닝 모델 정확도 92%, 분석 시간 70% 단축입니다. 이 숫자는 화면 구성을 보여 주기 위한 값이며, 다른 연구실의 데이터에서 그대로 재현된다고 읽으면 안 됩니다.",
-      "실제 글을 올릴 때는 논문에 적힌 조건(데이터 수, 비교한 기존 방법, 검증 방식)을 결과 옆에 같이 적습니다.",
-    ],
-  },
-  {
-    id: "meaning",
-    toc: "연구 의미와 활용성",
-    title: "다른 연구에 어떻게 이어질까?",
-    paragraphs: [
-      "세포나 조직 사진을 반복해서 나누는 연구라면, 같은 흐름으로 ‘무엇을 나누고 싶은지’와 ‘라벨을 얼마나 가지고 있는지’부터 전문가와 맞출 수 있습니다.",
-      "의료 영상처럼 민감한 데이터가 아니라도, 현미경·재료·식물 사진 분석에 컴퓨터 비전과 딥러닝 경험이 있는 전문가를 찾는 출발점이 됩니다.",
-    ],
-  },
-  {
-    id: "caveats",
-    toc: "고려할 점과 한계",
-    title: "적용 전에 볼 점은?",
-    paragraphs: [
-      "학습에 쓴 염색 방식과 다른 이미지가 들어오면 성능이 떨어질 수 있습니다. 라벨이 틀린 데이터가 섞이면 모델도 그 실수를 따라갑니다.",
-      "진단이나 치료 결정에 쓰려면 규제와 추가 검증이 따로 필요합니다. 이 페이지는 그 절차를 끝낸 제품 소개가 아닙니다.",
-    ],
-  },
-  {
-    id: "sources",
-    toc: "관련 연구 및 자료",
-    title: "어디에 근거했나?",
-    paragraphs: [
-      "원문 링크와 DOI는 레이아웃 확인용 예시입니다. 실제 서비스에서는 논문, 기술 블로그, 공식 자료 중 무엇인지와 저자·발행일을 구분해 적습니다.",
-      "LabBridge 작성자의 해석은 논문이 보고한 수치와 문장을 나눠 보여 줄 예정입니다.",
-    ],
-  },
-];
 
 const coScientistSections: InsightSection[] = [
   {
@@ -766,75 +707,9 @@ const seeds: ArticleSeed[] = [
     relatedSlugs: ["lettuce-biomass-estimation", "periodontal-bone-loss-analysis", "few-shot-vision"],
   },
   {
-    slug: "cancer-cell-classification",
-    kind: "case",
-    title: "세포 이미지에서 암세포를 자동으로 분류하는 AI 모델 개발",
-    summary:
-      "수천 장의 현미경 이미지를 AI로 분석해 암세포 유형을 자동 분류한 연구 사례를 살펴보고, 연구 과정과 결과, 다른 연구 분야에의 적용 가능성을 정리합니다.",
-    field: "생명과학 · 이미지 분석",
-    topicId: "AM-03",
-    topicLabel: "컴퓨터 비전",
-    domains: ["생명과학", "의료·헬스케어"],
-    tags: ["#세포 이미지 분류", "#의료 영상 분석", "#딥러닝"],
-    source: "화면 시안용 예시",
-    publishedOn: "2025.04.17",
-    readingMinutes: 6,
-    cover: "medical",
-    institution: "서울대학교 생명과학연구원",
-    doi: "10.1234/example.2024.001",
-    sampleNotice:
-      "기관명, DOI, 정확도 92%와 시간 70% 단축은 상세 화면 시안에 있던 예시 값입니다.",
-    highlights: [
-      {
-        label: "연구 문제",
-        text: "수천 장의 세포 이미지를 사람이 직접 분류하는 데 많은 시간과 인력이 필요",
-      },
-      {
-        label: "AI의 역할",
-        text: "딥러닝 모델로 세포 유형을 자동 분석 및 분류",
-      },
-      {
-        label: "주요 결과",
-        text: "딥러닝 모델 정확도 92% · 분석 시간 70% 단축",
-      },
-      {
-        label: "적용 가능성",
-        text: "유사한 세포·조직 분석 연구 및 다른 생명과학 분야에도 활용 가능",
-      },
-    ],
-    sections: cancerSections,
-    facts: [
-      { label: "분야", value: "생명과학 / 암 연구" },
-      { label: "활용 기술", value: "컴퓨터 비전, 딥러닝, 이미지 분류" },
-      { label: "데이터 유형", value: "현미경 이미지 (H&E 염색 등)" },
-      { label: "연구 기관", value: "서울대학교 생명과학연구원" },
-      { label: "발표일", value: "2025.04.17" },
-      { label: "DOI", value: "10.1234/example.2024.001" },
-    ],
-    technologies: [
-      {
-        title: "컴퓨터 비전",
-        description: "이미지에서 임상 데이터를 분류하는 AI 기술",
-      },
-      {
-        title: "딥러닝",
-        description: "데이터의 복잡한 패턴을 학습하는 방법",
-      },
-      {
-        title: "의료 영상 분석",
-        description: "의료 분야 세포 이미지를 분석하는 기술",
-      },
-    ],
-    relatedSlugs: [
-      "food-image-quality",
-      "medical-imaging-limits",
-      "metastasis-multimodal",
-    ],
-  },
-  {
     slug: "microscope-cell-drawing",
     kind: "case",
-    title: "현미경 사진 속 세포, 이제 손으로 그리지 않는다",
+    title: "현미경 사진에서 세포 경계를 찾는 AI: Cellpose 연구",
     summary:
       "광학·형광 현미경 이미지에서 모양이 제각각인 세포의 경계를 자동으로 분할합니다. 세포마다 경계 흐름 방향을 예측해, 새 실험 이미지에도 따로 학습 없이 바로 쓸 수 있습니다.",
     field: "세포생물학 · 이미지 분석",
@@ -856,7 +731,7 @@ const seeds: ArticleSeed[] = [
       { title: "컴퓨터 비전", description: "이미지에서 세포 경계를 찾는 기술" },
       { title: "이미지 분할", description: "픽셀마다 어디가 세포인지 나누는 작업" },
     ],
-    relatedSlugs: ["cancer-cell-classification", "medical-imaging-limits"],
+    relatedSlugs: ["medical-imaging-limits"],
   },
   {
     slug: "eeg-behavior",
@@ -883,7 +758,7 @@ const seeds: ArticleSeed[] = [
       { title: "시계열 딥러닝", description: "시간에 따라 변하는 신호를 학습하는 방법" },
       { title: "생체 신호 분석", description: "EEG 같은 측정값을 연구 질문과 연결하는 작업" },
     ],
-    relatedSlugs: ["sensor-logs", "cancer-cell-classification"],
+    relatedSlugs: ["sensor-logs"],
   },
   {
     slug: "protein-structure",
@@ -1064,7 +939,7 @@ const seeds: ArticleSeed[] = [
   {
     slug: "solar-panels",
     kind: "case",
-    title: "위성 사진에서 미국 전역의 태양광 패널을 찾아 지도로 그리다",
+    title: "미국 본토의 태양광 설비를 위성 영상에서 찾다: DeepSolar",
     summary: "대규모 항공·위성 영상에서 태양광 패널의 유무와 면적을 자동으로 식별한 사례입니다.",
     field: "환경·에너지 · 원격 탐사",
     topicId: "AM-03",
@@ -1112,31 +987,6 @@ const seeds: ArticleSeed[] = [
       { title: "컴퓨터 비전", description: "스펙트로그램 이미지를 분류하는 임시 분류입니다." },
     ],
     relatedSlugs: ["sensor-logs", "few-shot-vision"],
-  },
-  {
-    slug: "metastasis-multimodal",
-    kind: "case",
-    title: "전이성 암 조기 예측을 위한 멀티모달 연구",
-    summary: "영상과 다른 측정값을 함께 보는 연구 질문을 예시로 정리한 글입니다.",
-    field: "생명과학 · 암 연구",
-    topicId: "AM-03",
-    topicLabel: "컴퓨터 비전",
-    domains: ["생명과학", "의료·헬스케어"],
-    tags: ["#멀티모달", "#암 연구"],
-    source: "화면 시안용 예시",
-    publishedOn: "2024.05.01",
-    readingMinutes: 4,
-    cover: "medical",
-    highlights: [
-      { label: "연구 문제", text: "한 종류 데이터만으로는 이른 신호를 보기 어려울 수 있습니다." },
-      { label: "AI의 역할", text: "서로 다른 데이터 형태를 한 모델에서 다루게 합니다." },
-      { label: "주요 결과", text: "이 글에는 확정 수치를 넣지 않았습니다." },
-      { label: "적용 가능성", text: "데이터 종류가 두 가지 이상인 연구 질문에 해당합니다." },
-    ],
-    technologies: [
-      { title: "멀티모달 학습", description: "이미지와 표 데이터를 함께 보는 방법" },
-    ],
-    relatedSlugs: ["cancer-cell-classification", "medical-imaging-limits"],
   },
   {
     slug: "research-agent",
@@ -1644,7 +1494,7 @@ const seeds: ArticleSeed[] = [
     technologies: [
       { title: "컴퓨터 비전", description: "이미지를 나누고 분류하는 모델" },
     ],
-    relatedSlugs: ["microscope-cell-drawing", "cancer-cell-classification"],
+    relatedSlugs: ["microscope-cell-drawing"],
   },
   {
     slug: "diffusion-molecules",
@@ -1826,7 +1676,7 @@ const seeds: ArticleSeed[] = [
     technologies: [
       { title: "컴퓨터 비전", description: "표면 이미지에서 품질 단서를 찾는 기술" },
     ],
-    relatedSlugs: ["cancer-cell-classification", "few-shot-vision"],
+    relatedSlugs: ["few-shot-vision"],
   },
   {
     slug: "medical-imaging-limits",
@@ -1852,7 +1702,7 @@ const seeds: ArticleSeed[] = [
     technologies: [
       { title: "의료 영상 분석", description: "영상에서 연구 질문을 분류하는 딥러닝" },
     ],
-    relatedSlugs: ["cancer-cell-classification", "eeg-behavior"],
+    relatedSlugs: ["eeg-behavior"],
   },
 ];
 
@@ -1920,6 +1770,7 @@ export function toListItem(article: InsightArticle): InsightListItem {
     domains: article.domains,
     tags: article.tags,
     publishedOn: article.publishedOn,
+    articlePublishedOn: article.editorial?.publishedOn,
     readingMinutes: article.readingMinutes,
     cover: article.cover,
     coverSrc: article.coverSrc,

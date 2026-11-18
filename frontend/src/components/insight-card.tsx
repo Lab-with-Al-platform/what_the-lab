@@ -38,7 +38,7 @@ export function InsightCard({ article, variant = "default", reason }: InsightCar
             <h3 className="mt-2 line-clamp-2 text-base leading-snug font-bold tracking-tight text-ink transition-colors group-hover:text-brand md:min-h-[2lh]">{article.title}</h3>
             <p className="mt-3 line-clamp-2 text-sm leading-6 text-muted md:min-h-[2lh]">{article.summary}</p>
             <div className="mt-auto flex items-center justify-between gap-3 pt-5 text-xs text-muted">
-              <time dateTime={article.publishedOn}>{article.publishedOn}</time>
+              {article.articlePublishedOn ? <time dateTime={article.articlePublishedOn}>{article.articlePublishedOn}</time> : null}
               <span className="flex items-center gap-3">
                 읽는 시간 {article.readingMinutes}분
                 <span aria-hidden="true" className="text-base text-brand">↗</span>
@@ -72,9 +72,11 @@ export function InsightCard({ article, variant = "default", reason }: InsightCar
           </Link>
         </h3>
         <p className={`mt-2 line-clamp-2 min-h-[2lh] text-muted ${isLanding ? "text-xs leading-5" : "text-sm leading-6"}`}>{article.summary}</p>
-        <time className={`mt-auto text-xs text-faint ${isLanding ? "pt-3" : "pt-4"}`} dateTime={article.publishedOn}>
-          {article.publishedOn}
-        </time>
+        <p className={`mt-auto text-xs text-faint ${isLanding ? "pt-3" : "pt-4"}`}>
+          {article.articlePublishedOn ? (
+            <time dateTime={article.articlePublishedOn}>{article.articlePublishedOn}</time>
+          ) : `읽는 시간 ${article.readingMinutes}분`}
+        </p>
       </div>
     </article>
   );

@@ -85,7 +85,7 @@ export function InsightList({
               setPage(1);
             }}
           >
-            <option value="latest">{kind === "case" ? "최신 등록순" : "최신순"}</option>
+            <option value="latest">기본순</option>
             <option value="title">제목순</option>
           </select>
         </label>

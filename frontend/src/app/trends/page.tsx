@@ -1,10 +1,8 @@
-import type { Metadata } from "next";
+import { publicPageMetadata } from "@/lib/site-seo";
 import { InsightBrowser } from "@/components/insight-browser";
 import { TREND_TOPICS, featuredInsights, listInsights, topicCounts } from "@/lib/insights";
 
-export const metadata: Metadata = {
-  title: "AI 트렌드",
-};
+export const metadata = publicPageMetadata("/trends");
 
 export default function TrendsPage() {
   return (
@@ -18,8 +16,8 @@ export default function TrendsPage() {
       title="AI 트렌드"
       kicker="연구실에서 읽는, 지금의 AI 흐름"
       description="AI를 전공하지 않은 연구자도 따라올 수 있게, 연구에 쓸 만한 AI 소식과 원문 근거를 골라 짧게 정리합니다."
-      listTitle="최신 트렌드"
-      footnote="Co-Scientist·MatterGen·AlphaEvolve 글은 원 논문과 공식 연구기관 발표를 확인해 작성했습니다. 나머지 트렌드 글에는 화면 시안용 예시 콘텐츠가 포함되어 있습니다."
+      listTitle="AI 기술과 연구 방법"
+      footnote="논문, 공식 지침, 연구 자료에 근거한 해설입니다. 출처가 뒷받침하는 범위와 연구실에서 따로 확인할 점을 글마다 안내합니다."
     />
   );
 }

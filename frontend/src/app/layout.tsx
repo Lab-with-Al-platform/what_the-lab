@@ -2,10 +2,15 @@ import type { Metadata } from "next";
 import { AnalyticsPageBeacon } from "@/components/analytics-page-beacon";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { getSiteOrigin, NON_INDEXABLE } from "@/lib/site-seo";
 import { pretendard } from "./fonts";
 import "./globals.css";
 
+const metadataBase = getSiteOrigin();
+
 export const metadata: Metadata = {
+  metadataBase,
+  ...NON_INDEXABLE,
   title: {
     default: "LabBridge",
     template: "%s · LabBridge",

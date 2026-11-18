@@ -12,7 +12,8 @@ const PORT = Number(process.env.PORT || 4310);
 const API_TARGET = process.env.API_PROXY_TARGET;
 const TYPES = {
   ".html": "text/html; charset=utf-8", ".txt": "text/plain; charset=utf-8", ".js": "application/javascript",
-  ".css": "text/css", ".json": "application/json", ".png": "image/png", ".jpg": "image/jpeg",
+  ".css": "text/css", ".json": "application/json", ".xml": "application/xml; charset=utf-8",
+  ".png": "image/png", ".jpg": "image/jpeg",
   ".webp": "image/webp", ".svg": "image/svg+xml", ".ico": "image/x-icon", ".woff2": "font/woff2",
 };
 

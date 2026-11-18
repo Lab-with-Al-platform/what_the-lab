@@ -9,7 +9,6 @@ export interface DetailPlan {
   sourceTitle: string;
   evidenceScope: string;
   doi?: string;
-  scenario?: boolean;
   appendOnly?: boolean;
   title?: string;
   summary?: string;
@@ -82,19 +81,15 @@ export function enrichInsight(article: InsightArticle): InsightArticle {
     source: plan.source,
     sourceUrl: plan.sourceUrl,
     doi: plan.doi,
-    // 기존 등록일은 유지하고 원 연구의 연도와 보강일을 별도로 안내합니다.
-    institution: plan.scenario ? undefined : article.institution,
     readingMinutes: 7,
     glossary: plan.terms,
     // 기존에 근거를 검토한 두 트렌드는 원문 설명을 보존하고 부족한 부분만 붙입니다.
     sections: expandedSections,
-    sampleNotice: plan.scenario
-      ? "설명용 연구 시나리오입니다. 특정 기관의 실제 협업·실험 성과를 보고한 글이 아닙니다. 참고 자료는 방법·검토 기준의 근거이며 이 시나리오의 성공을 입증하지 않습니다. 2026.10.19 보강; 이미지는 설명용입니다."
-      : `2026.10.19 본문 보강. ${plan.evidenceScope} 카드 날짜는 편집용 등록일이며 원 연구 발표일과 다릅니다. 최신 성능 순위·LabBridge 수행 실적·실험 재현 보고가 아닙니다. 이미지는 설명용입니다.`,
+    sampleNotice: `${plan.evidenceScope} LabBridge 수행 실적이나 실험 재현 보고가 아닙니다.`,
     facts: [
       { label: "분야", value: article.field },
       { label: "활용 기술", value: article.topicLabel },
-      { label: "자료 구분", value: plan.scenario ? "설명용 시나리오 / 성과 미확인" : isCase ? "발표 연구 해설" : "연구자를 위한 기술 해설" },
+      { label: "자료 구분", value: isCase ? "발표 연구 해설" : "연구자를 위한 기술 해설" },
       { label: "참고 자료", value: plan.source },
       { label: "확인 범위", value: plan.evidenceScope },
       ...(plan.doi ? [{ label: "DOI", value: plan.doi }] : []),

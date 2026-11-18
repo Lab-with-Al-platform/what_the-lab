@@ -11,7 +11,6 @@ export const GENERATED_INSIGHT_COVERS: Record<string, InsightCover> = {
   "fluid-simulation": { src: "/generated/case-fluid-channel-v1.jpg", alt: "계산 격자와 장애물 뒤 유동을 보여 주는 유체 시뮬레이션 AI 생성 개념 이미지" },
   "battery-life": { src: "/generated/case-battery-cycling-v1.jpg", alt: "충방전 시험 장치에 연결한 원통형 배터리와 전압 곡선을 표현한 AI 생성 이미지" },
   "protein-design": { src: "/generated/case-protein-design-v1.jpg", alt: "표적 단백질과 결합 후보 구조를 표현한 AI 생성 개념 이미지" },
-  "metastasis-multimodal": { src: "/generated/case-multimodal-research-v1.jpg", alt: "조직 영상과 비식별 표 데이터를 함께 검토하는 멀티모달 연구 설계의 AI 생성 이미지" },
   "medical-imaging-limits": { src: "/generated/trend-medical-review-v1.jpg", alt: "설명용 흉부 영상과 분석 표시를 사람이 검토하는 AI 생성 이미지" },
   "few-shot-vision": { src: "/generated/trend-vision-prompts-v1.jpg", alt: "잎 이미지의 점·상자 입력과 분할 마스크를 비교한 AI 생성 개념 이미지" },
   "graph-neural-nets": { src: "/generated/trend-graph-messages-v1.jpg", alt: "노드와 연결선을 따라 이웃 정보를 전달하는 그래프 신경망의 AI 생성 개념 이미지" },

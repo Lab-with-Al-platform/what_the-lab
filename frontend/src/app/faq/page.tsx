@@ -1,10 +1,8 @@
 import { Suspense } from "react";
 import { FaqPage } from "@/components/community/faq-page";
+import { publicPageMetadata } from "@/lib/site-seo";
 
-export const metadata = {
-  title: "자주 묻는 질문",
-  description: "연구·전문가 탐색, 직접 협업 요청, 공유 일정·작업 관리, Discord 명령어·알림, Google Calendar, 협업 평가와 게시판 이용 가이드",
-};
+export const metadata = publicPageMetadata("/faq");
 export default function FaqRoute() {
   return (
     <Suspense
