@@ -119,3 +119,32 @@ jobs:
           echo "current=$current head=$head"
           test -n "$current" && test "$current" = "$head"
           uv run alembic upgrade head
+      # B11: RDS처럼 superuser가 아닌 마스터 → 계정 3개 → migrator 로 마이그레이션 → 권한 맞추기 → 확인
+      - name: 운영 DB 계정 흐름 (앱·조회 전용 계정 권한)
+        env:
+          PGHOST: 127.0.0.1
+          PGUSER: labbridge_ci
+          PGPASSWORD: ci-migration-only
+          RDS_DB: labbridge_rds
+          MIGRATOR_URL: "postgresql://labbridge_migrator:ci-mig@127.0.0.1:5432/labbridge_rds"
+        run: |
+          psql -d labbridge -v ON_ERROR_STOP=1 -c "CREATE ROLE rds_master LOGIN PASSWORD 'ci-master' CREATEROLE CREATEDB"
+          psql -d labbridge -v ON_ERROR_STOP=1 -c "CREATE DATABASE $RDS_DB OWNER rds_master"
+          PGUSER=rds_master PGPASSWORD=ci-master psql -d "$RDS_DB" \
+            -v migrator_password=ci-mig -v app_password=ci-app -v readonly_password=ci-ro \
+            -f migrations/roles/01_create_roles.sql
+          DATABASE_URL="$MIGRATOR_URL" uv run alembic upgrade head
+          DATABASE_URL="$MIGRATOR_URL" uv run python migrations/roles/apply_grants.py
+          DATABASE_URL="$MIGRATOR_URL" uv run python migrations/roles/apply_grants.py   # 다시 실행해도 같아요
+          PGUSER=labbridge_migrator PGPASSWORD=ci-mig psql -d "$RDS_DB" -f migrations/roles/03_verify_privileges.sql
+          # RLS 표가 0줄로 보이지 않는지 (기관 기준표)
+          test "$(PGUSER=labbridge_app PGPASSWORD=ci-app psql -d "$RDS_DB" -tAc 'SELECT count(*) FROM public.institution')" -gt 0
+          test "$(PGUSER=labbridge_readonly PGPASSWORD=ci-ro psql -d "$RDS_DB" -tAc 'SELECT count(*) FROM public.institution')" -gt 0
+          # 막혀야 하는 것: 조회 전용 쓰기, 앱의 표 만들기 (`! 명령`은 set -e 가 무시해서 if 로 확인해요)
+          if PGUSER=labbridge_readonly PGPASSWORD=ci-ro psql -d "$RDS_DB" -v ON_ERROR_STOP=1 -c "DELETE FROM public.institution"; then
+            echo "조회 전용 계정이 지울 수 있어요"; exit 1
+          fi
+          if PGUSER=labbridge_app PGPASSWORD=ci-app psql -d "$RDS_DB" -v ON_ERROR_STOP=1 -c "CREATE TABLE public.should_fail (id int)"; then
+            echo "앱 계정이 표를 만들 수 있어요"; exit 1
+          fi
+          echo "운영 DB 계정 흐름 통과"

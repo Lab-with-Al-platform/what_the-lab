@@ -15,6 +15,7 @@ cd /opt/labbridge
 | 1 | 새 이미지 받기 (서버에서 빌드하지 않음) | 이미지가 없음 |
 | 2 | DB 버전 ≠ 이미지 버전이면 **스냅샷 표시 확인** 후 `alembic upgrade head` | `MIGRATION_SNAPSHOT_ID`가 없음, 마이그레이션 실패 |
 | 3 | `current = heads` 확인 | 버전 불일치 |
+| 3-1 | `MIGRATION_DATABASE_URL`이 있으면 앱·조회 전용 계정 권한·RLS 정책 맞추기 ([B11](../../backend/migrations/roles/README.md)) | 권한 맞추기 실패 |
 | 4 | backend 교체 → health 확인 | 응답 없음 → **이전 이미지로 자동 되돌림** (DB는 그대로) |
 | 5 | discord-bot: `ENABLE_DISCORD_BOT=1`일 때만 켬 | 켜자마자 다시 시작함 |
 | 6 | nginx 교체·설정 다시 읽기, healthz와 backend 연결 확인 | 설정 오류 |
@@ -26,6 +27,7 @@ cd /opt/labbridge
   첫 배포(빈 DB)는 `MIGRATION_SNAPSHOT_ID=first-deploy`.
 - **봇은 전환(Go-Live) 전까지 꺼 둬요.** Render의 봇과 함께 켜지면 알림이 두 번 가요. 전환하는 날 `.env.production`의 `ENABLE_DISCORD_BOT=1`.
 - 로그와 이전 이미지 기록은 `/var/tmp/labbridge/`에 남아요.
+- 마이그레이션·권한 맞추기는 `MIGRATION_DATABASE_URL`(표의 주인 `labbridge_migrator`)로, backend·봇은 `DATABASE_URL`(`labbridge_app`)로 돌아요. 비워 두면 하나로 다 해요.
 - `downgrade`나 `--scale`은 쓰지 않아요.
 
 ## 로컬 리허설

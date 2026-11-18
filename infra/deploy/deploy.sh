@@ -14,6 +14,8 @@
 #   ENV_FILE              기본 .env.production
 #   COMPOSE_FILES         기본 "-f docker-compose.prod.yml -f docker-compose.awslogs.yml"
 #   MIGRATION_SNAPSHOT_ID 새 마이그레이션이 있을 때 필수. 먼저 찍은 RDS 스냅샷 이름 (첫 배포는 first-deploy)
+#   MIGRATION_DATABASE_URL 마이그레이션·권한 맞추기용 DB 주소(표의 주인 labbridge_migrator). 없으면 ENV_FILE 값,
+#                         그것도 없으면 DATABASE_URL 하나로 다 해요 (계정 분리 전). B11
 #   ENABLE_DISCORD_BOT    1이면 봇을 켜요. 없으면 ENV_FILE 값, 그것도 없으면 0 (전환 전 봇 중복 방지)
 #   SKIP_PULL             1이면 이미지를 받지 않아요 (로컬 리허설용)
 #   STATE_DIR             기록·로그 폴더. 기본 /var/tmp/labbridge
@@ -43,9 +45,19 @@ compose() {
   docker compose "${files[@]}" --env-file "$ENV_FILE" "$@"
 }
 
+# 마이그레이션 계정으로 backend 이미지의 명령을 실행해요.
+# 주소를 명령줄(-e)에 쓰지 않고 환경변수로 넘겨요. (ps 에 비밀번호가 보이지 않게)
+migrator_run() {
+  if [ -n "$MIGRATION_URL" ]; then
+    DATABASE_URL="$MIGRATION_URL" compose run --rm --no-deps -T backend "$@"
+  else
+    compose run --rm --no-deps -T backend "$@"
+  fi
+}
+
 # alembic 명령 결과에서 버전 이름만 꺼내요. 예) "20261104_27 (head)" → 20261104_27
 alembic_revision() {
-  compose run --rm --no-deps -T backend alembic "$1" 2>>"$LOG" \
+  migrator_run alembic "$1" 2>>"$LOG" \
     | awk '/^[0-9A-Za-z_]+( \(head\))?$/ {print $1}' | tail -n 1
 }
 
@@ -127,6 +139,7 @@ main() {
 
   BOT_ENABLED="${ENABLE_DISCORD_BOT:-$(env_file_value ENABLE_DISCORD_BOT)}"
   BOT_ENABLED="${BOT_ENABLED:-0}"
+  MIGRATION_URL="${MIGRATION_DATABASE_URL:-$(env_file_value MIGRATION_DATABASE_URL)}"
   log "배포 시작: $BACKEND_IMAGE (봇 켜기=$BOT_ENABLED, 로그 $LOG)"
 
   # 0) 설정 검사 + 지금 상태 기록 (롤백용)
@@ -151,13 +164,22 @@ main() {
   if [ "$current" != "$heads" ]; then
     [ -n "${MIGRATION_SNAPSHOT_ID:-}" ] || fail "새 마이그레이션이 있어요. RDS 스냅샷을 먼저 찍고 MIGRATION_SNAPSHOT_ID=<스냅샷 이름> 으로 다시 실행해 주세요 (런북 1절). 첫 배포면 first-deploy"
     log "스냅샷 확인: $MIGRATION_SNAPSHOT_ID → alembic upgrade head"
-    compose run --rm --no-deps -T backend alembic upgrade head >>"$LOG" 2>&1 || fail "마이그레이션 실패. 컨테이너는 이전 그대로예요. DB 담당자에게 알려 주세요"
+    migrator_run alembic upgrade head >>"$LOG" 2>&1 || fail "마이그레이션 실패. 컨테이너는 이전 그대로예요. DB 담당자에게 알려 주세요"
   fi
 
   # 3) 버전 확인: current = heads 여야 다음 단계로
   current="$(alembic_revision current)" || fail "DB 버전을 다시 읽지 못했어요"
   [ "$current" = "$heads" ] || fail "DB 버전 불일치: current=$current heads=$heads"
   log "DB 버전 일치: $current"
+
+  # 3-1) 앱·조회 전용 계정 권한 맞추기 (새 표·RLS 정책). 계정을 나눈 뒤에만 (B11)
+  if [ -n "$MIGRATION_URL" ]; then
+    migrator_run python migrations/roles/apply_grants.py >>"$LOG" 2>&1 \
+      || fail "앱 계정 권한 맞추기 실패 (backend/migrations/roles/README.md)"
+    log "앱·조회 전용 계정 권한 맞춤"
+  else
+    log "MIGRATION_DATABASE_URL 없음: 앱 계정 하나로 운영 중 (권한 맞추기 건너뜀)"
+  fi
 
   # 4) backend 교체 → 확인 → 실패하면 이전 이미지로
   compose up -d --no-deps backend >>"$LOG" 2>&1
