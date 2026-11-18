@@ -179,7 +179,7 @@ def test_env_example_lists_every_compose_variable():
     """compose 가 읽는 ${이름} 은 infra/env.production.example 에도 있어야 팀원이 채울 수 있어요."""
     compose_vars = set(re.findall(r"\$\{([A-Z_]+)", COMPOSE.read_text(encoding="utf-8")))
     example = (ROOT / "infra" / "env.production.example").read_text(encoding="utf-8")
-    example_vars = set(re.findall(r"^([A-Z_]+)=", example, flags=re.M))
+    example_vars = set(re.findall(r"^([A-Z_]+)=", example, flags=re.MULTILINE))
     assert not compose_vars - example_vars, sorted(compose_vars - example_vars)
 
 
