@@ -1,4 +1,4 @@
-"""회원 정지·해제와 공통 관리자 부여. 계정과 운영 이력은 한 저장 동작에서 함께 성공하거나 함께 실패합니다."""
+"""회원 정지·해제, 공통 관리자 부여, 역할 변경. 계정과 운영 이력은 한 저장 동작에서 함께 성공하거나 함께 실패합니다."""
 
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -12,6 +12,9 @@ from app.db import transaction
 ALLOWED = {"active": "suspended", "suspended": "active"}
 ACTIONS = {"suspended": "suspend", "active": "restore"}
 ADMIN_LABEL = {True: "admin", False: "member"}
+ROLES = {"researcher", "expert"}
+# operation_audit의 ck_operation_audit_action이 받아야 하는 값 전부입니다. 새 값은 마이그레이션과 함께 더합니다.
+AUDIT_ACTIONS = ("suspend", "restore", "grant_admin", "revoke_admin", "change_role", "reset_role")
 
 
 class AccountActionError(Exception):
@@ -27,6 +30,8 @@ class MemberAccount:
     user_id: int
     status: str
     is_admin: bool
+    user_role: str | None = None
+    signup_step: str = "done"
 
 
 @dataclass
@@ -42,6 +47,15 @@ class StatusChange:
 class AdminChange:
     expected_is_admin: bool
     next_is_admin: bool
+    reason: str
+    notice: str
+    idempotency_key: str
+
+
+@dataclass
+class RoleChange:
+    expected_role: str | None
+    next_role: str
     reason: str
     notice: str
     idempotency_key: str
@@ -87,6 +101,26 @@ def parse_admin_change(body: dict) -> AdminChange:
     except ValueError as error:
         raise AccountActionError(422, "다시 시도 키가 올바르지 않습니다.") from error
     return AdminChange(expected, nxt, reason, notice, key)
+
+
+def parse_role_change(body: dict) -> RoleChange:
+    """연구자·AI 전문가 두 역할만 받습니다. 빈 사유와 형식이 다른 재시도 키는 저장 전에 거절합니다."""
+    reason = str(body.get("reason", "")).strip()
+    notice = str(body.get("notice", "")).strip()
+    key = str(body.get("idempotency_key", "")).strip()
+    expected = body.get("expected_role")
+    nxt = body.get("next_role")
+    if nxt not in ROLES or (expected is not None and expected not in ROLES):
+        raise AccountActionError(422, "연구자와 AI 전문가 중에서만 바꿀 수 있습니다.")
+    if not reason or len(reason) > 200 or len(notice) > 200:
+        raise AccountActionError(
+            422, "내부 사유는 1~200자입니다. 사용자 안내도 200자를 넘길 수 없습니다."
+        )
+    try:
+        UUID(key)
+    except ValueError as error:
+        raise AccountActionError(422, "다시 시도 키가 올바르지 않습니다.") from error
+    return RoleChange(expected, nxt, reason, notice, key)
 
 
 def decide(member: MemberAccount, actor_id: int, change: StatusChange, prior: dict | None) -> dict:
@@ -171,10 +205,97 @@ def decide_admin(
     }
 
 
+def decide_role(member: MemberAccount, actor_id: int, change: RoleChange, prior: dict | None) -> dict:
+    """관리자(테스트) 계정은 바로 바꾸고(change_role), 일반 회원은 가입 단계로 되돌립니다(reset_role)."""
+    after = change.next_role if member.is_admin else "signup"
+    if prior is not None:
+        same = (
+            prior["target_id"] == str(member.user_id)
+            and prior["after_status"] == after
+            and prior["reason"] == change.reason
+        )
+        if not same:
+            raise AccountActionError(
+                409, "같은 재시도 키로 다른 요청이 이미 처리되었습니다. 상태를 다시 조회하세요."
+            )
+        return {**prior, "replayed": True}
+    if member.user_id == actor_id:
+        raise AccountActionError(409, "본인 역할은 이 화면에서 바꾸지 않습니다.")
+    if member.status != "active":
+        raise AccountActionError(409, "정상 계정의 역할만 바꿉니다.")
+    if member.user_role is None:
+        raise AccountActionError(409, "아직 역할을 고르지 않은 회원입니다. 가입을 마친 뒤 바꿀 수 있습니다.")
+    if member.user_role != change.expected_role:
+        raise AccountActionError(409, "현재 역할이 바뀌었습니다. 최신 상태를 다시 조회하세요.")
+    if member.user_role == change.next_role:
+        raise AccountActionError(409, "지금과 같은 역할로는 바꾸지 않습니다.")
+    return {
+        "idempotency_key": change.idempotency_key,
+        "actor_user_id": actor_id,
+        "target_type": "member",
+        "target_id": str(member.user_id),
+        "action": "change_role" if member.is_admin else "reset_role",
+        "before_status": member.user_role,
+        "after_status": after,
+        "reason": change.reason,
+        "notice": change.notice,
+        "created_at": datetime.now(UTC),
+        "replayed": False,
+    }
+
+
+def _apply_role_now(cursor, user_id: int, change: RoleChange) -> None:
+    """관리자(테스트) 계정: 역할을 바로 바꾸고, 새 역할 화면이 비지 않도록 없는 프로필만 테스트 값으로 만듭니다."""
+    cursor.execute(
+        """
+        UPDATE users SET user_role = %s, signup_step = 'done'
+        WHERE user_id = %s AND user_role IS NOT DISTINCT FROM %s AND status = 'active' AND is_admin IS TRUE
+        """,
+        (change.next_role, user_id, change.expected_role),
+    )
+    if cursor.rowcount != 1:
+        raise AccountActionError(409, "현재 역할이 바뀌었습니다. 최신 상태를 다시 조회하세요.")
+    # 이미 있는 프로필은 그대로 둡니다(ON CONFLICT DO NOTHING). 전문가 프로필은 검색에 공개하지 않습니다.
+    if change.next_role == "researcher":
+        cursor.execute(
+            """
+            INSERT INTO researcher_profile
+              (user_id, institution_name, institution_source, department, is_verified, verified_at)
+            VALUES (%s, '테스트 기관', 'manual', '테스트', TRUE, now())
+            ON CONFLICT (user_id) DO NOTHING
+            """,
+            (user_id,),
+        )
+    else:
+        cursor.execute(
+            """
+            INSERT INTO expert (user_id, current_job, ai_career, is_public)
+            VALUES (%s, 'etc', 'lt1', FALSE)
+            ON CONFLICT (user_id) DO NOTHING
+            """,
+            (user_id,),
+        )
+
+
+def _send_back_to_signup(cursor, user_id: int, change: RoleChange) -> None:
+    """일반 회원: 역할을 비우고 회원 유형 선택으로 되돌립니다. 기존 프로필·연구·협업 기록은 지우지 않습니다."""
+    cursor.execute(
+        """
+        UPDATE users SET user_role = NULL, signup_step = 'role'
+        WHERE user_id = %s AND user_role = %s AND status = 'active' AND is_admin IS NOT TRUE
+        """,
+        (user_id, change.expected_role),
+    )
+    if cursor.rowcount != 1:
+        raise AccountActionError(409, "현재 역할이 바뀌었습니다. 최신 상태를 다시 조회하세요.")
+
+
 class AccountStore(Protocol):
     def change(self, actor_id: int, user_id: int, change: StatusChange) -> dict: ...
 
     def change_admin(self, actor_id: int, user_id: int, change: AdminChange) -> dict: ...
+
+    def change_role(self, actor_id: int, user_id: int, change: RoleChange) -> dict: ...
 
     def history(self, user_id: int) -> list[dict]: ...
 
@@ -185,6 +306,7 @@ class MemoryAccountStore:
     def __init__(self, members: dict[int, MemberAccount] | None = None) -> None:
         self.members = members or {}
         self.rows: list[dict] = []
+        self.filled: list[tuple[int, str]] = []  # (회원 번호, 빈 프로필을 채운 역할)
         self.fail_write = False
 
     def change(self, actor_id: int, user_id: int, change: StatusChange) -> dict:
@@ -223,6 +345,24 @@ class MemoryAccountStore:
         if self.fail_write:
             member.is_admin = previous
             raise AccountActionError(503, "이력 저장에 실패해 권한 변경을 취소했습니다.")
+        self.rows.append({key: value for key, value in decision.items() if key != "replayed"})
+        return decision
+
+    def change_role(self, actor_id: int, user_id: int, change: RoleChange) -> dict:
+        member = self.members.get(user_id)
+        if member is None:
+            raise AccountActionError(404, "회원을 찾을 수 없습니다.")
+        prior = next(
+            (row for row in self.rows if row["idempotency_key"] == change.idempotency_key), None
+        )
+        decision = decide_role(member, actor_id, change, prior)
+        if decision["replayed"]:
+            return decision
+        if member.is_admin:
+            member.user_role, member.signup_step = change.next_role, "done"
+            self.filled.append((user_id, change.next_role))
+        else:
+            member.user_role, member.signup_step = None, "role"
         self.rows.append({key: value for key, value in decision.items() if key != "replayed"})
         return decision
 
@@ -363,6 +503,62 @@ class PostgresAccountStore:
         except errors.UndefinedTable as error:
             raise AccountActionError(
                 503, "운영 이력 표가 아직 없어 권한을 바꾸지 않습니다."
+            ) from error
+
+    def change_role(self, actor_id: int, user_id: int, change: RoleChange) -> dict:
+        try:
+            with transaction() as cursor:
+                cursor.execute(
+                    """
+                    SELECT user_id, status, is_admin, user_role, signup_step
+                    FROM users WHERE user_id = %s FOR UPDATE
+                    """,
+                    (user_id,),
+                )
+                row = cursor.fetchone()
+                if row is None:
+                    raise AccountActionError(404, "회원을 찾을 수 없습니다.")
+                cursor.execute(
+                    """
+                    SELECT idempotency_key, target_id, after_status, reason, before_status, action
+                    FROM operation_audit WHERE idempotency_key = %s
+                    """,
+                    (change.idempotency_key,),
+                )
+                prior = cursor.fetchone()
+                member = MemberAccount(
+                    row["user_id"], row["status"], row["is_admin"], row["user_role"], row["signup_step"]
+                )
+                decision = decide_role(member, actor_id, change, prior)
+                if decision["replayed"]:
+                    return decision
+                if member.is_admin:
+                    _apply_role_now(cursor, user_id, change)
+                else:
+                    _send_back_to_signup(cursor, user_id, change)
+                cursor.execute(
+                    """
+                    INSERT INTO operation_audit (
+                      idempotency_key, actor_user_id, target_type, target_id, action,
+                      before_status, after_status, reason, notice, created_at
+                    ) VALUES (%s, %s, 'member', %s, %s, %s, %s, %s, %s, %s)
+                    """,
+                    (
+                        change.idempotency_key,
+                        actor_id,
+                        str(user_id),
+                        decision["action"],
+                        decision["before_status"],
+                        decision["after_status"],
+                        change.reason,
+                        change.notice,
+                        decision["created_at"],
+                    ),
+                )
+                return decision
+        except errors.UndefinedTable as error:
+            raise AccountActionError(
+                503, "운영 이력 표가 아직 없어 역할을 바꾸지 않습니다."
             ) from error
 
     def history(self, user_id: int) -> list[dict]:

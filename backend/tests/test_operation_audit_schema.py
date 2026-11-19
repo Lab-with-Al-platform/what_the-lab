@@ -6,12 +6,12 @@
 import re
 from pathlib import Path
 
-from app.operations.account_actions import ACTIONS
+from app.operations.account_actions import AUDIT_ACTIONS
 
 ROOT = Path(__file__).resolve().parents[2]
 RULE = re.compile(r"ck_operation_audit_action\s+CHECK\s*\(\s*action\s+IN\s*\(([^)]*)\)", re.IGNORECASE)
 # 코드가 operation_audit에 남기는 기록 종류 전부
-WRITTEN_ACTIONS = set(ACTIONS.values()) | {"grant_admin", "revoke_admin"}
+WRITTEN_ACTIONS = set(AUDIT_ACTIONS)
 
 
 def last_rule(paths: list[Path]) -> set[str]:

@@ -1,10 +1,12 @@
 """회원 정지·해제는 가상 계정으로만 확인합니다. 실제 회원 DB에는 쓰지 않습니다."""
 
+import re
 from pathlib import Path
 from uuid import uuid4
 
 from app import user_store
 from app.operations.account_actions import MemberAccount, MemoryAccountStore
+from app.operations.records import OperationsSnapshot
 from app.routers.operations import get_account_store
 from app.security import create_access_token
 from tests.test_insight_workflow import ADMIN_ID, ORIGIN, login
@@ -53,7 +55,8 @@ def test_suspend_and_replay_keep_one_history_and_do_not_touch_research(client, m
     assert target.status == "suspended"
     assert len(store.rows) == 1
     source = Path("app/operations/account_actions.py").read_text(encoding="utf-8").lower()
-    assert "delete from" not in source and "research" not in source
+    # 연구 표(research, research_*)는 건드리지 않습니다. 역할 이름 researcher·researcher_profile은 괜찮습니다.
+    assert "delete from" not in source and not re.search(r"\bresearch(?!er)", source)
     detail = client.get("/api/v1/admin/operations/members/1").json()
     assert "discord_id" not in detail["audit"]["items"].__repr__()
 
@@ -205,3 +208,91 @@ def test_ops_reader_cannot_revoke_last_admin_or_self_or_without_origin(client, m
     login(client)
     forbidden = client.post(ADMIN.format(user_id=51), json=admin_payload(True, False), headers=ORIGIN)
     assert forbidden.status_code == 403 and only_admin.is_admin is True
+
+
+ROLE = "/api/v1/admin/operations/members/{user_id}/role"
+
+
+def role_payload(expected: str | None, nxt: str, reason: str = "가상 사유", key: str | None = None) -> dict:
+    return {
+        "expected_role": expected,
+        "next_role": nxt,
+        "reason": reason,
+        "notice": "",
+        "idempotency_key": key or str(uuid4()),
+    }
+
+
+def role_store(actor_id: int, *members: MemberAccount) -> MemoryAccountStore:
+    accounts = {item.user_id: item for item in members}
+    accounts[actor_id] = MemberAccount(actor_id, "active", False)
+    store = MemoryAccountStore(accounts)
+    bind(store)
+    return store
+
+
+def test_admin_target_role_changes_at_once_and_fills_blank_profile(client, monkeypatch):
+    monkeypatch.setenv("OPERATIONS_ADMIN_DISCORD_IDS", "300000000000000003")
+    actor = login_ops(client)
+    target = MemberAccount(50, "active", True, "expert")
+    store = role_store(actor["user_id"], target)
+    key = str(uuid4())
+    first = client.post(ROLE.format(user_id=50), json=role_payload("expert", "researcher", key=key), headers=ORIGIN)
+    second = client.post(ROLE.format(user_id=50), json=role_payload("expert", "researcher", key=key), headers=ORIGIN)
+    assert first.status_code == 200, first.text
+    assert first.json()["role"] == "researcher"
+    assert first.json()["signup_step"] == "done"
+    assert second.json()["replayed"] is True
+    # 관리자(테스트) 계정은 바로 바뀌고, 연구자에게 필요한 빈 프로필을 채웁니다.
+    assert (target.user_role, target.signup_step) == ("researcher", "done")
+    assert store.filled == [(50, "researcher")]
+    assert [row["action"] for row in store.rows] == ["change_role"]
+    assert (store.rows[0]["before_status"], store.rows[0]["after_status"]) == ("expert", "researcher")
+
+
+def test_member_target_role_goes_back_to_signup_choice(client, monkeypatch):
+    monkeypatch.setenv("OPERATIONS_ADMIN_DISCORD_IDS", "300000000000000003")
+    actor = login_ops(client)
+    target = MemberAccount(50, "active", False, "expert")
+    store = role_store(actor["user_id"], target)
+    response = client.post(ROLE.format(user_id=50), json=role_payload("expert", "researcher"), headers=ORIGIN)
+    assert response.status_code == 200, response.text
+    assert response.json()["role"] is None
+    assert response.json()["signup_step"] == "role"
+    # 일반 회원은 역할을 비우고 회원 유형 선택으로 보냅니다. 기관 인증은 회원이 직접 합니다.
+    assert (target.user_role, target.signup_step) == (None, "role")
+    assert store.filled == []
+    assert store.rows[0]["action"] == "reset_role"
+    assert store.rows[0]["after_status"] == "signup"
+
+
+def test_role_change_rejects_stale_same_self_inactive_unchosen_and_missing_origin(client, monkeypatch):
+    monkeypatch.setenv("OPERATIONS_ADMIN_DISCORD_IDS", "300000000000000003")
+    actor = login_ops(client)
+    expert = MemberAccount(50, "active", True, "expert")
+    stopped = MemberAccount(51, "suspended", False, "researcher")
+    unchosen = MemberAccount(52, "active", False, None, "role")
+    store = role_store(actor["user_id"], expert, stopped, unchosen)
+    stale = client.post(ROLE.format(user_id=50), json=role_payload("researcher", "expert"), headers=ORIGIN)
+    same = client.post(ROLE.format(user_id=50), json=role_payload("expert", "expert"), headers=ORIGIN)
+    self_change = client.post(
+        ROLE.format(user_id=actor["user_id"]), json=role_payload(None, "expert"), headers=ORIGIN
+    )
+    inactive = client.post(ROLE.format(user_id=51), json=role_payload("researcher", "expert"), headers=ORIGIN)
+    not_chosen = client.post(ROLE.format(user_id=52), json=role_payload(None, "expert"), headers=ORIGIN)
+    missing_origin = client.post(ROLE.format(user_id=50), json=role_payload("expert", "researcher"))
+    assert [item.status_code for item in (stale, same, self_change, inactive, not_chosen)] == [409] * 5
+    assert missing_origin.status_code == 403
+    assert expert.user_role == "expert" and store.rows == []
+
+
+def test_member_detail_explains_role_change_for_admin_and_member(client, monkeypatch):
+    from tests.test_operations_admin import member
+
+    monkeypatch.setenv("OPERATIONS_ADMIN_DISCORD_IDS", "300000000000000003")
+    login_ops(client)
+    use_snapshot(OperationsSnapshot(members=(member(7, "expert", admin=True), member(8, "researcher")), researches=()))
+    admin_detail = client.get("/api/v1/admin/operations/members/7").json()["role_actions"]
+    member_detail = client.get("/api/v1/admin/operations/members/8").json()["role_actions"]
+    assert (admin_detail["status"], admin_detail["mode"], admin_detail["next_role"]) == ("ready", "direct", "researcher")
+    assert (member_detail["status"], member_detail["mode"], member_detail["next_role"]) == ("ready", "reset", "expert")

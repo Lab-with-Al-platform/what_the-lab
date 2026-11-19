@@ -48,10 +48,18 @@ def signup_expert(body: ExpertSignupRequest, user_id: int = Depends(get_current_
 
     with transaction() as cursor:  # 하나라도 실패하면 전부 취소
         check_able_works_exist(cursor, able_works)
+        # 운영자가 역할을 되돌린 회원은 예전 전문가 행이 남아 있을 수 있어, 새로 고른 값으로 덮어씁니다.
         cursor.execute(
-            "INSERT INTO expert (user_id, current_job, ai_career, affiliation) VALUES (%s, %s, %s, %s)",
+            """
+            INSERT INTO expert (user_id, current_job, ai_career, affiliation) VALUES (%s, %s, %s, %s)
+            ON CONFLICT (user_id) DO UPDATE SET
+              current_job = EXCLUDED.current_job,
+              ai_career = EXCLUDED.ai_career,
+              affiliation = EXCLUDED.affiliation
+            """,
             (user_id, body.current_job, body.ai_career, affiliation),
         )
+        cursor.execute("DELETE FROM expert_able_work WHERE user_id = %s", (user_id,))
         cursor.executemany(
             "INSERT INTO expert_able_work (user_id, able_work_id) VALUES (%s, %s)",
             [(user_id, able_work_id) for able_work_id in able_works],

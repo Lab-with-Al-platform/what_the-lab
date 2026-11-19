@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { ApiError, requestApi } from "@/lib/api";
-import { MemberDetail, MemberItem, PageResult, Summary, auditActionLabel, formatWhen } from "@/lib/operations-admin";
+import { MemberDetail, MemberItem, PageResult, ROLE_NAMES, Summary, auditActionLabel, formatWhen } from "@/lib/operations-admin";
 import { demoMemberDetail, demoMembers, demoSummary } from "@/lib/admin-demo";
 import { ADMIN_BUTTON, ADMIN_FIELD } from "./admin-ui";
 import { adminHref, useAdminDemo } from "./admin-shell";
@@ -127,7 +127,7 @@ export function MemberDetailScreen({ userId }: { userId: string }) {
   }, [userId, demo]);
 
   return (
-    <OperationsFrame title="회원 상세" description="공개에 필요한 계정 정보와 연구 제목만 봅니다. 정지와 관리자 부여는 서버가 다시 검사하고, 연구 기록은 지우지 않습니다.">
+    <OperationsFrame title="회원 상세" description="공개에 필요한 계정 정보와 연구 제목만 봅니다. 정지·관리자 부여·역할 변경은 서버가 다시 검사하고, 연구 기록은 지우지 않습니다.">
       <Link href={adminHref("/admin/members", demo)} className="mb-4 inline-flex min-h-11 items-center text-sm font-semibold text-brand underline">회원 목록</Link>
       {error ? <p role="alert" className="text-sm text-danger">{error}</p> : null}
       {data ? (
@@ -150,16 +150,20 @@ export function MemberDetailScreen({ userId }: { userId: string }) {
           {data.admin_actions?.status === "ready" && data.admin_actions.next_is_admin !== undefined && data.admin_actions.next_is_admin !== null && !demo ? (
             <MemberAdminDialog userId={data.user_id} nickname={data.nickname} current={data.is_admin} nextIsAdmin={data.admin_actions.next_is_admin} onChanged={setData} />
           ) : null}
+          {data.role_actions ? <p className="mt-4 text-xs leading-5 text-muted">{data.role_actions.note}</p> : null}
+          {data.role_actions?.status === "ready" && data.role_actions.mode && data.role_actions.next_role && !demo ? (
+            <MemberRoleDialog userId={data.user_id} nickname={data.nickname} current={data.role} nextRole={data.role_actions.next_role} mode={data.role_actions.mode} onChanged={setData} />
+          ) : null}
           <h2 className="mt-6 text-base font-bold">운영 이력</h2>
           <p className="mt-1 text-xs text-muted">{data.audit.note}</p>
           {data.audit.items?.length ? (
             <div className="mt-3 overflow-x-auto">
               <table className="w-full min-w-[640px] text-left text-sm">
                 <thead><tr className="text-xs text-muted"><th className="py-2">시각</th><th>작업</th><th>이전</th><th>이후</th><th>내부 사유</th><th>사용자 안내</th></tr></thead>
-                <tbody>{data.audit.items.map((item) => <tr key={item.created_at + item.action} className="border-t border-line"><td className="py-2">{formatWhen(item.created_at)}</td><td>{auditActionLabel(item.action)}</td><td>{item.before_status}</td><td>{item.after_status}</td><td>{item.reason}</td><td>{item.notice || "—"}</td></tr>)}</tbody>
+                <tbody>{data.audit.items.map((item) => <tr key={item.created_at + item.action} className="border-t border-line"><td className="py-2">{formatWhen(item.created_at)}</td><td>{auditActionLabel(item.action)}</td><td>{ROLE_NAMES[item.before_status] ?? item.before_status}</td><td>{ROLE_NAMES[item.after_status] ?? item.after_status}</td><td>{item.reason}</td><td>{item.notice || "—"}</td></tr>)}</tbody>
               </table>
             </div>
-          ) : <p className="mt-2 text-sm text-muted">기록된 정지·해제·권한 변경이 없습니다.</p>}
+          ) : <p className="mt-2 text-sm text-muted">기록된 정지·해제·권한·역할 변경이 없습니다.</p>}
           <h2 className="mt-6 text-base font-bold">연구 등록</h2>
           <ul className="mt-2 space-y-2 text-sm">
             {data.researches.length ? data.researches.map((item) => (
@@ -266,6 +270,57 @@ function MemberAdminDialog({ userId, nickname, current, nextIsAdmin, onChanged }
     <form role="dialog" aria-modal="true" aria-labelledby="member-admin-title" className="w-full max-w-lg rounded-card bg-white p-5 shadow-card" onSubmit={submit}>
       <h2 id="member-admin-title" className="text-lg font-bold">{granting ? "공통 관리자를 부여할까요?" : "공통 관리자를 해제할까요?"}</h2>
       <p className="mt-2 text-sm leading-6 text-muted">대상 {nickname} · 회원 번호 {userId}. {granting ? "운영 조회, 인사이트 관리, 게시판 운영이 함께 열립니다. Discord 환경 변수 목록은 바꾸지 않습니다." : "운영·인사이트·게시판 관리가 함께 닫힙니다. 마지막 관리자는 서버가 막습니다."}</p>
+      <label className="mt-4 block text-sm font-semibold">내부 사유<textarea required maxLength={200} className={ADMIN_FIELD} value={reason} onChange={(event) => setReason(event.target.value)} /></label>
+      <label className="mt-3 block text-sm font-semibold">사용자 안내 · 저장만 하고 보내지 않음<textarea maxLength={200} className={ADMIN_FIELD} value={notice} onChange={(event) => setNotice(event.target.value)} /></label>
+      {error ? <p role="alert" className="mt-3 text-sm text-danger">{error}</p> : null}
+      <div className="mt-4 flex justify-end gap-2">
+        <button type="button" className={`${ADMIN_BUTTON} bg-white`} disabled={busy} onClick={() => setOpen(false)}>취소</button>
+        <button className={`${ADMIN_BUTTON} bg-ink text-white`} disabled={busy || !reason.trim()}>{busy ? "저장 중" : "확인"}</button>
+      </div>
+    </form>
+  </div>;
+}
+
+function MemberRoleDialog({ userId, nickname, current, nextRole, mode, onChanged }: {
+  userId: number; nickname: string; current: string | null; nextRole: "researcher" | "expert"; mode: "direct" | "reset"; onChanged: (detail: MemberDetail) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState("");
+  const [notice, setNotice] = useState("");
+  const [key, setKey] = useState("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const direct = mode === "direct";
+  const currentName = ROLE_NAMES[current ?? ""] ?? "미선택";
+  const nextName = ROLE_NAMES[nextRole];
+  async function submit(event: FormEvent) {
+    event.preventDefault();
+    setBusy(true); setError("");
+    try {
+      // 같은 키로 다시 보내면 서버가 이력을 한 번만 남깁니다. 관리자 여부는 서버가 다시 보고 방식을 정합니다.
+      await requestApi(`/admin/operations/members/${userId}/role`, {
+        method: "POST",
+        body: JSON.stringify({ expected_role: current, next_role: nextRole, reason, notice, idempotency_key: key }),
+      });
+      onChanged(await requestApi<MemberDetail>(`/admin/operations/members/${userId}`));
+      setOpen(false);
+    } catch (problem: unknown) {
+      const message = problem instanceof ApiError ? problem.message : "역할을 바꾸지 못했습니다.";
+      setError(message);
+      if (problem instanceof ApiError && problem.status === 409) {
+        requestApi<MemberDetail>(`/admin/operations/members/${userId}`).then(onChanged).catch(() => undefined);
+      }
+    } finally {
+      setBusy(false);
+    }
+  }
+  if (!open) {
+    return <button type="button" className={`${ADMIN_BUTTON} mt-4 bg-white`} onClick={() => { setKey(crypto.randomUUID()); setReason(""); setNotice(""); setError(""); setOpen(true); }}>{direct ? `${nextName}로 역할 변경` : "회원 유형 다시 고르게 하기"}</button>;
+  }
+  return <div className="fixed inset-0 z-30 grid place-items-center bg-ink/40 p-4" role="presentation" onKeyDown={(event) => { if (event.key === "Escape" && !busy) setOpen(false); }}>
+    <form role="dialog" aria-modal="true" aria-labelledby="member-role-title" className="w-full max-w-lg rounded-card bg-white p-5 shadow-card" onSubmit={submit}>
+      <h2 id="member-role-title" className="text-lg font-bold">{direct ? `${nextName}로 바꿀까요?` : "회원 유형 선택으로 되돌릴까요?"}</h2>
+      <p className="mt-2 text-sm leading-6 text-muted">대상 {nickname} · 회원 번호 {userId} · {currentName} → {direct ? nextName : "회원 유형 선택"}. {direct ? "관리자(테스트) 계정이라 바로 바뀝니다. 새 역할에 없는 프로필은 테스트용 값으로 채우고, 기존 프로필은 그대로 둡니다." : "역할을 비우고 가입 단계를 처음으로 되돌립니다. 회원이 다음 로그인 때 직접 고르고 필요한 인증을 거칩니다. 연구·협업 기록은 지우지 않습니다."}</p>
       <label className="mt-4 block text-sm font-semibold">내부 사유<textarea required maxLength={200} className={ADMIN_FIELD} value={reason} onChange={(event) => setReason(event.target.value)} /></label>
       <label className="mt-3 block text-sm font-semibold">사용자 안내 · 저장만 하고 보내지 않음<textarea maxLength={200} className={ADMIN_FIELD} value={notice} onChange={(event) => setNotice(event.target.value)} /></label>
       {error ? <p role="alert" className="mt-3 text-sm text-danger">{error}</p> : null}
