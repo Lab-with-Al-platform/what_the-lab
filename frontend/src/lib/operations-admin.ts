@@ -63,6 +63,8 @@ export type MemberDetail = MemberItem & {
   researches: { research_id: number; title: string; status: string; status_label: string; created_at: string }[];
   actions: { status: string; next_status?: string | null; note: string };
   admin_actions?: { status: string; next_is_admin?: boolean | null; note: string };
+  // direct = 관리자(테스트) 계정이라 바로 바꿈, reset = 일반 회원이라 회원 유형 선택으로 되돌림
+  role_actions?: { status: string; mode: "direct" | "reset" | null; next_role: "researcher" | "expert" | null; note: string };
   audit: {
     status: string;
     note: string;
@@ -75,8 +77,12 @@ export function auditActionLabel(action: string): string {
   if (action === "restore") return "해제";
   if (action === "grant_admin") return "관리자 부여";
   if (action === "revoke_admin") return "관리자 해제";
+  if (action === "change_role") return "역할 변경";
+  if (action === "reset_role") return "역할 되돌림";
   return action;
 }
+
+export const ROLE_NAMES: Record<string, string> = { researcher: "연구자", expert: "AI 전문가", signup: "회원 유형 선택" };
 
 export type ResearchItem = {
   research_id: number;

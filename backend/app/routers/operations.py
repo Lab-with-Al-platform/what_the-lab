@@ -17,6 +17,7 @@ from app.operations.account_actions import (
     PostgresAccountStore,
     parse_admin_change,
     parse_change,
+    parse_role_change,
 )
 from app.operations.auth import require_operations_reader
 from app.operations.collaboration import (
@@ -61,6 +62,14 @@ class StatusBody(BaseModel):
 class AdminBody(BaseModel):
     expected_is_admin: bool
     next_is_admin: bool
+    reason: str = Field(min_length=1, max_length=200)
+    notice: str = Field(default="", max_length=200)
+    idempotency_key: str
+
+
+class RoleBody(BaseModel):
+    expected_role: Literal["researcher", "expert"] | None
+    next_role: Literal["researcher", "expert"]
     reason: str = Field(min_length=1, max_length=200)
     notice: str = Field(default="", max_length=200)
     idempotency_key: str
@@ -239,6 +248,13 @@ def one_member(
         actor_id=reader["user_id"],
         target_id=user_id,
     )
+    body["role_actions"] = _role_action(
+        role=body["role"],
+        is_admin=body["is_admin"],
+        status=body["status"],
+        actor_id=reader["user_id"],
+        target_id=user_id,
+    )
     body["audit"] = _audit_body(store, user_id)
     return body
 
@@ -282,6 +298,30 @@ def change_admin(
         "user_id": user_id,
         "is_admin": result["after_status"] == "admin",
         "previous_is_admin": result["before_status"] == "admin",
+        "replayed": result["replayed"],
+        "action": result["action"],
+    }
+
+
+@router.post("/members/{user_id}/role", dependencies=[Depends(require_trusted_origin)])
+def change_role(
+    user_id: int,
+    body: RoleBody,
+    reader: Reader,
+    store: Annotated[PostgresAccountStore | MemoryAccountStore, Depends(get_account_store)],
+) -> dict:
+    """관리자(테스트) 계정은 바로 바꾸고, 일반 회원은 회원 유형 선택으로 되돌립니다."""
+    try:
+        change = parse_role_change(body.model_dump())
+        result = store.change_role(reader["user_id"], user_id, change)
+    except AccountActionError as error:
+        raise HTTPException(error.status_code, error.detail) from error
+    applied_now = result["action"] == "change_role"
+    return {
+        "user_id": user_id,
+        "role": result["after_status"] if applied_now else None,
+        "signup_step": "done" if applied_now else "role",
+        "previous_role": result["before_status"],
         "replayed": result["replayed"],
         "action": result["action"],
     }
@@ -354,7 +394,7 @@ def _audit_body(store: PostgresAccountStore | MemoryAccountStore, user_id: int) 
         return {"status": "not_collected", "note": error.detail, "items": []}
     return {
         "status": "ready",
-        "note": "성공한 정지·해제·관리자 변경만 보여 줍니다. 화면에서 고치거나 지우지 않습니다.",
+        "note": "성공한 정지·해제·관리자·역할 변경만 보여 줍니다. 화면에서 고치거나 지우지 않습니다.",
         "items": [
             {
                 "actor_user_id": row["actor_user_id"],
@@ -367,6 +407,33 @@ def _audit_body(store: PostgresAccountStore | MemoryAccountStore, user_id: int) 
             }
             for row in rows
         ],
+    }
+
+
+def _role_action(*, role: str | None, is_admin: bool, status: str, actor_id: int, target_id: int) -> dict:
+    """버튼 표시용입니다. 실제 변경은 POST에서 다시 검사합니다."""
+    blocked = None
+    if actor_id == target_id:
+        blocked = "본인 역할은 이 화면에서 바꾸지 않습니다. 다른 관리자에게 요청하세요."
+    elif status != "active":
+        blocked = "정상 계정의 역할만 바꿉니다."
+    elif role not in ("researcher", "expert"):
+        blocked = "아직 역할을 고르지 않은 회원입니다. 가입을 마친 뒤 바꿀 수 있습니다."
+    if blocked:
+        return {"status": "not_available", "mode": None, "next_role": None, "note": blocked}
+    next_role = "researcher" if role == "expert" else "expert"
+    if is_admin:
+        return {
+            "status": "ready",
+            "mode": "direct",
+            "next_role": next_role,
+            "note": "관리자(테스트) 계정은 역할을 바로 바꿉니다. 새 역할에 없는 프로필은 테스트용 값으로 채웁니다.",
+        }
+    return {
+        "status": "ready",
+        "mode": "reset",
+        "next_role": next_role,
+        "note": "일반 회원은 역할을 비우고 회원 유형 선택으로 되돌립니다. 다음 로그인 때 회원이 직접 고르고 필요한 인증을 거칩니다.",
     }
 
 
