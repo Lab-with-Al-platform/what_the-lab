@@ -51,7 +51,6 @@ export function InsightList({
     if (sort !== "latest" || !interest) return ordered;
     return rankRelated(ordered, (article) => Boolean(articleReason(article, interest)));
   }, [articles, interest, sort, topic]);
-  const rankedCount = interest && sort === "latest" ? filtered.filter((article) => articleReason(article, interest)).length : 0;
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
   const safePage = Math.min(page, pageCount);
@@ -111,9 +110,6 @@ export function InsightList({
           );
         })}
       </div>
-      {rankedCount > 0 ? (
-        <p className="mt-3 text-sm text-muted">나와 같은 키워드의 글 {rankedCount}편을 위에 두었어요. 나머지 글도 그대로 볼 수 있어요.</p>
-      ) : null}
 
       {topic !== "all" && !topics.some((item) => item.id === topic || item.label === topic) ? (
         <p className="mt-3 text-sm text-muted">

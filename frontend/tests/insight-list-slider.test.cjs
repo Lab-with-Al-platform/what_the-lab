@@ -41,17 +41,25 @@ test("목록 카드는 사진 높이를 줄여 카드가 작아진다", () => {
   assert.match(read("src/components/cover-art.tsx"), /INSIGHT_LIST_COVER_CLASS = "aspect-\[2\/1\] w-full shrink-0"/);
 });
 
-test("PC에서만 위(제목+배너)·아래(목록~꼬리말) 두 구역에 부드럽게 맞춰 멈춘다", () => {
+test("PC에서는 위(제목+배너)·아래(목록)·맨 끝(꼬리말) 세 지점에 확실히 맞춰 멈춘다", () => {
   const css = read("src/app/globals.css");
-  // 강제 고정(mandatory)이 아니라 가까울 때만 맞추는 proximity, 1024px 이상에서만
-  assert.match(css, /@media \(min-width: 1024px\) \{\s*html:has\(\.insight-editorial\) \{\s*scroll-snap-type: y proximity;/);
-  assert.doesNotMatch(css, /scroll-snap-type: y mandatory/);
+  // 1024px 이상에서만, 경계 사이에 어중간하게 멈추지 않도록 mandatory로 맞춰요.
+  assert.match(css, /@media \(min-width: 1024px\) \{\s*html:has\(\.insight-editorial\) \{\s*scroll-snap-type: y mandatory;/);
   // 고정 헤더(60px)에 가리지 않게 위 여백을 둬요.
   assert.match(css, /scroll-padding-top: 60px;/);
   assert.match(css, /\.insight-page-heading,\s*\.insight-snap-lower \{\s*scroll-snap-align: start;/);
+  // 꼬리말 끝도 멈추는 지점이라 맨 아래까지 내려갈 수 있어요.
+  assert.match(css, /html:has\(\.insight-editorial\) \.site-footer \{\s*scroll-snap-align: end;/);
+  assert.match(read("src/components/site-footer.tsx"), /<footer className="site-footer /);
 
   const browser = read("src/components/insight-browser.tsx");
   assert.match(browser, /className="insight-snap-lower"/);
+});
+
+test("키워드 안내 문장은 없다 (카드마다 이유가 표시돼요)", () => {
+  const list = read("src/components/insight-list.tsx");
+  assert.doesNotMatch(list, /위에 두었어요/);
+  assert.doesNotMatch(list, /rankedCount/);
 });
 
 test("홈 최신 인사이트 카드는 남는 높이를 사진이 채워 흰 글자 영역이 커지지 않는다", () => {
