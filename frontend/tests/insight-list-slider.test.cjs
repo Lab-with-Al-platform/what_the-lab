@@ -69,3 +69,13 @@ test("홈 최신 인사이트 카드는 남는 높이를 사진이 채워 흰 �
   assert.match(card, /isLanding \? "min-h-\[132px\] w-full flex-1"/);
   assert.match(card, /isLanding \? "shrink-0 pt-3" : "flex-1 pt-4"/);
 });
+
+test("내 키워드 이유는 사진 위 배지로 떠 있어 카드 높이를 바꾸지 않는다", () => {
+  const card = read("src/components/insight-card.tsx");
+  // 글자 영역에 줄을 더하지 않아요.
+  assert.doesNotMatch(card, /\{reason \? <p className="mt-1 text-xs font-medium text-brand">\{reason\}<\/p> : null\}/);
+  // 사진 왼쪽 아래에 겹쳐 띄워요.
+  assert.match(card, /className="insight-reason-badge"/);
+  const css = read("src/app/globals.css");
+  assert.match(css, /\.insight-reason-badge \{\s*position: absolute;/);
+});
