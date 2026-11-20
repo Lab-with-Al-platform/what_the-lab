@@ -88,8 +88,6 @@ def review_context(collaboration_id: int, user_id: int) -> dict:
         complete_ended_collaborations(cursor)
         row = _participant(cursor, collaboration_id, user_id)
         window = review_window(row, user_id)
-        if window["stopped_by_me"]:
-            raise HTTPException(409, "직접 중단한 협업은 평가를 남기지 않아요.")
         own = _my_record(cursor, collaboration_id, user_id)
         # Release counterpart feedback only after the same seven-day cool-off.
         received = None
@@ -159,6 +157,8 @@ def submit_review(user_id: int, collaboration_id: int, values: dict) -> dict:
         complete_ended_collaborations(cursor)
         row = _participant(cursor, collaboration_id, user_id, lock=True)
         window = review_window(row, user_id)
+        if window["stopped_by_me"]:
+            raise HTTPException(409, "직접 중단한 협업은 평가를 남기지 않아요.")
         if not window["eligible"]:
             raise HTTPException(409, "협업 종료 후 30일 이내에만 평가할 수 있습니다.")
         receiver = row["expert_id"] if window["side"] == "researcher" else row["researcher_id"]
