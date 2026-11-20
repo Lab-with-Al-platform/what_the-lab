@@ -13,8 +13,9 @@ on:
 permissions:
   contents: read
 
+# Deploy가 이 파일을 불러 쓸 때(github.workflow = "Deploy")는 다른 그룹이 되어, main의 CI와 서로 취소하지 않아요.
 concurrency:
-  group: ci-${{ github.head_ref || github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 jobs:
