@@ -430,11 +430,12 @@ html {
   scroll-behavior: smooth;
 }
 
-/* 사례·트렌드 화면(PC): 위(제목+배너)와 아래(목록~꼬리말) 두 구역 근처에서 멈추면 시작점에 맞춰 붙어요.
-   강제 고정(mandatory)은 화면보다 긴 아래 구역을 못 보게 만들 수 있어 "가까울 때만"(proximity)을 써요. */
+/* 사례·트렌드 화면(PC): 스크롤을 멈추면 위(제목+배너)·아래(목록)·맨 끝(꼬리말) 중 가까운 곳에 맞춰 붙어요.
+   proximity는 브라우저가 "가깝다"고 볼 때만 붙어서 효과가 약해 mandatory를 써요.
+   화면보다 긴 구역 안에서는 브라우저가 자유롭게 스크롤하게 해 주고, 꼬리말 끝도 멈추는 지점이라 맨 아래까지 갈 수 있어요. */
 @media (min-width: 1024px) {
   html:has(.insight-editorial) {
-    scroll-snap-type: y proximity;
+    scroll-snap-type: y mandatory;
     /* 위에 붙어 있는 헤더(60px)에 구역 첫 줄이 가리지 않게 해요. */
     scroll-padding-top: 60px;
   }
@@ -442,6 +443,10 @@ html {
   .insight-page-heading,
   .insight-snap-lower {
     scroll-snap-align: start;
+  }
+
+  html:has(.insight-editorial) .site-footer {
+    scroll-snap-align: end;
   }
 }
 
