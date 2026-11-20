@@ -133,7 +133,7 @@
   --header-height: 60px;
   --toc-collapsed-height: 48px;
   --toc-sticky-gap: 24px;
-  --insight-page-title: clamp(32px, 3.4vw, 48px);
+  --insight-page-title: clamp(22px, 2.2vw, 30px);
   --insight-feature-title: clamp(28px, 3vw, 42px);
   --insight-quote-title: clamp(24px, 2.2vw, 30px);
   --home-card-lift: -4px;
@@ -228,7 +228,7 @@
 }
 
 .insight-page-heading {
-  padding-block: 40px 32px;
+  padding-block: 20px 16px;
   border-bottom: 1px solid var(--color-line);
   background: var(--color-card);
 }
@@ -393,7 +393,7 @@
 }
 
 @media (max-width: 767px) {
-  .insight-page-heading { padding-block: 28px 24px; }
+  .insight-page-heading { padding-block: 16px 12px; }
   .insight-feature__art { inset: auto 0 0; height: 240px; }
   .insight-feature::after {
     background: linear-gradient(180deg, var(--insight-surface) calc(100% - 240px), color-mix(in srgb, var(--insight-surface) 65%, transparent) calc(100% - 180px), transparent calc(100% - 80px), var(--insight-surface));
@@ -428,6 +428,21 @@
 
 html {
   scroll-behavior: smooth;
+}
+
+/* 사례·트렌드 화면(PC): 위(제목+배너)와 아래(목록~꼬리말) 두 구역 근처에서 멈추면 시작점에 맞춰 붙어요.
+   강제 고정(mandatory)은 화면보다 긴 아래 구역을 못 보게 만들 수 있어 "가까울 때만"(proximity)을 써요. */
+@media (min-width: 1024px) {
+  html:has(.insight-editorial) {
+    scroll-snap-type: y proximity;
+    /* 위에 붙어 있는 헤더(60px)에 구역 첫 줄이 가리지 않게 해요. */
+    scroll-padding-top: 60px;
+  }
+
+  .insight-page-heading,
+  .insight-snap-lower {
+    scroll-snap-align: start;
+  }
 }
 
 /* 관리자 메뉴를 바꿀 때 스크롤바가 생겼다 사라지며 화면이 좌우로 밀리지 않게 합니다. */
