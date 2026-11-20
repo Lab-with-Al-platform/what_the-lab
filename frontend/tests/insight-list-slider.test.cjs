@@ -40,3 +40,16 @@ test("목록 카드는 사진 높이를 줄여 카드가 작아진다", () => {
   assert.match(card, /INSIGHT_LIST_COVER_CLASS/);
   assert.match(read("src/components/cover-art.tsx"), /INSIGHT_LIST_COVER_CLASS = "aspect-\[2\/1\] w-full shrink-0"/);
 });
+
+test("PC에서만 위(제목+배너)·아래(목록~꼬리말) 두 구역에 부드럽게 맞춰 멈춘다", () => {
+  const css = read("src/app/globals.css");
+  // 강제 고정(mandatory)이 아니라 가까울 때만 맞추는 proximity, 1024px 이상에서만
+  assert.match(css, /@media \(min-width: 1024px\) \{\s*html:has\(\.insight-editorial\) \{\s*scroll-snap-type: y proximity;/);
+  assert.doesNotMatch(css, /scroll-snap-type: y mandatory/);
+  // 고정 헤더(60px)에 가리지 않게 위 여백을 둬요.
+  assert.match(css, /scroll-padding-top: 60px;/);
+  assert.match(css, /\.insight-page-heading,\s*\.insight-snap-lower \{\s*scroll-snap-align: start;/);
+
+  const browser = read("src/components/insight-browser.tsx");
+  assert.match(browser, /className="insight-snap-lower"/);
+});

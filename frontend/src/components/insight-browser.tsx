@@ -62,6 +62,8 @@ export function InsightBrowser({
       <InsightFeatureCarousel kind={kind} items={featuredItems} />
 
       {/* 공통 푸터에 이미 바깥 여백이 있으므로 목록 끝의 여백을 중복하지 않습니다. */}
+      {/* PC에서는 여기부터 꼬리말까지가 "아래 구역"이에요. 스크롤을 근처에서 멈추면 이 줄에 맞춰 붙어요. */}
+      <div className="insight-snap-lower">
       <PageContainer>
         <Suspense fallback={<p className="pt-8 text-sm text-muted">목록을 준비하는 중입니다.</p>}>
           <InsightList
@@ -94,6 +96,7 @@ export function InsightBrowser({
           </section>
         ) : null}
       </PageContainer>
+      </div>
     </div>
   );
 }
