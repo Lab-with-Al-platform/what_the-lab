@@ -54,3 +54,19 @@ test("정적 빌드 결과의 큰 기본 이미지는 화면 크기에 맞게 �
   assert.match(script, /"profile-images\/default-researcher\.png": 128/);
   assert.match(read("scripts/build-static.cjs"), /optimize-static-images\.cjs/);
 });
+
+test("정적 빌드에서도 워드마크 로고가 원본 크기(624×180)로 커지지 않는다", () => {
+  // 정적 빌드는 이미지 최적화를 꺼서 원본 PNG가 그대로 나가요. 높이를 CSS로 고정해야 해요.
+  const src = read("src/components/brand-wordmark.tsx");
+  assert.match(src, /style=\{sizeStyle\}/, "className이 없을 때 높이를 style로 고정해요");
+  assert.match(src, /height: `\$\{height\}px`/);
+
+  // className을 직접 넘기는 곳은 높이 클래스(h-…)도 함께 넘겨야 해요.
+  const callers = ["src/components/site-header.tsx", "src/components/site-footer.tsx", "src/components/home-hero.tsx"];
+  for (const file of callers) {
+    for (const [tag] of read(file).matchAll(/<BrandWordmark[^>]*\/>/g)) {
+      const className = tag.match(/className="([^"]*)"/);
+      if (className) assert.match(className[1], /(^|\s)h-\d/, `${file}: ${tag}`);
+    }
+  }
+});
