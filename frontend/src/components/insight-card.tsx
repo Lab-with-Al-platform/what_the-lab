@@ -24,17 +24,25 @@ export function InsightCard({ article, variant = "default", reason }: InsightCar
       <article className="insight-editorial-card">
         {/* 카드 전체를 링크 하나로 묶어 클릭과 키보드 탐색을 모두 쉽게 합니다. */}
         <Link href={href} className="group flex h-full flex-col" aria-label={`${kindLabel(article.kind)}: ${article.title}`}>
-          <CoverArt
-            theme={article.cover} src={article.coverSrc} className={INSIGHT_LIST_COVER_CLASS}
-            sizes="(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
-          />
+          {/* 내 키워드 이유는 사진 위에 띄워서, 이유가 있든 없든 카드 높이가 같게 해요. */}
+          <div className="relative">
+            <CoverArt
+              theme={article.cover} src={article.coverSrc} className={INSIGHT_LIST_COVER_CLASS}
+              sizes="(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
+            />
+            {reason ? (
+              <p className="insight-reason-badge">
+                <span aria-hidden="true" className="insight-reason-badge__dot" />
+                <span className="truncate">{reason}</span>
+              </p>
+            ) : null}
+          </div>
           <div className="flex flex-1 flex-col p-5">
             <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-5">
               <span className={`font-semibold ${article.kind === "case" ? "text-brand" : "text-trend"}`}>{kindLabel(article.kind)}</span>
               <span aria-hidden="true" className="text-line">|</span>
               <span className="text-muted">{article.field}</span>
             </p>
-            {reason ? <p className="mt-1 text-xs font-medium text-brand">{reason}</p> : null}
             <h3 className="mt-2 line-clamp-2 text-base leading-snug font-bold tracking-tight text-ink transition-colors group-hover:text-brand md:min-h-[2lh]">{article.title}</h3>
             <p className="mt-3 line-clamp-2 text-sm leading-6 text-muted md:min-h-[2lh]">{article.summary}</p>
             <div className="mt-auto flex items-center justify-between gap-3 pt-5 text-xs text-muted">

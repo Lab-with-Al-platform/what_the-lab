@@ -334,6 +334,35 @@
   transition: border-color 160ms ease, box-shadow 160ms ease;
 }
 
+/* 목록 카드 사진 왼쪽 아래의 "내 키워드" 배지. 밝은 반투명 유리 위에 브랜드색 글자로 사진과 겹쳐도 읽혀요. */
+.insight-reason-badge {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  display: inline-flex;
+  max-width: calc(100% - 24px);
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 8px;
+  border: 1px solid color-mix(in srgb, white 70%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, white 86%, transparent);
+  box-shadow: 0 2px 8px rgb(31 45 91 / 0.12);
+  backdrop-filter: blur(8px);
+  color: var(--color-brand);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.insight-reason-badge__dot {
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: var(--color-brand);
+}
+
 .insight-editorial-card:hover,
 .insight-editorial-card:focus-within {
   border-color: color-mix(in srgb, var(--color-brand) 35%, var(--color-line));
