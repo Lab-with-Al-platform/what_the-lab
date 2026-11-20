@@ -11,16 +11,20 @@ export function BrandWordmark({
   height = 28,
   priority = false,
   alt = "LabBridge",
-  className = "w-auto",
+  className,
 }: {
   variant?: "header" | "hero";
   height?: number;
   priority?: boolean;
   alt?: string;
+  /** 넘길 때는 높이 클래스(h-…)도 함께 넘겨요. 예: "h-10 w-auto md:h-14" */
   className?: string;
 }) {
   const asset = WORDMARKS[variant];
   const width = Math.round((height * asset.width) / asset.height);
+  // 정적 빌드(S3)는 이미지 최적화를 꺼서 원본 PNG(624×180)가 그대로 나가요.
+  // 높이를 CSS로 고정하지 않으면 로고가 원본 크기로 커지므로, className이 없을 때는 style로 고정해요.
+  const sizeStyle = className ? undefined : { height: `${height}px`, width: "auto" };
   return (
     <Image
       src={asset.src}
@@ -29,6 +33,7 @@ export function BrandWordmark({
       height={height}
       priority={priority}
       className={className}
+      style={sizeStyle}
     />
   );
 }
