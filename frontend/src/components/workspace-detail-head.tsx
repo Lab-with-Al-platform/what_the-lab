@@ -116,7 +116,9 @@ function Timeline({ detail }: { detail: CollaborationDetail }) {
   const running = collab.status === "active";
   const thisWeek = running ? Math.floor(daysBetween(collab.start_date, today) / 7) + 1 : null;
   const past = (item: Schedule) => item.end_date < today;
-
+  // 실제로 끝난 날 (한국 날짜). 중단 · 조기 완료면 종료 예정일보다 빨라요. 없으면 종료 예정일
+  const endedOn = collab.ended_at ? new Date(collab.ended_at).toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" }) : collab.end_date;
+  
   return (
     <div className="mt-5 border-t border-line pt-4">
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-xs text-muted">
@@ -128,7 +130,9 @@ function Timeline({ detail }: { detail: CollaborationDetail }) {
           ) : collab.status === "canceled" ? (
             <>시작 전에 취소됐어요</>
           ) : (
-            <>{shortDay(collab.end_date)}에 끝났어요</>
+            <>
+              {shortDay(endedOn)}에 {collab.status === "ended_early" ? "중단됐어요" : "끝났어요"}
+            </>
           )}
         </p>
         <p>
