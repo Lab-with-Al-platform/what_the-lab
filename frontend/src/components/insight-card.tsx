@@ -52,10 +52,11 @@ export function InsightCard({ article, variant = "default", reason }: InsightCar
 
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-card border border-line bg-card shadow-card">
-      <Link href={href} className="relative block shrink-0">
+      {/* 홈 카드는 옆 인터뷰 칸 높이에 맞춰 늘어나요. 늘어난 만큼은 사진이 채우고 글자 영역은 내용만큼만 써요. */}
+      <Link href={href} className={isLanding ? "relative flex min-h-[132px] flex-1 flex-col" : "relative block shrink-0"}>
         <CoverArt
           theme={article.cover} src={article.coverSrc}
-          className={isLanding ? "h-[132px] w-full shrink-0" : INSIGHT_CARD_COVER_CLASS}
+          className={isLanding ? "min-h-[132px] w-full flex-1" : INSIGHT_CARD_COVER_CLASS}
           sizes={isLanding
             ? "(min-width: 1440px) 350px, (min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw"
             : "(min-width: 1440px) 460px, (min-width: 768px) 33vw, 100vw"}
@@ -65,7 +66,7 @@ export function InsightCard({ article, variant = "default", reason }: InsightCar
           <span className="rounded-md bg-white/20 px-2 py-1 text-[11px] font-medium text-white backdrop-blur-sm">{article.field}</span>
         </span>
       </Link>
-      <div className={`flex flex-1 flex-col px-4 pb-4 ${isLanding ? "pt-3" : "pt-4"}`}>
+      <div className={`flex flex-col px-4 pb-4 ${isLanding ? "shrink-0 pt-3" : "flex-1 pt-4"}`}>
         <h3 className={`line-clamp-2 min-h-[2lh] leading-snug font-bold tracking-tight ${isLanding ? "text-[14px]" : "text-[15px]"}`}>
           <Link href={href} className="hover:text-brand">
             {article.title}

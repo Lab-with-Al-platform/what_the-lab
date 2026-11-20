@@ -53,3 +53,11 @@ test("PC에서만 위(제목+배너)·아래(목록~꼬리말) 두 구역에 부
   const browser = read("src/components/insight-browser.tsx");
   assert.match(browser, /className="insight-snap-lower"/);
 });
+
+test("홈 최신 인사이트 카드는 남는 높이를 사진이 채워 흰 글자 영역이 커지지 않는다", () => {
+  const card = read("src/components/insight-card.tsx");
+  // 카드 높이는 옆 인터뷰 칸에 맞춰 늘어나요. 늘어난 만큼 사진이 커지고, 글자 영역은 내용만큼만 차지해요.
+  assert.match(card, /isLanding \? "relative flex min-h-\[132px\] flex-1 flex-col"/);
+  assert.match(card, /isLanding \? "min-h-\[132px\] w-full flex-1"/);
+  assert.match(card, /isLanding \? "shrink-0 pt-3" : "flex-1 pt-4"/);
+});
