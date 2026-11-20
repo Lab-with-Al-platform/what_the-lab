@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CoverArt, INSIGHT_CARD_COVER_CLASS } from "@/components/cover-art";
+import { CoverArt, INSIGHT_CARD_COVER_CLASS, INSIGHT_LIST_COVER_CLASS } from "@/components/cover-art";
 import { KindBadge } from "@/components/kind-badge";
 import { articlePath, kindLabel, type InsightListItem } from "@/lib/insight-meta";
 
@@ -25,7 +25,7 @@ export function InsightCard({ article, variant = "default", reason }: InsightCar
         {/* 카드 전체를 링크 하나로 묶어 클릭과 키보드 탐색을 모두 쉽게 합니다. */}
         <Link href={href} className="group flex h-full flex-col" aria-label={`${kindLabel(article.kind)}: ${article.title}`}>
           <CoverArt
-            theme={article.cover} src={article.coverSrc} className={INSIGHT_CARD_COVER_CLASS}
+            theme={article.cover} src={article.coverSrc} className={INSIGHT_LIST_COVER_CLASS}
             sizes="(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
           />
           <div className="flex flex-1 flex-col p-5">

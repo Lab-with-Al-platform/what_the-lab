@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { InsightCard } from "@/components/insight-card";
 import {
-  kindLabel,
   matchesTopicFilter,
   type InsightKind,
   type InsightListItem,
@@ -12,8 +11,7 @@ import {
 } from "@/lib/insight-meta";
 import { articleReason, rankRelated } from "@/lib/related-rank";
 import { useViewerInterest } from "@/lib/viewer-interest";
-
-const PAGE_SIZE = 6;
+import { useCardsPerView } from "@/lib/use-cards-per-view";
 
 interface InsightListProps {
   kind: InsightKind;
@@ -39,6 +37,8 @@ export function InsightList({
   const [sort, setSort] = useState<"latest" | "title">("latest");
   const [page, setPage] = useState(1);
   const interest = useViewerInterest();
+  // 한 페이지 = 한 줄. PC 3장, 태블릿 2장, 모바일 1장이에요.
+  const pageSize = useCardsPerView();
 
   const filtered = useMemo(() => {
     const matched = articles.filter((article) => matchesTopicFilter(article, topic));
@@ -53,9 +53,9 @@ export function InsightList({
   }, [articles, interest, sort, topic]);
   const rankedCount = interest && sort === "latest" ? filtered.filter((article) => articleReason(article, interest)).length : 0;
 
-  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
   const safePage = Math.min(page, pageCount);
-  const visible = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  const visible = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
 
   function selectTopic(nextTopic: string) {
     setPage(1);
@@ -127,24 +127,32 @@ export function InsightList({
       {visible.length === 0 ? (
         <p className="mt-6 rounded-2xl bg-white px-5 py-10 text-sm text-muted">이 조건에 해당하는 글이 없습니다. 다른 분야를 선택해 보세요.</p>
       ) : (
-        <div className="mt-6 grid items-stretch gap-5 md:grid-cols-2 xl:grid-cols-3" aria-label="콘텐츠 목록">
-          {visible.map((article) => (
-            <InsightCard key={article.slug} article={article} variant="editorial" reason={interest && sort === "latest" ? articleReason(article, interest) : null} />
-          ))}
+        // 한 줄만 보여 주고 양옆 버튼으로 넘겨요. 버튼은 카드 바깥 여백에 둬서 글을 가리지 않아요.
+        <div className="relative mt-6 md:px-14">
+          <SlideButton direction="prev" disabled={safePage <= 1} onClick={() => setPage(safePage - 1)} />
+          <div
+            className="grid items-stretch gap-5"
+            style={{ gridTemplateColumns: `repeat(${pageSize}, minmax(0, 1fr))` }}
+            aria-label="콘텐츠 목록"
+            aria-live="polite"
+          >
+            {visible.map((article) => (
+              <InsightCard key={article.slug} article={article} variant="editorial" reason={interest && sort === "latest" ? articleReason(article, interest) : null} />
+            ))}
+          </div>
+          <SlideButton direction="next" disabled={safePage >= pageCount} onClick={() => setPage(safePage + 1)} />
         </div>
       )}
-      {footnote ? <p className="mt-4 text-xs leading-5 text-muted">{footnote}</p> : null}
 
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
-        <button
-          type="button"
-          className="inline-flex h-11 items-center rounded-button border border-ink px-4 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-40"
-          disabled={safePage >= pageCount}
-          onClick={() => setPage(safePage + 1)}
-        >
-          {kindLabel(kind)} 더 보기 ↓
-        </button>
-        <nav aria-label="페이지" className="flex gap-2 text-sm">
+      {pageCount > 7 ? (
+        // 모바일처럼 한 장씩 넘기면 번호가 너무 많아져서, 숫자로만 짧게 알려 줘요.
+        <nav aria-label="페이지" className="mt-6 flex justify-center text-sm text-muted">
+          <span aria-current="page">
+            <strong className="text-ink">{safePage}</strong> / {pageCount}
+          </span>
+        </nav>
+      ) : pageCount > 1 ? (
+        <nav aria-label="페이지" className="mt-6 flex flex-wrap justify-center gap-2 text-sm">
           {Array.from({ length: pageCount }, (_, index) => index + 1).map((pageNumber) => (
             <button
               key={pageNumber}
@@ -159,7 +167,26 @@ export function InsightList({
             </button>
           ))}
         </nav>
-      </div>
+      ) : null}
+      {footnote ? <p className="mt-4 text-center text-xs leading-5 text-muted">{footnote}</p> : null}
     </section>
+  );
+}
+
+/** 목록 양옆의 < > 버튼. 모바일은 카드 위에 겹쳐 두고, 태블릿부터는 카드 바깥 여백에 둬요. */
+function SlideButton({ direction, disabled, onClick }: { direction: "prev" | "next"; disabled: boolean; onClick: () => void }) {
+  const isPrev = direction === "prev";
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={isPrev ? "이전 글" : "다음 글"}
+      className={`absolute top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-line bg-white text-xl text-ink shadow-card transition-colors hover:border-brand hover:text-brand disabled:pointer-events-none disabled:opacity-30 ${
+        isPrev ? "left-1 md:left-0" : "right-1 md:right-0"
+      }`}
+    >
+      <span aria-hidden="true">{isPrev ? "‹" : "›"}</span>
+    </button>
   );
 }

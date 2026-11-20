@@ -44,11 +44,12 @@ export function InsightBrowser({
       {/* 페이지 제목은 추천 사진 영역 밖에 두어 페이지의 역할을 먼저 알립니다. */}
       <header className="insight-page-heading">
         <PageContainer>
-          <p className="text-xs font-semibold tracking-[0.18em] text-brand uppercase">{eyebrow}</p>
-          <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
-            <div>
+          <p className="text-[11px] font-semibold tracking-[0.18em] text-brand uppercase">{eyebrow}</p>
+          {/* 제목과 소제목을 한 줄에 두어 제목 영역을 낮추고, 아래 추천 배너가 돋보이게 합니다. */}
+          <div className="insight-page-heading__row mt-1.5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
               <h1 className="insight-page-heading__title">{title}</h1>
-              <p className="mt-3 text-sm text-muted md:text-base">{kicker}</p>
+              <p className="text-sm text-muted">{kicker}</p>
             </div>
             <p className="text-xs text-muted">
               총 {articles.length}건 · {kind === "case" ? "실증 사례·시안 콘텐츠" : "검증 글·시안 콘텐츠"}

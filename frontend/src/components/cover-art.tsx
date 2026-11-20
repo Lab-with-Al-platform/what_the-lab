@@ -49,6 +49,8 @@ interface CoverArtProps {
  * SCREEN_DESIGN_SPECS의 목록 카드 시작값입니다.
  */
 export const INSIGHT_CARD_COVER_CLASS = "aspect-video w-full shrink-0";
+/** 사례·트렌드 목록 슬라이드 카드: 사진을 조금 낮춰 카드 한 줄이 한 화면에 들어오게 해요. */
+export const INSIGHT_LIST_COVER_CLASS = "aspect-[2/1] w-full shrink-0";
 
 export function CoverArt({ theme, src, className, sizes, priority = false, alt = "" }: CoverArtProps) {
   return (

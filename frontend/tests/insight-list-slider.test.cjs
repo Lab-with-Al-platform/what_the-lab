@@ -1,0 +1,42 @@
+// 사례·트렌드 목록: 제목 영역을 낮추고, 카드는 한 줄 슬라이드로 보여 줘요.
+const test = require("node:test");
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
+
+const ROOT = path.join(__dirname, "..");
+const read = (file) => fs.readFileSync(path.join(ROOT, file), "utf8");
+
+test("제목 영역은 이전의 절반 정도로 낮고 글자도 작다", () => {
+  const css = read("src/app/globals.css");
+  // 제목 글자: 32~48px → 22~30px
+  assert.match(css, /--insight-page-title: clamp\(22px, 2\.2vw, 30px\);/);
+  // 위아래 여백: 40px 32px → 20px 16px
+  assert.match(css, /\.insight-page-heading \{\s*padding-block: 20px 16px;/);
+
+  const browser = read("src/components/insight-browser.tsx");
+  // 소제목(kicker)을 제목 옆 같은 줄에 두어 한 줄을 줄여요.
+  assert.match(browser, /insight-page-heading__row/);
+  assert.doesNotMatch(browser, /<p className="mt-3 text-sm text-muted md:text-base">\{kicker\}<\/p>/);
+});
+
+test("카드는 한 줄만 보이고 양옆 < > 버튼으로 넘긴다", () => {
+  const list = read("src/components/insight-list.tsx");
+  assert.match(list, /useCardsPerView\(\)/, "화면 폭에 따라 한 줄에 1·2·3장");
+  assert.match(list, /aria-label=\{isPrev \? "이전 글" : "다음 글"\}/);
+  assert.match(list, /<SlideButton direction="prev"/);
+  assert.match(list, /<SlideButton direction="next"/);
+  assert.doesNotMatch(list, /md:grid-cols-2 xl:grid-cols-3/, "여러 줄 격자는 쓰지 않아요");
+});
+
+test("페이지 번호는 가운데 아래에 있고 더 보기 버튼은 없다", () => {
+  const list = read("src/components/insight-list.tsx");
+  assert.match(list, /<nav aria-label="페이지" className="[^"]*justify-center/);
+  assert.doesNotMatch(list, /더 보기 ↓/);
+});
+
+test("목록 카드는 사진 높이를 줄여 카드가 작아진다", () => {
+  const card = read("src/components/insight-card.tsx");
+  assert.match(card, /INSIGHT_LIST_COVER_CLASS/);
+  assert.match(read("src/components/cover-art.tsx"), /INSIGHT_LIST_COVER_CLASS = "aspect-\[2\/1\] w-full shrink-0"/);
+});
