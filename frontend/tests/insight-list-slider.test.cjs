@@ -26,6 +26,9 @@ test("카드는 한 줄만 보이고 양옆 < > 버튼으로 넘긴다", () => {
   assert.match(list, /aria-label=\{isPrev \? "이전 글" : "다음 글"\}/);
   assert.match(list, /<SlideButton direction="prev"/);
   assert.match(list, /<SlideButton direction="next"/);
+  assert.match(list, /text-brand/);
+  assert.match(list, /width="28"/);
+  assert.doesNotMatch(list, /rounded-full border border-line bg-white/);
   assert.doesNotMatch(list, /md:grid-cols-2 xl:grid-cols-3/, "여러 줄 격자는 쓰지 않아요");
 });
 
