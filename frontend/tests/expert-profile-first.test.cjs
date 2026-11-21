@@ -22,10 +22,12 @@ const read = (name) => fs.readFileSync(path.join(__dirname, "../src/components",
 test("사용자가 선택한 2번 시안: 밝은 헤더, 왼쪽 필터, 추천, 3열 전문가 카드", () => {
   const list = read("expert-search.tsx");
   const hero = read("expert-search-hero.tsx");
+  const lead = read("page-lead-header.tsx");
   assert.match(hero, /AI 전문가 찾기/);
-  assert.match(hero, /현재 위치/);
-  assert.match(hero, /bg-white/);
-  assert.doesNotMatch(hero, /bg-navy|Expert discovery/);
+  assert.match(hero, /PageLeadHeader/);
+  assert.match(hero, /FIND EXPERTS/);
+  assert.doesNotMatch(lead, /현재 위치|홈 ›/);
+  assert.doesNotMatch(hero, /bg-navy|Expert discovery|crumb=/);
   assert.match(list, /aria-label="전문가 검색 필터"/);
   assert.match(list, /무엇을 맡길까요/);
   assert.match(list, /연구 분야/);

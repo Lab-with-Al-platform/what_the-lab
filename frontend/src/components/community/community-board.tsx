@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { PageContainer } from "@/components/page-container";
+import { PageLeadHeader } from "@/components/page-lead-header";
 import { ApiError } from "@/lib/api";
 import {
   communityApi,
@@ -135,31 +136,24 @@ export function CommunityBoard() {
   );
 
   return (
-    <PageContainer className={styles.page}>
-      <div className={styles.breadcrumb}>
-        <Link href="/">홈</Link>
-        <span>›</span>
-        <span>자유게시판</span>
-      </div>
-      <header className={styles.hero}>
-        <div>
-          <p className={styles.eyebrow}>COMMUNITY & FEEDBACK</p>
-          <h1>질문에서 시작하는 연결</h1>
-          <p>
-            연구의 막힌 순간부터, 작지만 반가운 발견까지.
-            <br />
-            함께 묻고 나누며 랩브릿지를 만들어 가요.
-          </p>
-        </div>
-        <div className={styles.heroActions}>
-          <Link className={styles.secondary} href="/faq">
-            FAQ 먼저 보기
-          </Link>
-          <Link className={styles.primary} href="/community/new">
-            <Icon name="plus" size={17} /> 글쓰기
-          </Link>
-        </div>
-      </header>
+    <PageContainer className={`${styles.page} ${styles.leadPage}`}>
+      <PageLeadHeader
+        kicker="COMMUNITY & FEEDBACK"
+        title="자유게시판"
+        lead="질문에서 시작하는 연결, 연구의 발견을 함께 나눠요."
+        artSrc="/headers/community-lead.jpg"
+        artKind="banner"
+        actions={
+          <>
+            <Link className={styles.secondary} href="/faq">
+              FAQ 먼저 보기
+            </Link>
+            <Link className={styles.primary} href="/community/new">
+              <Icon name="plus" size={17} /> 글쓰기
+            </Link>
+          </>
+        }
+      />
       <div className={styles.entryGrid}>
         <Link href="/community/new?category=question" className={styles.entry}>
           <span className={styles.entryIcon}>
