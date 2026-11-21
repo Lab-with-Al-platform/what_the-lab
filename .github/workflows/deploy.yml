@@ -1,0 +1,148 @@
+# 운영 배포 (CD): main에 머지되면 CI를 다시 통과한 뒤 AWS에 올려요.
+# - 화면(S3 + CloudFront): 지금 켜져 있어요.
+# - 서버(ECR + EC2): 저장소 변수 BACKEND_DEPLOY_ENABLED=true 로 켤 때까지 꺼 둬요. (서버 .env·도메인 준비 뒤)
+# AWS 액세스 키는 저장하지 않아요. GitHub OIDC로 labbridge-github-deploy 역할을 잠깐 빌려 써요.
+# 그 역할은 main 브랜치 증명서만 믿어서, 이 파일에서는 environment: 를 쓰지 않아요. (쓰면 증명서 값이 바뀌어요)
+# 자세한 설계: docs/aws-deployment/14-ci-cd-pipeline.md 5절
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write # OIDC 증명서를 받기 위해 필요해요
+
+# 배포는 한 번에 하나만. 진행 중인 배포를 중간에 끊지 않아요.
+concurrency:
+  group: production
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: ap-northeast-2
+
+jobs:
+  ci:
+    name: ci
+    uses: ./.github/workflows/ci.yml
+
+  backend:
+    name: backend (ECR + EC2)
+    needs: ci
+    # 서버 준비 전에는 건너뛰어요(skipped). 켜는 법: Settings → Variables → BACKEND_DEPLOY_ENABLED = true
+    if: vars.BACKEND_DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-24.04-arm # 서버(t4g)와 같은 ARM64에서 이미지를 만들어요
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: ECR 로그인
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: backend 이미지 빌드 → ECR (태그 = 커밋 SHA)
+        env:
+          IMAGE: ${{ steps.ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}:${{ github.sha }}
+        run: |
+          docker build -t "$IMAGE" backend
+          docker push "$IMAGE"
+          echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
+
+      # 서버에 SSH로 들어가지 않고 SSM으로 deploy.sh 한 줄만 실행해요. (역할 권한도 이 서버·이 명령 문서로 제한)
+      - name: 서버 배포 (SSM → /opt/labbridge/deploy.sh)
+        run: |
+          # 따옴표가 겹치지 않게 jq로 JSON을 만들어 넘겨요.
+          params=$(jq -nc --arg cmd "sudo -u ec2-user bash -lc 'cd /opt/labbridge && ./deploy.sh $IMAGE'" '{commands: [$cmd]}')
+          command_id=$(aws ssm send-command \
+            --instance-ids "${{ vars.APP_INSTANCE_ID }}" \
+            --document-name AWS-RunShellScript \
+            --comment "deploy ${GITHUB_SHA::7}" \
+            --parameters "$params" \
+            --query Command.CommandId --output text)
+          echo "SSM 명령: $command_id"
+          aws ssm wait command-executed --command-id "$command_id" --instance-id "${{ vars.APP_INSTANCE_ID }}" || true
+          aws ssm get-command-invocation --command-id "$command_id" --instance-id "${{ vars.APP_INSTANCE_ID }}" \
+            --query '{status: Status, out: StandardOutputContent, err: StandardErrorContent}' --output json
+          status=$(aws ssm get-command-invocation --command-id "$command_id" --instance-id "${{ vars.APP_INSTANCE_ID }}" --query Status --output text)
+          test "$status" = "Success"
+
+  frontend:
+    name: frontend (S3 + CloudFront)
+    needs: [ci, backend]
+    # 새 화면이 아직 없는 API를 부르지 않도록 서버 배포 뒤에 올려요. 서버 배포가 꺼져 있으면(skipped) 바로 진행해요.
+    if: >-
+      always() && vars.AWS_DEPLOY_ROLE_ARN != '' &&
+      needs.ci.result == 'success' &&
+      (needs.backend.result == 'success' || needs.backend.result == 'skipped')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BUCKET: ${{ vars.FRONTEND_BUCKET }}
+      DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
+      FUNCTION_NAME: ${{ vars.CLOUDFRONT_FUNCTION_NAME }}
+      SITE_URL: ${{ vars.SITE_URL }}
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+
+      # out/ (화면 파일)과 build/cloudfront-url-rewrite.js (주소 변환 함수)를 함께 만들어요. API 주소는 /api/v1 (같은 CloudFront)
+      - name: 정적 빌드
+        run: npm run build:static
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # 1) 화면 파일 올리기
+      #    - _next/static: 파일 이름에 해시가 붙어 내용이 바뀌면 이름도 바뀌어요 → 1년 캐시. 예전 파일은 지우지 않아요
+      #      (캐시에 남은 예전 화면이 예전 파일을 부를 수 있어서요)
+      #    - 나머지(HTML 등): 1분 캐시, 없어진 화면은 S3에서도 지워요(--delete)
+      - name: S3 업로드
+        run: |
+          aws s3 sync out/_next/static "s3://$BUCKET/_next/static" \
+            --cache-control "public, max-age=31536000, immutable"
+          aws s3 sync out/ "s3://$BUCKET" --delete \
+            --exclude "_next/static/*" \
+            --cache-control "public, max-age=60"
+
+      # 2) 주소 변환 함수: 화면 목록이 바뀌었을 수 있어 매번 새 코드로 바꾸고 게시해요
+      - name: CloudFront Function 게시
+        run: |
+          etag=$(aws cloudfront describe-function --name "$FUNCTION_NAME" --query ETag --output text)
+          etag=$(aws cloudfront update-function --name "$FUNCTION_NAME" --if-match "$etag" \
+            --function-config '{"Comment":"Map clean URLs to static export files","Runtime":"cloudfront-js-2.0"}' \
+            --function-code fileb://build/cloudfront-url-rewrite.js \
+            --query ETag --output text)
+          aws cloudfront publish-function --name "$FUNCTION_NAME" --if-match "$etag" \
+            --query 'FunctionSummary.FunctionMetadata.Stage' --output text
+
+      # 3) 캐시 비우기: 바뀐 화면이 바로 보이게 해요 (/* 는 1건으로 계산, 매달 1,000건까지 무료)
+      - name: CloudFront 캐시 비우기
+        run: |
+          invalidation_id=$(aws cloudfront create-invalidation --distribution-id "$DISTRIBUTION_ID" \
+            --paths "/*" --query Invalidation.Id --output text)
+          aws cloudfront wait invalidation-completed --distribution-id "$DISTRIBUTION_ID" --id "$invalidation_id"
+
+      - name: 확인 (첫 화면·사례·404)
+        run: |
+          for path in / /cases /this-page-does-not-exist; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "$SITE_URL$path")
+            echo "$path → $code"
+            test "$code" = "200"
+          done
