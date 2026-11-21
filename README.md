@@ -457,3 +457,13 @@ feature/expert-search-dark-profile-first-20261031
 | [제품 의사결정 기록](docs/product/03_DECISION_LOG.md) | 장기 범위와 기존 팀 결정·변경 배경 |
 
 **이 문서의 한 줄 결론:** 현재 브랜치에는 **연구자가 AI 전문가를 검색해 직접 협업을 요청하는 흐름**과 **실제 종료 협업 기반 양방향 평가 시스템**의 코드가 준비되어 있습니다. **운영 검증·공용 DB 적용·`develop` 병합은 별도의 완료 조건**입니다.
+
+---
+
+## 저작권 안내 (Copyright)
+
+© 2026 Lab-with-Al-platform 팀. **All rights reserved.**
+
+이 저장소는 학습·포트폴리오 확인을 위해 공개되어 있습니다. 코드를 **읽고 참고하는 것은 자유**지만, 팀의 서면 허락 없이 코드·디자인·문서를 복제, 수정, 배포하거나 상업적으로 이용할 수 없습니다. 오픈소스 라이선스는 적용되지 않습니다.
+
+This repository is public for learning and portfolio review only. No license is granted to copy, modify, distribute, or use any part of it commercially without written permission from the team.
