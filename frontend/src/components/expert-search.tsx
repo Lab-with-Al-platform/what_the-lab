@@ -371,7 +371,7 @@ export function ExpertSearch() {
   );
 
   return (
-    <PageContainer className="pb-20 pt-5 md:pt-7">
+    <PageContainer className="pb-20 pt-0">
       <ExpertSearchHero />
       <div className="mb-3 flex items-center justify-between gap-3 md:hidden">
         <span className="text-sm font-semibold text-ink">AI 전문가 탐색</span>

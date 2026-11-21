@@ -124,7 +124,7 @@ export function InsightList({
         <p className="mt-6 rounded-2xl bg-white px-5 py-10 text-sm text-muted">이 조건에 해당하는 글이 없습니다. 다른 분야를 선택해 보세요.</p>
       ) : (
         // 한 줄만 보여 주고 양옆 버튼으로 넘겨요. 버튼은 카드 바깥 여백에 둬서 글을 가리지 않아요.
-        <div className="relative mt-6 md:px-14">
+        <div className="relative mt-6 md:px-16">
           <SlideButton direction="prev" disabled={safePage <= 1} onClick={() => setPage(safePage - 1)} />
           <div
             className="grid items-stretch gap-5"
@@ -169,7 +169,7 @@ export function InsightList({
   );
 }
 
-/** 목록 양옆의 < > 버튼. 모바일은 카드 위에 겹쳐 두고, 태블릿부터는 카드 바깥 여백에 둬요. */
+/** 목록 양옆의 < >. 원은 빼고 기호만 크게 두며, 손가락이 닿는 칸은 44px을 유지해요. */
 function SlideButton({ direction, disabled, onClick }: { direction: "prev" | "next"; disabled: boolean; onClick: () => void }) {
   const isPrev = direction === "prev";
   return (
@@ -178,11 +178,13 @@ function SlideButton({ direction, disabled, onClick }: { direction: "prev" | "ne
       onClick={onClick}
       disabled={disabled}
       aria-label={isPrev ? "이전 글" : "다음 글"}
-      className={`absolute top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-line bg-white text-xl text-ink shadow-card transition-colors hover:border-brand hover:text-brand disabled:pointer-events-none disabled:opacity-30 ${
-        isPrev ? "left-1 md:left-0" : "right-1 md:right-0"
+      className={`absolute top-1/2 z-10 flex h-12 w-12 -translate-y-1/2 items-center justify-center text-brand transition-colors hover:text-brand-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:pointer-events-none disabled:text-faint ${
+        isPrev ? "left-0" : "right-0"
       }`}
     >
-      <span aria-hidden="true">{isPrev ? "‹" : "›"}</span>
+      <svg viewBox="0 0 20 40" width="28" height="56" fill="none" aria-hidden="true" className={isPrev ? undefined : "rotate-180"}>
+        <path d="M14.5 3.5 4 20l10.5 16.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
     </button>
   );
 }

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { PageContainer } from "@/components/page-container";
+import { PageLeadHeader } from "@/components/page-lead-header";
 import { FAQ_CATEGORIES, FAQS, searchFaqs, normalizeFaqCategory, type FaqCategory } from "@/lib/faq";
 import { DISCORD_GUIDES, FAQ_DISCORD_GUIDE_IDS } from "@/lib/faq-discord";
 import { FaqDiscordGuide } from "./faq-discord-guide";
@@ -76,38 +77,50 @@ export function FaqPage() {
   }
 
   return (
-    <PageContainer className={communityStyles.page}>
-      <div className={communityStyles.breadcrumb}>
-        <Link href="/">홈</Link><span>›</span><span>FAQ</span>
-      </div>
-
+    <PageContainer className={`${communityStyles.page} ${communityStyles.leadPage}`}>
       <div className={styles.shell}>
-        <header className={styles.hero}>
-          <div className={styles.heroEyebrow}>WHAT THE LAB / HELP CENTER</div>
-          <h1>궁금한 순간, 바로 찾는 답.</h1>
-          <p>처음 이용하는 방법부터 협업 요청, 함께 쓰는 달력과 할 일, 종료 후 평가까지. 실제 서비스 흐름에 맞춰 안내합니다.</p>
-          <div className={styles.heroSearch}>
+        <PageLeadHeader
+          kicker="HELP CENTER"
+          title="궁금한 순간, 바로 찾는 답."
+          lead="서비스 이용부터 협업과 Discord까지, 필요한 도움말을 찾아보세요."
+          artSrc="/headers/faq-lead.jpg"
+          artKind="banner"
+        >
+          <form
+            className={styles.heroSearch}
+            role="search"
+            onSubmit={(event) => {
+              event.preventDefault();
+              const typed = String(new FormData(event.currentTarget).get("q") ?? "").trim();
+              filter({ q: typed });
+            }}
+          >
             <Icon name="search" />
             <label className="sr-only" htmlFor="faq-search">FAQ 검색</label>
             <input
               id="faq-search"
+              name="q"
               type="search"
               value={query}
-              onChange={event => filter({ q: event.target.value })}
-              placeholder="예: /요청, Discord 연결, 일정 추가, 기한 조정"
+              onChange={(event) => filter({ q: event.target.value })}
+              placeholder="예: Discord 연결, 일정 추가, 협업 요청"
               maxLength={200}
             />
             {query ? (
-              <button type="button" aria-label="검색어 지우기" onClick={() => filter({ q: "" })}>지우기</button>
-            ) : <span aria-hidden="true" className="text-[11px] font-semibold text-[#a0aec4]">FAQ</span>}
-          </div>
+              <button type="button" aria-label="검색어 지우기" onClick={() => filter({ q: "" })}>
+                지우기
+              </button>
+            ) : (
+              <button type="submit">검색</button>
+            )}
+          </form>
           <nav aria-label="자주 찾는 도움말" className={styles.heroShortcuts}>
             <span>바로 보기</span>
-            {QUICK_HELP.map(item => (
+            {QUICK_HELP.map((item) => (
               <Link href={`/faq#${item.id}`} key={item.id}>{item.label}</Link>
             ))}
           </nav>
-        </header>
+        </PageLeadHeader>
 
         <div className={styles.overview}>
           <div className={styles.overviewText}>

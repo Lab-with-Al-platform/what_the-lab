@@ -2,6 +2,9 @@
   padding-block: 32px 64px;
   color: var(--color-ink);
 }
+.leadPage {
+  padding-top: 0;
+}
 .page a,
 .page button {
   -webkit-tap-highlight-color: transparent;
@@ -981,6 +984,9 @@
 @media (max-width: 767px) {
   .page {
     padding-block: 22px 40px;
+  }
+  .leadPage {
+    padding-top: 0;
   }
   .breadcrumb {
     margin-bottom: 20px;
