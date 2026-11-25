@@ -7,8 +7,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "LabBridge",
-    template: "%s · LabBridge",
+    default: "LabBridges",
+    template: "%s · LabBridges",
   },
   description: "연구의 질문이 AI와 만나는 곳. 연구 사례와 기술 동향을 보고 함께할 AI 전문가를 찾습니다.",
   icons: {

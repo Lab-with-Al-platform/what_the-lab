@@ -11,8 +11,8 @@ import "./home-hero.css";
 
 const SLIDE_DURATION_MS = 9000;
 const HOME_SLIDES = [
-  { id: "intro", label: "LabBridge 소개", eyebrow: "RESEARCH × AI × COLLABORATION", firstLine: "연구의 질문이", secondLine: "AI와 만나는 곳,", accent: "", body: "실제 연구사례와 최신 기술 동향을 통해 내 연구에 맞는 AI 아이디어를 발견하고, 함께할 AI 전문가를 찾아보세요." },
-  { id: "platform", label: "플랫폼 이용 안내", eyebrow: "GET STARTED WITH LABBRIDGE", firstLine: "연구의 시작부터", secondLine: "협업의 완성까지", accent: "", body: "인사이트에서 가능성을 발견하고, 내 연구에 맞는 전문가와 연결되세요. 함께할 팀을 만나 프로젝트를 이어갑니다." },
+  { id: "intro", label: "LabBridges 소개", eyebrow: "RESEARCH × AI × COLLABORATION", firstLine: "연구의 질문이", secondLine: "AI와 만나는 곳,", accent: "", body: "실제 연구사례와 최신 기술 동향을 통해 내 연구에 맞는 AI 아이디어를 발견하고, 함께할 AI 전문가를 찾아보세요." },
+  { id: "platform", label: "플랫폼 이용 안내", eyebrow: "GET STARTED WITH LABBRIDGES", firstLine: "연구의 시작부터", secondLine: "협업의 완성까지", accent: "", body: "인사이트에서 가능성을 발견하고, 내 연구에 맞는 전문가와 연결되세요. 함께할 팀을 만나 프로젝트를 이어갑니다." },
   { id: "discord", label: "Discord 이용 안내", eyebrow: "YOUR COLLABORATION SPACE", firstLine: "함께하는 연구의 현장,", secondLine: "Discord로 이어집니다.", accent: "", body: "프로젝트의 대화와 협업이 이어지는 공간. 챗봇과 Google Calendar의 연결로 연구 논의와 일정이 한 흐름으로 이어집니다." },
 ] as const;
 
@@ -96,8 +96,8 @@ export function HomeHero({ introVisual }: { introVisual: ReactNode }) {
   }
 
   return (
-    <section aria-label="LabBridge 소개와 이용 안내" aria-roledescription="carousel" onFocus={handleFocus}>
-      <h1 className="sr-only">LabBridge · 연구의 질문이 AI와 만나는 곳</h1>
+    <section aria-label="LabBridges 소개와 이용 안내" aria-roledescription="carousel" onFocus={handleFocus}>
+      <h1 className="sr-only">LabBridges · 연구의 질문이 AI와 만나는 곳</h1>
       <PageContainer className="home-hero">
         {/* 영상은 순환 밖입니다. 건너뛰거나 끝난 뒤 닫으면 소개 화면부터 세 배너만 다시 돕니다. */}
         {showVideo ? (

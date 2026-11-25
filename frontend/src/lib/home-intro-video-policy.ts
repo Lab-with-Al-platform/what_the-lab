@@ -1,7 +1,7 @@
 /** 홈 소개 영상을 오늘 자동으로 켤지 정합니다. 날짜 계산은 순수 함수이고, 저장소 읽기는 맨 아래 브라우저 함수만 합니다. */
 
 export const HOME_VIDEO_STORAGE_KEY = "labbridge.homeIntroVideo";
-export const HOME_VIDEO_VERSION = "creative-minds-v1";
+export const HOME_VIDEO_VERSION = "labbridges-brand-v2";
 
 export type HomeVideoRecord = {
   version: string;
