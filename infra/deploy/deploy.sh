@@ -61,9 +61,13 @@ alembic_revision() {
     | awk '/^[0-9A-Za-z_]+( \(head\))?$/ {print $1}' | tail -n 1
 }
 
-# 환경 파일에서 값 하나를 읽어요 (따옴표 없이 KEY=VALUE 형식).
+# 환경 파일에서 값 하나를 읽어요. KEY=VALUE 와 make-env.sh 가 쓰는 KEY='VALUE' 둘 다 돼요.
 env_file_value() {
-  grep -E "^$1=" "$ENV_FILE" | tail -n 1 | cut -d= -f2- || true
+  local value quote="'"
+  value="$(grep -E "^$1=" "$ENV_FILE" | tail -n 1 | cut -d= -f2-)" || true
+  value="${value#"$quote"}"
+  value="${value%"$quote"}"
+  printf '%s' "$value"
 }
 
 # 지금 돌고 있는 backend 컨테이너의 이미지 (첫 배포면 빈 값)
