@@ -2,6 +2,9 @@
 .env
 .env.*
 !.env.example
+# 운영 비밀 파일 (구글 서비스 계정 키 등)과 관리자 디스코드 ID 목록
+/secrets/
+infra/admins/admin-ids.txt
 
 # Node.js / Next.js
 node_modules/
@@ -57,3 +60,13 @@ logs/
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# 시드 원본·점검 결과 (스크립트로 다시 만듦)
+database/seed/*.json
+database/seed/needs_korean_name.csv
+database/seed/missing_homepage.csv
+
+backend/uploads/
+
+# 임시 제작 산출물 및 영상/로고 작업 아카이브
+archive/

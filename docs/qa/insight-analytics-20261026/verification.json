@@ -1,0 +1,52 @@
+{
+  "checks": [
+    {
+      "name": "published",
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "name": "stats",
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "name": "detail",
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "name": "published",
+      "width": 768,
+      "scrollWidth": 768
+    },
+    {
+      "name": "stats",
+      "width": 768,
+      "scrollWidth": 768
+    },
+    {
+      "name": "detail",
+      "width": 768,
+      "scrollWidth": 768
+    },
+    {
+      "name": "published",
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "name": "stats",
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "name": "detail",
+      "width": 390,
+      "scrollWidth": 390
+    }
+  ],
+  "writes": 0,
+  "errors": [],
+  "note": "가상 API. 실제 Discord·운영 DB 쓰기는 하지 않음."
+}

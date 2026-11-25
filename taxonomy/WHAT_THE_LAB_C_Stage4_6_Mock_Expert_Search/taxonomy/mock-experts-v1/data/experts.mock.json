@@ -1,0 +1,582 @@
+[
+  {
+    "id": "MOCK_EXP_001",
+    "slug": "mock-expert-001",
+    "displayName": "가상 전문가 01",
+    "headline": "연구 이미지 분석",
+    "summary": "현미경 사진에서 세포를 찾고 위치를 표시하는 분석",
+    "skillIds": [
+      "CAP022",
+      "CAP023",
+      "CAP024"
+    ],
+    "experienceFieldIds": [
+      "FIELD002",
+      "FIELD011"
+    ],
+    "collaborationFieldIds": [
+      "FIELD002"
+    ],
+    "tools": [
+      "PyTorch",
+      "OpenCV"
+    ],
+    "availability": "available",
+    "profileVisibility": "public",
+    "dataStatus": "mock",
+    "isVerified": false,
+    "affiliation": "가상 연구기관 (예시)",
+    "requestEnabled": false
+  },
+  {
+    "id": "MOCK_EXP_002",
+    "slug": "mock-expert-002",
+    "displayName": "가상 전문가 02",
+    "headline": "의료영상 분할",
+    "summary": "CT·MRI 영상의 관심 영역을 분리하는 작업",
+    "skillIds": [
+      "CAP024",
+      "CAP028",
+      "CAP073"
+    ],
+    "experienceFieldIds": [
+      "FIELD011",
+      "FIELD042"
+    ],
+    "collaborationFieldIds": [
+      "FIELD011"
+    ],
+    "tools": [
+      "PyTorch",
+      "MONAI"
+    ],
+    "availability": "available",
+    "profileVisibility": "public",
+    "dataStatus": "mock",
+    "isVerified": false,
+    "affiliation": "가상 연구기관 (예시)",
+    "requestEnabled": false
+  },
+  {
+    "id": "MOCK_EXP_003",
+    "slug": "mock-expert-003",
+    "displayName": "가상 전문가 03",
+    "headline": "유전체 분석",
+    "summary": "유전체 데이터를 정리하고 발현 패턴을 비교하는 분석",
+    "skillIds": [
+      "CAP003",
+      "CAP065",
+      "CAP017"
+    ],
+    "experienceFieldIds": [
+      "FIELD001",
+      "FIELD003"
+    ],
+    "collaborationFieldIds": [
+      "FIELD001"
+    ],
+    "tools": [
+      "Python",
+      "R"
+    ],
+    "availability": "available",
+    "profileVisibility": "public",
+    "dataStatus": "mock",
+    "isVerified": false,
+    "affiliation": "가상 연구기관 (예시)",
+    "requestEnabled": false
+  },
+  {
+    "id": "MOCK_EXP_004",
+    "slug": "mock-expert-004",
+    "displayName": "가상 전문가 04",
+    "headline": "임상 연구 통계",
+    "summary": "임상 자료의 분석 설계와 효과 추정을 돕는 작업",
+    "skillIds": [
+      "CAP010",
+      "CAP012",
+      "CAP011"
+    ],
+    "experienceFieldIds": [
+      "FIELD010",
+      "FIELD012"
+    ],
+    "collaborationFieldIds": [
+      "FIELD010"
+    ],
+    "tools": [
+      "R",
+      "Python"
+    ],
+    "availability": "negotiable",
+    "profileVisibility": "public",
+    "dataStatus": "mock",
+    "isVerified": false,
+    "affiliation": "가상 연구기관 (예시)",
+    "requestEnabled": false
+  },
+  {
+    "id": "MOCK_EXP_005",
+    "slug": "mock-expert-005",
+    "displayName": "가상 전문가 05",
+    "headline": "신약 후보 계산",
+    "summary": "분자 구조 자료로 물성 예측과 가상 실험 지원",
+    "skillIds": [
+      "CAP066",
+      "CAP067",
+      "CAP016"
+    ],
+    "experienceFieldIds": [
+      "FIELD013",
+      "FIELD028"
+    ],
+    "collaborationFieldIds": [
+      "FIELD013"
+    ],
+    "tools": [
+      "Python",
+      "RDKit"
+    ],
+    "availability": "available",
+    "profileVisibility": "public",
+    "dataStatus": "mock",
+    "isVerified": false,
+    "affiliation": "가상 연구기관 (예시)",
+    "requestEnabled": false
+  },
+  {
+    "id": "MOCK_EXP_006",
+    "slug": "mock-expert-006",
+    "displayName": "가상 전문가 06",
+    "headline": "제조 품질 분석",
+    "summary": "생산 데이터의 이상 징후와 불량 패턴 분석",
+    "skillIds": [
+      "CAP018",
+      "CAP020",
+      "CAP005"
+    ],
+    "experienceFieldIds": [
+      "FIELD038",
+      "FIELD037"
+    ],
+    "collaborationFieldIds": [
+      "FIELD038"
+    ],
+    "tools": [
+      "Python",
+      "SQL"
+    ],
+    "availability": "available",
+    "profileVisibility": "public",
+    "dataStatus": "mock",
+    "isVerified": false,
+    "affiliation": "가상 연구기관 (예시)",
+    "requestEnabled": false
+  },
+  {
+    "id": "MOCK_EXP_007",
+    "slug": "mock-expert-007",
+    "displayName": "가상 전문가 07",
+    "headline": "설비 센서 예측",
+    "summary": "시계열 센서 데이터로 고장 가능성을 예측",
+    "skillIds": [
+      "CAP044",
+      "CAP045",
+      "CAP046"
+    ],
+    "experienceFieldIds": [
+      "FIELD034",
+      "FIELD038"
+    ],
+    "collaborationFieldIds": [
+      "FIELD034"
+    ],
+    "tools": [
+      "Python",
+      "scikit-learn"
+    ],
+    "availability": "available",
+    "profileVisibility": "public",
+    "dataStatus": "mock",
+    "isVerified": false,
+    "affiliation": "가상 연구기관 (예시)",
+    "requestEnabled": false
+  },
+  {
+    "id": "MOCK_EXP_008",
+    "slug": "mock-expert-008",
+    "displayName": "가상 전문가 08",
+    "headline": "기후 데이터 예측",
+    "summary": "기후 관측치의 시간 흐름과 변동성 분석",
+    "skillIds": [
+      "CAP002",
+      "CAP045",
+      "CAP047"
+    ],
+    "experienceFieldIds": [
+      "FIELD043",
+      "FIELD045"
+    ],
+    "collaborationFieldIds": [
+      "FIELD043"
+    ],
+    "tools": [
+      "Python",
+      "xarray"
+    ],
+    "availability": "negotiable",
+    "profileVisibility": "public",
+    "dataStatus": "mock",
+    "isVerified": false,
+    "affiliation": "가상 연구기관 (예시)",
+    "requestEnabled": false
+  },
+  {
+    "id": "MOCK_EXP_009",
+    "slug": "mock-expert-009",
+    "displayName": "가상 전문가 09",
+    "headline": "위성영상 해석",
+    "summary": "위성 자료에서 지표 변화를 찾아 지도에 표시",
+    "skillIds": [
+      "CAP048",
+      "CAP024",
+      "CAP047"
+    ],
+    "experienceFieldIds": [
+      "FIELD047",
+      "FIELD044"
+    ],
+    "collaborationFieldIds": [
+      "FIELD047"
+    ],
+    "tools": [
+      "Python",
+      "QGIS"
+    ],
+    "availability": "available",
+    "profileVisibility": "public",
+    "dataStatus": "mock",
+    "isVerified": false,
+    "affiliation": "가상 연구기관 (예시)",
+    "requestEnabled": false
+  },
+  {
+    "id": "MOCK_EXP_010",
+    "slug": "mock-expert-010",
+    "displayName": "가상 전문가 10",
+    "headline": "스마트 농업 영상",
+    "summary": "작물 사진의 상태를 분류하고 탐지하는 작업",
+    "skillIds": [
+      "CAP022",
+      "CAP023",
+      "CAP004"
+    ],
+    "experienceFieldIds": [
+      "FIELD048",
+      "FIELD049"
+    ],
+    "collaborationFieldIds": [
+      "FIELD048"
+    ],
+    "tools": [
+      "Python",
+      "OpenCV"
+    ],
+    "availability": "available",
+    "profileVisibility": "public",
+    "dataStatus": "mock",
+    "isVerified": false,
+    "affiliation": "가상 연구기관 (예시)",
+    "requestEnabled": false
+  },
+  {
+    "id": "MOCK_EXP_011",
+    "slug": "mock-expert-011",
+    "displayName": "가상 전문가 11",
+    "headline": "경제 데이터 분석",
+    "summary": "경제 지표의 효과와 예측 모형을 비교",
+    "skillIds": [
+      "CAP011",
+      "CAP016",
+      "CAP008"
+    ],
+    "experienceFieldIds": [
+      "FIELD052",
+      "FIELD022"
+    ],
+    "collaborationFieldIds": [
+      "FIELD052"
+    ],
+    "tools": [
+      "R",
+      "Python"
+    ],
+    "availability": "available",
+    "profileVisibility": "public",
+    "dataStatus": "mock",
+    "isVerified": false,
+    "affiliation": "가상 연구기관 (예시)",
+    "requestEnabled": false
+  },
+  {
+    "id": "MOCK_EXP_012",
+    "slug": "mock-expert-012",
+    "displayName": "가상 전문가 12",
+    "headline": "금융 위험 분석",
+    "summary": "거래 데이터에서 비정상 패턴을 찾고 분류",
+    "skillIds": [
+      "CAP018",
+      "CAP015",
+      "CAP074"
+    ],
+    "experienceFieldIds": [
+      "FIELD061",
+      "FIELD066"
+    ],
+    "collaborationFieldIds": [
+      "FIELD061"
+    ],
+    "tools": [
+      "Python",
+      "SQL"
+    ],
+    "availability": "negotiable",
+    "profileVisibility": "public",
+    "dataStatus": "mock",
+    "isVerified": false,
+    "affiliation": "가상 연구기관 (예시)",
+    "requestEnabled": false
+  },
+  {
+    "id": "MOCK_EXP_013",
+    "slug": "mock-expert-013",
+    "displayName": "가상 전문가 13",
+    "headline": "감사·내부통제 분석",
+    "summary": "거래·로그 데이터의 이상 징후와 설명 가능성 검토",
+    "skillIds": [
+      "CAP005",
+      "CAP018",
+      "CAP074"
+    ],
+    "experienceFieldIds": [
+      "FIELD062",
+      "FIELD066"
+    ],
+    "collaborationFieldIds": [
+      "FIELD062"
+    ],
+    "tools": [
+      "Python",
+      "SQL"
+    ],
+    "availability": "available",
+    "profileVisibility": "public",
+    "dataStatus": "mock",
+    "isVerified": false,
+    "affiliation": "가상 연구기관 (예시)",
+    "requestEnabled": false
+  },
+  {
+    "id": "MOCK_EXP_014",
+    "slug": "mock-expert-014",
+    "displayName": "가상 전문가 14",
+    "headline": "법률 문서 검색",
+    "summary": "긴 법률 문서에서 관련 정보를 추출하고 검색",
+    "skillIds": [
+      "CAP031",
+      "CAP032",
+      "CAP052"
+    ],
+    "experienceFieldIds": [
+      "FIELD065",
+      "FIELD066"
+    ],
+    "collaborationFieldIds": [
+      "FIELD065"
+    ],
+    "tools": [
+      "Python",
+      "Elasticsearch"
+    ],
+    "availability": "available",
+    "profileVisibility": "public",
+    "dataStatus": "mock",
+    "isVerified": false,
+    "affiliation": "가상 연구기관 (예시)",
+    "requestEnabled": false
+  },
+  {
+    "id": "MOCK_EXP_015",
+    "slug": "mock-expert-015",
+    "displayName": "가상 전문가 15",
+    "headline": "역사 기록 디지털화",
+    "summary": "옛 문헌 이미지를 텍스트로 변환하고 분류",
+    "skillIds": [
+      "CAP029",
+      "CAP030",
+      "CAP032"
+    ],
+    "experienceFieldIds": [
+      "FIELD069",
+      "FIELD075"
+    ],
+    "collaborationFieldIds": [
+      "FIELD069"
+    ],
+    "tools": [
+      "Python",
+      "Tesseract"
+    ],
+    "availability": "available",
+    "profileVisibility": "public",
+    "dataStatus": "mock",
+    "isVerified": false,
+    "affiliation": "가상 연구기관 (예시)",
+    "requestEnabled": false
+  },
+  {
+    "id": "MOCK_EXP_016",
+    "slug": "mock-expert-016",
+    "displayName": "가상 전문가 16",
+    "headline": "언어 데이터 연구",
+    "summary": "여러 언어 텍스트의 의미 비교와 분류",
+    "skillIds": [
+      "CAP034",
+      "CAP030",
+      "CAP037"
+    ],
+    "experienceFieldIds": [
+      "FIELD068",
+      "FIELD071"
+    ],
+    "collaborationFieldIds": [
+      "FIELD068"
+    ],
+    "tools": [
+      "Python",
+      "transformers"
+    ],
+    "availability": "negotiable",
+    "profileVisibility": "public",
+    "dataStatus": "mock",
+    "isVerified": false,
+    "affiliation": "가상 연구기관 (예시)",
+    "requestEnabled": false
+  },
+  {
+    "id": "MOCK_EXP_017",
+    "slug": "mock-expert-017",
+    "displayName": "가상 전문가 17",
+    "headline": "교육 데이터 분석",
+    "summary": "학습 로그로 학습 패턴을 분류하고 분석",
+    "skillIds": [
+      "CAP017",
+      "CAP014",
+      "CAP015"
+    ],
+    "experienceFieldIds": [
+      "FIELD076",
+      "FIELD082"
+    ],
+    "collaborationFieldIds": [
+      "FIELD076"
+    ],
+    "tools": [
+      "Python",
+      "R"
+    ],
+    "availability": "available",
+    "profileVisibility": "public",
+    "dataStatus": "mock",
+    "isVerified": false,
+    "affiliation": "가상 연구기관 (예시)",
+    "requestEnabled": false
+  },
+  {
+    "id": "MOCK_EXP_018",
+    "slug": "mock-expert-018",
+    "displayName": "가상 전문가 18",
+    "headline": "사용자 경험 연구",
+    "summary": "사용성 조사 결과를 정리하고 의견을 분석",
+    "skillIds": [
+      "CAP014",
+      "CAP035",
+      "CAP036"
+    ],
+    "experienceFieldIds": [
+      "FIELD080",
+      "FIELD081"
+    ],
+    "collaborationFieldIds": [
+      "FIELD080"
+    ],
+    "tools": [
+      "Python",
+      "Excel"
+    ],
+    "availability": "available",
+    "profileVisibility": "public",
+    "dataStatus": "mock",
+    "isVerified": false,
+    "affiliation": "가상 연구기관 (예시)",
+    "requestEnabled": false
+  },
+  {
+    "id": "MOCK_EXP_019",
+    "slug": "mock-expert-019",
+    "displayName": "가상 전문가 19",
+    "headline": "로봇 인지",
+    "summary": "카메라 입력을 이용한 물체 인식과 제어 지원",
+    "skillIds": [
+      "CAP063",
+      "CAP023",
+      "CAP062"
+    ],
+    "experienceFieldIds": [
+      "FIELD036",
+      "FIELD035"
+    ],
+    "collaborationFieldIds": [
+      "FIELD036"
+    ],
+    "tools": [
+      "Python",
+      "ROS"
+    ],
+    "availability": "available",
+    "profileVisibility": "public",
+    "dataStatus": "mock",
+    "isVerified": false,
+    "affiliation": "가상 연구기관 (예시)",
+    "requestEnabled": false
+  },
+  {
+    "id": "MOCK_EXP_020",
+    "slug": "mock-expert-020",
+    "displayName": "가상 전문가 20",
+    "headline": "연구 자동화·AI 도구",
+    "summary": "연구 문서에 근거를 찾아 답하는 보조 시스템",
+    "skillIds": [
+      "CAP032",
+      "CAP052",
+      "CAP051"
+    ],
+    "experienceFieldIds": [
+      "FIELD019",
+      "FIELD020"
+    ],
+    "collaborationFieldIds": [
+      "FIELD019"
+    ],
+    "tools": [
+      "Python",
+      "FastAPI"
+    ],
+    "availability": "negotiable",
+    "profileVisibility": "public",
+    "dataStatus": "mock",
+    "isVerified": false,
+    "affiliation": "가상 연구기관 (예시)",
+    "requestEnabled": false
+  }
+]

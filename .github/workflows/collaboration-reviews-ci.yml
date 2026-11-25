@@ -1,0 +1,79 @@
+name: Collaboration review regression
+
+on:
+  pull_request:
+    paths:
+      - "frontend/**"
+      - "backend/**"
+      - "database/init/**"
+      - "docker-compose.prod.yml"
+      - "docker-compose.awslogs.yml"
+      - "infra/nginx/**"
+      - ".github/workflows/collaboration-reviews-ci.yml"
+  push:
+    branches:
+      - feature/expert-search-dark-profile-first-20261031
+      - integration/develop-feature-20261103
+
+permissions:
+  contents: read
+
+concurrency:
+  group: collaboration-reviews-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # 프론트 테스트·tsc·lint 전체와 백엔드 전체 테스트는 ci.yml(필수 검사)로 옮겼어요. (B12)
+  # 여기에는 리뷰 기능 전용 검사만 남겨요.
+
+  review-ui-contract:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - name: Review feature and directly integrated UI tests
+        run: node --test tests/collaboration-reviews.test.cjs tests/lab-trust.test.cjs tests/expert-profile-first.test.cjs tests/expert-local-demo.test.cjs tests/community-integration.test.cjs tests/community-navigation.test.cjs
+      - run: npx tsc --noEmit
+      - run: npm run lint
+      - run: npm run build
+
+  review-postgres-schema:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci-review-test-only
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      PGPASSWORD: ci-review-test-only
+    steps:
+      - uses: actions/checkout@v4
+      - name: PostgreSQL schema fixture
+        run: psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f backend/tests/sql/review_schema_smoke.sql
+      - name: Execute production review DDL in PostgreSQL 17
+        run: psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f backend/migrations/sql/20261103_24/001_create_collaboration_reviews.sql
+      - name: Verify integrity, unique reviewer and immutable RLS boundaries
+        run: psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f backend/tests/sql/review_schema_assertions.sql
+      - name: Seed legitimate and adversarial reputation examples
+        run: psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f backend/tests/sql/reputation_scoring_seed.sql
+      - name: Verify production LAB TRUST SQL, reviewer cap, private/early/hidden exclusions
+        run: |
+          python3 backend/tests/build_reputation_ci_query.py /tmp/lab-trust-ci-query.sql
+          psql -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f /tmp/lab-trust-ci-query.sql

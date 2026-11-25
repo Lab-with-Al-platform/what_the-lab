@@ -1,0 +1,12 @@
+{
+  "passed": [
+    "rich_article_preview_has_explanations_without_placeholder_cover",
+    "full_body_and_source_scope_are_not_truncated",
+    "1440_768_390_layout_no_page_overflow",
+    "web_and_mobile_preview_switch",
+    "six_reading_checks_are_separate_and_reset_on_reload",
+    "add_terms_paragraphs_and_reject_empty_paragraph_without_losing_input",
+    "collection_note_promotes_to_editable_skeleton_not_auto_approved"
+  ],
+  "errors": []
+}

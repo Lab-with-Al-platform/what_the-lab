@@ -1,0 +1,183 @@
+/* 홈에서만 쓰는 치수는 이 파일에 모으고, 색·모서리·그림자는 공통 토큰을 재사용합니다. */
+.home-hero {
+  --home-hero-title: clamp(32px, 3.35vw, 48px);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: linear-gradient(100deg, var(--color-card) 36%, var(--color-page));
+}
+/* 가장 긴 소개 문구에 맞춰 내용과 버튼의 두 행을 공유합니다. */
+.home-hero__slides { display: grid; grid-template-rows: repeat(2, auto); isolation: isolate; }
+.home-hero__slide {
+  grid-area: 1 / 1 / 3 / 2;
+  display: grid;
+  grid-template-columns: minmax(0, .72fr) minmax(0, 1.28fr);
+  grid-template-rows: subgrid;
+  align-items: stretch;
+  column-gap: 8px;
+  min-height: 390px;
+  z-index: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 350ms ease, visibility 350ms;
+}
+.home-hero__slide[data-active="true"] {
+  z-index: 1;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+.home-hero__copy {
+  position: relative;
+  z-index: 1;
+  grid-column: 1;
+  grid-row: 1 / 3;
+  display: grid;
+  grid-template-rows: subgrid;
+  padding: 32px 0 32px 48px;
+}
+.home-hero__message { align-self: start; }
+.home-hero__eyebrow { color: var(--color-faint); font-size: 11px; font-weight: 650; letter-spacing: .18em; }
+.home-hero__title { margin-top: 20px; color: var(--color-ink); font-size: var(--home-hero-title); font-weight: 750; line-height: 1.2; letter-spacing: -.04em; word-break: keep-all; }
+.home-hero__description { max-width: 520px; margin-top: 20px; color: var(--color-muted); font-size: 15px; line-height: 1.9; word-break: keep-all; }
+.home-hero__cta { display: inline-flex; align-items: center; gap: 24px; min-height: 44px; margin-top: 20px; padding: 12px 24px; border-radius: var(--radius-button); background: var(--color-brand); color: white; font-size: 14px; font-weight: 600; }
+.home-hero__cta:hover { background: var(--color-brand-hover); }
+.home-hero__cta { align-self: start; justify-self: start; }
+.home-hero__intro-art {
+  position: relative;
+  grid-column: 2;
+  grid-row: 1 / -1;
+  align-self: stretch;
+  display: flex;
+  justify-content: flex-end;
+  height: 100%;
+  min-width: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.home-hero__intro-art::after { content: ""; position: absolute; inset: auto 0 0; height: 20px; pointer-events: none; background: linear-gradient(transparent, var(--color-card)); }
+.home-hero__intro-mobile { display: none; }
+/* 예전 760×378 크롭을 높이에 맞춰 키우면 가로는 비율대로 따라옵니다. */
+.home-hero__collage { display: block; position: relative; flex: 0 0 auto; height: 100%; aspect-ratio: 760 / 378; }
+.home-hero__controls { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 20px; margin: 0 32px 16px 48px; border-bottom: 1px solid var(--color-line); }
+.home-hero__choices { display: flex; gap: 28px; }
+.home-hero__choice { position: relative; display: flex; align-items: center; gap: 8px; min-height: 52px; padding-block: 8px; color: var(--color-muted); font-size: 13px; font-weight: 600; text-align: left; cursor: pointer; }
+.home-hero__choice[aria-current] { color: var(--color-brand); }
+.home-hero__choice-number { font-size: 10px; font-variant-numeric: tabular-nums; opacity: .7; }
+.home-hero__progress { position: absolute; inset: auto 0 -1px; height: 2px; background: var(--color-brand-soft); overflow: hidden; }
+.home-hero__choice[aria-current] .home-hero__progress::after { content: ""; display: block; height: 100%; background: var(--color-brand); transform-origin: left; animation: home-hero-progress var(--home-slide-duration) linear forwards; }
+.home-hero__choice[aria-current] .home-hero__progress[data-running="false"]::after { animation-play-state: paused; }
+.home-hero__navigation { display: flex; align-items: center; }
+.home-hero__navigation button { width: 44px; height: 44px; color: var(--color-ink); cursor: pointer; border-radius: var(--radius-button); }
+.home-hero__navigation button:hover { background: var(--color-brand-soft); }
+.home-hero__navigation button:disabled { opacity: .5; cursor: default; }
+.home-hero__count { padding-inline: 4px; color: var(--color-ink); font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.home-hero__count i { padding-inline: 4px; color: var(--color-faint); font-style: normal; }
+.home-hero button:focus-visible, .home-hero a:focus-visible { outline: 2px solid var(--color-brand); outline-offset: 3px; }
+@keyframes home-hero-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+.home-hero__video-stage { display: grid; background: var(--color-card); }
+.home-hero__video-frame { position: relative; width: 100%; aspect-ratio: 16 / 7.8; overflow: hidden; background: #f4f7fb; }
+.home-hero__video-frame video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+.home-hero__video-bar { position: absolute; left: 50%; bottom: 14px; z-index: 1; display: flex; gap: 8px; transform: translateX(-50%); transition: opacity .2s ease; }
+/* 재생 중에는 흐리게, 마우스를 올리거나 키보드로 버튼에 오면 다시 또렷하게 보입니다. */
+.home-hero__video-bar[data-dimmed="true"] { opacity: .4; }
+.home-hero__video-bar[data-dimmed="true"]:hover, .home-hero__video-bar[data-dimmed="true"]:has(:focus-visible) { opacity: 1; }
+.home-hero__video-icon { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid rgb(255 255 255 / .8); border-radius: 999px; background: rgb(255 255 255 / .84); color: var(--color-ink); cursor: pointer; backdrop-filter: blur(10px); }
+.home-hero__video-icon svg { width: 18px; height: 18px; }
+.home-hero__video-icon[aria-pressed="true"] { color: var(--color-brand); }
+.home-hero__video-icon:disabled { opacity: .5; cursor: default; }
+.home-hero__video-status, .home-hero__video-credit { margin: 8px 16px 0; color: var(--color-muted); font-size: 12px; line-height: 1.5; }
+
+.home-hero__guide-photo { position: absolute; inset: 0; overflow: hidden; }
+.home-hero__guide-fade { position: absolute; inset: 0; background: linear-gradient(90deg, #fff 0%, rgba(255,255,255,.55) 10%, rgba(255,255,255,0) 32%); pointer-events: none; }
+.home-hero__guide-notes { position: absolute; inset: 0; pointer-events: none; }
+.home-hero__note {
+  position: absolute;
+  width: auto;
+  max-width: 168px;
+  padding: 8px 11px;
+  border: 1px solid rgb(255 255 255 / .8);
+  border-radius: var(--radius-card);
+  background: rgb(255 255 255 / .84);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(12px);
+  pointer-events: none;
+}
+.home-hero__note-title {
+  color: var(--color-ink);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  word-break: keep-all;
+}
+.home-hero__note-body {
+  margin-top: 3px;
+  color: var(--color-muted);
+  font-size: 11px;
+  line-height: 1.45;
+  word-break: keep-all;
+}
+.home-hero__note--platform-insight { top: 18%; left: 32%; }
+.home-hero__note--platform-experts { top: 7%; right: 14%; }
+.home-hero__note--platform-match { bottom: 16%; left: 36%; }
+.home-hero__note--discord-bot { top: 14%; left: 30%; }
+.home-hero__note--discord-channel { top: 60%; left: 36%; bottom: auto; }
+.home-hero__note--discord-cal { left: auto; right: 12%; bottom: 8%; }
+.home-hero__note--intro-bio { top: 13%; left: 26%; }
+.home-hero__note--intro-med { top: 13%; right: 3%; }
+.home-hero__note--intro-climate { bottom: 7%; left: 26%; }
+.home-hero__note--intro-caption { right: 4%; bottom: 7%; max-width: 156px; color: var(--color-muted); font-size: 11px; line-height: 1.45; word-break: keep-all; }
+
+@media (max-width: 1199px) and (min-width: 1024px) {
+  .home-hero__copy { padding-left: 24px; }
+  .home-hero__title { font-size: 36px; }
+  .home-hero__note { max-width: 140px; }
+  .home-hero__note-title { font-size: 12px; }
+  .home-hero__note-body { font-size: 10px; }
+}
+@media (max-width: 1023px) {
+  /* 좁은 화면에서는 공통 내용·버튼 2행 다음에 이미지 행을 추가합니다. */
+  .home-hero__slides { grid-template-rows: repeat(3, auto); }
+  .home-hero__slide { grid-area: 1 / 1 / 4 / 2; grid-template-columns: minmax(0, 1fr); gap: 0; align-content: start; }
+  .home-hero__copy { padding: 32px 16px 16px; }
+  .home-hero__title { font-size: 36px; }
+  .home-hero__description { max-width: 600px; }
+  .home-hero__intro-art { grid-column: 1; grid-row: 3; width: 100%; max-width: 680px; min-height: 320px; height: auto; margin: 0 auto; overflow: visible; }
+  .home-hero__collage--intro,
+  .home-hero__collage--guide {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+    aspect-ratio: auto;
+  }
+  .home-hero__guide-photo { position: relative; height: 240px; }
+  .home-hero__guide-notes { position: static; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 12px 8px 4px; }
+  .home-hero__note { position: static; width: auto; max-width: none; }
+  .home-hero__note--intro-caption { grid-column: 1 / -1; }
+  .home-hero__intro-mobile { display: none; }
+  .home-hero__controls { margin: 8px 16px 20px; }
+  .home-hero__choices { gap: 20px; }
+}
+@media (max-width: 767px) {
+  .home-hero__copy { padding: 28px 0 12px; }
+  .home-hero__title { font-size: clamp(28px, 7.6vw, 36px); }
+  .home-hero__description { font-size: 14px; line-height: 1.8; }
+  .home-hero__controls { flex-wrap: wrap; justify-content: center; gap: 4px; margin: 12px 0 16px; }
+  .home-hero__choices { width: 100%; justify-content: space-between; gap: 8px; }
+  .home-hero__choice { flex: 1; justify-content: center; gap: 4px; font-size: 11px; white-space: nowrap; }
+  .home-hero__choice-number { display: none; }
+  .home-hero__navigation { justify-content: center; }
+  .home-hero__intro-art { min-height: 340px; }
+  .home-hero__guide-photo { height: 200px; }
+  .home-hero__guide-notes { grid-template-columns: minmax(0, 1fr); }
+  .home-hero__video-frame { aspect-ratio: 16 / 9; }
+  .home-hero__video-frame video { object-fit: contain; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-hero__slide { transition: none; }
+  .home-hero__progress::after { animation: none !important; }
+  .home-hero__video-bar { transition: none; }
+}

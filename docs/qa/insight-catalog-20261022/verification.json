@@ -1,0 +1,17 @@
+{
+  "results": [
+    "private_collection_excludes_31_published_articles",
+    "three_trends_with_separate_labels_and_glossary",
+    "trend_collect_only_gate_and_readable_preview",
+    "dirty_draft_survives_catalog_switch_cancel",
+    "published_catalog_31_records",
+    "seventeen_cases_and_pagination",
+    "fourteen_trends_search_full_notes_glossary_and_live_link",
+    "published_no_horizontal_overflow_1440",
+    "published_no_horizontal_overflow_768",
+    "published_no_horizontal_overflow_390",
+    "mobile_trend_editor_selection_and_no_overflow"
+  ],
+  "page_errors": [],
+  "boundary": "Real local Next UI to isolated SQLite FastAPI; no live Supabase writes or real Discord login."
+}

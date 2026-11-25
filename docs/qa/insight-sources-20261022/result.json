@@ -1,0 +1,11 @@
+{
+  "passed": [
+    "eleven_sources_show_case_trend_and_dual_purposes",
+    "version_conflict_preserves_unsaved_purposes_and_interval",
+    "both_purposes_and_existing_settings_survive_save_reload",
+    "1440_768_390_layout_and_purpose_controls_no_overflow",
+    "custom_source_can_be_classified_and_removed_without_affecting_others",
+    "only_settings_put_requests_no_collection_or_publication"
+  ],
+  "errors": []
+}

@@ -1,0 +1,80 @@
+[
+  {
+    "width": 1440,
+    "bounds": [
+      {
+        "width": 448,
+        "height": 238.5
+      },
+      {
+        "width": 448,
+        "height": 238.5
+      },
+      {
+        "width": 448,
+        "height": 238.5
+      }
+    ],
+    "imageState": {
+      "src": "/_next/image?url=%2Fgenerated%2Fai-trends-card-v2.webp&w=3840&q=75",
+      "currentSrc": "http://127.0.0.1:3000/_next/image?url=%2Fgenerated%2Fai-trends-card-v2.webp&w=640&q=75",
+      "naturalWidth": 460,
+      "naturalHeight": 230
+    },
+    "imageStatus": 200,
+    "overflowing": false,
+    "errors": []
+  },
+  {
+    "width": 768,
+    "bounds": [
+      {
+        "width": 704,
+        "height": 238.5
+      },
+      {
+        "width": 704,
+        "height": 238.5
+      },
+      {
+        "width": 704,
+        "height": 238.5
+      }
+    ],
+    "imageState": {
+      "src": "/_next/image?url=%2Fgenerated%2Fai-trends-card-v2.webp&w=3840&q=75",
+      "currentSrc": "http://127.0.0.1:3000/_next/image?url=%2Fgenerated%2Fai-trends-card-v2.webp&w=828&q=75",
+      "naturalWidth": 768,
+      "naturalHeight": 384
+    },
+    "imageStatus": 200,
+    "overflowing": false,
+    "errors": []
+  },
+  {
+    "width": 390,
+    "bounds": [
+      {
+        "width": 350,
+        "height": 278.5
+      },
+      {
+        "width": 350,
+        "height": 278.5
+      },
+      {
+        "width": 350,
+        "height": 278.5
+      }
+    ],
+    "imageState": {
+      "src": "/_next/image?url=%2Fgenerated%2Fai-trends-card-v2.webp&w=3840&q=75",
+      "currentSrc": "http://127.0.0.1:3000/_next/image?url=%2Fgenerated%2Fai-trends-card-v2.webp&w=640&q=75",
+      "naturalWidth": 390,
+      "naturalHeight": 195
+    },
+    "imageStatus": 200,
+    "overflowing": false,
+    "errors": []
+  }
+]

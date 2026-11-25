@@ -1,0 +1,31 @@
+{
+  "results": [
+    "unified_default_39_and_sidebar",
+    "list_responsive_1440",
+    "list_responsive_768",
+    "list_responsive_390",
+    "pagination_scope_kind_keyword_filters",
+    "candidate_modal_and_real_article_component_preview",
+    "live_unsaved_preview_and_close_cancel_preserves_text",
+    "version_conflict_preserves_editor_then_explicit_reload",
+    "keyboard_editor_tabs_and_trend_publish_gate",
+    "modal_edit_preview_tabs_768",
+    "modal_edit_preview_tabs_390",
+    "modal_escape_and_return_to_filtered_list",
+    "published_copy_unchanged_after_correction_create_and_save",
+    "switch_preview_between_working_revision_and_public_copy",
+    "settings_saved_shared_without_collection_or_publication",
+    "settings_conflict_and_navigation_cancel_preserve_input",
+    "settings_responsive_1440",
+    "settings_responsive_768",
+    "settings_responsive_390",
+    "nested_native_confirmation_focus_and_escape_preserves_editor",
+    "modal_saved_edit_invalidates_approval",
+    "lost_publish_response_reloads_without_double_write",
+    "anonymous_denied_workspace",
+    "member_denied_workspace"
+  ],
+  "page_errors": [],
+  "publication_requests": 1,
+  "boundary": "Local Next UI with isolated SQLite FastAPI only. No real OAuth or live Supabase content writes."
+}

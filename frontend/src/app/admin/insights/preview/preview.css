@@ -1,0 +1,35 @@
+/* 이 표식이 있는 iframe 안에서만 공통 헤더·푸터를 감춥니다. 일반 사이트는 그대로입니다. */
+body:has(.insight-preview-page) {
+  min-height: 0;
+  --header-height: 0px;
+}
+
+body:has(.insight-preview-page) > :is(header, footer, a) {
+  display: none;
+}
+
+html:has(.insight-preview-page) {
+  overflow: hidden;
+}
+
+.insight-preview-page {
+  display: flow-root;
+  width: 100%;
+}
+
+.article-content-preview.page-container {
+  padding-block: 0;
+}
+
+@media (min-width: 640px) {
+  .article-content-preview.page-container {
+    width: 100%;
+  }
+}
+
+@media (min-width: 1280px) {
+  /* 1440px 가상 화면의 본문 폭만 잘라 보여주고, xl의 웹 레이아웃은 유지합니다. */
+  .insight-preview-page {
+    width: var(--layout-article);
+  }
+}

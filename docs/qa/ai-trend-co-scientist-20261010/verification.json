@@ -1,0 +1,139 @@
+{
+  "checks": [
+    {
+      "page": "trends",
+      "viewport": "1440",
+      "title": "AI 트렌드",
+      "viewportWidth": 1440,
+      "contentWidth": 1440,
+      "brokenImages": 0,
+      "sourceLinks": []
+    },
+    {
+      "page": "co-scientist",
+      "viewport": "1440",
+      "title": "AI가 가설을 만들고 토론한다:Co‑Scientist가 바꾸는 연구의 시작",
+      "viewportWidth": 1440,
+      "contentWidth": 1440,
+      "brokenImages": 0,
+      "sourceLinks": [
+        "https://doi.org/10.1038/s41586-026-10644-y",
+        "https://doi.org/10.1038/s41586-026-10644-y"
+      ]
+    },
+    {
+      "page": "mattergen",
+      "viewport": "1440",
+      "title": "찾는 AI에서 설계하는 AI로:MatterGen이 바꾼 신소재 탐색",
+      "viewportWidth": 1440,
+      "contentWidth": 1440,
+      "brokenImages": 0,
+      "sourceLinks": [
+        "https://doi.org/10.1038/s41586-025-08628-5",
+        "https://doi.org/10.1038/s41586-025-08628-5"
+      ]
+    },
+    {
+      "page": "alphaevolve",
+      "viewport": "1440",
+      "title": "코드를 진화시켜 알고리즘을 찾는다:AlphaEvolve의 연구 방식",
+      "viewportWidth": 1440,
+      "contentWidth": 1440,
+      "brokenImages": 0,
+      "sourceLinks": [
+        "https://arxiv.org/abs/2506.13131",
+        "https://arxiv.org/abs/2506.13131"
+      ]
+    },
+    {
+      "page": "trends",
+      "viewport": "768",
+      "title": "AI 트렌드",
+      "viewportWidth": 768,
+      "contentWidth": 768,
+      "brokenImages": 0,
+      "sourceLinks": []
+    },
+    {
+      "page": "co-scientist",
+      "viewport": "768",
+      "title": "AI가 가설을 만들고 토론한다:Co‑Scientist가 바꾸는 연구의 시작",
+      "viewportWidth": 768,
+      "contentWidth": 768,
+      "brokenImages": 0,
+      "sourceLinks": [
+        "https://doi.org/10.1038/s41586-026-10644-y",
+        "https://doi.org/10.1038/s41586-026-10644-y"
+      ]
+    },
+    {
+      "page": "mattergen",
+      "viewport": "768",
+      "title": "찾는 AI에서 설계하는 AI로:MatterGen이 바꾼 신소재 탐색",
+      "viewportWidth": 768,
+      "contentWidth": 768,
+      "brokenImages": 0,
+      "sourceLinks": [
+        "https://doi.org/10.1038/s41586-025-08628-5",
+        "https://doi.org/10.1038/s41586-025-08628-5"
+      ]
+    },
+    {
+      "page": "alphaevolve",
+      "viewport": "768",
+      "title": "코드를 진화시켜 알고리즘을 찾는다:AlphaEvolve의 연구 방식",
+      "viewportWidth": 768,
+      "contentWidth": 768,
+      "brokenImages": 0,
+      "sourceLinks": [
+        "https://arxiv.org/abs/2506.13131",
+        "https://arxiv.org/abs/2506.13131"
+      ]
+    },
+    {
+      "page": "trends",
+      "viewport": "390",
+      "title": "AI 트렌드",
+      "viewportWidth": 390,
+      "contentWidth": 390,
+      "brokenImages": 0,
+      "sourceLinks": []
+    },
+    {
+      "page": "co-scientist",
+      "viewport": "390",
+      "title": "AI가 가설을 만들고 토론한다:Co‑Scientist가 바꾸는 연구의 시작",
+      "viewportWidth": 390,
+      "contentWidth": 390,
+      "brokenImages": 0,
+      "sourceLinks": [
+        "https://doi.org/10.1038/s41586-026-10644-y",
+        "https://doi.org/10.1038/s41586-026-10644-y"
+      ]
+    },
+    {
+      "page": "mattergen",
+      "viewport": "390",
+      "title": "찾는 AI에서 설계하는 AI로:MatterGen이 바꾼 신소재 탐색",
+      "viewportWidth": 390,
+      "contentWidth": 390,
+      "brokenImages": 0,
+      "sourceLinks": [
+        "https://doi.org/10.1038/s41586-025-08628-5",
+        "https://doi.org/10.1038/s41586-025-08628-5"
+      ]
+    },
+    {
+      "page": "alphaevolve",
+      "viewport": "390",
+      "title": "코드를 진화시켜 알고리즘을 찾는다:AlphaEvolve의 연구 방식",
+      "viewportWidth": 390,
+      "contentWidth": 390,
+      "brokenImages": 0,
+      "sourceLinks": [
+        "https://arxiv.org/abs/2506.13131",
+        "https://arxiv.org/abs/2506.13131"
+      ]
+    }
+  ]
+}

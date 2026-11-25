@@ -1,0 +1,164 @@
+{
+  "checks": [
+    {
+      "screen": "cases",
+      "device": "desktop",
+      "width": 1406,
+      "scrollWidth": 1406,
+      "height": 2200,
+      "images": 7,
+      "loadedImages": 7
+    },
+    {
+      "screen": "cases",
+      "device": "mobile",
+      "width": 388,
+      "scrollWidth": 388,
+      "height": 4221,
+      "images": 7,
+      "loadedImages": 7
+    },
+    {
+      "screen": "trends",
+      "device": "desktop",
+      "width": 1406,
+      "scrollWidth": 1406,
+      "height": 2023,
+      "images": 7,
+      "loadedImages": 7
+    },
+    {
+      "screen": "trends",
+      "device": "mobile",
+      "width": 388,
+      "scrollWidth": 388,
+      "height": 3939,
+      "images": 7,
+      "loadedImages": 7
+    },
+    {
+      "screen": "experts",
+      "device": "desktop",
+      "width": 1406,
+      "scrollWidth": 1406,
+      "height": 1749,
+      "images": 0,
+      "loadedImages": 0
+    },
+    {
+      "screen": "experts",
+      "device": "mobile",
+      "width": 388,
+      "scrollWidth": 388,
+      "height": 3757,
+      "images": 0,
+      "loadedImages": 0
+    },
+    {
+      "screen": "detail",
+      "device": "desktop",
+      "width": 1406,
+      "scrollWidth": 1406,
+      "height": 1578,
+      "images": 0,
+      "loadedImages": 0
+    },
+    {
+      "screen": "detail",
+      "device": "mobile",
+      "width": 388,
+      "scrollWidth": 388,
+      "height": 1849,
+      "images": 0,
+      "loadedImages": 0
+    },
+    {
+      "screen": "case-detail",
+      "device": "desktop",
+      "width": 1406,
+      "scrollWidth": 1406,
+      "height": 3268,
+      "images": 7,
+      "loadedImages": 7
+    },
+    {
+      "screen": "case-detail",
+      "device": "mobile",
+      "width": 388,
+      "scrollWidth": 388,
+      "height": 5205,
+      "images": 7,
+      "loadedImages": 7
+    },
+    {
+      "screen": "trend-detail",
+      "device": "desktop",
+      "width": 1406,
+      "scrollWidth": 1406,
+      "height": 2940,
+      "images": 4,
+      "loadedImages": 4
+    },
+    {
+      "screen": "trend-detail",
+      "device": "mobile",
+      "width": 388,
+      "scrollWidth": 388,
+      "height": 4822,
+      "images": 4,
+      "loadedImages": 4
+    }
+  ],
+  "responsive": [
+    {
+      "screen": "case-detail",
+      "viewport": 320,
+      "width": 286,
+      "scrollWidth": 286
+    },
+    {
+      "screen": "trend-detail",
+      "viewport": 320,
+      "width": 286,
+      "scrollWidth": 286
+    },
+    {
+      "screen": "case-detail",
+      "viewport": 390,
+      "width": 356,
+      "scrollWidth": 356
+    },
+    {
+      "screen": "trend-detail",
+      "viewport": 390,
+      "width": 356,
+      "scrollWidth": 356
+    },
+    {
+      "screen": "case-detail",
+      "viewport": 736,
+      "width": 702,
+      "scrollWidth": 702
+    },
+    {
+      "screen": "trend-detail",
+      "viewport": 736,
+      "width": 702,
+      "scrollWidth": 702
+    },
+    {
+      "screen": "case-detail",
+      "viewport": 1024,
+      "width": 990,
+      "scrollWidth": 990
+    },
+    {
+      "screen": "trend-detail",
+      "viewport": 1024,
+      "width": 990,
+      "scrollWidth": 990
+    }
+  ],
+  "interactions": "목록 연결, 목차 이동, 모바일 목차 접기, 저장, 기술 설명, 목록 복귀, 관련 전문가 연결 통과",
+  "errors": []
+}

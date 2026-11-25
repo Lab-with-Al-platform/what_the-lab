@@ -1,0 +1,266 @@
+[
+  {
+    "id": "TC001",
+    "group": "키워드",
+    "query": "객체 검출",
+    "expected": "CAP 객체 탐지 직접 매칭",
+    "test_type": "정확 검색",
+    "priority": "P0"
+  },
+  {
+    "id": "TC002",
+    "group": "키워드",
+    "query": "Object Detection",
+    "expected": "대소문자 무시 동일 ID",
+    "test_type": "정확 검색",
+    "priority": "P0"
+  },
+  {
+    "id": "TC003",
+    "group": "키워드",
+    "query": "이미지 분할",
+    "expected": "객체 탐지와 다른 ID",
+    "test_type": "분리 검색",
+    "priority": "P0"
+  },
+  {
+    "id": "TC004",
+    "group": "키워드",
+    "query": "시계열 분석",
+    "expected": "시계열 미래값 예측과 다른 ID",
+    "test_type": "분리 검색",
+    "priority": "P0"
+  },
+  {
+    "id": "TC005",
+    "group": "키워드",
+    "query": "GNN",
+    "expected": "그래프 신경망 단일 ID, 그래프 통계와 구분",
+    "test_type": "약어 검색",
+    "priority": "P0"
+  },
+  {
+    "id": "TC006",
+    "group": "키워드",
+    "query": "RAG",
+    "expected": "검색증강생성 단일 ID, 문서 검색과 구분",
+    "test_type": "약어 검색",
+    "priority": "P0"
+  },
+  {
+    "id": "TC007",
+    "group": "키워드",
+    "query": "NER",
+    "expected": "개체명·정보 추출 검색",
+    "test_type": "약어 검색",
+    "priority": "P0"
+  },
+  {
+    "id": "TC008",
+    "group": "키워드",
+    "query": "STT",
+    "expected": "음성 인식·전사 검색",
+    "test_type": "약어 검색",
+    "priority": "P0"
+  },
+  {
+    "id": "TC009",
+    "group": "키워드",
+    "query": "CV",
+    "expected": "모호한 약어 직접 확정 금지",
+    "test_type": "모호성",
+    "priority": "P0"
+  },
+  {
+    "id": "TC010",
+    "group": "분류",
+    "query": "파이토치",
+    "expected": "도구 검색 후보만; 객체 탐지 자동 보유 부여 금지",
+    "test_type": "도구·역량 분리",
+    "priority": "P0"
+  },
+  {
+    "id": "TC011",
+    "group": "필터",
+    "query": "이미지·영상 분석",
+    "expected": "하위 기술들의 OR 그룹 필터 적용",
+    "test_type": "그룹 필터",
+    "priority": "P0"
+  },
+  {
+    "id": "TC012",
+    "group": "필터",
+    "query": "기술+연구 분야",
+    "expected": "축 간 AND",
+    "test_type": "복합 필터",
+    "priority": "P0"
+  },
+  {
+    "id": "TC013",
+    "group": "필터",
+    "query": "분야 미선택",
+    "expected": "분야로 인한 불필요한 제외 없음",
+    "test_type": "기본값",
+    "priority": "P0"
+  },
+  {
+    "id": "TC014",
+    "group": "필터",
+    "query": "다중 작업 OR",
+    "expected": "하나 이상 충족 조건 그대로 표시",
+    "test_type": "다중필터",
+    "priority": "P0"
+  },
+  {
+    "id": "TC015",
+    "group": "필터",
+    "query": "0건",
+    "expected": "빈 상태/해제/관련 추천 구분",
+    "test_type": "무결과",
+    "priority": "P0"
+  },
+  {
+    "id": "TC016",
+    "group": "데이터",
+    "query": "존재하지 않는 CAP ID",
+    "expected": "FK 참조 검증에서 거절",
+    "test_type": "참조무결성",
+    "priority": "P0"
+  },
+  {
+    "id": "TC017",
+    "group": "데이터",
+    "query": "같은 axis 동일 exact alias 서로 다른 ID",
+    "expected": "자동매칭 불가 및 배포 게이트 실패",
+    "test_type": "동의어 충돌",
+    "priority": "P0"
+  },
+  {
+    "id": "TC018",
+    "group": "데이터",
+    "query": "retired ID를 신규 연결",
+    "expected": "신규 연결 불허, 기존 기록 보존",
+    "test_type": "버전관리",
+    "priority": "P0"
+  },
+  {
+    "id": "TC019",
+    "group": "전문가",
+    "query": "미검증 기술",
+    "expected": "보유 검증 배지 없음",
+    "test_type": "신뢰성",
+    "priority": "P0"
+  },
+  {
+    "id": "TC020",
+    "group": "전문가",
+    "query": "공개되지 않은 프로필",
+    "expected": "검색 API에서 제외",
+    "test_type": "접근통제",
+    "priority": "P0"
+  },
+  {
+    "id": "TC021",
+    "group": "전문가",
+    "query": "분야 경험 없음·희망 분야만 있음",
+    "expected": "경험 보유로 표시 금지",
+    "test_type": "의미분리",
+    "priority": "P0"
+  },
+  {
+    "id": "TC022",
+    "group": "검색",
+    "query": "RAG 관련 연구 질문",
+    "expected": "관련어는 후보로만 제시",
+    "test_type": "정확/관련 구분",
+    "priority": "P0"
+  },
+  {
+    "id": "TC023",
+    "group": "검색",
+    "query": "영문 대소문자 공백",
+    "expected": "동일 용어 매칭",
+    "test_type": "정규화",
+    "priority": "P0"
+  },
+  {
+    "id": "TC024",
+    "group": "UI",
+    "query": "키보드 탭",
+    "expected": "필터 모두 접근·탈출 가능",
+    "test_type": "접근성",
+    "priority": "P0"
+  },
+  {
+    "id": "TC025",
+    "group": "UI",
+    "query": "모바일 360px",
+    "expected": "필터 리스트 오버플로 없이 탐색 가능",
+    "test_type": "반응형",
+    "priority": "P0"
+  },
+  {
+    "id": "TC026",
+    "group": "성능",
+    "query": "전문가 10,000명",
+    "expected": "p95 목표 협의 후 부하테스트",
+    "test_type": "성능",
+    "priority": "P1"
+  },
+  {
+    "id": "TC027",
+    "group": "운영",
+    "query": "미승인 분류 상태",
+    "expected": "운영 API에 노출되지 않음",
+    "test_type": "승인 게이트",
+    "priority": "P0"
+  },
+  {
+    "id": "TC028",
+    "group": "운영",
+    "query": "시연 Mock Data",
+    "expected": "운영 DB 유입/공개 없음",
+    "test_type": "사실성",
+    "priority": "P0"
+  },
+  {
+    "id": "TC029",
+    "group": "운영",
+    "query": "v2 이전 URI 쿼리",
+    "expected": "호환 리다이렉트 또는 유도 UI",
+    "test_type": "마이그레이션",
+    "priority": "P0"
+  },
+  {
+    "id": "TC030",
+    "group": "보안",
+    "query": "연구 주제에 스크립트 태그",
+    "expected": "단순 텍스트 처리, 실행 없음",
+    "test_type": "XSS",
+    "priority": "P0"
+  },
+  {
+    "id": "TC031",
+    "group": "보안",
+    "query": "남의 프로필 private data 요청",
+    "expected": "서버에서 객체 권한 검사",
+    "test_type": "BOLA",
+    "priority": "P0"
+  },
+  {
+    "id": "TC032",
+    "group": "전문가",
+    "query": "공동연구 증빙 없는 경험",
+    "expected": "검증 성과로 표시 불가",
+    "test_type": "증빙",
+    "priority": "P0"
+  },
+  {
+    "id": "TC033",
+    "group": "분류",
+    "query": "비슷한 연구분야 동음이의",
+    "expected": "자동 단일 매핑 금지",
+    "test_type": "용어 품질",
+    "priority": "P1"
+  }
+]

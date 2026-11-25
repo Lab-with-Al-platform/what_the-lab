@@ -1,0 +1,22 @@
+{
+  "results": [
+    "anonymous_denied",
+    "member_denied",
+    "admin_account_menu_link_and_escape",
+    "responsive_1440",
+    "responsive_768",
+    "responsive_390",
+    "keyboard_tabs",
+    "submit_explicit_checks_approval_confirmation",
+    "saved_edit_invalidates_approval",
+    "lost_publish_response_reloads_without_duplicate",
+    "new_draft_form_saved_and_unreviewed",
+    "stale_version_preserves_local_text_and_explicit_reload",
+    "mobile_confirmation_focus_and_escape",
+    "mobile_selection_scrolls_to_editor",
+    "unsaved_internal_navigation_cancel_preserves_input"
+  ],
+  "page_errors": [],
+  "publication_requests": 1,
+  "boundary": "Browser and actual FastAPI services on isolated in-memory SQLite; all API calls proxied to 8001; no production/Supabase writes."
+}

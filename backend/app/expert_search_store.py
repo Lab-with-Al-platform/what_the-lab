@@ -1,0 +1,281 @@
+"""AI 전문가 찾기: 공개한 전문가만 검색합니다.
+
+검색어는 분류표(taxonomy v4.0)의 같은 말 사전으로 넓혀서 찾습니다.
+예: '데이터 정리' → 같은 뜻의 수행 기술(CAP) → 그 기술이 속한 '할 수 있는 일'(UG) 그룹
+"""
+
+import json
+import re
+from pathlib import Path
+
+from app.collab_waiting import open_from
+from app.db import get_connection
+from app.google_sync import today_kst
+
+TAXONOMY_DIR = Path(__file__).resolve().parents[2] / "taxonomy" / "v4.0"
+
+
+def normalize(text: str) -> str:
+    """비교용: 소문자로 바꾸고 공백·가운뎃점·하이픈을 지웁니다. 예: 'Object Detection' → 'objectdetection'"""
+    return re.sub(r"[\s·\-_/()]", "", text.lower())
+
+
+def load_aliases() -> tuple[dict[str, set[str]], dict[str, set[str]]]:
+    """(검색어 → UG ID들, 검색어 → FIELD ID들). 분류표 파일이 없으면 빈 사전으로 동작합니다."""
+    try:
+        aliases = json.loads((TAXONOMY_DIR / "search-aliases.json").read_text(encoding="utf-8"))
+        members = json.loads((TAXONOMY_DIR / "ui-group-members.json").read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return {}, {}
+    groups_of_capability: dict[str, set[str]] = {}
+    for member in members:
+        groups_of_capability.setdefault(member["capability_id"], set()).add(member["group_id"])
+
+    to_groups: dict[str, set[str]] = {}
+    to_fields: dict[str, set[str]] = {}
+    for alias in aliases:
+        key = normalize(alias["term"])
+        if alias["axis"] == "capability":
+            to_groups.setdefault(key, set()).update(
+                groups_of_capability.get(alias["term_id"], set())
+            )
+        elif alias["axis"] == "research_field":
+            to_fields.setdefault(key, set()).add(alias["term_id"])
+    return to_groups, to_fields
+
+
+ALIAS_GROUPS, ALIAS_FIELDS = load_aliases()  # 서버가 켜질 때 한 번만 읽습니다.
+
+
+def expand_query(query: str) -> tuple[list[str], list[str]]:
+    """검색어와 같은 뜻인 (UG ID 목록, FIELD ID 목록). 사전에 없으면 빈 목록."""
+    key = normalize(query)
+    if not key:
+        return [], []
+    groups, fields = set(ALIAS_GROUPS.get(key, set())), set(ALIAS_FIELDS.get(key, set()))
+    # 세 글자 이상이면 그 말을 포함한 표현도 같은 뜻으로 봅니다. (예: 데이터 정리 → 비정형 데이터 정리)
+    if len(key) >= 3:
+        for term, ids in ALIAS_GROUPS.items():
+            if key in term:
+                groups |= ids
+        for term, ids in ALIAS_FIELDS.items():
+            if key in term:
+                fields |= ids
+    return sorted(groups), sorted(fields)
+
+
+# '진행 중' 판단은 실제 협업 공간의 상태를 기준으로 합니다.
+# 요청 상태 started는 협업 완료 뒤에도 남으므로 이를 가용성으로 사용하면 안 됩니다.
+ENGAGED_SQL = """
+    SELECT expert_id, MAX(end_date) AS engaged_until
+    FROM collaboration
+    WHERE status = 'ongoing'
+      AND end_date >= (now() AT TIME ZONE 'Asia/Seoul')::date
+    GROUP BY expert_id
+"""
+
+
+def search_experts(
+    query: str,
+    able_work_ids: list[str],
+    category_ids: list[str],
+    offset: int,
+    limit: int,
+    prefer_work_ids: list[str] | None = None,
+    prefer_category_ids: list[str] | None = None,
+    engagement: str = "all",
+    sort: str = "relevance",
+) -> dict:
+    """공개 전문가 목록.
+
+    정렬: (선택한 키워드와 맞는 사람) → 지금 협업 가능한 사람(최근 가입 순)
+    → 참여 중인 사람(종료일 빠른 순). 맞는 사람만 남기지는 않습니다.
+    """
+    group_ids, field_ids = expand_query(query)
+    conditions = ["e.is_public = TRUE", "u.status = 'active'", "u.user_role = 'expert'"]
+    params: list = []
+
+    if able_work_ids:  # 고른 일 중 하나라도 할 수 있으면
+        conditions.append(
+            "EXISTS (SELECT 1 FROM expert_able_work w"
+            " WHERE w.user_id = e.user_id AND w.able_work_id = ANY(%s))"
+        )
+        params.append(able_work_ids)
+    if category_ids:  # 고른 분야(대분류) 중 하나라도 도메인 경험이 있으면
+        conditions.append(
+            "EXISTS (SELECT 1 FROM expert_domain d JOIN research_field f ON f.field_id = d.field_id"
+            " WHERE d.user_id = e.user_id AND f.field_category_id = ANY(%s))"
+        )
+        params.append(category_ids)
+    # Filter in SQL so the total and every pagination page remain consistent.
+    if engagement == "idle":
+        conditions.append("g.expert_id IS NULL")
+    elif engagement == "engaged":
+        conditions.append("g.expert_id IS NOT NULL")
+
+    if query.strip():
+        # %, _ 는 LIKE에서 특별한 뜻이라, 글자 그대로 찾도록 앞에 역슬래시를 붙입니다.
+        like = "%" + re.sub(r"([%_\\])", r"\\\1", query.strip()) + "%"
+        conditions.append(
+            """(
+            u.nickname ILIKE %s OR e.introduce ILIKE %s OR e.affiliation ILIKE %s
+            OR EXISTS (SELECT 1 FROM expert_able_work w JOIN able_work a ON a.able_work_id = w.able_work_id
+                       WHERE w.user_id = e.user_id AND (a.name ILIKE %s OR w.able_work_id = ANY(%s)))
+            OR EXISTS (SELECT 1 FROM expert_domain d
+                       JOIN research_field f ON f.field_id = d.field_id
+                       JOIN field_category c ON c.field_category_id = f.field_category_id
+                       WHERE d.user_id = e.user_id
+                         AND (f.name ILIKE %s OR c.name ILIKE %s OR d.field_id = ANY(%s)))
+            OR EXISTS (SELECT 1 FROM portfolio p WHERE p.user_id = e.user_id AND p.title ILIKE %s)
+            )"""
+        )
+        params += [like, like, like, like, group_ids, like, like, field_ids, like]
+
+    base = f"""
+        FROM expert e
+        JOIN users u ON u.user_id = e.user_id
+        LEFT JOIN ({ENGAGED_SQL}) g ON g.expert_id = e.user_id
+        WHERE {" AND ".join(conditions)}
+    """
+    with get_connection() as conn, conn.cursor() as cursor:
+        cursor.execute(f"SELECT COUNT(*) AS total {base}", params)
+        total = cursor.fetchone()["total"]
+        order_sql = "g.expert_id IS NOT NULL, g.engaged_until NULLS LAST, e.created_at DESC, e.user_id DESC" if sort == "relevance" else "e.created_at DESC, e.user_id DESC"
+        order_params: list = []
+        prefer_works = prefer_work_ids or []
+        prefer_fields = prefer_category_ids or []
+        related_checks: list[str] = []
+        if prefer_works:
+            related_checks.append(
+                "EXISTS (SELECT 1 FROM expert_able_work w"
+                " WHERE w.user_id = e.user_id AND w.able_work_id = ANY(%s))"
+            )
+            order_params.append(prefer_works)
+        if prefer_fields:
+            related_checks.append(
+                "EXISTS (SELECT 1 FROM expert_domain d JOIN research_field f ON f.field_id = d.field_id"
+                " WHERE d.user_id = e.user_id AND f.field_category_id = ANY(%s))"
+            )
+            order_params.append(prefer_fields)
+        if related_checks and sort == "relevance":
+            order_sql = f"CASE WHEN {' OR '.join(related_checks)} THEN 0 ELSE 1 END, " + order_sql
+        elif sort == "newest":
+            order_params = []
+        cursor.execute(
+            f"""
+            SELECT e.user_id, u.nickname, u.user_photo, e.introduce,
+                   e.affiliation, e.current_job, e.ai_career,
+                   g.expert_id IS NOT NULL AS engaged, g.engaged_until
+            {base}
+            ORDER BY {order_sql}
+            LIMIT %s OFFSET %s
+            """,
+            [*params, *order_params, limit, offset],
+        )
+        rows = cursor.fetchall()
+        ids = [row["user_id"] for row in rows]
+        works = group_by_user(
+            cursor, ids, "expert_able_work", "able_work_id", "expert_able_work_id"
+        )
+        domains = group_by_user(cursor, ids, "expert_domain", "field_id", "expert_domain_id")
+
+    today = today_kst()
+    for row in rows:
+        row["able_work_ids"] = works.get(row["user_id"], [])
+        row["domain_ids"] = domains.get(row["user_id"], [])
+        # 새 협업 요청을 받을 수 있는 날 (모든 협업이 30일 안에 끝나면 None = 지금 가능)
+        row["available_from"] = open_from(row["engaged_until"], today)
+    return {
+        "total": total,
+        "items": rows,
+        # 같은 뜻으로 함께 찾은 분류 (화면에 '○○과 같은 뜻으로 함께 찾았어요' 안내용)
+        "matched": {"able_work_ids": group_ids, "field_ids": field_ids},
+    }
+
+
+def group_by_user(cursor, user_ids: list[int], table: str, column: str, order: str) -> dict:
+    """여러 전문가의 고른 값을 한 번에 읽어 {user_id: [값, ...]}로 묶습니다."""
+    if not user_ids:
+        return {}
+    cursor.execute(
+        f"SELECT user_id, {column} AS value FROM {table} WHERE user_id = ANY(%s) ORDER BY {order}",
+        (user_ids,),
+    )
+    grouped: dict[int, list[str]] = {}
+    for row in cursor.fetchall():
+        grouped.setdefault(row["user_id"], []).append(row["value"])
+    return grouped
+
+
+def load_engagement(user_id: int) -> dict:
+    """한 전문가의 참여 상태. 협업 요청 창의 '지금 협업 중이라 ○월 ○일부터' 안내에 씁니다."""
+    with get_connection() as conn, conn.cursor() as cursor:
+        cursor.execute(
+            f"SELECT engaged_until FROM ({ENGAGED_SQL}) g WHERE expert_id = %s", (user_id,)
+        )
+        row = cursor.fetchone()
+    until = row["engaged_until"] if row else None
+    # available_from: 새 협업 요청을 받을 수 있는 날 (None = 지금 가능). 요청 창에서 이 날 전에는 못 보내요
+    return {"engaged": row is not None, "engaged_until": until, "available_from": open_from(until, today_kst())}
+
+def load_collaborations(user_id: int) -> list[dict]:
+    """Public, consent-safe history of completed collaborations.
+
+    The internal workspace is the source of truth for completed work, not the
+    collaboration_request's 'started' status (which persists after completion).
+    Research names, researchers' identities, schedules, and agreement details
+    must never leave this public endpoint without explicit bilateral consent.
+    Only broad field categories and the expert's performed work codes are shown.
+    """
+    with get_connection() as conn, conn.cursor() as cursor:
+        cursor.execute(
+            """
+            SELECT c.collaboration_id, c.start_date, c.end_date,
+                   COALESCE(c.agreement -> 'field_ids', '[]'::jsonb) AS field_ids,
+                   COALESCE(c.agreement -> 'able_work_ids', '[]'::jsonb) AS work_ids
+            FROM collaboration c
+            WHERE c.expert_id = %s AND c.status = 'done'
+            ORDER BY c.end_date DESC, c.collaboration_id DESC
+            LIMIT 50
+            """,
+            (user_id,),
+        )
+        rows = cursor.fetchall()
+        field_ids = sorted({
+            field_id
+            for row in rows
+            for field_id in (row["field_ids"] or [])
+            if isinstance(field_id, str)
+        })
+        categories: dict[str, str] = {}
+        if field_ids:
+            cursor.execute(
+                "SELECT field_id, field_category_id FROM research_field"
+                " WHERE field_id = ANY(%s)",
+                (field_ids,),
+            )
+            categories = {
+                row["field_id"]: row["field_category_id"]
+                for row in cursor.fetchall()
+            }
+
+    return [
+        {
+            "start_date": row["start_date"],
+            "end_date": row["end_date"],
+            "ongoing": False,
+            "title": "완료한 협업 연구",
+            "partner_nickname": None,
+            "private": True,
+            "category_ids": sorted({
+                categories[field_id]
+                for field_id in (row["field_ids"] or [])
+                if isinstance(field_id, str) and field_id in categories
+            }),
+            "able_work_ids": [
+                work_id for work_id in (row["work_ids"] or [])
+                if isinstance(work_id, str) and work_id.startswith("UG")
+            ],
+        }
+        for row in rows
+    ]

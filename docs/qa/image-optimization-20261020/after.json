@@ -1,0 +1,3155 @@
+{
+  "phase": "after",
+  "date": "2026-10-20",
+  "baseUrl": "http://localhost:3000",
+  "captureDirectory": "after-1792455274505",
+  "checks": [
+    {
+      "name": "home",
+      "route": "/",
+      "width": 1440,
+      "height": 900,
+      "dpr": 1,
+      "initialBytes": 97850,
+      "scrolledBytes": 97850,
+      "initialResponses": [
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fresearch-cases-card-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 9144,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fai-trends-card-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 9804,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ffind-experts-card-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 14228,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Flabbridge-hero-v1.png&w=828&q=75",
+          "status": 200,
+          "bytes": 26028,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=384&q=75",
+          "status": 200,
+          "bytes": 15538,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-inverse-design-v1.png&w=384&q=75",
+          "status": 200,
+          "bytes": 7968,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-alphaevolve-v1.png&w=384&q=75",
+          "status": 200,
+          "bytes": 15140,
+          "type": "image/webp",
+          "cache": "STALE"
+        }
+      ],
+      "initialImages": [
+        {
+          "src": "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Flabbridge-hero-v1.png&w=828&q=75",
+          "sizes": "",
+          "loading": "lazy",
+          "width": 743.609375,
+          "height": 378,
+          "naturalWidth": 759,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fresearch-cases-card-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fresearch-cases-card-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 460px, (min-width: 1024px) 33vw, 100vw",
+          "loading": "lazy",
+          "width": 446,
+          "height": 236.5,
+          "naturalWidth": 460,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fai-trends-card-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fai-trends-card-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 460px, (min-width: 1024px) 33vw, 100vw",
+          "loading": "lazy",
+          "width": 446,
+          "height": 236.5,
+          "naturalWidth": 460,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ffind-experts-card-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ffind-experts-card-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 460px, (min-width: 1024px) 33vw, 100vw",
+          "loading": "lazy",
+          "width": 446,
+          "height": 236.5,
+          "naturalWidth": 460,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=384&q=75",
+          "sizes": "(min-width: 1440px) 350px, (min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 340.65625,
+          "height": 132,
+          "naturalWidth": 350,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-inverse-design-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-inverse-design-v1.png&w=384&q=75",
+          "sizes": "(min-width: 1440px) 350px, (min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 340.671875,
+          "height": 132,
+          "naturalWidth": 350,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-alphaevolve-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-alphaevolve-v1.png&w=384&q=75",
+          "sizes": "(min-width: 1440px) 350px, (min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 340.65625,
+          "height": 132,
+          "naturalWidth": 350,
+          "visible": true
+        }
+      ],
+      "layout": [
+        {
+          "tag": "H1",
+          "x": 80,
+          "y": 140.25,
+          "width": 560.390625,
+          "height": 116
+        },
+        {
+          "tag": "DIV",
+          "x": 32,
+          "y": 439,
+          "width": 1376,
+          "height": 238.5
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "home",
+      "route": "/",
+      "width": 768,
+      "height": 1024,
+      "dpr": 1,
+      "initialBytes": 87992,
+      "scrolledBytes": 87992,
+      "initialResponses": [
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fresearch-cases-card-v1.png&w=828&q=75",
+          "status": 200,
+          "bytes": 13350,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=384&q=75",
+          "status": 200,
+          "bytes": 15538,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-inverse-design-v1.png&w=384&q=75",
+          "status": 200,
+          "bytes": 7968,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ffind-experts-card-v1.png&w=828&q=75",
+          "status": 200,
+          "bytes": 20152,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fai-trends-card-v1.png&w=828&q=75",
+          "status": 200,
+          "bytes": 15844,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-alphaevolve-v1.png&w=384&q=75",
+          "status": 200,
+          "bytes": 15140,
+          "type": "image/webp",
+          "cache": "HIT"
+        }
+      ],
+      "initialImages": [
+        {
+          "src": "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+          "currentSrc": "",
+          "sizes": "",
+          "loading": "lazy",
+          "width": 0,
+          "height": 0,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fresearch-cases-card-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fresearch-cases-card-v1.png&w=828&q=75",
+          "sizes": "(min-width: 1440px) 460px, (min-width: 1024px) 33vw, 100vw",
+          "loading": "lazy",
+          "width": 702,
+          "height": 236.5,
+          "naturalWidth": 768,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fai-trends-card-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fai-trends-card-v1.png&w=828&q=75",
+          "sizes": "(min-width: 1440px) 460px, (min-width: 1024px) 33vw, 100vw",
+          "loading": "lazy",
+          "width": 702,
+          "height": 236.5,
+          "naturalWidth": 768,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ffind-experts-card-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ffind-experts-card-v1.png&w=828&q=75",
+          "sizes": "(min-width: 1440px) 460px, (min-width: 1024px) 33vw, 100vw",
+          "loading": "lazy",
+          "width": 702,
+          "height": 236.5,
+          "naturalWidth": 768,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=384&q=75",
+          "sizes": "(min-width: 1440px) 350px, (min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 342,
+          "height": 132,
+          "naturalWidth": 384,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-inverse-design-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-inverse-design-v1.png&w=384&q=75",
+          "sizes": "(min-width: 1440px) 350px, (min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 342,
+          "height": 132,
+          "naturalWidth": 384,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-alphaevolve-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-alphaevolve-v1.png&w=384&q=75",
+          "sizes": "(min-width: 1440px) 350px, (min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 342,
+          "height": 132,
+          "naturalWidth": 384,
+          "visible": false
+        }
+      ],
+      "layout": [
+        {
+          "tag": "H1",
+          "x": 32,
+          "y": 140.25,
+          "width": 704,
+          "height": 116
+        },
+        {
+          "tag": "DIV",
+          "x": 32,
+          "y": 439,
+          "width": 704,
+          "height": 747.5
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "home",
+      "route": "/",
+      "width": 390,
+      "height": 844,
+      "dpr": 1,
+      "initialBytes": 112298,
+      "scrolledBytes": 112298,
+      "initialResponses": [
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fresearch-cases-card-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 9144,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fai-trends-card-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 9804,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 30714,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-inverse-design-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 15790,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ffind-experts-card-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 14228,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-alphaevolve-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 32618,
+          "type": "image/webp",
+          "cache": "STALE"
+        }
+      ],
+      "initialImages": [
+        {
+          "src": "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+          "currentSrc": "",
+          "sizes": "",
+          "loading": "lazy",
+          "width": 0,
+          "height": 0,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fresearch-cases-card-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fresearch-cases-card-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 460px, (min-width: 1024px) 33vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 276.5,
+          "naturalWidth": 390,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fai-trends-card-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fai-trends-card-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 460px, (min-width: 1024px) 33vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 276.5,
+          "naturalWidth": 390,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ffind-experts-card-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ffind-experts-card-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 460px, (min-width: 1024px) 33vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 276.5,
+          "naturalWidth": 390,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 350px, (min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 132,
+          "naturalWidth": 390,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-inverse-design-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-inverse-design-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 350px, (min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 132,
+          "naturalWidth": 390,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-alphaevolve-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-alphaevolve-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 350px, (min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 132,
+          "naturalWidth": 390,
+          "visible": false
+        }
+      ],
+      "layout": [
+        {
+          "tag": "H1",
+          "x": 20,
+          "y": 139.09375,
+          "width": 350,
+          "height": 118.3125
+        },
+        {
+          "tag": "DIV",
+          "x": 20,
+          "y": 439,
+          "width": 350,
+          "height": 867.5
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "home",
+      "route": "/",
+      "width": 390,
+      "height": 844,
+      "dpr": 2,
+      "initialBytes": 162856,
+      "scrolledBytes": 162856,
+      "initialResponses": [
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fai-trends-card-v1.png&w=828&q=75",
+          "status": 200,
+          "bytes": 15844,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fresearch-cases-card-v1.png&w=828&q=75",
+          "status": 200,
+          "bytes": 13350,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=828&q=75",
+          "status": 200,
+          "bytes": 43058,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ffind-experts-card-v1.png&w=828&q=75",
+          "status": 200,
+          "bytes": 20152,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-inverse-design-v1.png&w=828&q=75",
+          "status": 200,
+          "bytes": 22242,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-alphaevolve-v1.png&w=828&q=75",
+          "status": 200,
+          "bytes": 48210,
+          "type": "image/webp",
+          "cache": "STALE"
+        }
+      ],
+      "initialImages": [
+        {
+          "src": "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+          "currentSrc": "",
+          "sizes": "",
+          "loading": "lazy",
+          "width": 0,
+          "height": 0,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fresearch-cases-card-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fresearch-cases-card-v1.png&w=828&q=75",
+          "sizes": "(min-width: 1440px) 460px, (min-width: 1024px) 33vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 276.5,
+          "naturalWidth": 390,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fai-trends-card-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fai-trends-card-v1.png&w=828&q=75",
+          "sizes": "(min-width: 1440px) 460px, (min-width: 1024px) 33vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 276.5,
+          "naturalWidth": 390,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ffind-experts-card-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ffind-experts-card-v1.png&w=828&q=75",
+          "sizes": "(min-width: 1440px) 460px, (min-width: 1024px) 33vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 276.5,
+          "naturalWidth": 390,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=828&q=75",
+          "sizes": "(min-width: 1440px) 350px, (min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 132,
+          "naturalWidth": 390,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-inverse-design-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-inverse-design-v1.png&w=828&q=75",
+          "sizes": "(min-width: 1440px) 350px, (min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 132,
+          "naturalWidth": 390,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-alphaevolve-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-alphaevolve-v1.png&w=828&q=75",
+          "sizes": "(min-width: 1440px) 350px, (min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 132,
+          "naturalWidth": 390,
+          "visible": false
+        }
+      ],
+      "layout": [
+        {
+          "tag": "H1",
+          "x": 20,
+          "y": 139.09375,
+          "width": 350,
+          "height": 118.3125
+        },
+        {
+          "tag": "DIV",
+          "x": 20,
+          "y": 439,
+          "width": 350,
+          "height": 867.5
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "cases",
+      "route": "/cases",
+      "width": 1440,
+      "height": 900,
+      "dpr": 1,
+      "initialBytes": 276976,
+      "scrolledBytes": 276976,
+      "initialResponses": [
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=1080&q=75",
+          "status": 200,
+          "bytes": 65586,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 34638,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fcase-periodontal-xray-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 18054,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fcase-concrete-crack-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 30656,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 31298,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fphotos%2Fcells-render.jpg&w=640&q=75",
+          "status": 200,
+          "bytes": 45868,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fphotos%2Fbrain-network.jpg&w=640&q=75",
+          "status": 200,
+          "bytes": 50876,
+          "type": "image/webp",
+          "cache": "STALE"
+        }
+      ],
+      "initialImages": [
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=1080&q=75",
+          "sizes": "(min-width: 1440px) 960px, (min-width: 1024px) 68vw, (min-width: 768px) 80vw, 100vw",
+          "loading": "auto",
+          "width": 935.6875,
+          "height": 445.1875,
+          "naturalWidth": 960,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 443.328125,
+          "height": 249.359375,
+          "naturalWidth": 440,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 443.328125,
+          "height": 249.359375,
+          "naturalWidth": 440,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-periodontal-xray-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fcase-periodontal-xray-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 443.34375,
+          "height": 249.375,
+          "naturalWidth": 440,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-concrete-crack-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fcase-concrete-crack-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 443.328125,
+          "height": 249.359375,
+          "naturalWidth": 440,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fphotos%2Fcells-render.jpg&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fphotos%2Fcells-render.jpg&w=640&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 443.328125,
+          "height": 249.359375,
+          "naturalWidth": 352,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fphotos%2Fbrain-network.jpg&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fphotos%2Fbrain-network.jpg&w=640&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 443.34375,
+          "height": 249.375,
+          "naturalWidth": 352,
+          "visible": false
+        }
+      ],
+      "layout": [
+        {
+          "tag": "H1",
+          "x": 32,
+          "y": 129,
+          "width": 310.828125,
+          "height": 58.546875
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 32,
+          "y": 857.734375,
+          "width": 445.328125,
+          "height": 467.375
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 497.328125,
+          "y": 857.734375,
+          "width": 445.328125,
+          "height": 467.375
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 962.65625,
+          "y": 857.734375,
+          "width": 445.34375,
+          "height": 467.375
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 32,
+          "y": 1345.109375,
+          "width": 445.328125,
+          "height": 467.375
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 497.328125,
+          "y": 1345.109375,
+          "width": 445.328125,
+          "height": 467.375
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 962.65625,
+          "y": 1345.109375,
+          "width": 445.34375,
+          "height": 467.375
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "cases",
+      "route": "/cases",
+      "width": 768,
+      "height": 1024,
+      "dpr": 1,
+      "initialBytes": 147930,
+      "scrolledBytes": 147930,
+      "initialResponses": [
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 31298,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=384&q=75",
+          "status": 200,
+          "bytes": 14994,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fcase-periodontal-xray-v1.png&w=384&q=75",
+          "status": 200,
+          "bytes": 9232,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fcase-concrete-crack-v1.png&w=384&q=75",
+          "status": 200,
+          "bytes": 12874,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-v1.png&w=384&q=75",
+          "status": 200,
+          "bytes": 16488,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fphotos%2Fcells-render.jpg&w=384&q=75",
+          "status": 200,
+          "bytes": 30272,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fphotos%2Fbrain-network.jpg&w=384&q=75",
+          "status": 200,
+          "bytes": 32772,
+          "type": "image/webp",
+          "cache": "STALE"
+        }
+      ],
+      "initialImages": [
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 960px, (min-width: 1024px) 68vw, (min-width: 768px) 80vw, 100vw",
+          "loading": "auto",
+          "width": 563.203125,
+          "height": 408.78125,
+          "naturalWidth": 614,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-v1.png&w=384&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 340,
+          "height": 191.25,
+          "naturalWidth": 384,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=384&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 340,
+          "height": 191.25,
+          "naturalWidth": 384,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-periodontal-xray-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fcase-periodontal-xray-v1.png&w=384&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 340,
+          "height": 191.25,
+          "naturalWidth": 384,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-concrete-crack-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fcase-concrete-crack-v1.png&w=384&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 340,
+          "height": 191.25,
+          "naturalWidth": 384,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fphotos%2Fcells-render.jpg&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fphotos%2Fcells-render.jpg&w=384&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 340,
+          "height": 191.25,
+          "naturalWidth": 384,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fphotos%2Fbrain-network.jpg&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fphotos%2Fbrain-network.jpg&w=384&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 340,
+          "height": 191.25,
+          "naturalWidth": 384,
+          "visible": false
+        }
+      ],
+      "layout": [
+        {
+          "tag": "H1",
+          "x": 32,
+          "y": 129,
+          "width": 210.0625,
+          "height": 39.03125
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 32,
+          "y": 853.8125,
+          "width": 342,
+          "height": 409.25
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 394,
+          "y": 853.8125,
+          "width": 342,
+          "height": 409.25
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 32,
+          "y": 1283.0625,
+          "width": 342,
+          "height": 409.25
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 394,
+          "y": 1283.0625,
+          "width": 342,
+          "height": 409.25
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 32,
+          "y": 1712.3125,
+          "width": 342,
+          "height": 409.25
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 394,
+          "y": 1712.3125,
+          "width": 342,
+          "height": 409.25
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "cases",
+      "route": "/cases",
+      "width": 390,
+      "height": 844,
+      "dpr": 1,
+      "initialBytes": 83990,
+      "scrolledBytes": 211390,
+      "initialResponses": [
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 31298,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 34638,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fcase-periodontal-xray-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 18054,
+          "type": "image/webp",
+          "cache": "HIT"
+        }
+      ],
+      "initialImages": [
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 960px, (min-width: 1024px) 68vw, (min-width: 768px) 80vw, 100vw",
+          "loading": "auto",
+          "width": 350,
+          "height": 240,
+          "naturalWidth": 390,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 390,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 390,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-periodontal-xray-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fcase-periodontal-xray-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 390,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-concrete-crack-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fphotos%2Fcells-render.jpg&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fphotos%2Fbrain-network.jpg&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 0,
+          "visible": false
+        }
+      ],
+      "layout": [
+        {
+          "tag": "H1",
+          "x": 20,
+          "y": 117,
+          "width": 207.21875,
+          "height": 39.03125
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 20,
+          "y": 1194.8125,
+          "width": 350,
+          "height": 413.75
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 20,
+          "y": 1628.5625,
+          "width": 350,
+          "height": 413.75
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 20,
+          "y": 2062.3125,
+          "width": 350,
+          "height": 413.75
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 20,
+          "y": 2496.0625,
+          "width": 350,
+          "height": 391.75
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 20,
+          "y": 2907.8125,
+          "width": 350,
+          "height": 391.75
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 20,
+          "y": 3319.5625,
+          "width": 350,
+          "height": 413.75
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "cases",
+      "route": "/cases",
+      "width": 390,
+      "height": 844,
+      "dpr": 2,
+      "initialBytes": 120624,
+      "scrolledBytes": 262870,
+      "initialResponses": [
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=828&q=75",
+          "status": 200,
+          "bytes": 45602,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-v1.png&w=828&q=75",
+          "status": 200,
+          "bytes": 49020,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fcase-periodontal-xray-v1.png&w=828&q=75",
+          "status": 200,
+          "bytes": 26002,
+          "type": "image/webp",
+          "cache": "STALE"
+        }
+      ],
+      "initialImages": [
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=828&q=75",
+          "sizes": "(min-width: 1440px) 960px, (min-width: 1024px) 68vw, (min-width: 768px) 80vw, 100vw",
+          "loading": "auto",
+          "width": 350,
+          "height": 240,
+          "naturalWidth": 390,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-v1.png&w=828&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 390,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=828&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 390,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-periodontal-xray-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fcase-periodontal-xray-v1.png&w=828&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 390,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-concrete-crack-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fphotos%2Fcells-render.jpg&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fphotos%2Fbrain-network.jpg&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 0,
+          "visible": false
+        }
+      ],
+      "layout": [
+        {
+          "tag": "H1",
+          "x": 20,
+          "y": 117,
+          "width": 207.21875,
+          "height": 39.03125
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 20,
+          "y": 1194.8125,
+          "width": 350,
+          "height": 413.75
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 20,
+          "y": 1628.5625,
+          "width": 350,
+          "height": 413.75
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 20,
+          "y": 2062.3125,
+          "width": 350,
+          "height": 413.75
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 20,
+          "y": 2496.0625,
+          "width": 350,
+          "height": 391.75
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 20,
+          "y": 2907.8125,
+          "width": 350,
+          "height": 391.75
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 20,
+          "y": 3319.5625,
+          "width": 350,
+          "height": 413.75
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "trends",
+      "route": "/trends",
+      "width": 1440,
+      "height": 900,
+      "dpr": 1,
+      "initialBytes": 215184,
+      "scrolledBytes": 215184,
+      "initialResponses": [
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=1080&q=75",
+          "status": 200,
+          "bytes": 60744,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-literature-review-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 28568,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-alphaevolve-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 32618,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-surrogate-comparison-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 20706,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 30714,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-vision-prompts-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 26044,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-inverse-design-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 15790,
+          "type": "image/webp",
+          "cache": "HIT"
+        }
+      ],
+      "initialImages": [
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=1080&q=75",
+          "sizes": "(min-width: 1440px) 960px, (min-width: 1024px) 68vw, (min-width: 768px) 80vw, 100vw",
+          "loading": "auto",
+          "width": 935.6875,
+          "height": 445.1875,
+          "naturalWidth": 960,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 443.328125,
+          "height": 249.359375,
+          "naturalWidth": 440,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-inverse-design-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-inverse-design-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 443.328125,
+          "height": 249.359375,
+          "naturalWidth": 440,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-alphaevolve-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-alphaevolve-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 443.34375,
+          "height": 249.375,
+          "naturalWidth": 440,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-literature-review-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-literature-review-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 443.328125,
+          "height": 249.359375,
+          "naturalWidth": 440,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-surrogate-comparison-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-surrogate-comparison-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 443.328125,
+          "height": 249.359375,
+          "naturalWidth": 440,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-vision-prompts-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-vision-prompts-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 443.34375,
+          "height": 249.375,
+          "naturalWidth": 440,
+          "visible": false
+        }
+      ],
+      "layout": [
+        {
+          "tag": "H1",
+          "x": 32,
+          "y": 129,
+          "width": 200.34375,
+          "height": 58.546875
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 32,
+          "y": 857.734375,
+          "width": 445.328125,
+          "height": 467.375
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 497.328125,
+          "y": 857.734375,
+          "width": 445.328125,
+          "height": 467.375
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 962.65625,
+          "y": 857.734375,
+          "width": 445.34375,
+          "height": 467.375
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 32,
+          "y": 1345.109375,
+          "width": 445.328125,
+          "height": 467.375
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 497.328125,
+          "y": 1345.109375,
+          "width": 445.328125,
+          "height": 467.375
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 962.65625,
+          "y": 1345.109375,
+          "width": 445.34375,
+          "height": 467.375
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "trends",
+      "route": "/trends",
+      "width": 768,
+      "height": 1024,
+      "dpr": 1,
+      "initialBytes": 104284,
+      "scrolledBytes": 104284,
+      "initialResponses": [
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 30714,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=384&q=75",
+          "status": 200,
+          "bytes": 15538,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-alphaevolve-v1.png&w=384&q=75",
+          "status": 200,
+          "bytes": 15140,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-inverse-design-v1.png&w=384&q=75",
+          "status": 200,
+          "bytes": 7968,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-surrogate-comparison-v1.png&w=384&q=75",
+          "status": 200,
+          "bytes": 8030,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-vision-prompts-v1.png&w=384&q=75",
+          "status": 200,
+          "bytes": 13170,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-literature-review-v1.png&w=384&q=75",
+          "status": 200,
+          "bytes": 13724,
+          "type": "image/webp",
+          "cache": "STALE"
+        }
+      ],
+      "initialImages": [
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 960px, (min-width: 1024px) 68vw, (min-width: 768px) 80vw, 100vw",
+          "loading": "auto",
+          "width": 563.203125,
+          "height": 408.78125,
+          "naturalWidth": 614,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=384&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 340,
+          "height": 191.25,
+          "naturalWidth": 384,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-inverse-design-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-inverse-design-v1.png&w=384&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 340,
+          "height": 191.25,
+          "naturalWidth": 384,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-alphaevolve-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-alphaevolve-v1.png&w=384&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 340,
+          "height": 191.25,
+          "naturalWidth": 384,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-literature-review-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-literature-review-v1.png&w=384&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 340,
+          "height": 191.25,
+          "naturalWidth": 384,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-surrogate-comparison-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-surrogate-comparison-v1.png&w=384&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 340,
+          "height": 191.25,
+          "naturalWidth": 384,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-vision-prompts-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-vision-prompts-v1.png&w=384&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 340,
+          "height": 191.25,
+          "naturalWidth": 384,
+          "visible": false
+        }
+      ],
+      "layout": [
+        {
+          "tag": "H1",
+          "x": 32,
+          "y": 129,
+          "width": 200.34375,
+          "height": 39.03125
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 32,
+          "y": 801.8125,
+          "width": 342,
+          "height": 409.25
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 394,
+          "y": 801.8125,
+          "width": 342,
+          "height": 409.25
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 32,
+          "y": 1231.0625,
+          "width": 342,
+          "height": 409.25
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 394,
+          "y": 1231.0625,
+          "width": 342,
+          "height": 409.25
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 32,
+          "y": 1660.3125,
+          "width": 342,
+          "height": 409.25
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 394,
+          "y": 1660.3125,
+          "width": 342,
+          "height": 409.25
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "trends",
+      "route": "/trends",
+      "width": 390,
+      "height": 844,
+      "dpr": 1,
+      "initialBytes": 79122,
+      "scrolledBytes": 154440,
+      "initialResponses": [
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 30714,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-inverse-design-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 15790,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-alphaevolve-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 32618,
+          "type": "image/webp",
+          "cache": "HIT"
+        }
+      ],
+      "initialImages": [
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 960px, (min-width: 1024px) 68vw, (min-width: 768px) 80vw, 100vw",
+          "loading": "auto",
+          "width": 350,
+          "height": 240,
+          "naturalWidth": 390,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 390,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-inverse-design-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-inverse-design-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 390,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-alphaevolve-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-alphaevolve-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 390,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-literature-review-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-surrogate-comparison-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-vision-prompts-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 0,
+          "visible": false
+        }
+      ],
+      "layout": [
+        {
+          "tag": "H1",
+          "x": 20,
+          "y": 117,
+          "width": 175.296875,
+          "height": 39.03125
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 20,
+          "y": 1090.203125,
+          "width": 350,
+          "height": 413.75
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 20,
+          "y": 1523.953125,
+          "width": 350,
+          "height": 391.75
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 20,
+          "y": 1935.703125,
+          "width": 350,
+          "height": 413.75
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 20,
+          "y": 2369.453125,
+          "width": 350,
+          "height": 391.75
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 20,
+          "y": 2781.203125,
+          "width": 350,
+          "height": 413.75
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 20,
+          "y": 3214.953125,
+          "width": 350,
+          "height": 413.75
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "trends",
+      "route": "/trends",
+      "width": 390,
+      "height": 844,
+      "dpr": 2,
+      "initialBytes": 113510,
+      "scrolledBytes": 224044,
+      "initialResponses": [
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=828&q=75",
+          "status": 200,
+          "bytes": 43058,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-inverse-design-v1.png&w=828&q=75",
+          "status": 200,
+          "bytes": 22242,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-alphaevolve-v1.png&w=828&q=75",
+          "status": 200,
+          "bytes": 48210,
+          "type": "image/webp",
+          "cache": "HIT"
+        }
+      ],
+      "initialImages": [
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=828&q=75",
+          "sizes": "(min-width: 1440px) 960px, (min-width: 1024px) 68vw, (min-width: 768px) 80vw, 100vw",
+          "loading": "auto",
+          "width": 350,
+          "height": 240,
+          "naturalWidth": 390,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=828&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 390,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-inverse-design-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-inverse-design-v1.png&w=828&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 390,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-alphaevolve-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-alphaevolve-v1.png&w=828&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 390,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-literature-review-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-surrogate-comparison-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-vision-prompts-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 0,
+          "visible": false
+        }
+      ],
+      "layout": [
+        {
+          "tag": "H1",
+          "x": 20,
+          "y": 117,
+          "width": 175.296875,
+          "height": 39.03125
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 20,
+          "y": 1090.203125,
+          "width": 350,
+          "height": 413.75
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 20,
+          "y": 1523.953125,
+          "width": 350,
+          "height": 391.75
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 20,
+          "y": 1935.703125,
+          "width": 350,
+          "height": 413.75
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 20,
+          "y": 2369.453125,
+          "width": 350,
+          "height": 391.75
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 20,
+          "y": 2781.203125,
+          "width": 350,
+          "height": 413.75
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 20,
+          "y": 3214.953125,
+          "width": 350,
+          "height": 413.75
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "article",
+      "route": "/cases/lettuce-biomass-estimation",
+      "width": 1440,
+      "height": 900,
+      "dpr": 1,
+      "initialBytes": 17300,
+      "scrolledBytes": 92054,
+      "initialResponses": [
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=384&q=75",
+          "status": 200,
+          "bytes": 14994,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fcase-periodontal-xray-v1.png&w=64&q=75",
+          "status": 200,
+          "bytes": 806,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fcase-concrete-crack-v1.png&w=64&q=75",
+          "status": 200,
+          "bytes": 542,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-vision-prompts-v1.png&w=64&q=75",
+          "status": 200,
+          "bytes": 958,
+          "type": "image/webp",
+          "cache": "STALE"
+        }
+      ],
+      "initialImages": [
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=384&q=75",
+          "sizes": "(min-width: 1280px) 280px, (min-width: 768px) calc(100vw - 112px), calc(100vw - 40px)",
+          "loading": "auto",
+          "width": 280,
+          "height": 232,
+          "naturalWidth": 280,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-periodontal-xray-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fcase-periodontal-xray-v1.png&w=64&q=75",
+          "sizes": "64px",
+          "loading": "lazy",
+          "width": 64,
+          "height": 56,
+          "naturalWidth": 64,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-concrete-crack-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fcase-concrete-crack-v1.png&w=64&q=75",
+          "sizes": "64px",
+          "loading": "lazy",
+          "width": 64,
+          "height": 56,
+          "naturalWidth": 64,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-vision-prompts-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-vision-prompts-v1.png&w=64&q=75",
+          "sizes": "64px",
+          "loading": "lazy",
+          "width": 64,
+          "height": 56,
+          "naturalWidth": 64,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-periodontal-xray-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "(min-width: 1440px) 460px, (min-width: 768px) 33vw, 100vw",
+          "loading": "lazy",
+          "width": 446,
+          "height": 250.875,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-concrete-crack-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "(min-width: 1440px) 460px, (min-width: 768px) 33vw, 100vw",
+          "loading": "lazy",
+          "width": 446,
+          "height": 250.875,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-vision-prompts-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "(min-width: 1440px) 460px, (min-width: 768px) 33vw, 100vw",
+          "loading": "lazy",
+          "width": 446,
+          "height": 250.875,
+          "naturalWidth": 0,
+          "visible": false
+        }
+      ],
+      "layout": [
+        {
+          "tag": "DIV",
+          "x": 32,
+          "y": 117.5,
+          "width": 1376,
+          "height": 5196.28125
+        },
+        {
+          "tag": "H1",
+          "x": 345,
+          "y": 171,
+          "width": 366,
+          "height": 81
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "article",
+      "route": "/cases/lettuce-biomass-estimation",
+      "width": 768,
+      "height": 1024,
+      "dpr": 1,
+      "initialBytes": 39342,
+      "scrolledBytes": 60896,
+      "initialResponses": [
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=750&q=75",
+          "status": 200,
+          "bytes": 39342,
+          "type": "image/webp",
+          "cache": "STALE"
+        }
+      ],
+      "initialImages": [
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=750&q=75",
+          "sizes": "(min-width: 1280px) 280px, (min-width: 768px) calc(100vw - 112px), calc(100vw - 40px)",
+          "loading": "auto",
+          "width": 654,
+          "height": 425.09375,
+          "naturalWidth": 656,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-periodontal-xray-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "64px",
+          "loading": "lazy",
+          "width": 64,
+          "height": 56,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-concrete-crack-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "64px",
+          "loading": "lazy",
+          "width": 64,
+          "height": 56,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-vision-prompts-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "64px",
+          "loading": "lazy",
+          "width": 64,
+          "height": 56,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-periodontal-xray-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "(min-width: 1440px) 460px, (min-width: 768px) 33vw, 100vw",
+          "loading": "lazy",
+          "width": 222,
+          "height": 124.875,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-concrete-crack-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "(min-width: 1440px) 460px, (min-width: 768px) 33vw, 100vw",
+          "loading": "lazy",
+          "width": 222,
+          "height": 124.875,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-vision-prompts-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "(min-width: 1440px) 460px, (min-width: 768px) 33vw, 100vw",
+          "loading": "lazy",
+          "width": 222,
+          "height": 124.875,
+          "naturalWidth": 0,
+          "visible": false
+        }
+      ],
+      "layout": [
+        {
+          "tag": "DIV",
+          "x": 32,
+          "y": 117.5,
+          "width": 704,
+          "height": 6755.015625
+        },
+        {
+          "tag": "H1",
+          "x": 57,
+          "y": 660.09375,
+          "width": 654,
+          "height": 40.5
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "article",
+      "route": "/cases/lettuce-biomass-estimation",
+      "width": 390,
+      "height": 844,
+      "dpr": 1,
+      "initialBytes": 14994,
+      "scrolledBytes": 92054,
+      "initialResponses": [
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=384&q=75",
+          "status": 200,
+          "bytes": 14994,
+          "type": "image/webp",
+          "cache": "HIT"
+        }
+      ],
+      "initialImages": [
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=384&q=75",
+          "sizes": "(min-width: 1280px) 280px, (min-width: 768px) calc(100vw - 112px), calc(100vw - 40px)",
+          "loading": "auto",
+          "width": 350,
+          "height": 227.5,
+          "naturalWidth": 350,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-periodontal-xray-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "64px",
+          "loading": "lazy",
+          "width": 64,
+          "height": 56,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-concrete-crack-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "64px",
+          "loading": "lazy",
+          "width": 64,
+          "height": 56,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-vision-prompts-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "64px",
+          "loading": "lazy",
+          "width": 64,
+          "height": 56,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-periodontal-xray-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "(min-width: 1440px) 460px, (min-width: 768px) 33vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-concrete-crack-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "(min-width: 1440px) 460px, (min-width: 768px) 33vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-vision-prompts-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "(min-width: 1440px) 460px, (min-width: 768px) 33vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 0,
+          "visible": false
+        }
+      ],
+      "layout": [
+        {
+          "tag": "DIV",
+          "x": 20,
+          "y": 113.5,
+          "width": 350,
+          "height": 8792.828125
+        },
+        {
+          "tag": "H1",
+          "x": 20,
+          "y": 437.5,
+          "width": 350,
+          "height": 70.1875
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "article",
+      "route": "/cases/lettuce-biomass-estimation",
+      "width": 390,
+      "height": 844,
+      "dpr": 2,
+      "initialBytes": 39342,
+      "scrolledBytes": 153522,
+      "initialResponses": [
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=750&q=75",
+          "status": 200,
+          "bytes": 39342,
+          "type": "image/webp",
+          "cache": "HIT"
+        }
+      ],
+      "initialImages": [
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=750&q=75",
+          "sizes": "(min-width: 1280px) 280px, (min-width: 768px) calc(100vw - 112px), calc(100vw - 40px)",
+          "loading": "auto",
+          "width": 350,
+          "height": 227.5,
+          "naturalWidth": 350,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-periodontal-xray-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "64px",
+          "loading": "lazy",
+          "width": 64,
+          "height": 56,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-concrete-crack-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "64px",
+          "loading": "lazy",
+          "width": 64,
+          "height": 56,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-vision-prompts-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "64px",
+          "loading": "lazy",
+          "width": 64,
+          "height": 56,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-periodontal-xray-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "(min-width: 1440px) 460px, (min-width: 768px) 33vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-concrete-crack-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "(min-width: 1440px) 460px, (min-width: 768px) 33vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 0,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-vision-prompts-v1.png&w=3840&q=75",
+          "currentSrc": "",
+          "sizes": "(min-width: 1440px) 460px, (min-width: 768px) 33vw, 100vw",
+          "loading": "lazy",
+          "width": 348,
+          "height": 195.75,
+          "naturalWidth": 0,
+          "visible": false
+        }
+      ],
+      "layout": [
+        {
+          "tag": "DIV",
+          "x": 20,
+          "y": 113.5,
+          "width": 350,
+          "height": 8792.828125
+        },
+        {
+          "tag": "H1",
+          "x": 20,
+          "y": 437.5,
+          "width": 350,
+          "height": 70.1875
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "home",
+      "route": "/",
+      "width": 2880,
+      "height": 1080,
+      "dpr": 1,
+      "initialBytes": 97850,
+      "scrolledBytes": 97850,
+      "initialResponses": [
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Flabbridge-hero-v1.png&w=828&q=75",
+          "status": 200,
+          "bytes": 26028,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fai-trends-card-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 9804,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fresearch-cases-card-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 9144,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-inverse-design-v1.png&w=384&q=75",
+          "status": 200,
+          "bytes": 7968,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ffind-experts-card-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 14228,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=384&q=75",
+          "status": 200,
+          "bytes": 15538,
+          "type": "image/webp",
+          "cache": "STALE"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-alphaevolve-v1.png&w=384&q=75",
+          "status": 200,
+          "bytes": 15140,
+          "type": "image/webp",
+          "cache": "STALE"
+        }
+      ],
+      "initialImages": [
+        {
+          "src": "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Flabbridge-hero-v1.png&w=828&q=75",
+          "sizes": "",
+          "loading": "lazy",
+          "width": 756.8125,
+          "height": 378,
+          "naturalWidth": 759,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fresearch-cases-card-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fresearch-cases-card-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 460px, (min-width: 1024px) 33vw, 100vw",
+          "loading": "lazy",
+          "width": 454,
+          "height": 236.5,
+          "naturalWidth": 460,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fai-trends-card-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fai-trends-card-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 460px, (min-width: 1024px) 33vw, 100vw",
+          "loading": "lazy",
+          "width": 454,
+          "height": 236.5,
+          "naturalWidth": 460,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ffind-experts-card-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ffind-experts-card-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 460px, (min-width: 1024px) 33vw, 100vw",
+          "loading": "lazy",
+          "width": 454,
+          "height": 236.5,
+          "naturalWidth": 460,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-co-scientist-v1.png&w=384&q=75",
+          "sizes": "(min-width: 1440px) 350px, (min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348.65625,
+          "height": 132,
+          "naturalWidth": 350,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-inverse-design-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-inverse-design-v1.png&w=384&q=75",
+          "sizes": "(min-width: 1440px) 350px, (min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348.671875,
+          "height": 132,
+          "naturalWidth": 350,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-alphaevolve-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-alphaevolve-v1.png&w=384&q=75",
+          "sizes": "(min-width: 1440px) 350px, (min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 348.65625,
+          "height": 132,
+          "naturalWidth": 350,
+          "visible": true
+        }
+      ],
+      "layout": [
+        {
+          "tag": "H1",
+          "x": 788,
+          "y": 140.25,
+          "width": 571.1875,
+          "height": 116
+        },
+        {
+          "tag": "DIV",
+          "x": 740,
+          "y": 439,
+          "width": 1400,
+          "height": 238.5
+        }
+      ],
+      "errors": []
+    },
+    {
+      "name": "cases",
+      "route": "/cases",
+      "width": 2880,
+      "height": 1080,
+      "dpr": 1,
+      "initialBytes": 276976,
+      "scrolledBytes": 276976,
+      "initialResponses": [
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=1080&q=75",
+          "status": 200,
+          "bytes": 65586,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 31298,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fcase-periodontal-xray-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 18054,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 34638,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fgenerated%2Fcase-concrete-crack-v1.png&w=640&q=75",
+          "status": 200,
+          "bytes": 30656,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fphotos%2Fcells-render.jpg&w=640&q=75",
+          "status": 200,
+          "bytes": 45868,
+          "type": "image/webp",
+          "cache": "HIT"
+        },
+        {
+          "url": "/_next/image?url=%2Fphotos%2Fbrain-network.jpg&w=640&q=75",
+          "status": 200,
+          "bytes": 50876,
+          "type": "image/webp",
+          "cache": "HIT"
+        }
+      ],
+      "initialImages": [
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=1080&q=75",
+          "sizes": "(min-width: 1440px) 960px, (min-width: 1024px) 68vw, (min-width: 768px) 80vw, 100vw",
+          "loading": "auto",
+          "width": 952,
+          "height": 445.1875,
+          "naturalWidth": 960,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Ftrend-mattergen-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 451.328125,
+          "height": 253.859375,
+          "naturalWidth": 440,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fcase-lettuce-biomass-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 451.328125,
+          "height": 253.859375,
+          "naturalWidth": 440,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-periodontal-xray-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fcase-periodontal-xray-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 451.34375,
+          "height": 253.875,
+          "naturalWidth": 440,
+          "visible": true
+        },
+        {
+          "src": "/_next/image?url=%2Fgenerated%2Fcase-concrete-crack-v1.png&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fgenerated%2Fcase-concrete-crack-v1.png&w=640&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 451.328125,
+          "height": 253.859375,
+          "naturalWidth": 440,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fphotos%2Fcells-render.jpg&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fphotos%2Fcells-render.jpg&w=640&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 451.328125,
+          "height": 253.859375,
+          "naturalWidth": 352,
+          "visible": false
+        },
+        {
+          "src": "/_next/image?url=%2Fphotos%2Fbrain-network.jpg&w=3840&q=75",
+          "currentSrc": "/_next/image?url=%2Fphotos%2Fbrain-network.jpg&w=640&q=75",
+          "sizes": "(min-width: 1440px) 440px, (min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw",
+          "loading": "lazy",
+          "width": 451.34375,
+          "height": 253.875,
+          "naturalWidth": 352,
+          "visible": false
+        }
+      ],
+      "layout": [
+        {
+          "tag": "H1",
+          "x": 740,
+          "y": 129,
+          "width": 310.828125,
+          "height": 58.546875
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 740,
+          "y": 857.734375,
+          "width": 453.328125,
+          "height": 471.875
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 1213.328125,
+          "y": 857.734375,
+          "width": 453.328125,
+          "height": 471.875
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 1686.65625,
+          "y": 857.734375,
+          "width": 453.34375,
+          "height": 471.875
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 740,
+          "y": 1349.609375,
+          "width": 453.328125,
+          "height": 471.875
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 1213.328125,
+          "y": 1349.609375,
+          "width": 453.328125,
+          "height": 471.875
+        },
+        {
+          "tag": "ARTICLE",
+          "x": 1686.65625,
+          "y": 1349.609375,
+          "width": 453.34375,
+          "height": 471.875
+        }
+      ],
+      "errors": []
+    }
+  ],
+  "images": [
+    {
+      "path": "generated/ai-trends-card-v1.png",
+      "bytes": 1911014,
+      "sha256": "dd7ead26053ec3a2e17e820d8bd0488cee1092607bc142db9625e9a96412a825"
+    },
+    {
+      "path": "generated/case-battery-cycling-v1.png",
+      "bytes": 1868968,
+      "sha256": "61617fab6ac1147c1165d2816ce9d5e07e70e1546a8dbcf44655721e3be0729b"
+    },
+    {
+      "path": "generated/case-concrete-crack-v1.png",
+      "bytes": 2463682,
+      "sha256": "d4ee815945764c2e6ee93680b9a9a937accbece3cbc9dc90f8e9c414ab184b4f"
+    },
+    {
+      "path": "generated/case-fluid-channel-v1.png",
+      "bytes": 2383006,
+      "sha256": "8c5ae77d862fc1fde3a97bea02628ef109947b04be465ce6b43541d6a0ed9803"
+    },
+    {
+      "path": "generated/case-inscription-restoration-v1.png",
+      "bytes": 3202984,
+      "sha256": "3231008c91220253751e73da52f7bd24c75d41142f74b70ce8d214e7b7bc214a"
+    },
+    {
+      "path": "generated/case-lettuce-biomass-v1.png",
+      "bytes": 2205512,
+      "sha256": "11980d811c6ee8f7e1dbf5964a76e03e4ea1f9cc01479115720b00e902c32f21"
+    },
+    {
+      "path": "generated/case-multimodal-research-v1.png",
+      "bytes": 2115156,
+      "sha256": "e27c032ae8f37146edea767f9a19e1a5936f797b8bbd0f9e2fe5093e833b32b2"
+    },
+    {
+      "path": "generated/case-orca-acoustics-v1.png",
+      "bytes": 2095954,
+      "sha256": "fce3b9c4adb0ea9240a36dfc9cb737af72521a1f800e48641f9892df6464e200"
+    },
+    {
+      "path": "generated/case-periodontal-xray-v1.png",
+      "bytes": 1997453,
+      "sha256": "e597ac3eb4e5fb5100b8b2cd538d7346a4f4dc136cdc7b325f4118a0dafc2055"
+    },
+    {
+      "path": "generated/case-protein-design-v1.png",
+      "bytes": 1870709,
+      "sha256": "822904f449b04e7317b224713a83fa2fb92fff4c11660d2d41fe84b7e1e47cd5"
+    },
+    {
+      "path": "generated/find-experts-card-v1.png",
+      "bytes": 1715377,
+      "sha256": "897c02df7b3d2671e0fbf77cfb08c983d5dd6280701bb70e61a80ece2b8ea3b2"
+    },
+    {
+      "path": "generated/labbridge-hero-v1.png",
+      "bytes": 1973516,
+      "sha256": "59987d185144c7be6a363b726d8148ed84e2ddc0b54011ca75db1517a7606c27"
+    },
+    {
+      "path": "generated/research-cases-card-v1.png",
+      "bytes": 1811030,
+      "sha256": "03c3f3d74b3883277ca26c58fd64fe1f39e8ac693005f62fd7dc94b60cb1bc76"
+    },
+    {
+      "path": "generated/trend-alphaevolve-v1.png",
+      "bytes": 2196347,
+      "sha256": "8fa5f0cd35339812b6e235af85efab2f59c33616dca245a7a7f42c27617aab87"
+    },
+    {
+      "path": "generated/trend-co-scientist-v1.png",
+      "bytes": 2103938,
+      "sha256": "90bb0dd730485be149333486170ca28b57881fd738709c4e1961b3e14e4514bd"
+    },
+    {
+      "path": "generated/trend-experiment-search-v1.png",
+      "bytes": 1827838,
+      "sha256": "4aed67654a9fdaa60bf1703578bbc9e9a0ac744dce0d2ffe9bd946c0d49a43fa"
+    },
+    {
+      "path": "generated/trend-graph-messages-v1.png",
+      "bytes": 1724125,
+      "sha256": "182d9429e04ce6b49bbe382421e9c7c70d10a908826126b21f2bd041537f618f"
+    },
+    {
+      "path": "generated/trend-literature-review-v1.png",
+      "bytes": 2233437,
+      "sha256": "e18e61eb37ffdb82ed8ae8d96d0b6be3d63d0da7a6eb5cf69872b4facfa618ee"
+    },
+    {
+      "path": "generated/trend-mattergen-inverse-design-v1.png",
+      "bytes": 1871258,
+      "sha256": "c99e686c7b7f69499df45003d9db9c9410ab1b606f94ea445b6c216637ab6712"
+    },
+    {
+      "path": "generated/trend-mattergen-v1.png",
+      "bytes": 2158294,
+      "sha256": "092560a6652405659e74725d8da0f743678988ca063a0e4c5141bb8de95f9518"
+    },
+    {
+      "path": "generated/trend-medical-review-v1.png",
+      "bytes": 1851801,
+      "sha256": "861b6c038a9c9a88dcbf1863dc4ec83e0bdb8810068031dd9e9fece184086350"
+    },
+    {
+      "path": "generated/trend-molecule-denoising-v1.png",
+      "bytes": 1782767,
+      "sha256": "d058acfa28d47f664793056ed866cb07f5e39287f65793ae9fb904b25e03b610"
+    },
+    {
+      "path": "generated/trend-orchard-vision-v1.png",
+      "bytes": 2271568,
+      "sha256": "bfbd7161634d53c7d0983dd719c9b9e49263ef16ae425bbd92a2a48d53acdf88"
+    },
+    {
+      "path": "generated/trend-private-data-boundary-v1.png",
+      "bytes": 1824665,
+      "sha256": "95568378befb1b6600c1c87f5e9886b694538faf44c55a5d395be413eb358ddb"
+    },
+    {
+      "path": "generated/trend-reproducibility-records-v1.png",
+      "bytes": 1786296,
+      "sha256": "ae53ee341eb7f487df90ba6b3f387f27f467f4008567d7c1412cd6c1d5551b32"
+    },
+    {
+      "path": "generated/trend-sensor-logging-v1.png",
+      "bytes": 2262564,
+      "sha256": "933461a6a053ad666646bd2f5c0ae6ae9cac06dd2af1c1948537f00f17e8ed16"
+    },
+    {
+      "path": "generated/trend-surrogate-comparison-v1.png",
+      "bytes": 2090355,
+      "sha256": "dc76cb0cc714d5e549f235d4a2289afa9acb6485789b0a1f74abeba4d2eca9f9"
+    },
+    {
+      "path": "generated/trend-vision-prompts-v1.png",
+      "bytes": 1998774,
+      "sha256": "3b1db0aaf2dffe34c7bbd78085b44a97e3fffc32726b9f39c5ba3fee8108c8e5"
+    },
+    {
+      "path": "photos/brain-network.jpg",
+      "bytes": 91760,
+      "sha256": "8360ac340509f43d1a7d2dc438705dc3f6ae88cd418737a8a34cb604f519af20"
+    },
+    {
+      "path": "photos/brain.jpg",
+      "bytes": 162961,
+      "sha256": "b214bf9f6e21226a799685d6bfaef305a8eb0a0e9e65e6b67faecf9c7df7c39d"
+    },
+    {
+      "path": "photos/cells-render.jpg",
+      "bytes": 82446,
+      "sha256": "4f0dbd1e19c7a7232a210caae71ff748aa1f9b6f9007c922dd5839c808574045"
+    },
+    {
+      "path": "photos/cells.jpg",
+      "bytes": 375323,
+      "sha256": "fb81b15b7c24f819ebefcc4a7d0b48b2786400e39a54b41e3632dfafe716dca4"
+    },
+    {
+      "path": "photos/chart.jpg",
+      "bytes": 159318,
+      "sha256": "fbb2dbb5b9f2bf132bc6ad4b8d240ecdf0b13e765b6be29d5f72eb0a276e4f1b"
+    },
+    {
+      "path": "photos/climate.jpg",
+      "bytes": 213606,
+      "sha256": "063a6f0bcb1081ea4a1080edd521f8b8ab01b7fb2cfaf3d4ce0103dcd5bdc472"
+    },
+    {
+      "path": "photos/earth.jpg",
+      "bytes": 200049,
+      "sha256": "548f75cfef5b2f05862b5d035cd574ba61ddf068d791e5ce5b2d5cfd134a7a1d"
+    },
+    {
+      "path": "photos/histology.jpg",
+      "bytes": 115420,
+      "sha256": "13fc6a80d1ed29c9d381e7249ea8c267b4e082e7ac97dbd0d1d4c0587daadf88"
+    },
+    {
+      "path": "photos/lab-team.jpg",
+      "bytes": 58158,
+      "sha256": "c883624d1ff5a490e1d43c3cd93186221243fd1ba2e89d122bb74d082a547f69"
+    },
+    {
+      "path": "photos/lab.jpg",
+      "bytes": 689308,
+      "sha256": "da5fdfe302ce48008220b70605fd0b350b4b23ea812a63e79b410d72207ad1fa"
+    },
+    {
+      "path": "photos/molecule.jpg",
+      "bytes": 197590,
+      "sha256": "b494b0459fb6b821c0a83fc908bc2652e674721debebfbe03537c265114af480"
+    },
+    {
+      "path": "photos/papers.jpg",
+      "bytes": 202481,
+      "sha256": "158b80f456f2303e61f81a7f6ea2823924b0e8d1233b88402a2228cfa26cd091"
+    },
+    {
+      "path": "photos/people.jpg",
+      "bytes": 118231,
+      "sha256": "b966bef6411ead2a3453517a8cc9394c45fbad225511446cd54bd9689b70c7b0"
+    },
+    {
+      "path": "photos/petri.jpg",
+      "bytes": 302018,
+      "sha256": "79f5eafe3bd768df14f868976c85ab75525c4143af22af9445787d1f8da86a23"
+    },
+    {
+      "path": "photos/pexel-cells.jpg",
+      "bytes": 159453,
+      "sha256": "50967199a1d4768299b9c96458869d34af17cab4af3ac8b4cb60d81c0dc3c555"
+    },
+    {
+      "path": "photos/pexel-lab2.jpg",
+      "bytes": 177507,
+      "sha256": "7e7dbd1bf53d28796a4cacd7f8079836eb539f1eee40a738f5b73fd388556b54"
+    },
+    {
+      "path": "photos/pexel-scope.jpg",
+      "bytes": 194337,
+      "sha256": "50216ab4d7f339e0ac648df7c5b209b282f9614ac02bf4b306bb311337d5a251"
+    },
+    {
+      "path": "photos/protein-render.jpg",
+      "bytes": 64764,
+      "sha256": "164e5e1f84da2d2dcdb2c70df0e475e20e7dc67d27f0b4be103fac1f47039e4d"
+    },
+    {
+      "path": "photos/protein.jpg",
+      "bytes": 275722,
+      "sha256": "1962f8f5863e42c5150527d1b0f162181c6236293dd9a4ac6ec7fd283f54bbfd"
+    },
+    {
+      "path": "photos/scope.jpg",
+      "bytes": 216323,
+      "sha256": "c9cde8ab5c5ce0afa31056f76e8364da4caabc1da5634586ae464dbcb058b1e8"
+    },
+    {
+      "path": "photos/solar.jpg",
+      "bytes": 246563,
+      "sha256": "fc1429c493f6c80c814d5b1d038fdad9d907723c0301aa2f6540c53e200ae4a4"
+    },
+    {
+      "path": "photos/tissue.jpg",
+      "bytes": 282461,
+      "sha256": "a3b80ce73f4d91cd7f7218e1f5b305303f0ab15cd53a17916646a9a4f1591656"
+    },
+    {
+      "path": "photos/turbines-sunset.jpg",
+      "bytes": 47639,
+      "sha256": "119d89d347cbc9ab136317630f6d7e48af032faffa36e8f7a9c2eb5dddc8eac5"
+    },
+    {
+      "path": "photos/turbines.jpg",
+      "bytes": 253441,
+      "sha256": "be8210f78c605abac1e0f82ffbfc6a18942d376c989569b1b672008aadac2bc4"
+    },
+    {
+      "path": "photos/waves.jpg",
+      "bytes": 225006,
+      "sha256": "302a6edacd566622b7d7e417092e8fe5012b1cfece0891c33ce666c0f952aa8b"
+    },
+    {
+      "path": "photos/xray.jpg",
+      "bytes": 157550,
+      "sha256": "f3ede0e19827cf7c8a916f850c7694afc967563d5ad59f7a93aa06908b394d2c"
+    },
+    {
+      "path": "profile-images/default-expert.png",
+      "bytes": 1392050,
+      "sha256": "b760e361c2cc189a636d608e78b8b788f02463741ea90c0ea838e579f51aeb02"
+    },
+    {
+      "path": "profile-images/default-researcher.png",
+      "bytes": 1444781,
+      "sha256": "610a2915235fa9a1d0d5dda4f59b177cc32d7767591c9adc6e8fa482df3f221f"
+    }
+  ],
+  "metric": "로컬 HTTP 이미지 응답 본문 바이트 합계. JS·HTML·헤더·실제 모바일 회선 속도는 제외. 매 조건 브라우저 캐시 분리, 서버 최적화 캐시는 남을 수 있음.",
+  "comparison": [
+    {
+      "name": "home",
+      "width": 1440,
+      "dpr": 1,
+      "beforeBytes": 6244093,
+      "afterBytes": 97850,
+      "savedPercent": 98.4
+    },
+    {
+      "name": "home",
+      "width": 768,
+      "dpr": 1,
+      "beforeBytes": 6228469,
+      "afterBytes": 87992,
+      "savedPercent": 98.6
+    },
+    {
+      "name": "home",
+      "width": 390,
+      "dpr": 1,
+      "beforeBytes": 6212299,
+      "afterBytes": 112298,
+      "savedPercent": 98.2
+    },
+    {
+      "name": "home",
+      "width": 390,
+      "dpr": 2,
+      "beforeBytes": 6228469,
+      "afterBytes": 162856,
+      "savedPercent": 97.4
+    },
+    {
+      "name": "cases",
+      "width": 1440,
+      "dpr": 1,
+      "beforeBytes": 8999147,
+      "afterBytes": 276976,
+      "savedPercent": 96.9
+    },
+    {
+      "name": "cases",
+      "width": 768,
+      "dpr": 1,
+      "beforeBytes": 8999147,
+      "afterBytes": 147930,
+      "savedPercent": 98.4
+    },
+    {
+      "name": "cases",
+      "width": 390,
+      "dpr": 1,
+      "beforeBytes": 8999147,
+      "afterBytes": 83990,
+      "savedPercent": 99.1
+    },
+    {
+      "name": "cases",
+      "width": 390,
+      "dpr": 2,
+      "beforeBytes": 8999147,
+      "afterBytes": 120624,
+      "savedPercent": 98.7
+    },
+    {
+      "name": "trends",
+      "width": 1440,
+      "dpr": 1,
+      "beforeBytes": 12494109,
+      "afterBytes": 215184,
+      "savedPercent": 98.3
+    },
+    {
+      "name": "trends",
+      "width": 768,
+      "dpr": 1,
+      "beforeBytes": 12494109,
+      "afterBytes": 104284,
+      "savedPercent": 99.2
+    },
+    {
+      "name": "trends",
+      "width": 390,
+      "dpr": 1,
+      "beforeBytes": 12494109,
+      "afterBytes": 79122,
+      "savedPercent": 99.4
+    },
+    {
+      "name": "trends",
+      "width": 390,
+      "dpr": 2,
+      "beforeBytes": 12494109,
+      "afterBytes": 113510,
+      "savedPercent": 99.1
+    },
+    {
+      "name": "article",
+      "width": 1440,
+      "dpr": 1,
+      "beforeBytes": 8665421,
+      "afterBytes": 17300,
+      "savedPercent": 99.8
+    },
+    {
+      "name": "article",
+      "width": 768,
+      "dpr": 1,
+      "beforeBytes": 8665421,
+      "afterBytes": 39342,
+      "savedPercent": 99.5
+    },
+    {
+      "name": "article",
+      "width": 390,
+      "dpr": 1,
+      "beforeBytes": 8665421,
+      "afterBytes": 14994,
+      "savedPercent": 99.8
+    },
+    {
+      "name": "article",
+      "width": 390,
+      "dpr": 2,
+      "beforeBytes": 8665421,
+      "afterBytes": 39342,
+      "savedPercent": 99.5
+    },
+    {
+      "name": "home",
+      "width": 2880,
+      "dpr": 1,
+      "beforeBytes": 6333083,
+      "afterBytes": 97850,
+      "savedPercent": 98.5
+    },
+    {
+      "name": "cases",
+      "width": 2880,
+      "dpr": 1,
+      "beforeBytes": 8999147,
+      "afterBytes": 276976,
+      "savedPercent": 96.9
+    }
+  ],
+  "interaction": "목록 페이지·필터·이미지 로딩, 용어 click/Enter, 모바일 목차 이동·접힘 통과"
+}

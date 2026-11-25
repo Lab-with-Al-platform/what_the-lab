@@ -1,0 +1,17 @@
+{
+  "passed": 10,
+  "results": [
+    "first_page_shows_five_numbers_and_disables_previous",
+    "number_click_fetches_correct_rows_and_shifts_window",
+    "last_page_disables_next",
+    "arrow_moves_one_page_backward",
+    "responsive_1440",
+    "responsive_768",
+    "responsive_390",
+    "single_page_and_scope_change_reset",
+    "empty_results_disable_both_arrows",
+    "touch_targets_44px_without_horizontal_overflow"
+  ],
+  "page_errors": [],
+  "scope": "synthetic GET-only API, real frontend; no real DB requests"
+}

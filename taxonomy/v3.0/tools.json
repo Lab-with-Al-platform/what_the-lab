@@ -1,0 +1,258 @@
+[
+  {
+    "id": "TOOL001",
+    "name": "Python",
+    "type": "언어",
+    "description": "데이터·ML 개발에 사용되는 범용 프로그래밍 언어",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL002",
+    "name": "R",
+    "type": "언어",
+    "description": "통계·시각화 분석 언어",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL003",
+    "name": "SQL",
+    "type": "언어",
+    "description": "관계형 데이터 조회 및 변환",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL004",
+    "name": "PyTorch",
+    "type": "ML 프레임워크",
+    "description": "딥러닝 모델 학습 프레임워크",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL005",
+    "name": "TensorFlow",
+    "type": "ML 프레임워크",
+    "description": "딥러닝 모델 학습 프레임워크",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL006",
+    "name": "scikit-learn",
+    "type": "ML 라이브러리",
+    "description": "일반 머신러닝 라이브러리",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL007",
+    "name": "XGBoost",
+    "type": "ML 라이브러리",
+    "description": "부스팅 모델 라이브러리",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL008",
+    "name": "Hugging Face Transformers",
+    "type": "생성형·NLP",
+    "description": "사전학습 모델 활용",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL009",
+    "name": "LangChain",
+    "type": "생성형·NLP",
+    "description": "LLM 워크플로 프레임워크",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL010",
+    "name": "LlamaIndex",
+    "type": "생성형·NLP",
+    "description": "문서 검색·RAG 개발 프레임워크",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL011",
+    "name": "OpenCV",
+    "type": "비전",
+    "description": "영상처리 라이브러리",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL012",
+    "name": "MONAI",
+    "type": "비전·의료",
+    "description": "의료영상 AI 프레임워크",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL013",
+    "name": "Ultralytics YOLO",
+    "type": "비전",
+    "description": "객체 탐지 구현 도구",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL014",
+    "name": "OpenAI API",
+    "type": "모델 API",
+    "description": "상용 AI 모델 인터페이스",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL015",
+    "name": "PostgreSQL",
+    "type": "데이터베이스",
+    "description": "관계형 데이터베이스",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL016",
+    "name": "pgvector",
+    "type": "벡터 검색",
+    "description": "PostgreSQL 벡터 확장",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL017",
+    "name": "Elasticsearch",
+    "type": "검색",
+    "description": "문서 및 검색 엔진",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL018",
+    "name": "FAISS",
+    "type": "벡터 검색",
+    "description": "유사도 검색 라이브러리",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL019",
+    "name": "Airflow",
+    "type": "데이터 파이프라인",
+    "description": "작업 워크플로 오케스트레이션",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL020",
+    "name": "MLflow",
+    "type": "MLOps",
+    "description": "실험 추적·모델 관리",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL021",
+    "name": "Docker",
+    "type": "배포",
+    "description": "컨테이너 실행·배포",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL022",
+    "name": "Kubernetes",
+    "type": "배포",
+    "description": "컨테이너 운영 관리",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL023",
+    "name": "FastAPI",
+    "type": "백엔드",
+    "description": "Python API 프레임워크",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL024",
+    "name": "Next.js",
+    "type": "프론트엔드",
+    "description": "React 기반 웹 앱 프레임워크",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL025",
+    "name": "React",
+    "type": "프론트엔드",
+    "description": "UI 컴포넌트 프레임워크",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL026",
+    "name": "Spark",
+    "type": "빅데이터",
+    "description": "분산 데이터 처리",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL027",
+    "name": "QGIS",
+    "type": "공간 분석",
+    "description": "GIS 도구",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL028",
+    "name": "ArcGIS",
+    "type": "공간 분석",
+    "description": "공간 데이터 플랫폼",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL029",
+    "name": "Pandas",
+    "type": "데이터 처리",
+    "description": "표형 데이터 분석",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL030",
+    "name": "NumPy",
+    "type": "데이터 처리",
+    "description": "배열·수치 처리",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL031",
+    "name": "SHAP",
+    "type": "해석가능성",
+    "description": "특성 기여도 계산 도구",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  },
+  {
+    "id": "TOOL032",
+    "name": "Weights & Biases",
+    "type": "MLOps",
+    "description": "학습 실험·모델 추적",
+    "status": "pending_review",
+    "match_policy": "profile_optional_no_auto_capability"
+  }
+]

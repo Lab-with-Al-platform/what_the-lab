@@ -1,0 +1,714 @@
+[
+  {
+    "axis": "capability",
+    "term_id": "CAP001",
+    "term": "크롤링",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP002",
+    "term": "데이터 수집",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP003",
+    "term": "데이터 라벨링",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP004",
+    "term": "이미지 분할",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP005",
+    "term": "모델 검증",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP006",
+    "term": "문서 정보 추출",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP007",
+    "term": "MLOps",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP008",
+    "term": "통계 검정",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP009",
+    "term": "인과 추론",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP010",
+    "term": "A/B 테스트",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP011",
+    "term": "상관관계 분석",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP012",
+    "term": "시계열 예측",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP013",
+    "term": "일반 분류모델",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP014",
+    "term": "자연어 처리",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP015",
+    "term": "이미지 분류",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP016",
+    "term": "인과 추론",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP017",
+    "term": "텍스트 분류",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP018",
+    "term": "데이터 품질 검사",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP019",
+    "term": "문서 검색",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP020",
+    "term": "데이터 전처리",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP021",
+    "term": "데이터 정제",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP022",
+    "term": "객체 탐지",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP023",
+    "term": "이미지 분할",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP024",
+    "term": "객체 탐지",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP025",
+    "term": "객체 탐지",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP026",
+    "term": "영상 추적",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP027",
+    "term": "합성 이미지 생성",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP028",
+    "term": "그래프 딥러닝",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP029",
+    "term": "문서 정보 추출",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP030",
+    "term": "주제 모델링",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP031",
+    "term": "문서 검색",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP032",
+    "term": "RAG 구축",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP033",
+    "term": "RAG 구축",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP034",
+    "term": "일반 문서 검색",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP035",
+    "term": "텍스트 분류",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP036",
+    "term": "심리진단",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP037",
+    "term": "문서 요약",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP038",
+    "term": "음성 감정 분석",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP039",
+    "term": "음성 인식",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP040",
+    "term": "STT",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP041",
+    "term": "STT",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP042",
+    "term": "이미지 분류",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP043",
+    "term": "시계열 예측",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP044",
+    "term": "시계열 예측",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP045",
+    "term": "시계열 분석",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP046",
+    "term": "일반 이상 탐지",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP047",
+    "term": "위성영상 분석",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP048",
+    "term": "영상 분할",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP049",
+    "term": "GNN",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP050",
+    "term": "그래프·네트워크 분석",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP051",
+    "term": "LLM 사전학습",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP052",
+    "term": "일반 문서 검색",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP053",
+    "term": "정해진 규칙 자동화",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP054",
+    "term": "모델 미세조정",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP055",
+    "term": "프롬프트 설계",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP056",
+    "term": "이미지 복원",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP057",
+    "term": "데이터 증강",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP058",
+    "term": "GNN",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP059",
+    "term": "모델 하이퍼파라미터 최적화",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP060",
+    "term": "수리 최적화",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP061",
+    "term": "최적 제어",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP062",
+    "term": "강화학습",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP063",
+    "term": "객체 탐지",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP064",
+    "term": "AI 에이전트",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP065",
+    "term": "일반 표형 데이터 분석",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP066",
+    "term": "일반 3D 영상 분석",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP067",
+    "term": "재료 구조 실험",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP068",
+    "term": "시계열 예측",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP069",
+    "term": "물리 시뮬레이션",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP070",
+    "term": "실험 설계",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP071",
+    "term": "일반 수치 시뮬레이션",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP072",
+    "term": "LLM 응용",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP073",
+    "term": "데이터 품질 진단",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP074",
+    "term": "인과 추론",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP075",
+    "term": "수리 최적화",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP076",
+    "term": "데이터 파이프라인",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP077",
+    "term": "일반 DevOps",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP078",
+    "term": "성능 평가",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP079",
+    "term": "일반 데이터 보안",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP080",
+    "term": "모델 성능 평가",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP027",
+    "term": "Super Resolution",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP055",
+    "term": "LoRA",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP074",
+    "term": "SHAP",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP079",
+    "term": "연합학습",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP079",
+    "term": "Federated Learning",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "capability",
+    "term_id": "CAP079",
+    "term": "Differential Privacy",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD037",
+    "term": "Operations Research",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD063",
+    "term": "Consumer Behavior",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  },
+  {
+    "axis": "research_field",
+    "term_id": "FIELD083",
+    "term": "Service Design",
+    "relation": "RELATED",
+    "review_status": "pending_review",
+    "match_policy": "suggest_only"
+  }
+]

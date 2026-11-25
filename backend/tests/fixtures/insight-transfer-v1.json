@@ -1,0 +1,85 @@
+{
+  "schema_version": "insight_transfer_v1",
+  "bundle_id": "fictional-bundle-001",
+  "run_id": "offline-test-001",
+  "generated_at": "2026-10-28T01:00:00+09:00",
+  "settings_version": "fictional-settings-v1",
+  "generator": {
+    "tool": "manual-fixture",
+    "model": "no-model-called",
+    "prompt_version": "fixture-v1"
+  },
+  "items": [
+    {
+      "source_published": {"value": null, "precision": "unknown"},
+      "source_checked_at": "2026-10-28T00:55:00+09:00",
+      "access_notes": "가상 샘플입니다. 실제 출처에 접속하지 않았습니다.",
+      "rights_notes": "원문·삽화 없이 작성한 테스트용 문장입니다.",
+      "draft": {
+        "kind": "trend",
+        "source": {
+          "title": "가상 연구 설명",
+          "doi": null,
+          "url": "https://example.org/fictional-study",
+          "access_level": "unknown",
+          "bibliography_checked": false
+        },
+        "title": "가상 예시: AI의 예측을 확인하는 방법",
+        "slug": "fictional-ai-validation",
+        "summary": "실제 연구 결과가 아닌 전송 형식 검사 전용 예시입니다.",
+        "research_field": "가상 연구 분야",
+        "case_type": "research",
+        "claims": [
+          {
+            "field": "limitations",
+            "text": "가상 입력이므로 사실 검증과 게시 승인을 할 수 없습니다.",
+            "locator": "테스트 본문",
+            "verification": "needs_review",
+            "evidence_level": "unavailable"
+          }
+        ]
+      },
+      "article": {
+        "slug": "fictional-ai-validation",
+        "kind": "trend",
+        "title": "가상 예시: AI의 예측을 확인하는 방법",
+        "summary": "실제 연구 결과가 아닌 전송 형식 검사 전용 예시입니다.",
+        "field": "가상 연구 분야",
+        "sourceUrl": "https://example.org/fictional-study",
+        "doi": null,
+        "sections": [
+          {
+            "id": "limitations",
+            "title": "가상 예시와 한계",
+            "toc": "한계",
+            "paragraphs": [
+              "AI가 제안한 결과도 별도의 자료와 실험으로 확인해야 합니다. 이 문장은 테스트 예시입니다.",
+              {"kind": "interpretation", "text": "편집자의 해석도 출처의 사실과 구분하여 보존합니다."},
+              {"kind": "caution", "text": "이 원고는 실제 논문이나 게시용 글이 아닙니다."}
+            ],
+            "termIds": ["validation"],
+            "steps": [{"title": "직접 확인", "detail": "가상 입력과 결과를 비교합니다."}],
+            "chips": ["가상 샘플"]
+          }
+        ],
+        "topicId": "fictional-topic",
+        "topicLabel": "가상 분류",
+        "domains": ["가상 분야"],
+        "tags": ["가상 샘플"],
+        "source": "실제 출처 없음",
+        "publishedOn": "2026.10.28",
+        "readingMinutes": 1,
+        "cover": "chart",
+        "coverSrc": null,
+        "highlights": [],
+        "facts": [],
+        "technologies": [],
+        "relatedSlugs": [],
+        "glossary": [
+          {"id": "validation", "label": "검증", "definition": "결과가 맞는지 별도로 확인하는 과정입니다."}
+        ],
+        "sampleNotice": "형식 검사 전용 가상 원고. 게시 금지."
+      }
+    }
+  ]
+}

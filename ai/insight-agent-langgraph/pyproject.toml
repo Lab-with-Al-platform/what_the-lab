@@ -1,0 +1,32 @@
+[project]
+name = "insight-agent-langgraph-experiment"
+version = "0.0.0"
+description = "LangGraph 도입 가치 비교용 로컬 실험. 앱 실행기가 아닙니다."
+requires-python = ">=3.13"
+dependencies = [
+    "langgraph==1.2.18",
+    "cryptography>=50.0.2",
+    "fastapi>=0.143.0",
+    "httpx>=0.28.1",
+    "pyjwt>=2.15.1",
+    "python-dotenv>=1.2.4",
+    "pydantic>=2.10,<3",
+    "sqlalchemy>=2.0,<2.1",
+    "alembic>=1.13,<2",
+    "psycopg[binary]>=3.2,<4",
+    "pillow>=13.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8,<10",
+    "ruff>=0.12,<1",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [".", "../../backend"]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100

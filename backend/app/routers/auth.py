@@ -1,0 +1,193 @@
+"""디스코드 로그인 → 콜백(가입 또는 로그인) → JWT 쿠키 발급."""
+import secrets
+from typing import Annotated
+from urllib.parse import urlencode
+
+import httpx
+from fastapi import APIRouter, Cookie, Depends
+from fastapi.responses import RedirectResponse, Response
+
+from app import user_store
+from app.config import DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, DISCORD_REDIRECT_URI, FRONTEND_URL
+from app.discord_bot import join_guild
+from app.insights.auth import insights_enabled, is_insight_admin
+from app.notification_store import mark_discord_joined
+from app.operations.auth import can_read_operations
+from app.security import (
+    create_access_token,
+    ensure_active_user,
+    find_user_from_token,
+    get_current_user,
+)
+
+router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
+
+TOKEN_MAX_AGE = 7 * 24 * 60 * 60  # 7일(초)
+NEXT_PATH_BY_STEP = {  # 가입 단계별로 보낼 화면
+    "role": "/signup",
+    "info": "/signup/researcher/info",
+    "done": "/",
+}
+
+DISCORD_AUTHORIZE_URL = "https://discord.com/oauth2/authorize"
+DISCORD_TOKEN_URL = "https://discord.com/api/oauth2/token"
+DISCORD_ME_URL = "https://discord.com/api/users/@me"
+TOKEN_COOKIE = "access_token"
+STATE_COOKIE = "oauth_state"
+NEXT_COOKIE = "oauth_next"  # [디스코드 알림 연결]로 왔는지 표시 (값: "settings")
+SETTINGS_PATH = "/settings/profile"
+TOKEN_MAX_AGE = 7 * 24 * 60 * 60  # 7일(초)
+
+
+def cookie_secure() -> bool:
+    """HTTPS OAuth 배포에서는 인증 쿠키를 HTTPS 연결로만 전달합니다."""
+    return DISCORD_REDIRECT_URI.startswith("https://")
+
+
+def cookie_samesite() -> str:
+    """로컬은 Lax, HTTPS 배포는 None입니다.
+
+    화면(버셀)과 API(Render) 주소가 다르면 Lax 쿠키는 디스코드 왕복과
+    /auth/me 요청에 붙지 않아 로그인이 실패한 것처럼 보입니다.
+    """
+    return "none" if cookie_secure() else "lax"
+
+
+@router.get("/discord/login")
+def discord_login(access_token: str | None = Cookie(default=None)) -> RedirectResponse:
+    """① 이미 로그인했으면 가입 단계 화면으로, 아니면 디스코드 승인 화면으로 보냅니다."""
+    user = find_user_from_token(access_token)
+    if user is not None:
+        ensure_active_user(user)
+        return RedirectResponse(f"{FRONTEND_URL}{next_path_for(user)}")
+
+    return discord_authorize()
+
+
+@router.get("/discord/connect")
+def discord_connect(user: Annotated[dict, Depends(get_current_user)]) -> RedirectResponse:
+    """[디스코드 알림 연결] 이미 로그인했어도 디스코드 승인 화면을 다시 거쳐 LabBridge 서버에 참가해요.
+
+    끝나면 프로필 설정으로 돌아와요.
+    """
+    ensure_active_user(user)
+    response = discord_authorize()
+    response.set_cookie(NEXT_COOKIE, "settings", max_age=600, httponly=True, samesite=cookie_samesite(), secure=cookie_secure())
+    return response
+
+
+def discord_authorize() -> RedirectResponse:
+    """디스코드 승인 화면으로 보내요. state: 다른 사이트가 끼어들지 못하게 하는 1회용 확인값."""
+    state = secrets.token_urlsafe(16)
+    params = {
+        "client_id": DISCORD_CLIENT_ID,
+        "redirect_uri": DISCORD_REDIRECT_URI,
+        "response_type": "code",
+        "scope": "identify guilds.join",  # guilds.join = LabBridge 서버에 넣어도 된다는 허락 (알림 DM용)
+        "state": state,
+    }
+    response = RedirectResponse(f"{DISCORD_AUTHORIZE_URL}?{urlencode(params)}")
+    response.set_cookie(STATE_COOKIE, state, max_age=600, httponly=True, samesite=cookie_samesite(), secure=cookie_secure())
+    response.headers["Cache-Control"] = "private, no-store"
+    return response
+
+
+@router.get("/discord/callback")
+def discord_callback(
+    code: str | None = None,
+    state: str | None = None,
+    error: str | None = None,
+    oauth_state: str | None = Cookie(default=None),
+    oauth_next: str | None = Cookie(default=None),
+) -> RedirectResponse:
+    """② 디스코드가 돌려보내는 곳. 회원을 찾거나 만들고, JWT를 쿠키에 담아 프론트로 보냅니다."""
+    if error or not code or state is None or state != oauth_state:
+        return RedirectResponse(f"{FRONTEND_URL}/login?error=denied")
+
+    try:
+        discord_user = fetch_discord_user(code)
+    except httpx.HTTPError:
+        return RedirectResponse(f"{FRONTEND_URL}/login?error=discord")
+
+    user = user_store.find_by_discord_id(discord_user["id"])
+    if user is None:
+        user = user_store.create_user(discord_user)  # 처음 온 사람 = 가입
+
+    ensure_active_user(user)
+    joined = False
+    if discord_user.get("access_token"):
+        joined = connect_discord(user["user_id"], discord_user["id"], discord_user["access_token"])
+    if oauth_next == "settings":  # [디스코드 알림 연결]로 왔으면 결과와 함께 설정 화면으로
+        next_path = f"{SETTINGS_PATH}?discord={'connected' if joined else 'failed'}"
+    else:
+        next_path = next_path_for(user)
+    response = RedirectResponse(f"{FRONTEND_URL}{next_path}")
+    response.set_cookie(
+        TOKEN_COOKIE,
+        create_access_token(user["user_id"], user["discord_id"]),
+        max_age=TOKEN_MAX_AGE,
+        httponly=True,
+        samesite=cookie_samesite(),
+        secure=cookie_secure(),
+    )
+    response.delete_cookie(STATE_COOKIE, httponly=True, samesite=cookie_samesite(), secure=cookie_secure())
+    response.delete_cookie(NEXT_COOKIE, httponly=True, samesite=cookie_samesite(), secure=cookie_secure())
+    response.headers["Cache-Control"] = "private, no-store"
+    return response
+
+
+def connect_discord(user_id: int, discord_id: str, discord_token: str) -> bool:
+    """LabBridge 디스코드 서버에 넣어서 봇이 DM을 보낼 수 있게 해요. 들어갔으면 True.
+
+    실패해도 로그인은 그대로 진행돼요.
+    """
+    try:
+        joined = join_guild(discord_id, discord_token)
+    except httpx.HTTPError:
+        joined = False  # 디스코드가 잠깐 안 될 때: 다음 로그인 때 다시 시도
+    if joined:
+        mark_discord_joined(user_id)
+    return joined
+
+
+@router.get("/me")
+def me(user: Annotated[dict, Depends(get_current_user)], response: Response) -> dict:
+    """③ 지금 로그인한 사람의 정보와, 헤더 메뉴에 쓸 권한 사실을 돌려줍니다."""
+    response.headers["Cache-Control"] = "private, no-store"
+    return {
+        **user,
+        "can_manage_insights": insights_enabled() and is_insight_admin(user),
+        "can_read_operations": can_read_operations(user),
+    }
+
+@router.post("/logout")
+def logout() -> Response:
+    """④ 로그인 쿠키(JWT)를 지워서 로그아웃합니다."""
+    response = Response(status_code=204)
+    response.delete_cookie(TOKEN_COOKIE, httponly=True, samesite=cookie_samesite(), secure=cookie_secure())
+    response.headers["Cache-Control"] = "private, no-store"
+    return response
+
+
+
+
+def next_path_for(user: dict) -> str:
+    """가입 진행 단계(signup_step)에 따라 보낼 화면을 정합니다. 모르는 값이면 회원 유형 선택으로."""
+    return NEXT_PATH_BY_STEP.get(user["signup_step"], "/signup")
+
+def fetch_discord_user(code: str) -> dict:
+    """일회용 code → 디스코드 토큰 → 사용자 정보.
+
+    서버 참가에 쓰도록 디스코드 토큰을 "access_token"에 함께 담아 돌려줘요. (DB에는 저장하지 않아요)
+    """
+    token_response = httpx.post(
+        DISCORD_TOKEN_URL,
+        data={"grant_type": "authorization_code", "code": code, "redirect_uri": DISCORD_REDIRECT_URI},
+        auth=(DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET),
+    )
+    token_response.raise_for_status()
+    discord_token = token_response.json()["access_token"]
+
+    me_response = httpx.get(DISCORD_ME_URL, headers={"Authorization": f"Bearer {discord_token}"})
+    me_response.raise_for_status()
+    return {**me_response.json(), "access_token": discord_token}

@@ -1,0 +1,53 @@
+name: FAQ Discord guide checks
+on:
+  pull_request:
+    paths:
+      - 'frontend/src/**/faq*'
+      - 'frontend/tests/faq*'
+      - 'frontend/scripts/check-faq-discord-ui.cjs'
+      - '.github/workflows/faq-discord-guide-check.yml'
+permissions:
+  contents: read
+jobs:
+  faq-guide:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+      NEXT_PUBLIC_API_BASE_URL: http://127.0.0.1:3000/api/v1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm test
+      - run: npm run lint
+      - run: npm run build
+      - name: Install isolated browser test dependency
+        run: |
+          npm install --prefix "$RUNNER_TEMP/faq-browser" --no-package-lock playwright@1.56.1
+          "$RUNNER_TEMP/faq-browser/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Check FAQ navigation, all guide steps and responsive layouts
+        run: |
+          npm run start > /tmp/faq-next.log 2>&1 &
+          ready=0
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:3000/faq > /dev/null; then ready=1; break; fi
+            sleep 2
+          done
+          if [ "$ready" != 1 ]; then cat /tmp/faq-next.log; exit 1; fi
+          NODE_PATH="$RUNNER_TEMP/faq-browser/node_modules" node scripts/check-faq-discord-ui.cjs
+      - name: Save FAQ UI evidence (illustrations, not Discord captures)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: faq-discord-guide-ui
+          path: docs/qa/faq-discord-20261117/captures/
+          retention-days: 14
+          if-no-files-found: warn

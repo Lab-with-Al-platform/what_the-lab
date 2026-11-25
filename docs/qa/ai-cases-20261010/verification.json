@@ -1,0 +1,124 @@
+{
+  "checks": [
+    {
+      "page": "cases",
+      "viewport": "1440",
+      "title": "AI 연구 협업 사례",
+      "viewportWidth": 1440,
+      "contentWidth": 1440,
+      "imageCount": 7,
+      "brokenImages": 0,
+      "brokenSources": []
+    },
+    {
+      "page": "lettuce",
+      "viewport": "1440",
+      "title": "사진만으로 상추와 케일의 생체중을 예측할 수 있을까?",
+      "viewportWidth": 1440,
+      "contentWidth": 1440,
+      "imageCount": 7,
+      "brokenImages": 0,
+      "brokenSources": []
+    },
+    {
+      "page": "dental",
+      "viewport": "1440",
+      "title": "치과 파노라마 X-ray에서 치주골 손실을 분석한 AI 협업",
+      "viewportWidth": 1440,
+      "contentWidth": 1440,
+      "imageCount": 7,
+      "brokenImages": 0,
+      "brokenSources": []
+    },
+    {
+      "page": "concrete",
+      "viewport": "1440",
+      "title": "콘크리트 균열을 25 FPS로 분할한 경량 AI 모델",
+      "viewportWidth": 1440,
+      "contentWidth": 1440,
+      "imageCount": 7,
+      "brokenImages": 0,
+      "brokenSources": []
+    },
+    {
+      "page": "cases",
+      "viewport": "768",
+      "title": "AI 연구 협업 사례",
+      "viewportWidth": 768,
+      "contentWidth": 768,
+      "imageCount": 7,
+      "brokenImages": 0,
+      "brokenSources": []
+    },
+    {
+      "page": "lettuce",
+      "viewport": "768",
+      "title": "사진만으로 상추와 케일의 생체중을 예측할 수 있을까?",
+      "viewportWidth": 768,
+      "contentWidth": 768,
+      "imageCount": 7,
+      "brokenImages": 0,
+      "brokenSources": []
+    },
+    {
+      "page": "dental",
+      "viewport": "768",
+      "title": "치과 파노라마 X-ray에서 치주골 손실을 분석한 AI 협업",
+      "viewportWidth": 768,
+      "contentWidth": 768,
+      "imageCount": 7,
+      "brokenImages": 0,
+      "brokenSources": []
+    },
+    {
+      "page": "concrete",
+      "viewport": "768",
+      "title": "콘크리트 균열을 25 FPS로 분할한 경량 AI 모델",
+      "viewportWidth": 768,
+      "contentWidth": 768,
+      "imageCount": 7,
+      "brokenImages": 0,
+      "brokenSources": []
+    },
+    {
+      "page": "cases",
+      "viewport": "390",
+      "title": "AI 연구 협업 사례",
+      "viewportWidth": 390,
+      "contentWidth": 390,
+      "imageCount": 7,
+      "brokenImages": 0,
+      "brokenSources": []
+    },
+    {
+      "page": "lettuce",
+      "viewport": "390",
+      "title": "사진만으로 상추와 케일의 생체중을 예측할 수 있을까?",
+      "viewportWidth": 390,
+      "contentWidth": 390,
+      "imageCount": 7,
+      "brokenImages": 0,
+      "brokenSources": []
+    },
+    {
+      "page": "dental",
+      "viewport": "390",
+      "title": "치과 파노라마 X-ray에서 치주골 손실을 분석한 AI 협업",
+      "viewportWidth": 390,
+      "contentWidth": 390,
+      "imageCount": 7,
+      "brokenImages": 0,
+      "brokenSources": []
+    },
+    {
+      "page": "concrete",
+      "viewport": "390",
+      "title": "콘크리트 균열을 25 FPS로 분할한 경량 AI 모델",
+      "viewportWidth": 390,
+      "contentWidth": 390,
+      "imageCount": 7,
+      "brokenImages": 0,
+      "brokenSources": []
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+[
+  {
+    "id": "KR-2025",
+    "name": "국가과학기술표준분류체계",
+    "institution": "과학기술정보통신부",
+    "date": "시행 2025-12-16",
+    "application": "국내 연구 분야 교차 검증 기준",
+    "url": "https://www.law.go.kr/LSW/admRulInfoP.do?admRulSeq=2100000269796&chrClsCd=010201",
+    "limitation": "개별 FIELD 국가 표준 코드 검증 이전에는 공식 매핑 주장 금지"
+  },
+  {
+    "id": "OECD-FR-2015",
+    "name": "Frascati Manual 2015",
+    "institution": "OECD",
+    "date": "현행 2015판(2026-10 조회)",
+    "application": "국제 R&D FIELD 참조",
+    "url": "https://www.oecd.org/en/about/projects/frascati-manual-development.html",
+    "limitation": "AI 전문가 작업 기술 목록이 아님"
+  },
+  {
+    "id": "ANZSRC-2020",
+    "name": "ANZSRC 2020 Fields of Research",
+    "institution": "ABS/Stats NZ/ARC",
+    "date": "2020판, 2025-10-24 정정",
+    "application": "세부 학문 FoR 교차 검증 후보",
+    "url": "https://www.abs.gov.au/statistics/classifications/australian-and-new-zealand-standard-research-classification-anzsrc/2020",
+    "limitation": "2025 새 판이 아니라 2020 수정"
+  },
+  {
+    "id": "ESCO-2025",
+    "name": "ESCO v1.2.1",
+    "institution": "European Commission",
+    "date": "2025-12-10",
+    "application": "CAP 정의·대체 명칭 관리 원칙",
+    "url": "https://esco.ec.europa.eu/en/about-esco/escopedia/escopedia/esco-versions",
+    "limitation": "CAP80이 ESCO 공식 항목/공식 인증 목록은 아님"
+  },
+  {
+    "id": "W3C-SKOS",
+    "name": "SKOS Reference",
+    "institution": "W3C",
+    "date": "2009",
+    "application": "preferred/exact/related 구분 원칙",
+    "url": "https://www.w3.org/TR/skos-reference/",
+    "limitation": "서비스 검색 구현 자체를 검증하는 표준은 아님"
+  },
+  {
+    "id": "ONET",
+    "name": "O*NET Content Model",
+    "institution": "US Department of Labor",
+    "date": "지속 갱신",
+    "application": "작업·기술·도구 축 구별",
+    "url": "https://www.onetcenter.org/content.html",
+    "limitation": "직접 CAP 대응 코드는 검증하지 않음"
+  },
+  {
+    "id": "ELASTIC",
+    "name": "Elasticsearch synonym guidance",
+    "institution": "Elastic",
+    "date": "온라인 문서",
+    "application": "검색어 확장·오탐 관리",
+    "url": "https://www.elastic.co/guide/en/elasticsearch/reference/current/search-with-synonyms.html",
+    "limitation": "현재 코드에 엔진을 적용했다는 뜻은 아님"
+  },
+  {
+    "id": "OWASP",
+    "name": "API Security Top 10 2023",
+    "institution": "OWASP",
+    "date": "2023",
+    "application": "프로필·협업 요청 서버 권한",
+    "url": "https://owasp.org/API-Security/editions/2023/en/0x11-t10/",
+    "limitation": "데이터 분류 직접 인증 아님"
+  }
+]

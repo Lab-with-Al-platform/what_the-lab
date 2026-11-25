@@ -1,0 +1,62 @@
+[
+  {
+    "id": "global-search",
+    "path": "/faq/screenshots/global-search.png",
+    "url": "/search?q=RAG",
+    "note": "Screenshot of real Next.js UI; synthetic API data in isolated Playwright browser"
+  },
+  {
+    "id": "workspace-overview",
+    "path": "/faq/screenshots/workspace-overview.png",
+    "url": "/workspace",
+    "note": "Screenshot of real Next.js UI; synthetic API data in isolated Playwright browser"
+  },
+  {
+    "id": "schedule-add-dialog",
+    "path": "/faq/screenshots/schedule-add-dialog.png",
+    "url": "/workspace",
+    "note": "Screenshot of real Next.js UI; synthetic API data in isolated Playwright browser"
+  },
+  {
+    "id": "workspace-task-detail",
+    "path": "/faq/screenshots/workspace-task-detail.png",
+    "url": "/workspace/101",
+    "note": "Screenshot of real Next.js UI; synthetic API data in isolated Playwright browser"
+  },
+  {
+    "id": "workspace-due-talk",
+    "path": "/faq/screenshots/workspace-due-talk.png",
+    "url": "/workspace/101",
+    "note": "Screenshot of real Next.js UI; synthetic API data in isolated Playwright browser"
+  },
+  {
+    "id": "workspace-task-actions",
+    "path": "/faq/screenshots/workspace-task-actions.png",
+    "url": "/workspace/101",
+    "note": "Screenshot of real Next.js UI; synthetic API data in isolated Playwright browser"
+  },
+  {
+    "id": "workspace-finished",
+    "path": "/faq/screenshots/workspace-finished.png",
+    "url": "/workspace",
+    "note": "Screenshot of real Next.js UI; synthetic API data in isolated Playwright browser"
+  },
+  {
+    "id": "collaboration-review",
+    "path": "/faq/screenshots/collaboration-review.png",
+    "url": "/workspace/102",
+    "note": "Screenshot of real Next.js UI; synthetic API data in isolated Playwright browser"
+  },
+  {
+    "id": "collaboration-notifications",
+    "path": "/faq/screenshots/collaboration-notifications.png",
+    "url": "/workspace",
+    "note": "Screenshot of real Next.js UI; synthetic API data in isolated Playwright browser"
+  },
+  {
+    "id": "private-inquiry",
+    "path": "/faq/screenshots/private-inquiry.png",
+    "url": "/community/new?visibility=private&category=support",
+    "note": "Screenshot of real Next.js UI; synthetic API data in isolated Playwright browser"
+  }
+]

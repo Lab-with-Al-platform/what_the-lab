@@ -1,0 +1,68 @@
+# B7: 운영 서버(EC2 t4g, ARM64)에서 돌 backend 이미지를 ARM 실행 환경에서 직접 만들어 확인해요.
+# 이 단계에서는 레지스트리(ECR)에 올리지 않아요. 올리기는 CD(배포)에서 해요.
+# 자세한 이유: docs/aws-deployment/09-deployment-roadmap.md B7, 14-ci-cd-pipeline.md 4절
+name: Backend arm64 image
+
+on:
+  pull_request:
+    paths:
+      - "backend/**"
+      - "infra/ci/backend_image_smoke.py"
+      - ".github/workflows/backend-image.yml"
+  push:
+    branches: [develop, main]
+    paths:
+      - "backend/**"
+      - "infra/ci/backend_image_smoke.py"
+      - ".github/workflows/backend-image.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-image-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend-image:
+    # ARM64 실행 환경: 에뮬레이션 없이 t4g와 같은 CPU 종류로 빌드해요.
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: arm64 이미지 빌드 (올리지 않음)
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          platforms: linux/arm64
+          load: true
+          push: false
+          tags: labbridge-backend:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: 이미지 안 라이브러리·앱·마이그레이션 점검
+        run: docker run --rm -v "$PWD/infra/ci:/ci:ro" labbridge-backend:ci python /ci/backend_image_smoke.py
+
+      - name: 서버를 켜서 health 응답 확인 (DB 없이)
+        run: |
+          docker run -d --name api -p 8000:8000 \
+            -e DISCORD_CLIENT_ID=ci -e DISCORD_CLIENT_SECRET=ci \
+            -e DISCORD_REDIRECT_URI=http://localhost/callback \
+            -e JWT_SECRET=ci-only-secret-at-least-32-characters-long \
+            labbridge-backend:ci
+          for i in $(seq 45); do  # 최대 90초
+            if curl -fsS http://127.0.0.1:8000/api/v1/health; then echo; exit 0; fi
+            sleep 2
+          done
+          docker logs api
+          exit 1
+
+      - name: 이미지 정보
+        if: always()
+        run: |
+          docker image inspect labbridge-backend:ci --format 'arch={{.Architecture}} size={{.Size}}'
+          docker logs api 2>&1 | tail -20 || true
