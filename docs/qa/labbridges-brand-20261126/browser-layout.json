@@ -1,0 +1,71 @@
+[
+  {
+    "logos": [
+      {
+        "loaded": true,
+        "src": "/_next/image?url=%2Fbrand%2Flabbridges-wordmark-header-v2.png&w=256&q=75",
+        "width": 105.40625
+      },
+      {
+        "loaded": true,
+        "src": "/_next/image?url=%2Fbrand%2Flabbridges-wordmark-hero-v2.png&w=640&q=75",
+        "width": 199.1062469482422
+      },
+      {
+        "loaded": true,
+        "src": "/_next/image?url=%2Fbrand%2Flabbridges-wordmark-header-v2.png&w=256&q=75",
+        "width": 92.15625
+      }
+    ],
+    "scrollWidth": 1425,
+    "selected": "01LabBridges 소개",
+    "width": 1425,
+    "y": 0
+  },
+  {
+    "logos": [
+      {
+        "loaded": true,
+        "src": "/_next/image?url=%2Fbrand%2Flabbridges-wordmark-header-v2.png&w=256&q=75",
+        "width": 105.40625
+      },
+      {
+        "loaded": true,
+        "src": "/_next/image?url=%2Fbrand%2Flabbridges-wordmark-hero-v2.png&w=640&q=75",
+        "width": 199.1062469482422
+      },
+      {
+        "loaded": true,
+        "src": "/_next/image?url=%2Fbrand%2Flabbridges-wordmark-header-v2.png&w=256&q=75",
+        "width": 92.15625
+      }
+    ],
+    "scrollWidth": 753,
+    "selected": "01LabBridges 소개",
+    "width": 753,
+    "y": 0
+  },
+  {
+    "logos": [
+      {
+        "loaded": true,
+        "src": "/_next/image?url=%2Fbrand%2Flabbridges-wordmark-header-v2.png&w=256&q=75",
+        "width": 105.40625
+      },
+      {
+        "loaded": true,
+        "src": "/_next/image?url=%2Fbrand%2Flabbridges-wordmark-hero-v2.png&w=640&q=75",
+        "width": 142.21875
+      },
+      {
+        "loaded": true,
+        "src": "/_next/image?url=%2Fbrand%2Flabbridges-wordmark-header-v2.png&w=256&q=75",
+        "width": 92.15625
+      }
+    ],
+    "scrollWidth": 375,
+    "selected": "01LabBridges 소개",
+    "width": 375,
+    "y": 0
+  }
+]

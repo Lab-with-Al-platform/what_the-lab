@@ -44,7 +44,7 @@ test("홈은 기존 소개와 두 안내 화면을 같은 프레임에 표시한
   }));
   assert.equal((html.match(/data-home-slide=/g) ?? []).length, 3);
   assert.match(html, /기존 연구 이미지/);
-  assert.match(html, /labbridge-wordmark-hero/);
+  assert.match(html, /labbridges-wordmark-hero-v2/);
   assert.match(html, /플랫폼 이용 안내/);
   assert.match(html, /Discord 이용 안내/);
   assert.equal((html.match(/<h1[ >]/g) ?? []).length, 1);

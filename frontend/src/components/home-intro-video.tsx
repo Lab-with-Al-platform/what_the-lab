@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState, type MouseEvent, type PointerEvent } from "react";
 import { writeHomeVideoRecord } from "@/lib/home-intro-video-policy";
 
-const VIDEO_SRC = "/generated/labbridge-intro-55s.mp4";
-const POSTER_SRC = "/generated/labbridge-hero-v1.jpg";
+const VIDEO_SRC = "/generated/labbridges-intro-55s-v2.mp4";
+const POSTER_SRC = "/brand/labbridges-intro-poster-v2.jpg";
 // 터치로 탭한 뒤 버튼을 또렷하게 보여 주는 시간입니다.
 const CONTROLS_REVEAL_MS = 3000;
 
