@@ -48,7 +48,8 @@ pytestmark = pytest.mark.skipif(BASH is None, reason="bash 가 없어요")
 
 
 def run_deploy(tmp_path: Path, *, current: str, heads: str = "20261104_27", health: str = "ok",
-               running: str = OLD_IMAGE, extra_env: dict[str, str] | None = None) -> tuple[int, list[str], str]:
+               running: str = OLD_IMAGE, extra_env: dict[str, str] | None = None,
+               env_text: str = "ENABLE_DISCORD_BOT=0\n") -> tuple[int, list[str], str]:
     """가짜 docker 로 deploy.sh 를 실행하고 (종료 코드, docker 명령 목록, 출력)을 돌려줘요."""
     bin_dir = tmp_path / "bin"
     bin_dir.mkdir()
@@ -56,7 +57,7 @@ def run_deploy(tmp_path: Path, *, current: str, heads: str = "20261104_27", heal
     docker.write_text(FAKE_DOCKER, encoding="utf-8", newline="\n")
     docker.chmod(0o755)
     (tmp_path / "docker-compose.prod.yml").write_text("services: {}\n", encoding="utf-8")
-    (tmp_path / ".env.production").write_text("ENABLE_DISCORD_BOT=0\n", encoding="utf-8")
+    (tmp_path / ".env.production").write_text(env_text, encoding="utf-8", newline="\n")
     log = tmp_path / "docker.log"
     env = {
         **os.environ,
@@ -163,3 +164,12 @@ def test_single_account_mode_skips_grants(tmp_path):
     assert code == 0, out
     assert not any("apply_grants.py" in c for c in calls)
     assert "권한 맞추기 건너뜀" in out
+
+
+def test_reads_single_quoted_values_from_env_file(tmp_path):
+    """make-env.sh 는 값을 작은따옴표로 감싸 써요. deploy.sh 는 따옴표를 벗겨서 읽어야 해요."""
+    code, calls, out = run_deploy(tmp_path, current="20261104_27",
+                                  env_text=f"ENABLE_DISCORD_BOT='0'\nMIGRATION_DATABASE_URL='{MIGRATOR_URL}'\n")
+    assert code == 0, out
+    assert f"DB={MIGRATOR_URL}" in calls[index_of(calls, "alembic current")]
+    assert "stop discord-bot" in calls[index_of(calls, "stop discord-bot")]

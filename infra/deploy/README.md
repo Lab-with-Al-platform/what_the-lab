@@ -1,11 +1,34 @@
-# 배포 스크립트 (`deploy.sh`)
+# 배포 스크립트 (`make-env.sh`, `deploy.sh`)
 
-EC2의 `/opt/labbridge/deploy.sh`로 복사해서 써요. 런북([10](../../docs/aws-deployment/10-operations-runbook.md) 1절)의 수동 절차를 그대로 묶은 것이라, **사람과 GitHub Actions가 같은 스크립트**를 써요.
+EC2의 `/opt/labbridge`는 **이 저장소를 받아 둔 폴더**예요. compose·nginx 설정과 스크립트를 따로 복사하지 않고, 배포할 때마다 그 커밋으로 맞춰요. 런북([10](../../docs/aws-deployment/10-operations-runbook.md) 1절)의 수동 절차를 그대로 묶은 것이라, **사람과 GitHub Actions가 같은 스크립트**를 써요.
 
 ```bash
 cd /opt/labbridge
-./deploy.sh <계정ID>.dkr.ecr.ap-northeast-2.amazonaws.com/labbridge-backend:<커밋 SHA>
+./infra/deploy/make-env.sh     # Parameter Store → .env.production (chmod 600)
+./infra/deploy/deploy.sh <계정ID>.dkr.ecr.ap-northeast-2.amazonaws.com/labbridge-backend:<커밋 SHA>
 ```
+
+GitHub Actions(`deploy.yml`)는 이 앞에 `git checkout <커밋>`을 붙여 SSM으로 실행해요.
+
+## 서버 처음 준비 (한 번만, Session Manager에서)
+
+```bash
+sudo mkdir -p /opt/labbridge && sudo chown ec2-user:ec2-user /opt/labbridge
+git clone --branch main https://github.com/<조직>/<저장소>.git /opt/labbridge
+cd /opt/labbridge && ./infra/deploy/make-env.sh
+```
+
+- EC2 역할에 `ssm:GetParametersByPath`(`/labbridge/prod`, `/labbridge/prod/*`) 권한이 있어야 해요 ([03](../../docs/aws-deployment/03-network-security.md) 4절).
+- `make-env.sh`는 **값을 화면에 찍지 않고 이름만** 알려 줘요. "아직 비어 있는 필수 값"이 보이면 Parameter Store에 그 이름으로 넣고 다시 실행해요.
+
+## `make-env.sh` 규칙
+
+| 규칙 | 이유 |
+|---|---|
+| `infra/env.production.example`에 있는 이름만 써요 | 사람용 `READONLY_DB_PASSWORD` 같은 값이 서버 파일에 들어가지 않게 |
+| Parameter Store에 없으면 예시 파일 기본값 (`ENABLE_DISCORD_BOT=0` 등) | 봇·MVP+ 기능이 실수로 켜지지 않게 |
+| 값을 작은따옴표로 감싸요 (`KEY='값'`) | 비밀번호에 `$`가 있어도 compose가 다른 값으로 바꾸지 않게. 그래서 값에 `'`와 줄바꿈은 쓸 수 없어요 |
+| 임시 파일에 다 쓴 뒤 한 번에 바꿔요 (`chmod 600`) | 실패해도 원래 파일이 그대로, 다른 사용자는 못 읽게 |
 
 ## 순서와 안전장치
 

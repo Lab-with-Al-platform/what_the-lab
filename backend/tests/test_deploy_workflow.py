@@ -77,6 +77,17 @@ def test_backend_deploy_is_off_until_enabled():
     assert "needs.backend.result == 'skipped'" in load()["jobs"]["frontend"]["if"]
 
 
+def test_backend_syncs_code_then_makes_env_then_deploys():
+    """서버 설정을 이번 커밋에 맞추고 → Parameter Store로 .env를 만든 뒤 → deploy.sh 를 실행해요."""
+    text = steps_text(load()["jobs"]["backend"])
+    checkout = text.index("git checkout --quiet --detach $GITHUB_SHA")
+    make_env = text.index("./infra/deploy/make-env.sh")
+    deploy = text.index("./infra/deploy/deploy.sh $IMAGE")
+    assert checkout < make_env < deploy
+    # 앞 단계가 실패하면 다음 단계로 가지 않게 && 로 이어요.
+    assert "make-env.sh && ./infra/deploy/deploy.sh" in text
+
+
 def test_no_long_lived_aws_keys():
     """액세스 키를 저장하지 않고 OIDC 역할만 써요."""
     text = WORKFLOW.read_text(encoding="utf-8")
