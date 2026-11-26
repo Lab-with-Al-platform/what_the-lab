@@ -1,0 +1,13 @@
+# origin 인증서 갱신 (labbridge-cert-renew.timer 가 실행해요)
+# 설치: infra/certbot/README.md
+[Unit]
+Description=LabBridge origin certificate renewal (certbot DNS-01 via docker)
+Wants=network-online.target
+After=network-online.target docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+# /etc/letsencrypt 는 root 만 읽을 수 있어서 root 로 실행해요.
+User=root
+ExecStart=/opt/labbridge/infra/certbot/renew-origin-cert.sh

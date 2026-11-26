@@ -1,0 +1,14 @@
+# 하루 두 번(서버 시간 UTC 03시·15시 = 한국 12시·24시 무렵) 갱신을 확인해요.
+# certbot 은 만료 30일 전부터만 실제로 갱신해요.
+[Unit]
+Description=LabBridge origin certificate renewal twice a day
+
+[Timer]
+OnCalendar=*-*-* 03,15:17:00
+# 여러 서버가 같은 시각에 몰리지 않게 최대 1시간 늦춰요
+RandomizedDelaySec=1h
+# 서버가 꺼져 있던 동안 놓친 실행은 켜질 때 한 번 해요
+Persistent=true
+
+[Install]
+WantedBy=timers.target
