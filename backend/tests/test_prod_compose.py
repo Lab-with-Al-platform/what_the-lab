@@ -134,6 +134,15 @@ def test_origin_checks_secret_header_before_proxy():
     assert "ssl_reject_handshake on;" in text
 
 
+def test_map_bucket_fits_secret_header_value():
+    """비밀 헤더 값(openssl rand -hex 32 = 64자)이 map 의 열쇠예요.
+    기본 칸 크기(64)로는 64자 열쇠가 들어가지 않아 nginx 가 켜지지 않아요. (2026-11-26 첫 배포에서 확인)"""
+    conf = NGINX_CONF.read_text(encoding="utf-8")
+    found = re.search(r"map_hash_bucket_size\s+(\d+);", conf)
+    assert found, "nginx.conf 에 map_hash_bucket_size 가 필요해요"
+    assert int(found.group(1)) >= 128
+
+
 def test_auth_routes_have_strict_rate_limit():
     """로그인·콜백·인증번호 발송·확인은 엄격한 auth 제한을 받아요."""
     conf = NGINX_CONF.read_text(encoding="utf-8")
