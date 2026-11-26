@@ -85,7 +85,28 @@ def test_backend_syncs_code_then_makes_env_then_deploys():
     deploy = text.index("./infra/deploy/deploy.sh $IMAGE")
     assert checkout < make_env < deploy
     # 앞 단계가 실패하면 다음 단계로 가지 않게 && 로 이어요.
-    assert "make-env.sh && ./infra/deploy/deploy.sh" in text
+    assert 'make-env.sh && ${snapshot_env}./infra/deploy/deploy.sh' in text
+
+
+def test_manual_run_can_pass_migration_snapshot_id():
+    """손으로 실행할 때 RDS 스냅샷 이름을 넣으면 deploy.sh 에 MIGRATION_SNAPSHOT_ID 로 넘겨요."""
+    flow = load()
+    inputs = flow[True]["workflow_dispatch"]["inputs"]
+    snapshot = inputs["migration_snapshot_id"]
+    assert snapshot["required"] is False
+    assert snapshot["default"] == ""
+    text = steps_text(flow["jobs"]["backend"])
+    assert 'snapshot_env="MIGRATION_SNAPSHOT_ID=$SNAPSHOT_ID "' in text
+
+
+def test_snapshot_id_is_validated_before_use():
+    """입력 칸 값이 명령에 그대로 들어가지 않게 영문·숫자·하이픈만 허용해요."""
+    backend = load()["jobs"]["backend"]
+    check = next(step for step in backend["steps"] if step.get("name", "").startswith("스냅샷 이름 확인"))
+    # ${{ }} 를 run 안에 직접 쓰지 않고 env 로 받아요 (명령 주입 방지)
+    assert "${{" not in check["run"]
+    assert check["env"]["SNAPSHOT_ID"] == "${{ inputs.migration_snapshot_id }}"
+    assert "^[A-Za-z0-9-]{1,63}$" in check["run"]
 
 
 def test_no_long_lived_aws_keys():

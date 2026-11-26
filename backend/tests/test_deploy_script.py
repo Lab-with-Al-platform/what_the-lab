@@ -34,6 +34,12 @@ case "$*" in
 esac
 """
 
+# 가짜 aws: ECR 로그인 비밀번호 대신 가짜 글자를 돌려주고, 받은 명령을 같은 기록에 남겨요.
+FAKE_AWS = r"""#!/usr/bin/env bash
+echo "aws $*" >> "$FAKE_LOG"
+echo "fake-ecr-password"
+"""
+
 
 def find_bash() -> str | None:
     """Windows 에서는 WSL bash 가 아니라 Git Bash 를 써요."""
@@ -49,13 +55,17 @@ pytestmark = pytest.mark.skipif(BASH is None, reason="bash 가 없어요")
 
 def run_deploy(tmp_path: Path, *, current: str, heads: str = "20261104_27", health: str = "ok",
                running: str = OLD_IMAGE, extra_env: dict[str, str] | None = None,
-               env_text: str = "ENABLE_DISCORD_BOT=0\n") -> tuple[int, list[str], str]:
+               env_text: str = "ENABLE_DISCORD_BOT=0\n",
+               image: str = NEW_IMAGE) -> tuple[int, list[str], str]:
     """가짜 docker 로 deploy.sh 를 실행하고 (종료 코드, docker 명령 목록, 출력)을 돌려줘요."""
     bin_dir = tmp_path / "bin"
     bin_dir.mkdir()
     docker = bin_dir / "docker"
     docker.write_text(FAKE_DOCKER, encoding="utf-8", newline="\n")
     docker.chmod(0o755)
+    aws = bin_dir / "aws"
+    aws.write_text(FAKE_AWS, encoding="utf-8", newline="\n")
+    aws.chmod(0o755)
     (tmp_path / "docker-compose.prod.yml").write_text("services: {}\n", encoding="utf-8")
     (tmp_path / ".env.production").write_text(env_text, encoding="utf-8", newline="\n")
     log = tmp_path / "docker.log"
@@ -72,7 +82,7 @@ def run_deploy(tmp_path: Path, *, current: str, heads: str = "20261104_27", heal
     env.pop("MIGRATION_DATABASE_URL", None)
     env.update(extra_env or {})
     # 실패(종료 코드 1)도 테스트할 값이라 check=False 로 직접 확인해요.
-    result = subprocess.run([BASH, str(DEPLOY_SH), NEW_IMAGE], check=False, cwd=tmp_path, env=env,
+    result = subprocess.run([BASH, str(DEPLOY_SH), image], check=False, cwd=tmp_path, env=env,
                             capture_output=True, text=True, encoding="utf-8", timeout=60)
     calls = log.read_text(encoding="utf-8").splitlines() if log.exists() else []
     return result.returncode, calls, result.stdout + result.stderr
@@ -173,3 +183,22 @@ def test_reads_single_quoted_values_from_env_file(tmp_path):
     assert code == 0, out
     assert f"DB={MIGRATOR_URL}" in calls[index_of(calls, "alembic current")]
     assert "stop discord-bot" in calls[index_of(calls, "stop discord-bot")]
+
+
+ECR_IMAGE = "123456789012.dkr.ecr.ap-northeast-2.amazonaws.com/labbridge-backend:abc1234"
+
+
+def test_logs_in_to_ecr_before_pull(tmp_path):
+    """ECR 이미지는 받기 전에 docker 로그인을 해요. (EC2 역할 권한으로 비밀번호를 받아요)"""
+    code, calls, out = run_deploy(tmp_path, current="20261104_27", image=ECR_IMAGE)
+    assert code == 0, out
+    login = index_of(calls, "aws ecr get-login-password --region ap-northeast-2")
+    docker_login = index_of(calls, "login --username AWS --password-stdin 123456789012.dkr.ecr.ap-northeast-2.amazonaws.com")
+    assert login < docker_login < index_of(calls, "pull backend")
+    assert "fake-ecr-password" not in out  # 비밀번호를 화면에 찍지 않아요
+
+
+def test_skips_ecr_login_for_other_registries(tmp_path):
+    code, calls, out = run_deploy(tmp_path, current="20261104_27")
+    assert code == 0, out
+    assert not any("get-login-password" in c for c in calls)
