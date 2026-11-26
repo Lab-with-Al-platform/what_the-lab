@@ -109,6 +109,15 @@ def test_snapshot_id_is_validated_before_use():
     assert "^[A-Za-z0-9-]{1,63}$" in check["run"]
 
 
+def test_rerun_reuses_existing_image_instead_of_failing():
+    """같은 커밋을 다시 배포하면 ECR(태그 덮어쓰기 금지)에 이미 이미지가 있어요. 그때는 그 이미지를 그대로 써요."""
+    text = steps_text(load()["jobs"]["backend"])
+    assert "already exists" in text
+    assert "immutable" in text
+    # 다른 이유로 push 가 실패하면 그대로 멈춰요.
+    assert "exit 1" in text
+
+
 def test_no_long_lived_aws_keys():
     """액세스 키를 저장하지 않고 OIDC 역할만 써요."""
     text = WORKFLOW.read_text(encoding="utf-8")
