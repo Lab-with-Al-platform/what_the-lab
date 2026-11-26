@@ -9,7 +9,15 @@ name: Deploy
 on:
   push:
     branches: [main]
+  # 손으로 실행: Actions → Deploy → Run workflow
+  # 새 마이그레이션이 있으면 RDS 스냅샷을 먼저 찍고 그 이름을 넣어요. (첫 배포는 first-deploy)
   workflow_dispatch:
+    inputs:
+      migration_snapshot_id:
+        description: '새 마이그레이션이 있을 때만: 먼저 찍은 RDS 스냅샷 이름 (첫 배포는 first-deploy). 없으면 비워 두세요'
+        required: false
+        default: ''
+        type: string
 
 permissions:
   contents: read
@@ -60,9 +68,24 @@ jobs:
       #   1) 서버 설정 파일(compose·nginx)을 이번 커밋에 맞춰요 → 이미지와 설정이 항상 같은 커밋
       #   2) Parameter Store 값으로 .env.production 을 새로 만들어요
       #   3) deploy.sh 로 마이그레이션 확인 → backend → nginx 교체
+      # 입력 칸 값은 서버 명령 안에 들어가요. 영문·숫자·하이픈만 허용해 다른 명령이 끼어들지 못하게 해요.
+      # (${{ }} 를 run 안에 직접 쓰지 않고 env 로 받아요)
+      - name: 스냅샷 이름 확인
+        env:
+          SNAPSHOT_ID: ${{ inputs.migration_snapshot_id }}
+        run: |
+          if [ -n "$SNAPSHOT_ID" ] && ! [[ "$SNAPSHOT_ID" =~ ^[A-Za-z0-9-]{1,63}$ ]]; then
+            echo "::error::스냅샷 이름은 영문·숫자·하이픈(-)만, 63자 이하로 넣어 주세요"
+            exit 1
+          fi
+          echo "SNAPSHOT_ID=$SNAPSHOT_ID" >> "$GITHUB_ENV"
+          echo "스냅샷 이름: ${SNAPSHOT_ID:-없음 (새 마이그레이션이 있으면 deploy.sh 가 멈춰요)}"
+
       - name: 서버 배포 (SSM → /opt/labbridge)
         run: |
-          deploy_cmd="cd /opt/labbridge && git fetch --quiet origin main && git checkout --quiet --detach $GITHUB_SHA && ./infra/deploy/make-env.sh && ./infra/deploy/deploy.sh $IMAGE"
+          snapshot_env=""
+          if [ -n "$SNAPSHOT_ID" ]; then snapshot_env="MIGRATION_SNAPSHOT_ID=$SNAPSHOT_ID "; fi
+          deploy_cmd="cd /opt/labbridge && git fetch --quiet origin main && git checkout --quiet --detach $GITHUB_SHA && ./infra/deploy/make-env.sh && ${snapshot_env}./infra/deploy/deploy.sh $IMAGE"
           # 따옴표가 겹치지 않게 jq로 JSON을 만들어 넘겨요.
           params=$(jq -nc --arg cmd "sudo -u ec2-user bash -lc '$deploy_cmd'" '{commands: [$cmd]}')
           command_id=$(aws ssm send-command \
