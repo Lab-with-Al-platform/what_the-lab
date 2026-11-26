@@ -11,12 +11,14 @@ Let's Encrypt 인증서는 **90일**짜리라 자동 갱신이 꼭 필요해요.
 
 ## 필요한 권한 (EC2 역할)
 
+> certbot 은 `--network host`로 실행해요. EC2 메타데이터(IMDS) **홉 제한을 1**로 두어 일반 컨테이너(backend·봇)는 서버의 AWS 권한을 빌릴 수 없게 했고, AWS가 필요한 certbot만 서버 네트워크로 권한을 받아요.
+
 `route53:ListHostedZones`, `route53:GetChange`, 그리고 `route53:ChangeResourceRecordSets`는 **`_acme-challenge.origin.<도메인>` TXT 레코드만** (인라인 정책 `labbridge-ec2-certbot`).
 
 ## 처음 발급 (한 번만, 2026-11-25에 완료)
 
 ```bash
-docker run --rm -v /etc/letsencrypt:/etc/letsencrypt -v /var/lib/letsencrypt:/var/lib/letsencrypt \
+docker run --rm --network host -v /etc/letsencrypt:/etc/letsencrypt -v /var/lib/letsencrypt:/var/lib/letsencrypt \
   certbot/dns-route53 certonly --dns-route53 -d origin.<도메인> \
   -m '<팀이 계속 볼 이메일>' --agree-tos --no-eff-email --non-interactive
 ```

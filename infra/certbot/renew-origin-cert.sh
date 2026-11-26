@@ -39,7 +39,9 @@ cert_fingerprint() {
 run_certbot_renew() {
   local extra=()
   if [ "$DRY_RUN" = "1" ]; then extra+=(--dry-run); fi
-  docker run --rm \
+  # --network host: 서버 네트워크를 그대로 써요. EC2 메타데이터(IMDS) 홉 제한을 1로 둬서
+  # 일반 컨테이너(backend·봇)는 서버의 AWS 권한을 빌릴 수 없게 했고, AWS 가 필요한 certbot 만 이렇게 받아요.
+  docker run --rm --network host \
     -v "$LE_DIR:/etc/letsencrypt" \
     -v "$LE_WORK_DIR:/var/lib/letsencrypt" \
     "$CERTBOT_IMAGE" renew --cert-name "$CERT_NAME" --non-interactive "${extra[@]}"
