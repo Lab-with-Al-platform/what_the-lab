@@ -18,7 +18,25 @@ git clone --branch main https://github.com/<조직>/<저장소>.git /opt/labbrid
 cd /opt/labbridge && ./infra/deploy/make-env.sh
 ```
 
-- EC2 역할에 `ssm:GetParametersByPath`(`/labbridge/prod`, `/labbridge/prod/*`) 권한이 있어야 해요 ([03](../../docs/aws-deployment/03-network-security.md) 4절).
+- EC2 역할에 `ssm:GetParametersByPath`(`/labbridge/prod/server`, `/labbridge/prod/server/*`) 권한이 있어야 해요 ([03](../../docs/aws-deployment/03-network-security.md) 4절).
+
+## Parameter Store 경로 규칙
+
+`/labbridge/<환경>/<누가 읽나>/<무엇의 값>/<이름>` — 이름은 환경변수 이름 그대로예요.
+
+| 경로 | 누가 읽나 | 예 |
+|---|---|---|
+| `/labbridge/prod/server/db/` | EC2(서버) | `DATABASE_URL`, `MIGRATION_DATABASE_URL` |
+| `/labbridge/prod/server/auth/` | EC2 | `JWT_SECRET` |
+| `/labbridge/prod/server/discord/` | EC2 | `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, `DISCORD_REDIRECT_URI`, `DISCORD_BOT_TOKEN`, `DISCORD_GUILD_ID` |
+| `/labbridge/prod/server/origin/` | EC2 | `ORIGIN_DOMAIN`, `ORIGIN_VERIFY_SECRET` |
+| `/labbridge/prod/server/web/` | EC2 | `NEXT_PUBLIC_APP_URL`, `CORS_ORIGINS` |
+| `/labbridge/prod/server/admin/` | EC2 | `OPERATIONS_ADMIN_DISCORD_IDS` |
+| `/labbridge/prod/server/feature/` | EC2 | `ENABLE_DISCORD_BOT` |
+| `/labbridge/prod/human/db/` | **사람만** (EC2 역할은 거부) | `READONLY_DB_PASSWORD` |
+
+- `make-env.sh`는 `/labbridge/prod/server/` 아래만 읽고, 경로 맨 끝 이름을 환경변수로 써요. 다른 그룹에 같은 이름이 있으면 멈춰요.
+- 예전 평평한 경로(`/labbridge/prod/<이름>`)로 되돌릴 때만 `SSM_PATH=/labbridge/prod/ ./infra/deploy/make-env.sh`.
 - `make-env.sh`는 **값을 화면에 찍지 않고 이름만** 알려 줘요. "아직 비어 있는 필수 값"이 보이면 Parameter Store에 그 이름으로 넣고 다시 실행해요.
 
 ## `make-env.sh` 규칙

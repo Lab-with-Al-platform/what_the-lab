@@ -77,6 +77,8 @@ def test_runs_certbot_renew_with_route53_and_letsencrypt_folders(tmp_path):
     assert "certbot/dns-route53" in renew
     assert " renew" in renew and "--non-interactive" in renew
     assert f"{tmp_path / 'letsencrypt'}:/etc/letsencrypt" in renew
+    # IMDS 홉 제한 1 에서도 서버 역할 권한을 받도록 서버 네트워크를 그대로 써요 (팀 공유 문서 6-5).
+    assert "--network host" in renew
 
 
 def test_no_reload_when_certificate_did_not_change(tmp_path):
