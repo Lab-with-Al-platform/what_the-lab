@@ -45,6 +45,20 @@ compose() {
   docker compose "${files[@]}" --env-file "$ENV_FILE" "$@"
 }
 
+# ECR 이미지면 받기 전에 docker 로그인을 해요. 비밀번호는 EC2 역할 권한으로 받고 화면에 찍지 않아요.
+# 예) 123456789012.dkr.ecr.ap-northeast-2.amazonaws.com/... → 저장소 주소와 리전(4번째 칸)을 꺼내요
+ecr_login() {
+  local registry="${BACKEND_IMAGE%%/*}"
+  case "$registry" in
+    *.dkr.ecr.*.amazonaws.com) ;;
+    *) return 0 ;;
+  esac
+  local region
+  region="$(echo "$registry" | cut -d. -f4)"
+  aws ecr get-login-password --region "$region" 2>>"$LOG" \
+    | docker login --username AWS --password-stdin "$registry" >>"$LOG" 2>&1
+}
+
 # 마이그레이션 계정으로 backend 이미지의 명령을 실행해요.
 # 주소를 명령줄(-e)에 쓰지 않고 환경변수로 넘겨요. (ps 에 비밀번호가 보이지 않게)
 migrator_run() {
@@ -156,6 +170,7 @@ main() {
 
   # 1) 새 이미지 받기 (서버에서 빌드하지 않아요)
   if [ "${SKIP_PULL:-0}" != "1" ]; then
+    ecr_login || fail "ECR 로그인 실패 (EC2 역할의 ECR 읽기 권한 확인)"
     compose pull backend >>"$LOG" 2>&1 || fail "이미지를 받지 못했어요: $BACKEND_IMAGE"
   fi
 
