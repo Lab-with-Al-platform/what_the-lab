@@ -1,31 +1,37 @@
 #!/usr/bin/env bash
-# SSM Parameter Store(/labbridge/prod/*) 값으로 EC2의 .env.production 을 만들어요.
+# SSM Parameter Store 서버용 경로의 값으로 EC2의 .env.production 을 만들어요.
 # 비밀값을 손으로 서버에 복사하지 않고, Parameter Store 한 곳에서만 관리하려고요. (docs/aws-deployment/03 5절)
+#
+# 경로 규칙: /labbridge/<환경>/<누가 읽나>/<무엇의 값>/<이름>
+#   예) /labbridge/prod/server/db/DATABASE_URL   → DATABASE_URL
+#       /labbridge/prod/server/discord/DISCORD_BOT_TOKEN → DISCORD_BOT_TOKEN
+#       /labbridge/prod/human/db/READONLY_DB_PASSWORD  ← 사람용. 서버는 읽지 않아요 (EC2 역할도 거부)
+#   그룹(db·auth·discord…)은 사람이 알아보고 권한을 나누기 위한 폴더예요. 환경변수 이름은 맨 끝만 써요.
 #
 # 사용법 (/opt/labbridge 에서):
 #   ./infra/deploy/make-env.sh
 #
 # 규칙
 #   - infra/env.production.example 에 있는 이름만 파일에 써요.
-#     (사람용 READONLY_DB_PASSWORD 처럼 예시에 없는 값은 넣지 않아요)
+#   - 다른 그룹에 같은 이름이 있으면 어느 값을 쓸지 몰라 멈춰요.
 #   - Parameter Store 에 없는 값은 예시 파일의 기본값을 써요. (봇 0, MVP+ false, 나머지 빈 값)
 #   - 값은 작은따옴표로 감싸요. 비밀번호에 $ 가 있어도 compose 가 다른 값으로 바꾸지 않아요.
 #   - 비밀값은 화면에 찍지 않아요. 이름만 알려 줘요.
 #   - 실패하면 원래 .env.production 을 그대로 둬요. (다 쓴 뒤 한 번에 바꿔요)
 #
-# 필요한 권한 (EC2 역할): ssm:GetParametersByPath (/labbridge/prod, /labbridge/prod/*)
+# 필요한 권한 (EC2 역할): ssm:GetParametersByPath (/labbridge/prod/server, /labbridge/prod/server/*)
 #   SecureString 기본 키(aws/ssm)는 따로 kms 권한을 주지 않아도 풀려요.
 #
 # 바꿀 수 있는 값 (환경변수):
 #   ENV_FILE    기본 .env.production
 #   KEYS_FILE   기본 infra/env.production.example
-#   SSM_PATH    기본 /labbridge/prod/
+#   SSM_PATH    기본 /labbridge/prod/server/  (되돌릴 때만 예전 /labbridge/prod/ 로)
 #   AWS_REGION  기본 ap-northeast-2
 set -euo pipefail
 
 ENV_FILE="${ENV_FILE:-.env.production}"
 KEYS_FILE="${KEYS_FILE:-infra/env.production.example}"
-SSM_PATH="${SSM_PATH:-/labbridge/prod/}"
+SSM_PATH="${SSM_PATH:-/labbridge/prod/server/}"
 AWS_REGION="${AWS_REGION:-ap-northeast-2}"
 
 # docker-compose.prod.yml 에서 ${이름:?} 로 꼭 있어야 하는 값이에요. 비어 있으면 이름을 알려 줘요.
@@ -38,6 +44,7 @@ REQUIRED_KEYS=(
 fail() { echo "실패: $*" >&2; exit 1; }
 
 declare -A ssm_values=()   # Parameter Store 에서 읽은 값 (이름 → 값)
+declare -A ssm_source=()   # 그 이름을 어느 경로에서 읽었나 (같은 이름이 두 번 나오면 알려 주려고)
 declare -a key_order=()    # 예시 파일에 나온 순서
 declare -A key_default=()  # 예시 파일의 기본값
 
@@ -57,7 +64,7 @@ read_keys() {
 # Parameter Store 에서 값을 한 번에 읽어요. (여러 쪽이면 aws 가 알아서 이어 받아요)
 # 결과는 "전체 이름<TAB>값" 한 줄씩이에요.
 read_ssm() {
-  local output line name value tab=$'\t'
+  local output line path name value tab=$'\t'
   output="$(aws ssm get-parameters-by-path --path "$SSM_PATH" --recursive --with-decryption \
     --region "$AWS_REGION" --query 'Parameters[].[Name,Value]' --output text)" \
     || fail "Parameter Store 를 읽지 못했어요 (EC2 역할의 ssm:GetParametersByPath 권한 확인)"
@@ -66,10 +73,17 @@ read_ssm() {
     [ -n "$line" ] || continue
     # 탭이 없거나 경로가 다르면 값 안에 줄바꿈이 있다는 뜻이에요. 안전하게 쓸 수 없어 멈춰요.
     [[ "$line" == "$SSM_PATH"*"$tab"* ]] || fail "줄바꿈이 든 값이 있어요. Parameter Store 값을 한 줄로 고쳐 주세요"
-    name="${line%%"$tab"*}"
+    path="${line%%"$tab"*}"
     value="${line#*"$tab"}"
-    ssm_values["${name#"$SSM_PATH"}"]="$value"
+    name="${path##*/}"   # /labbridge/prod/server/db/DATABASE_URL → DATABASE_URL
+    if [ -n "${ssm_source[$name]+x}" ]; then
+      fail "$name 이 두 곳에 있어요 (${ssm_source[$name]}, $path). 하나만 남겨 주세요"
+    fi
+    ssm_source["$name"]="$path"
+    ssm_values["$name"]="$value"
   done <<< "$output"
+  # 하나도 못 읽었으면 경로가 틀렸거나 값을 아직 안 옮긴 거예요. 빈 값으로 덮어쓰지 않고 멈춰요.
+  [ "${#ssm_values[@]}" -gt 0 ] || fail "$SSM_PATH 아래에 값이 하나도 없어요 (경로·권한 확인). 원래 파일은 그대로예요"
 }
 
 # 작은따옴표 안에서는 작은따옴표를 쓸 수 없어서, 그런 값이 있으면 멈춰요.

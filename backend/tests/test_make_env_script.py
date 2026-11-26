@@ -1,7 +1,9 @@
 """infra/deploy/make-env.sh 를 가짜 aws 로 확인해요. (실제 AWS 없이)
 
-- SSM Parameter Store(/labbridge/prod/*)에서 값을 읽어 .env.production 을 만들어요.
-- infra/env.production.example 에 있는 이름만 써요. (사람용 READONLY_DB_PASSWORD 같은 값은 서버 파일에 넣지 않아요)
+- SSM Parameter Store 서버용 경로(/labbridge/prod/server/<그룹>/<이름>)에서 값을 읽어 .env.production 을 만들어요.
+  사람용 값은 /labbridge/prod/human/… 에 따로 두고 서버는 읽지 않아요 (경로 정책, 팀 공유 문서 6-4).
+- 경로의 맨 끝(이름)만 환경변수 이름으로 써요. 다른 그룹에 같은 이름이 있으면 어느 값을 쓸지 몰라 멈춰요.
+- infra/env.production.example 에 있는 이름만 써요.
 - 값은 작은따옴표로 감싸요. 비밀번호에 $ 가 있어도 compose 가 다른 값으로 바꾸지 않게요.
 - 비밀값을 화면(로그)에 찍지 않고, 실패하면 원래 파일을 그대로 둬요.
 자세한 이유: docs/aws-deployment/03-network-security.md 5절
@@ -49,7 +51,8 @@ def run_make_env(tmp_path: Path, params: dict[str, str], *, fail: bool = False) 
     aws.write_text(FAKE_AWS, encoding="utf-8", newline="\n")
     aws.chmod(0o755)
     params_file = tmp_path / "params.tsv"
-    lines = [f"/labbridge/prod/{name}\t{value}" for name, value in params.items()]
+    # params 의 열쇠는 "그룹/이름" (예: db/DATABASE_URL) 이에요.
+    lines = [f"/labbridge/prod/server/{name}\t{value}" for name, value in params.items()]
     params_file.write_text("".join(line + "\n" for line in lines), encoding="utf-8", newline="\n")
     log = tmp_path / "aws.log"
     env = {
@@ -74,18 +77,39 @@ def read_env(tmp_path: Path) -> dict[str, str]:
 
 def test_writes_known_keys_with_single_quotes(tmp_path):
     code, out, _ = run_make_env(tmp_path, {
-        "DATABASE_URL": SECRET_URL, "JWT_SECRET": SECRET_JWT, "READONLY_DB_PASSWORD": "human-only"})
+        "db/DATABASE_URL": SECRET_URL, "auth/JWT_SECRET": SECRET_JWT, "db/UNKNOWN_EXTRA": "not-in-example"})
     assert code == 0, out
     env = read_env(tmp_path)
     assert env["DATABASE_URL"] == f"'{SECRET_URL}'"
     assert env["JWT_SECRET"] == f"'{SECRET_JWT}'"
-    # 예시 파일에 없는 값(사람용 조회 계정 비밀번호)은 서버 파일에 넣지 않아요.
-    assert "READONLY_DB_PASSWORD" not in env
+    # 예시 파일에 없는 이름은 서버 파일에 넣지 않아요.
+    assert "UNKNOWN_EXTRA" not in env
+
+
+def test_group_folders_map_to_last_name(tmp_path):
+    """server/discord/DISCORD_BOT_TOKEN → DISCORD_BOT_TOKEN. 그룹은 사람이 알아보기 위한 폴더예요."""
+    code, out, _ = run_make_env(tmp_path, {
+        "discord/DISCORD_BOT_TOKEN": "bot-token", "feature/ENABLE_DISCORD_BOT": "1", "web/CORS_ORIGINS": "https://a,https://b"})
+    assert code == 0, out
+    env = read_env(tmp_path)
+    assert env["DISCORD_BOT_TOKEN"] == "'bot-token'"
+    assert env["ENABLE_DISCORD_BOT"] == "'1'"
+    assert env["CORS_ORIGINS"] == "'https://a,https://b'"
+
+
+def test_same_name_in_two_groups_stops_and_keeps_old_file(tmp_path):
+    """어느 값을 써야 할지 모르니 멈춰요. (조용히 하나를 고르면 엉뚱한 값으로 운영될 수 있어요)"""
+    old = tmp_path / ".env.production"
+    old.write_text("JWT_SECRET='old'\n", encoding="utf-8")
+    code, out, _ = run_make_env(tmp_path, {"auth/JWT_SECRET": "a", "db/JWT_SECRET": "b"})
+    assert code == 1
+    assert "JWT_SECRET" in out
+    assert old.read_text(encoding="utf-8") == "JWT_SECRET='old'\n"
 
 
 def test_missing_values_fall_back_to_example_defaults(tmp_path):
     """SSM 에 없는 값은 예시 파일의 기본값(봇 꺼 둠 0, MVP+ false, 나머지 빈 값)을 써요."""
-    code, out, _ = run_make_env(tmp_path, {"JWT_SECRET": SECRET_JWT})
+    code, out, _ = run_make_env(tmp_path, {"auth/JWT_SECRET": SECRET_JWT})
     assert code == 0, out
     env = read_env(tmp_path)
     assert env["ENABLE_DISCORD_BOT"] == "'0'"
@@ -96,17 +120,19 @@ def test_missing_values_fall_back_to_example_defaults(tmp_path):
 
 
 def test_never_prints_secret_values(tmp_path):
-    code, out, _ = run_make_env(tmp_path, {"DATABASE_URL": SECRET_URL, "JWT_SECRET": SECRET_JWT})
+    code, out, _ = run_make_env(tmp_path, {"db/DATABASE_URL": SECRET_URL, "auth/JWT_SECRET": SECRET_JWT})
     assert code == 0, out
     assert SECRET_URL not in out
     assert SECRET_JWT not in out
 
 
-def test_reads_decrypted_values_under_prod_path(tmp_path):
-    code, out, calls = run_make_env(tmp_path, {"JWT_SECRET": SECRET_JWT})
+def test_reads_decrypted_values_under_server_path_only(tmp_path):
+    """기본 경로는 서버용(server/) 이에요. 사람용(human/)·다른 환경은 읽지 않아요."""
+    code, out, calls = run_make_env(tmp_path, {"auth/JWT_SECRET": SECRET_JWT})
     assert code == 0, out
     assert "ssm get-parameters-by-path" in calls
-    assert "--path /labbridge/prod/" in calls
+    assert "--path /labbridge/prod/server/" in calls
+    assert "--recursive" in calls
     assert "--with-decryption" in calls
 
 
@@ -115,7 +141,7 @@ def test_rejects_single_quote_and_keeps_old_file(tmp_path, bad_value):
     """작은따옴표가 든 값은 안전하게 감쌀 수 없어서 멈추고, 원래 파일을 그대로 둬요."""
     old = tmp_path / ".env.production"
     old.write_text("JWT_SECRET='old'\n", encoding="utf-8")
-    code, out, _ = run_make_env(tmp_path, {"JWT_SECRET": bad_value})
+    code, out, _ = run_make_env(tmp_path, {"auth/JWT_SECRET": bad_value})
     assert code == 1
     assert "JWT_SECRET" in out
     assert old.read_text(encoding="utf-8") == "JWT_SECRET='old'\n"
@@ -127,6 +153,16 @@ def test_aws_failure_keeps_old_file(tmp_path):
     code, out, _ = run_make_env(tmp_path, {}, fail=True)
     assert code == 1
     assert "Parameter Store" in out
+    assert old.read_text(encoding="utf-8") == "JWT_SECRET='old'\n"
+
+
+def test_empty_path_stops_and_keeps_old_file(tmp_path):
+    """값을 새 경로로 옮기기 전에 배포돼도, 빈 값으로 덮어쓰지 않고 멈춰요."""
+    old = tmp_path / ".env.production"
+    old.write_text("JWT_SECRET='old'\n", encoding="utf-8")
+    code, out, _ = run_make_env(tmp_path, {})
+    assert code == 1
+    assert "하나도 없어요" in out
     assert old.read_text(encoding="utf-8") == "JWT_SECRET='old'\n"
 
 
